@@ -81,5 +81,6 @@ unverified. Judge0 tests use the existing provider fake; live execution stays de
 The owner approved G06 staff withdrawal and restoration, now implemented with a
 separate block that covers existing enrollees and pinned revisions while preserving
 committed evaluations. See [withdrawal scope](content-withdrawal-implementation.md).
-Next resolve G08's first-release preset reward mode, retaining owner-deferred
-purchases, rewards and live Judge0 activation in the deferred-feature register.
+The owner approved the first-release Deferred preset reward mode; see
+[G08–G10 scope](game-presets-implementation.md). Retain owner-deferred purchases,
+rewards and live Judge0 activation in the deferred-feature register.

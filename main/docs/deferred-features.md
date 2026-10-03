@@ -21,3 +21,7 @@ authorize guessed fees, rewards, balances or production provider activation.
 Relevant implementation records: [submissions](challenge-submission-implementation.md),
 [weekly events](weekly-challenge-plan.md), [course learning](course-learning-implementation.md),
 [game progression](play-implementation.md).
+
+G08–G10 managed presets explicitly use Deferred rewards under the owner's approved
+first-release scope; they do not unlock monetary/XP/rank rewards. See
+[preset implementation](game-presets-implementation.md).

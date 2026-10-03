@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Content;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Content\SaveModuleRequest;
+use App\Models\GamePreset;
 use App\Models\LearningModule;
 use App\Services\Content\ModulePublishing;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -25,7 +27,7 @@ class ModuleStudioController extends Controller
     {
         Gate::authorize('create', LearningModule::class);
 
-        return response()->view('content.editor', ['module' => null, 'revision' => null])->header('Cache-Control', 'no-store, private');
+        return response()->view('content.editor', ['module' => null, 'revision' => null, 'presets' => $this->presets()])->header('Cache-Control', 'no-store, private');
     }
 
     public function store(SaveModuleRequest $request, ModulePublishing $publishing): RedirectResponse
@@ -40,7 +42,7 @@ class ModuleStudioController extends Controller
     {
         Gate::authorize('viewOwned', $module);
 
-        return response()->view('content.editor', ['module' => $module, 'revision' => $module->latestRevision])->header('Cache-Control', 'no-store, private');
+        return response()->view('content.editor', ['module' => $module, 'revision' => $module->latestRevision, 'presets' => $this->presets()])->header('Cache-Control', 'no-store, private');
     }
 
     public function update(SaveModuleRequest $request, LearningModule $module, ModulePublishing $publishing): RedirectResponse
@@ -74,5 +76,10 @@ class ModuleStudioController extends Controller
         $publishing->submit($request->user(), $request->session()->getId(), $module, (int) $data['record_version']);
 
         return redirect()->route('studio.edit', $module)->with('status', 'Sent for review. You can continue editing after the decision.');
+    }
+
+    private function presets(): Collection
+    {
+        return GamePreset::where('status', 'Active')->whereNotNull('current_revision_id')->with('currentRevision')->orderBy('name')->limit(100)->get();
     }
 }

@@ -14,6 +14,7 @@ use App\Http\Controllers\Account\RecoveryController;
 use App\Http\Controllers\Account\RegistrationController;
 use App\Http\Controllers\Administration\AccountGovernanceController;
 use App\Http\Controllers\Administration\ContentModerationController;
+use App\Http\Controllers\Administration\GamePresetController;
 use App\Http\Controllers\Administration\SystemReportController;
 use App\Http\Controllers\Challenges\ChallengeReviewController;
 use App\Http\Controllers\Challenges\ChallengeStudioController;
@@ -127,6 +128,14 @@ Route::middleware(['auth', 'account.session'])->prefix('manage/accounts')->name(
 });
 Route::get('/account/contributor-application', [ContributorApplicationController::class, 'create'])->middleware(['auth', 'account.session'])->name('contributor-application.create');
 Route::get('/manage/reports', SystemReportController::class)->middleware(['auth', 'account.session', 'throttle:10,1,system-reports:'])->name('system-reports');
+Route::middleware(['auth', 'account.session'])->prefix('manage/game-presets')->name('game-presets.')->group(function (): void {
+    Route::get('/', [GamePresetController::class, 'index'])->name('index');
+    Route::get('/create', [GamePresetController::class, 'create'])->name('create');
+    Route::post('/', [GamePresetController::class, 'store'])->middleware('throttle:10,1,game-presets:')->name('store');
+    Route::get('/{preset}/edit', [GamePresetController::class, 'edit'])->whereNumber('preset')->name('edit');
+    Route::put('/{preset}', [GamePresetController::class, 'update'])->whereNumber('preset')->middleware('throttle:10,1,game-presets:')->name('update');
+    Route::post('/{preset}/inactivate', [GamePresetController::class, 'inactivate'])->whereNumber('preset')->middleware('throttle:10,1,game-presets:')->name('inactivate');
+});
 Route::middleware(['auth', 'account.session'])->prefix('manage/content')->name('content-moderation.')->group(function (): void {
     Route::get('/', [ContentModerationController::class, 'index'])->name('index');
     Route::get('/{kind}/{content}', [ContentModerationController::class, 'show'])->whereIn('kind', ['module', 'course', 'challenge'])->whereNumber('content')->name('show');

@@ -158,6 +158,12 @@ separate staff block from owner archival; only staff restoration can remove it,
 and creator edits/republication must retain it. See
 [content withdrawal](docs/content-withdrawal-implementation.md).
 
+The owner approved G08–G10 Administrator-managed game/quiz presets using existing
+server-validated win rules, explicit Deferred rewards and no XP/KodeBit grants.
+Updates preserve existing module instances; inactivation blocks new use while
+retaining references. Use immutable preset revisions and module snapshots, never
+uploaded executable rules. See [game presets](docs/game-presets-implementation.md).
+
 You are working on **Kody: Gamified Programming Learning Platform and Course Management System (K:GPLPCMS)**.
 
 This repository is a real Laravel application intended for deployment. Treat every production-bound change as maintainable software, not as tutorial, demo, or throwaway coursework.

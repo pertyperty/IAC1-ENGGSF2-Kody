@@ -5,6 +5,7 @@ use App\Actions\Account\RegisterAccount;
 use App\Actions\Account\ReviewInstructorApplication;
 use App\Models\CodingChallenge;
 use App\Models\ContributorApplication;
+use App\Models\GamePreset;
 use App\Models\InstructorApplication;
 use App\Models\LearningCourse;
 use App\Models\LearningModule;
@@ -26,6 +27,7 @@ use App\Services\Challenges\ChallengeSubmissions;
 use App\Services\Content\CourseLearning;
 use App\Services\Content\CoursePublishing;
 use App\Services\Content\ModulePublishing;
+use App\Services\Games\GamePresets;
 use App\Services\Gamification\LearningProgression;
 use App\Services\Gamification\WeeklyEvents;
 use Carbon\Carbon;
@@ -53,6 +55,22 @@ try {
     $session->start();
 
     $result = match ($argv[1]) {
+        'preset-change' => (function () use ($input, $argv): string {
+            $actor = User::findOrFail($input['actor_ids'][(int) $argv[3] - 1]);
+            $preset = GamePreset::findOrFail($input['preset_id']);
+            if ($input['action'] === 'inactivate') {
+                app(GamePresets::class)->inactivate($actor, 'module-test-session', $preset, 1, true);
+            } else {
+                app(GamePresets::class)->save($actor, 'module-test-session', $input['data'], $preset);
+            }
+
+            return 'changed';
+        })(),
+        'preset-create' => (function () use ($input, $argv): string {
+            app(GamePresets::class)->save(User::findOrFail($input['actor_ids'][(int) $argv[3] - 1]), 'module-test-session', $input['data']);
+
+            return 'created';
+        })(),
         'content-moderate' => (function () use ($input, $argv): string {
             app(ContentModeration::class)->change(User::findOrFail($input['actor_ids'][(int) $argv[3] - 1]), 'module-test-session',
                 $input['kind'], $input['content_id'], $input['data']);

@@ -21,6 +21,29 @@ use Symfony\Component\Process\Process;
 
 uses(DatabaseMigrations::class);
 
+test('G09 G10 competing administrator confirmations commit one preset transition and audit', function (string $action) {
+    $preset = presetFixture();
+    $first = moduleAccount(Role::Administrator);
+    $second = moduleAccount(Role::Administrator);
+    $results = simultaneousAccountRequests('preset-change', ['actor_ids' => [$first->id, $second->id], 'preset_id' => $preset->id,
+        'action' => $action, 'data' => presetData(['title' => 'Changed'])], fn () => $preset->newQuery()->whereKey($preset->id)->lockForUpdate()->first());
+    sort($results);
+    expect($results)->toBe(['changed', 'duplicate'])->and($preset->fresh()->record_version)->toBe(2);
+    expect(DB::table('game_preset_revisions')->count())->toBe($action === 'update' ? 2 : 1);
+    expect(DB::table('audit_events')->where('event', $action === 'update' ? 'game_preset.updated' : 'game_preset.inactivated')->count())->toBe(1);
+})->with(['update', 'inactivate']);
+
+test('G08 competing same-name creations commit one preset revision and audit', function () {
+    $first = moduleAccount(Role::Administrator);
+    $second = moduleAccount(Role::Administrator);
+    $results = simultaneousAccountRequests('preset-create', ['actor_ids' => [$first->id, $second->id], 'data' => presetData()],
+        fn () => DB::statement('LOCK TABLE game_presets IN SHARE MODE'));
+    sort($results);
+    expect($results)->toBe(['created', 'duplicate']);
+    expect(DB::table('game_presets')->count())->toBe(1)->and(DB::table('game_preset_revisions')->count())->toBe(1);
+    expect(DB::table('audit_events')->where('event', 'game_preset.created')->count())->toBe(1);
+});
+
 test('G06 simultaneous withdrawal and restoration confirmations commit one state version audit and notice', function (string $kind, string $action) {
     $item = moderationFixture($kind);
     $first = moduleAccount(Role::Moderator);

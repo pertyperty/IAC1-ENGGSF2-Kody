@@ -100,10 +100,8 @@ unverified.
 
 ## Next implementation prompt
 
-G08 requires game preset reward structures, while the owner has deferred reward
-formulas and ledger effects. Resolve an explicit first-release reward mode before
-persisting Admin-managed presets. G09 requires immutable versions for in-use
-presets, and G10 requires preserving references while inactivating them for new
-generation. Existing module snapshots and validated game/quiz win mechanics can
-support that work without arbitrary executable uploads. Keep monetary features
-and live Judge0 activation in the deferred-feature register.
+The owner subsequently approved G08–G10 using existing validated win rules and
+explicit Deferred rewards. The [preset workshop](game-presets-implementation.md)
+preserves immutable versions and module snapshots while inactivation blocks new
+generation. Continue its next prompt; keep monetary features and live Judge0
+activation in the deferred-feature register.
