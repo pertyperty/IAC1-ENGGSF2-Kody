@@ -47,6 +47,11 @@ class UserPolicy
             && $account->account_status === AccountStatus::Active && $account->email_verified_at !== null;
     }
 
+    public function viewReports(User $actor): bool
+    {
+        return $this->viewAny($actor) && $actor->account_role === Role::Administrator;
+    }
+
     public function archive(User $actor, User $account): bool
     {
         return $this->update($actor, $account) && in_array($actor->account_role, [Role::Learner, Role::Contributor, Role::Instructor], true);

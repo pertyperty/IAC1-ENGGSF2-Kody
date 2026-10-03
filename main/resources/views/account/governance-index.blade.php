@@ -9,4 +9,5 @@
 <button class="primary-button">Apply filters</button></form>
 @forelse($accounts as $account)<p><a href="{{ route('account-governance.show', $account) }}">{{ $account->username ?? 'Account #'.$account->id }}</a> · {{ $account->account_role->name }} · {{ $account->account_status->value }}</p>@empty<p>No matching accounts.</p>@endforelse
 {{ $accounts->links() }}
+@can('viewReports', \App\Models\User::class)<p class="secondary-link"><a href="{{ route('system-reports') }}">View system reports</a></p>@endcan
 @endsection

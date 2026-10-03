@@ -77,8 +77,8 @@ Remote CI, browser visual checks, live mail and production deployment are unveri
 
 ## Next implementation prompt
 
-G07 read-only reports can summarize implemented account, content and validated
-learning/submission records without inventing financial or reward results. Keep
+G07 read-only reports now summarize implemented account, content and validated
+learning/submission records; see [report scope](system-reports-implementation.md). Keep
 owner-deferred purchases, paid access, rewards and live Judge0 activation unavailable.
 G06 content withdrawal still needs an approved removal/restoration policy covering
 existing enrollment and pinned revisions before staff can remove published content.
