@@ -103,3 +103,7 @@ archived modules block learner access while preserving history. These decisions
 supersede the older authoring/publication ambiguity described above. See the
 [creator studio implementation](creator-studio-implementation.md) for the
 versioned studio, template attachments, review queue, inbox and delivered scope.
+
+The owner also approved applying the same review policy to new courses and
+published course revisions. Version 1 coding challenges support Python, Java
+and C++; provider compiler IDs remain an integration configuration task.

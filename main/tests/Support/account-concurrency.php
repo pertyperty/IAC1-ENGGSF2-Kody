@@ -4,10 +4,12 @@ use App\Actions\Account\LoginAccount;
 use App\Actions\Account\RegisterAccount;
 use App\Actions\Account\ReviewInstructorApplication;
 use App\Models\InstructorApplication;
+use App\Models\LearningCourse;
 use App\Models\LearningModule;
 use App\Models\User;
 use App\Services\Account\AccountRecoveryService;
 use App\Services\Account\EmailVerificationService;
+use App\Services\Content\CoursePublishing;
 use App\Services\Content\ModulePublishing;
 use App\Services\Gamification\LearningProgression;
 use Illuminate\Contracts\Console\Kernel;
@@ -42,6 +44,12 @@ try {
 
             return 'reviewed';
         })(),
+        'course-review' => (function () use ($input): string {
+            app(CoursePublishing::class)->review(User::findOrFail($input['actor_id']), $input['session_id'], LearningCourse::findOrFail($input['course_id']), 2, 'Approved', null);
+
+            return 'reviewed';
+        })(),
+        'course-save' => app(CoursePublishing::class)->save(User::findOrFail($input['actor_id']), $input['session_id'], $input['data'], LearningCourse::findOrFail($input['course_id'])) ? 'saved' : 'error',
         'module-save' => app(ModulePublishing::class)->save(User::findOrFail($input['actor_id']), $input['session_id'], $input['data'], LearningModule::findOrFail($input['module_id'])) ? 'saved' : 'error',
         'module-complete' => app(LearningProgression::class)->recordModule(User::findOrFail($input['actor_id']), $input['session_id'], $input['module_id'], $input['revision_id'], 'game', ['program' => ['right', 'right', 'up', 'right', 'right']]) ? 'saved' : 'error',
         'login' => strtolower(app(LoginAccount::class)->attempt($input['email'], $input['password'], $session)->name),

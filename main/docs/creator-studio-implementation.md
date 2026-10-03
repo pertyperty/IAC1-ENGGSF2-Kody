@@ -91,17 +91,15 @@ checks passed. All ten migrations execute on clean databases in concurrency
 tests. Remote CI/deployment and authenticated browser visual checks remain
 unverified.
 
-## Remaining scope and next prompt
+## Subsequent scope and next prompt
 
-Courses/ordered composition (D05-D09), private media upload/storage, deletion,
-creator module placement in the ladder, graded quizzes, rewards, paid access and
-notification preferences remain separate features. Module deletion must first
-protect learner activity and future course/challenge dependencies. Existing
-source documents duplicate D01/D02 labels for Create/Edit Course; retain those
-labels in references while using their intended D05/D06 sequence explicitly.
+Owned Instructor course drafts, ordered reusable approved modules, pinned
+previews, reviews and noncritical updates are now implemented in the subsequent
+[course composition slice](course-composition-implementation.md). The owner
+approved extending publication review to courses. Follow that document's next
+prompt for enrollment/access and the remaining archive policy decisions.
 
-Next: build owned Instructor course drafts and ordered module composition with
-constraints, version checks, audits and previews. Before course publication,
-confirm whether the module review policy also applies to new courses and their
-published revisions. Preserve learner access to the approved course version
-while a replacement is reviewed. Paid access must wait for ledger-backed grants.
+Private media upload/storage, deletion, creator module placement in the ladder,
+graded quizzes, rewards, paid access and notification preferences remain separate
+features. Module deletion must protect learner activity and course/challenge
+references. Courses do not yet grant learner enrollment/access or issue rewards.

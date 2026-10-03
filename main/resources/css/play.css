@@ -186,6 +186,7 @@
 .studio-errors { border: 1px solid #edc5a7; border-radius: 12px; background: #fff1e5; padding: 18px; font-size: 14px; }
 .studio-preview { border-top: 1px solid #dce5d2; margin-top: 40px; padding-top: 30px; }
 .studio-preview > h2 { font-size: 28px; }
+.course-slot { display: flex; align-items: end; gap: 16px; margin-bottom: 15px; }.course-slot label { flex: 1; margin: 0; }.course-slot select { margin-top: 8px; }.course-slot button { padding-bottom: 12px; }
 .lesson-text { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 15px; line-height: 1.9; margin-top: 24px; }
 .review-page .game-card { margin-top: 25px; max-width: 640px; }
 @media (max-width: 760px) { .studio-form { padding: 18px; }.site-header nav { gap: 14px; } }

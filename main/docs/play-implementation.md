@@ -4,8 +4,8 @@ Implements the owner's 2026-10-03 game-first amendment, supporting the direction
 of B01/B02/B05 and E01/E05/E06 without claiming their full original scope.
 The public landing game is a real command-grid exercise. Learning has its own
 searchable catalog; modules require current authenticated account sessions.
-Instructors are presented as content creators, with publication clearly marked
-as future functionality.
+Instructors are content creators. The subsequent Content studio implements
+module/course authoring and moderated publication; see its linked scope documents.
 
 ## Template slots
 
@@ -13,9 +13,9 @@ as future functionality.
 `command-garden` template accepts title, instructions, grid, path, start, goal,
 crystals, command limit, mode, hint and learning idea. Sequences, loops and
 conditions share one runtime. `choice-quiz` accepts title, question, options,
-answer and explanation. Creator authoring will replace the built-in instance
-data with authorized, validated, immutable published versions. No upload or
-publication endpoint exists yet.
+answer and explanation. Creator authoring now persists authorized, validated
+instances alongside these built-in trails; approved versions are immutable
+lesson snapshots. Private media uploads remain a separate feature.
 
 Browser validation rejects unsupported IDs/versions, invalid geometry, duplicate
 quiz options and oversized data. Text uses escaped Blade and textContent.

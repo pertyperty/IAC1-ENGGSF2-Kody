@@ -1,8 +1,8 @@
 # A10 instructor / creator approval
 
 Implements A10's review slice, fed by private Pending applications from A01.
-Instructors are Kody's learning content creators. Module authoring/publishing
-and A06 application/resubmission are separate work.
+Instructors are Kody's learning content creators. Subsequent Content milestones
+implement module/course authoring and publication; A06 resubmission is separate.
 
 The owner approved Pending/Approved/Rejected dictionary labels, rejection
 preserving Learner access, Moderator/Administrator review (A10 actors rather
@@ -62,18 +62,12 @@ template tests passed at the play milestone. Browser checks verify public play,
 search and guest login/registration; authenticated reviews use feature tests.
 Remote CI, real SMTP delivery and production deployment remain unverified.
 
-## Next implementation prompt
+## Subsequent implementation
 
-Build a Creator studio for owned module drafts and game/quiz template attachments
-with validated placeholders, private media, record versions, preview and audits.
-D01's Actor says Instructor but its precondition says Contributor or Instructor;
-D02 and the module dictionary identify Instructor. Resolve author roles before
-creation routes. D02 permits creator publication while G06 covers flagged/queued
-moderation; define publication policy before exposing creator content to learners.
-Keep Draft/Published/Archived/Deleted lifecycle labels, with separate moderation
-state if a queue is selected. Built-in practice games are not published creator
-modules; uploads/authoring are not implemented yet.
-
-The owner has now resolved those authoring and publication decisions. The
-[creator studio implementation](creator-studio-implementation.md) records the
-delivered versioned authoring/review workflow and current next-step prompt.
+The owner resolved authoring/publication policy and the subsequent
+[creator studio](creator-studio-implementation.md) implements module drafts,
+typed game/quiz attachments, preview, audit and moderation. The
+[course composition](course-composition-implementation.md) slice adds ordered
+reuse and reviewed course revisions. A06 resubmission and private media uploads
+remain separate work. Follow the course document's next prompt and unresolved
+learner access decisions.

@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\VerificationDelivery;
 use App\Services\Account\AccountRecoveryService;
 use App\Services\Account\EmailVerificationService;
+use App\Services\Content\CoursePublishing;
 use App\Services\Content\ModulePublishing;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Crypt;
@@ -15,6 +16,29 @@ use Illuminate\Support\Facades\DB;
 use Symfony\Component\Process\Process;
 
 uses(DatabaseMigrations::class);
+
+test('D06 concurrent course edits save one replacement and reject stale composition', function () {
+    $course = courseFixture();
+    $ids = $course->latestRevision->modules->pluck('module_id')->all();
+    $results = simultaneousAccountRequests('course-save', ['actor_id' => $course->created_by, 'session_id' => 'module-test-session', 'course_id' => $course->id, 'data' => courseData($ids)],
+        fn () => User::whereKey($course->created_by)->lockForUpdate()->first());
+    sort($results);
+    expect($results)->toBe(['duplicate', 'saved'])->and($course->fresh()->record_version)->toBe(2);
+    $this->assertDatabaseCount('course_revisions', 2);
+    $this->assertDatabaseCount('course_revision_modules', 2);
+});
+
+test('G06 concurrent course reviews publish and notify only once', function () {
+    $course = courseFixture();
+    app(CoursePublishing::class)->submit(User::find($course->created_by), 'module-test-session', $course, 1);
+    $reviewer = moduleAccount(Role::Moderator);
+    $results = simultaneousAccountRequests('course-review', ['actor_id' => $reviewer->id, 'session_id' => 'module-test-session', 'course_id' => $course->id],
+        fn () => User::whereKey($course->created_by)->lockForUpdate()->first());
+    sort($results);
+    expect($results)->toBe(['duplicate', 'reviewed'])->and($course->fresh()->status)->toBe('Published');
+    expect(DB::table('audit_events')->where('event', 'course.reviewed')->count())->toBe(1);
+    expect(DB::table('notifications')->where('type', 'course.reviewed')->count())->toBe(1);
+});
 
 test('D02 concurrent draft edits save one new revision and reject the stale edit', function () {
     $module = moduleFixture();

@@ -111,20 +111,22 @@ actual scope. Those implementations do not establish unmeasured NFR compliance.
 [A04/A05 recovery/profile](recovery-profile-implementation.md) and the
 [play implementation](play-implementation.md) document the subsequent tested
 slices. The play hub now records server-validated daily streaks and level
-clearance; it does not yet issue XP, ranks, KodeBits or creator-published content.
+clearance; it does not yet issue XP, ranks or KodeBits. Creator-published adventures are
+implemented by the Content studio slice.
 
 [A10 creator review](creator-review-implementation.md) adds policy-controlled
 private credential review, atomic role elevation/audit/pending notification and
-stale-write prevention. It grants Instructor access but does not yet implement
-the Creator studio or module publication.
+stale-write prevention. It grants Instructor access; the subsequent Creator studio adds owned module
+authoring and moderated publication.
 
 Requirement conflict detected:
 
 - SRS: 3.1.1 Code Execution API lists Python, Java, C++, JavaScript and PHP;
   3.4 Technical Environment Constraints restrict Version 1 to Python, Java, C++.
 - SDD: 3.3 / 4.1 delegate evaluation behavior to the SRS and do not resolve this.
-- Consequence: language validation and Judge0 mapping cannot be finalized.
-- Recommendation: approve one Version 1 language list before C03/C04 integration.
+- Resolution approved by the owner: Version 1 supports Python, Java and C++.
+  JavaScript/PHP are excluded. Provider compiler IDs still require verification
+  against the configured Judge0 instance before integration.
 
 Requirement conflict detected:
 

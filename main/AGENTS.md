@@ -48,6 +48,18 @@ published revisions, and Published as D03's archive-eligible state. Archived
 modules are hidden from learners while revisions, activity and audit history are
 preserved. See [creator studio](docs/creator-studio-implementation.md).
 
+The owner approved extending the same Moderator/Administrator review policy to
+new courses and published course revisions. Version 1 coding-challenge languages
+are Python, Java and C++, resolving SRS sections 3.1.1 and 3.4; JavaScript and PHP
+are excluded from Version 1. Judge0 language IDs must still be verified against
+the configured provider before integration.
+
+The owner approved reusing owned modules across multiple courses, with each
+course revision pinning its approved module revisions. This supersedes the
+dictionary's single optional course_id representation. Preserve old published
+course content and ordering during draft edits and review. See
+[course composition](docs/course-composition-implementation.md).
+
 You are working on **Kody: Gamified Programming Learning Platform and Course Management System (K:GPLPCMS)**.
 
 This repository is a real Laravel application intended for deployment. Treat every production-bound change as maintainable software, not as tutorial, demo, or throwaway coursework.

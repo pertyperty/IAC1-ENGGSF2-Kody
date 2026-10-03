@@ -6,6 +6,8 @@ use App\Http\Controllers\Account\LoginController;
 use App\Http\Controllers\Account\ProfileController;
 use App\Http\Controllers\Account\RecoveryController;
 use App\Http\Controllers\Account\RegistrationController;
+use App\Http\Controllers\Content\CourseReviewController;
+use App\Http\Controllers\Content\CourseStudioController;
 use App\Http\Controllers\Content\ModuleReviewController;
 use App\Http\Controllers\Content\ModuleStudioController;
 use App\Http\Controllers\Content\PublishedModuleController;
@@ -13,6 +15,8 @@ use App\Http\Controllers\LearningController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PlayController;
 use Illuminate\Support\Facades\Route;
+
+Route::pattern('course', '[0-9]+');
 
 Route::get('/', [LearningController::class, 'home'])->name('home');
 Route::get('/learn', [LearningController::class, 'catalog'])->name('learning.catalog');
@@ -23,6 +27,16 @@ Route::middleware(['auth', 'account.session'])->group(function (): void {
     Route::post('/learn/modules/{module}/revisions/{revision}/game', [PublishedModuleController::class, 'game'])->whereNumber('revision')->middleware('throttle:20,1,module-game:')->name('modules.game');
     Route::post('/learn/modules/{module}/revisions/{revision}/quiz', [PublishedModuleController::class, 'quiz'])->whereNumber('revision')->middleware('throttle:20,1,module-quiz:')->name('modules.quiz');
     Route::get('/create', [ModuleStudioController::class, 'index'])->name('studio.index');
+    Route::get('/create/courses', [CourseStudioController::class, 'index'])->name('courses.index');
+    Route::get('/create/courses/new', [CourseStudioController::class, 'create'])->name('courses.create');
+    Route::post('/create/courses', [CourseStudioController::class, 'store'])->middleware('throttle:10,1,course-create:')->name('courses.store');
+    Route::get('/create/courses/{course}', [CourseStudioController::class, 'edit'])->name('courses.edit');
+    Route::put('/create/courses/{course}', [CourseStudioController::class, 'update'])->middleware('throttle:20,1,course-edit:')->name('courses.update');
+    Route::post('/create/courses/{course}/submit', [CourseStudioController::class, 'submit'])->middleware('throttle:10,1,course-submit:')->name('courses.submit');
+    Route::get('/create/courses/{course}/modules/{slot}', [CourseStudioController::class, 'preview'])->whereNumber('slot')->name('courses.preview');
+    Route::get('/manage/courses', [CourseReviewController::class, 'index'])->name('course-reviews.index');
+    Route::get('/manage/courses/{course}', [CourseReviewController::class, 'show'])->name('course-reviews.show');
+    Route::post('/manage/courses/{course}', [CourseReviewController::class, 'review'])->middleware('throttle:10,1,course-review:')->name('course-reviews.review');
     Route::get('/create/modules/new', [ModuleStudioController::class, 'create'])->name('studio.create');
     Route::post('/create/modules', [ModuleStudioController::class, 'store'])->middleware('throttle:10,1,module-create:')->name('studio.store');
     Route::get('/create/modules/{module}', [ModuleStudioController::class, 'edit'])->name('studio.edit');

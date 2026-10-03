@@ -137,6 +137,10 @@ publication and replacements. Learning shows approved revisions; verified wins
 qualify the Manila daily streak. Creators receive reviews at `/updates` and can
 archive published adventures. See [creator studio scope and verification](docs/creator-studio-implementation.md).
 
+The studio also supports `/create/courses`: versioned course drafts, ordered reuse
+of owned approved adventures, saved previews and course review at `/manage/courses`.
+Learner enrollment remains a separate step. See [course composition scope](docs/course-composition-implementation.md).
+
 The target is Linux EC2, Nginx/PHP-FPM with PHP 8.4.1+, RDS PostgreSQL and S3 where required.
 Set `APP_ENV=production`, `APP_DEBUG=false`, a stable managed `APP_KEY`, HTTPS
 `APP_URL`, `SESSION_SECURE_COOKIE=true`, HttpOnly cookies and SameSite=lax.

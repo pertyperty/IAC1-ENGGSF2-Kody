@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Content;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Content\ReviewModuleRequest;
+use App\Http\Requests\Content\ReviewPublicationRequest;
 use App\Models\LearningModule;
 use App\Models\ModuleRevision;
 use App\Services\Content\ModulePublishing;
@@ -28,7 +28,7 @@ class ModuleReviewController extends Controller
         return response()->view('content.review', ['module' => $module, 'revision' => $module->latestRevision])->header('Cache-Control', 'no-store, private');
     }
 
-    public function review(ReviewModuleRequest $request, LearningModule $module, ModulePublishing $publishing): RedirectResponse
+    public function review(ReviewPublicationRequest $request, LearningModule $module, ModulePublishing $publishing): RedirectResponse
     {
         Gate::authorize('review', $module);
         $publishing->review($request->user(), $request->session()->getId(), $module, (int) $request->validated('record_version'),
