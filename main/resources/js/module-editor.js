@@ -1,8 +1,11 @@
+import { mountGardenDesigner } from './games/garden-designer.js';
+
 export function mountModuleEditor(root) {
     const kind = root.querySelector('[name="assessment_kind"]');
     const type = root.querySelector('[name="type"]');
     const preset = root.querySelector('[name="game_preset"]');
     const presets = JSON.parse(root.dataset.gamePresets);
+    mountGardenDesigner(root, presets);
     let previousPreset = preset.value;
     preset.addEventListener('change', () => {
         for (const [name, slot] of Object.entries({ game_instructions: 'instructions', game_hint: 'hint', game_learning_idea: 'learningIdea' })) {

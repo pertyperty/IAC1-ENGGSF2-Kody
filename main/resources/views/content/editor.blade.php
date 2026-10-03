@@ -40,9 +40,30 @@
                 @if($presets->count() === 100)<p class="field-hint">Showing the first 100 available presets.</p>@endif
                 <label for="preset_title">Activity title</label><input id="preset_title" name="preset_title" maxlength="100" value="{{ old('preset_title', $assessment['title'] ?? 'My adventure') }}">
             </div>
-            <div data-game-fields><h2>Your garden game</h2><p class="field-hint">Choose a trail, then make its prompts your own. The trail controls the goal and movement rules.</p>
+            <div data-game-fields><h2>Your garden game</h2><p class="field-hint">Choose a coding idea, build its world, then make the prompts your own.</p>
                 <label for="game_preset">Trail</label><select id="game_preset" name="game_preset">@foreach(config('learning.modules') as $slug => $preset)<option value="{{ $slug }}" @selected(old('game_preset', $assessment['preset'] ?? 'sequences') === $slug)>{{ $preset['concept'] }}</option>@endforeach</select>
                 @foreach(['game_title' => ['Game title',100], 'game_instructions' => ['Instructions',1000], 'game_hint' => ['Hint',1000], 'game_learning_idea' => ['What they learned',1000]] as $name => [$label,$limit])<label for="{{ $name }}">{{ $label }}</label><textarea id="{{ $name }}" name="{{ $name }}" rows="2" maxlength="{{ $limit }}">{{ old($name, $fields[$name]) }}</textarea>@endforeach
+                @php
+                    $initialGarden = $kind === 'game' ? $assessment : config('learning.instances.sequences');
+                    $initialLayout = array_intersect_key($initialGarden, array_flip(['start', 'goal', 'path', 'crystals']));
+                @endphp
+                <section class="garden-designer" data-garden-designer aria-label="Garden level designer">
+                    <h3>Build a little world</h3><p>Choose a tool, then tap a tile. K marks the start; the flag is your goal. Keyboard: move between tiles with arrows, then press Enter or Space.</p>
+                    <input type="hidden" name="game_layout" value="{{ old('game_layout', json_encode($initialLayout, JSON_THROW_ON_ERROR)) }}">
+                    <div class="designer-tools" aria-label="Painting tools">
+                        <button type="button" data-designer-tool="path" aria-pressed="true">Path</button>
+                        <button type="button" data-designer-tool="start" aria-pressed="false">Kody’s start</button>
+                        <button type="button" data-designer-tool="goal" aria-pressed="false">Goal flag</button>
+                        <button type="button" data-designer-tool="crystal" aria-pressed="false">Crystal</button>
+                    </div>
+                    <p class="field-hint">Sequences and conditions allow 12 instructions. Loops repeat a pattern of up to 3 instructions twice. Conditions can collect up to 4 crystals; the starting tile cannot hold one.</p>
+                    <div class="designer-board" data-designer-board role="group" aria-label="Editable garden, five columns and four rows"></div>
+                    <div class="studio-actions"><button type="button" class="button button-dark" data-designer-preview>Try this level</button><button type="button" class="game-reset" data-designer-reset>Reset trail</button></div>
+                    <p class="field-hint" data-designer-status role="status">Your saved world stays intact until you paint a tile or reset it. Published levels change only after review.</p>
+                    <div data-designer-preview-host></div>
+                    <template>@include('learning.game', ['game' => config('learning.instances.sequences'), 'module' => null, 'designerShell' => true])</template>
+                    <noscript><p>Enable JavaScript to paint and try your world. Saving keeps the current layout.</p></noscript>
+                </section>
             </div>
             <div data-quiz-fields><h2>Your quick quiz</h2><p class="field-hint">Two clear choices, one useful idea. This is a practice quiz with feedback.</p>
                 @foreach(['quiz_title' => ['Quiz title',100], 'quiz_question' => ['Question',500], 'quiz_a' => ['Choice A',300], 'quiz_b' => ['Choice B',300], 'quiz_explanation' => ['Feedback and explanation',1000]] as $name => [$label,$limit])<label for="{{ $name }}">{{ $label }}</label><textarea id="{{ $name }}" name="{{ $name }}" rows="2" maxlength="{{ $limit }}">{{ old($name, $fields[$name]) }}</textarea>@endforeach

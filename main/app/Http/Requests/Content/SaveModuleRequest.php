@@ -25,6 +25,7 @@ class SaveModuleRequest extends FormRequest
             'managed_preset' => ['exclude_unless:assessment_kind,preset', 'required', 'integer', 'min:1'],
             'preset_title' => ['exclude_unless:assessment_kind,preset', 'required', 'string', 'max:100'],
             'game_preset' => ['exclude_unless:assessment_kind,game', 'required', Rule::in(array_keys(config('learning.instances')))],
+            'game_layout' => ['exclude_unless:assessment_kind,game', 'nullable', 'string', 'max:4000'],
             'game_title' => ['exclude_unless:assessment_kind,game', 'required', 'string', 'max:100'],
             'game_instructions' => ['exclude_unless:assessment_kind,game', 'required', 'string', 'max:1000'],
             'game_hint' => ['exclude_unless:assessment_kind,game', 'required', 'string', 'max:1000'],

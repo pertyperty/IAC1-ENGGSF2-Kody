@@ -6,6 +6,12 @@ layered over playable experiences. See the approved
 modular monolith; business use cases are implemented incrementally.
 Read `AGENTS.md` and [architecture conventions](docs/architecture.md) first.
 
+The [creator garden designer](docs/garden-designer-implementation.md) lets
+Instructors paint paths, move objectives and add crystals, then play a preview
+before saving. The server rejects unsolvable layouts; published revisions remain
+unchanged until review. Google OAuth live setup is now explicitly deferred in the
+[deferred-feature register](docs/deferred-features.md).
+
 [Google sign-in](docs/google-authentication-implementation.md) supports explicitly
 linked existing verified accounts, with password-confirmed linking/unlinking,
 PKCE, single-use callback records and existing account/session restrictions.
