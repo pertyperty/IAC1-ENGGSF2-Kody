@@ -25,6 +25,11 @@ class CodingChallengePolicy
         return $this->viewOwned($user, $challenge) && in_array($challenge->status, ['Draft', 'Published'], true);
     }
 
+    public function delete(User $user, CodingChallenge $challenge): bool
+    {
+        return $this->viewOwned($user, $challenge);
+    }
+
     public function archive(User $user, CodingChallenge $challenge): bool
     {
         return $this->viewOwned($user, $challenge) && $challenge->status === 'Published';

@@ -13,9 +13,10 @@ D01/D02) and intended D07 assignment (its source heading incorrectly says D09)
 are implemented. G06's publication subset and noncritical F05 notifications also
 cover courses. This composition milestone did not include lifecycle removal,
 enrollment or financial effects. The subsequent [course learning milestone](course-learning-implementation.md)
-implements free B03/B04 enrollment/access and D08 archiving. D09 deletion and
-financial effects remain unavailable; owner/reviewer previews do not grant
-learner access.
+implements free B03/B04 enrollment/access and D08 archiving. The subsequent
+[content deletion milestone](content-deletion-implementation.md) implements D09
+only without retained dependencies. Financial effects remain unavailable;
+owner/reviewer previews do not grant learner access.
 
 The owner separately resolved SRS 3.1.1 versus 3.4: Version 1 code challenges
 support Python, Java and C++ only. `config/challenges.php` records that scope.

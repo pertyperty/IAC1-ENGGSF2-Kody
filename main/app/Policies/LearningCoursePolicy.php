@@ -35,6 +35,11 @@ class LearningCoursePolicy
         return $this->create($user) && $course->created_by === $user->id && $course->status !== 'Deleted';
     }
 
+    public function delete(User $user, LearningCourse $course): bool
+    {
+        return $this->viewOwned($user, $course);
+    }
+
     public function archive(User $user, LearningCourse $course): bool
     {
         return $this->viewOwned($user, $course) && $course->status === 'Published';

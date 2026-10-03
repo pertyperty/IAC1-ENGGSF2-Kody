@@ -10,6 +10,14 @@ validated completion. Course reactions also require enrollment. Catalog browsing
 creator/staff previews and browser assertions do not qualify. See
 [content feedback](docs/content-feedback-implementation.md).
 
+For D04/D09/C07, the owner approved preserving all retained dependencies, even
+after they become inactive. Learner history, pinned course revisions, weekly
+events, feedback and moderation history block permanent deletion; offer archival
+when eligible instead. Only dependency-free owned content may be permanently
+deleted after explicit confirmation and a locked dependency recheck. Ordinary
+authoring audits remain durable references. See
+[content deletion](docs/content-deletion-implementation.md).
+
 ### Product direction amendment — approved 2026-10-03
 
 Kody is a game-first coding platform. The project owner explicitly approved this

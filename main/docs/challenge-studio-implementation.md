@@ -63,9 +63,10 @@ C06 permits the owning Contributor/Instructor to confirm archiving a Published
 challenge with its current version. The challenge leaves public browsing and
 review queues, blocks future editing/public access, and retains all revisions,
 test snapshots, publication pointer, notifications and audit records. The owner
-can still view the archived studio. No restore or C07 permanent deletion exists.
-There are no learner submissions yet; their future schema must reference stable
-challenge revisions and preserve existing archive/history protections.
+can still view the archived studio. There is no creator restoration flow. The
+subsequent [content deletion milestone](content-deletion-implementation.md) adds
+C07 only without retained dependencies. [Challenge submissions](challenge-submission-implementation.md)
+now pin stable revisions and preserve existing archive/history protections.
 
 ## Ownership, integrity and security
 

@@ -22,6 +22,30 @@ use Symfony\Component\Process\Process;
 
 uses(DatabaseMigrations::class);
 
+test('D04 D09 C07 simultaneous deletion commits one purge and audit', function (string $kind) {
+    $content = moderationFixture($kind);
+    $results = simultaneousAccountRequests('content-delete', ['actor_ids' => [$content->created_by, $content->created_by],
+        'actions' => ['delete', 'delete'], 'kind' => $kind, 'content_id' => $content->id, 'version' => $content->record_version],
+        fn () => $content->newQuery()->whereKey($content->id)->lockForUpdate()->first());
+    sort($results);
+    expect($results)->toBe(['deleted', 'missing'])->and($content->fresh())->toBeNull();
+    expect(DB::table('audit_events')->where('event', $kind.'.deleted')->count())->toBe(1);
+})->with(['module', 'course', 'challenge']);
+
+test('D04 a simultaneous opening and deletion preserve either the learner reference or complete deletion', function () {
+    $content = moduleFixture(true);
+    $learner = moduleAccount(Role::Learner);
+    $results = simultaneousAccountRequests('content-delete', ['actor_ids' => [$content->created_by, $learner->id],
+        'actions' => ['delete', 'open'], 'kind' => 'module', 'content_id' => $content->id, 'version' => $content->record_version],
+        fn () => $content->newQuery()->whereKey($content->id)->lockForUpdate()->first());
+    sort($results);
+    if ($content->fresh() === null) {
+        expect($results)->toBe(['deleted', 'missing'])->and(DB::table('content_accesses')->where('module_id', $content->id)->count())->toBe(0);
+    } else {
+        expect($results)->toBe(['duplicate', 'opened'])->and(DB::table('content_accesses')->where('module_id', $content->id)->count())->toBe(1);
+    }
+});
+
 test('B10 simultaneous reactions serialize duplicate retries competing choices and independent users', function (string $case) {
     $item = moduleFixture(true);
     $first = moduleAccount(Role::Learner);

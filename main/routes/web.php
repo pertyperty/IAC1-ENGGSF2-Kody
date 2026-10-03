@@ -22,6 +22,7 @@ use App\Http\Controllers\Challenges\ChallengeStudioController;
 use App\Http\Controllers\Challenges\ChallengeSubmissionController;
 use App\Http\Controllers\Challenges\PublishedChallengeController;
 use App\Http\Controllers\Challenges\WeeklyChallengeController;
+use App\Http\Controllers\Content\ContentDeletionController;
 use App\Http\Controllers\Content\CourseLearningController;
 use App\Http\Controllers\Content\CourseReviewController;
 use App\Http\Controllers\Content\CourseStudioController;
@@ -134,6 +135,8 @@ Route::get('/manage/reports', SystemReportController::class)->middleware(['auth'
 Route::get('/help', [HelpController::class, 'index'])->middleware('throttle:30,1,help:')->name('help.index');
 Route::post('/feedback/{kind}/{content}', [ContentReactionController::class, 'store'])->whereIn('kind', ['module', 'course', 'challenge'])->whereNumber('content')
     ->middleware(['auth', 'account.session', 'throttle:20,1,content-feedback:'])->name('content-reactions.store');
+Route::get('/create/content/{kind}/{content}/delete', [ContentDeletionController::class, 'show'])->whereIn('kind', ['module', 'course', 'challenge'])->whereNumber('content')->middleware(['auth', 'account.session'])->name('content-deletion.show');
+Route::post('/create/content/{kind}/{content}/delete', [ContentDeletionController::class, 'store'])->whereIn('kind', ['module', 'course', 'challenge'])->whereNumber('content')->middleware(['auth', 'account.session', 'throttle:5,1,content-delete:'])->name('content-deletion.store');
 Route::get('/help/{entry}', [HelpController::class, 'show'])->whereNumber('entry')->middleware('throttle:30,1,help:')->name('help.show');
 Route::middleware(['auth', 'account.session'])->prefix('manage/faqs')->name('faq-management.')->group(function (): void {
     Route::get('/', [FaqController::class, 'index'])->name('index');

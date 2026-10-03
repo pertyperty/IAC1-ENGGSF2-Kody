@@ -54,5 +54,7 @@
     @if($revision?->review_status === 'Draft' && $module?->status !== 'Archived')<form method="post" action="{{ route('studio.submit', $module) }}" class="studio-actions">@csrf<input type="hidden" name="record_version" value="{{ $module->record_version }}"><button class="button button-dark" type="submit">Submit saved draft for review →</button></form>@endif
     @if($module?->status === 'Published')<p><a class="quiet-link" href="{{ route('studio.archive-confirmation', $module) }}">Archive this adventure</a></p>@endif
     @if($revision)<section class="studio-preview"><h2>Try your saved adventure</h2><p class="field-hint">This preview uses your last saved draft. Preview wins stay here.</p>@include('content.lesson', ['module' => null, 'preview' => true])</section>@endif
+@if($module)@can('delete', $module)<p><a class="quiet-link" href="{{ route('content-deletion.show', ['module', $module->id]) }}">Delete this module →</a></p>@endcan
+@endif
 </section>
 @endsection

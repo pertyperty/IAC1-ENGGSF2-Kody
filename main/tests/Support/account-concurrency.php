@@ -24,8 +24,10 @@ use App\Services\Administration\ContentModeration;
 use App\Services\Administration\FaqManagement;
 use App\Services\Administration\ModeratorAppointments;
 use App\Services\Administration\SupportProfileCorrections;
+use App\Services\Challenges\ChallengeDeletion;
 use App\Services\Challenges\ChallengePublishing;
 use App\Services\Challenges\ChallengeSubmissions;
+use App\Services\Content\ContentDeletion;
 use App\Services\Content\CourseLearning;
 use App\Services\Content\CoursePublishing;
 use App\Services\Content\ModulePublishing;
@@ -37,6 +39,7 @@ use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
@@ -58,6 +61,19 @@ try {
     $session->start();
 
     $result = match ($argv[1]) {
+        'content-delete' => (function () use ($input, $argv): string {
+            $index = (int) $argv[3] - 1;
+            $actor = User::findOrFail($input['actor_ids'][$index]);
+            if ($input['actions'][$index] === 'open') {
+                app(ContentFeedback::class)->read($actor, 'module-test-session', 'module', $input['content_id'], true);
+
+                return 'opened';
+            }
+            $service = app($input['kind'] === 'challenge' ? ChallengeDeletion::class : ContentDeletion::class);
+            $service->delete($actor, 'module-test-session', $input['kind'], $input['content_id'], $input['version'], true);
+
+            return 'deleted';
+        })(),
         'content-react' => (function () use ($input, $argv): string {
             $index = (int) $argv[3] - 1;
             app(ContentFeedback::class)->change(User::findOrFail($input['actor_ids'][$index]), 'module-test-session',
@@ -231,6 +247,13 @@ try {
     echo $result."\n";
 } catch (ValidationException) {
     echo "duplicate\n";
+} catch (ModelNotFoundException) {
+    if ($argv[1] === 'content-delete') {
+        echo "missing\n";
+    } else {
+        echo "error\n";
+        exit(1);
+    }
 } catch (Throwable) {
     // Test diagnostics must never print input tokens, credentials or provider details.
     echo "error\n";

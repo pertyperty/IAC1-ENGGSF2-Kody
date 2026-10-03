@@ -35,5 +35,7 @@
     @can('archive', $course)<p><a class="quiet-link" href="{{ route('courses.archive-confirmation', $course) }}">Archive this course</a></p>@endcan
     @if($course?->status === 'Archived')<p class="lesson-note">This course is archived. Enrollments and progress are retained; new learners cannot enroll. Existing learners can continue while no staff withdrawal is active.</p>@endif
     @if($revision)<h2>Try your saved journey</h2>@include('content.course-outline')@endif
+@if($course)@can('delete', $course)<p><a class="quiet-link" href="{{ route('content-deletion.show', ['course', $course->id]) }}">Delete this course →</a></p>@endcan
+@endif
 </section>
 @endsection

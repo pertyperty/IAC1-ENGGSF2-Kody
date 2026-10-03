@@ -73,8 +73,8 @@ completion/weekly/security checks); cached configuration/routes/views 193 tests 
 
 ## Next implementation prompt
 
-Resolve permanent creator content deletion (D04/D09/C07): published content may
-have pinned course revisions, enrollment, evaluations, weekly events, reactions
-and audit history. Determine deletion eligibility and retained learner access
-before implementing irreversible removal. Keep paid purchases, reward formulas,
-numeric ratings and live Judge0 activation in the deferred-feature register.
+The owner subsequently approved preserving all retained dependencies, even after
+they become inactive. [Content deletion](content-deletion-implementation.md)
+implements dependency-free D04/D09/C07 deletion and preserves archival alternatives.
+Its next prompt records the pending Google identity linking decision. Keep paid
+purchases, reward formulas, numeric ratings and live Judge0 activation deferred.

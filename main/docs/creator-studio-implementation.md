@@ -16,6 +16,10 @@ activity and audit history remain.
 
 ## Delivered scope
 
+The subsequent [content deletion milestone](content-deletion-implementation.md)
+adds D04 permanent removal only without retained dependencies; existing course
+pins, learner history and governance records remain protected through archival.
+
 - D01: Instructor studio at `/create`, owned drafts with title (150 characters),
   description, plain text/code lesson, Article/Interactive/Video formats and
   optional assessments. Interactive requires an assessment. Video uses an HTTPS

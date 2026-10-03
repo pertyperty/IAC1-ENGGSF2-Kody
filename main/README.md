@@ -12,6 +12,12 @@ opening available content. Enrolled courses also accept feedback; choices can be
 replaced or removed without interrupting game practice. Numeric ratings and
 rewards remain deferred. Deploy the additive feedback migration and rebuild assets.
 
+[Creator deletion](docs/content-deletion-implementation.md) removes dependency-free
+owned modules, courses and challenges after explicit confirmation. Retained
+learner/course/weekly/feedback/moderation history blocks permanent deletion and
+preserves the existing archival option. An additive migration indexes retained
+learner audit references; it preserves all stored history.
+
 ## Development setup
 
 Commands below run from the Laravel directory (`main/` in this repository).

@@ -29,6 +29,11 @@ class LearningModulePolicy
         return $this->create($user) && $module->created_by === $user->id && $module->status !== 'Deleted';
     }
 
+    public function delete(User $user, LearningModule $module): bool
+    {
+        return $this->viewOwned($user, $module);
+    }
+
     public function archive(User $user, LearningModule $module): bool
     {
         return $this->viewOwned($user, $module) && $module->status === 'Published';
