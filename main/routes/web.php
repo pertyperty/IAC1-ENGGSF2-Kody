@@ -28,6 +28,7 @@ use App\Http\Controllers\Content\CourseStudioController;
 use App\Http\Controllers\Content\ModuleReviewController;
 use App\Http\Controllers\Content\ModuleStudioController;
 use App\Http\Controllers\Content\PublishedModuleController;
+use App\Http\Controllers\Engagement\ContentReactionController;
 use App\Http\Controllers\Gamification\WeeklyEventStudioController;
 use App\Http\Controllers\HelpController;
 use App\Http\Controllers\LearningController;
@@ -131,6 +132,8 @@ Route::middleware(['auth', 'account.session'])->prefix('manage/accounts')->name(
 Route::get('/account/contributor-application', [ContributorApplicationController::class, 'create'])->middleware(['auth', 'account.session'])->name('contributor-application.create');
 Route::get('/manage/reports', SystemReportController::class)->middleware(['auth', 'account.session', 'throttle:10,1,system-reports:'])->name('system-reports');
 Route::get('/help', [HelpController::class, 'index'])->middleware('throttle:30,1,help:')->name('help.index');
+Route::post('/feedback/{kind}/{content}', [ContentReactionController::class, 'store'])->whereIn('kind', ['module', 'course', 'challenge'])->whereNumber('content')
+    ->middleware(['auth', 'account.session', 'throttle:20,1,content-feedback:'])->name('content-reactions.store');
 Route::get('/help/{entry}', [HelpController::class, 'show'])->whereNumber('entry')->middleware('throttle:30,1,help:')->name('help.show');
 Route::middleware(['auth', 'account.session'])->prefix('manage/faqs')->name('faq-management.')->group(function (): void {
     Route::get('/', [FaqController::class, 'index'])->name('index');
