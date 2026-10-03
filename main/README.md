@@ -170,6 +170,9 @@ resubmit after rejection, with private credentials and prior decisions preserved
 See [A06 scope and verification](docs/profile-editing-implementation.md).
 Paid purchases and other postponed scope are tracked in the
 [deferred-feature register](docs/deferred-features.md).
+Learners, Contributors and Instructors can archive their own accounts with
+password confirmation, retaining data and returning through A04 recovery.
+See [A07 archival scope](docs/account-archival-implementation.md).
 
 The target is Linux EC2, Nginx/PHP-FPM with PHP 8.4.1+, RDS PostgreSQL and S3 where required.
 Set `APP_ENV=production`, `APP_DEBUG=false`, a stable managed `APP_KEY`, HTTPS

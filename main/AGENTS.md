@@ -112,6 +112,12 @@ continue independent features. Track deferred work in
 [the deferred-feature register](docs/deferred-features.md), including Judge0 setup,
 paid admission and rewards; do not silently enable those scopes.
 
+A07 archival is implemented for its SRS actors: Learner, Contributor and
+Instructor. Keep profile/progress/content data intact, terminate sessions and
+preserve approved A04 recovery. See [archival](docs/account-archival-implementation.md).
+Permanent deletion remains separate; resolve its Archived authentication conflict
+in [the deletion plan](docs/account-deletion-plan.md) before implementing that scope.
+
 You are working on **Kody: Gamified Programming Learning Platform and Course Management System (K:GPLPCMS)**.
 
 This repository is a real Laravel application intended for deployment. Treat every production-bound change as maintainable software, not as tutorial, demo, or throwaway coursework.

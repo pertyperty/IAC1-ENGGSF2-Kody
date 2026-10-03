@@ -68,8 +68,9 @@ so assess compatibility before rolling back. Object retention/deletion needs a
 privacy-aware policy before implementing account deletion; this change preserves
 the owner-approved version history and does not claim regulatory compliance.
 
-A07 account archival, account deletion and administrative account editing remain
-separate. Profile editing does not provide self-assigned Contributor or privileged
+A07 account archival is implemented in its [follow-up](account-archival-implementation.md).
+Account deletion and administrative account editing remain separate.
+Profile editing does not provide self-assigned Contributor or privileged
 roles. Judge0 API-plan setup remains deferred as previously approved.
 
 ## Verification

@@ -62,6 +62,6 @@ fallback warning remains. No live providers, remote CI or deployment were run.
 A06 own-account editing and existing-account Instructor applications are now
 implemented in the [profile editing follow-up](profile-editing-implementation.md)
 under the owner's approved sensitive-field, actor and resubmission decisions.
-A07 archival remains separate: preserve approved A04 recovery eligibility,
-durable audit history, immediate authorization checks and account row locking.
+A07 archival is implemented in the [archival follow-up](account-archival-implementation.md)
+with approved A04 recovery eligibility, durable audit history and account locking.
 Keep the playable game hub, separate Learning catalog and creator workflows.

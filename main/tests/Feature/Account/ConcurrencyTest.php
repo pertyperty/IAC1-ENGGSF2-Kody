@@ -24,6 +24,15 @@ afterEach(function () {
     $this->artisan('migrate:fresh')->assertSuccessful();
 });
 
+test('A07 competing archive confirmations change status and audit exactly once', function () {
+    $user = moduleAccount(Role::Learner);
+    $results = simultaneousAccountRequests('account-archive', ['actor_id' => $user->id, 'session_id' => 'module-test-session', 'data' => archiveData($user)],
+        fn () => User::whereKey($user->id)->lockForUpdate()->first());
+    sort($results);
+    expect($results)->toBe(['archived', 'revoked']);
+    expect(DB::table('audit_events')->where('event', 'account.archived')->count())->toBe(1);
+});
+
 test('A06 simultaneous creator applications save one pending version and clean up the losing upload', function () {
     Storage::fake('local');
     $user = moduleAccount(Role::Learner);

@@ -9,6 +9,7 @@ use App\Models\LearningCourse;
 use App\Models\LearningModule;
 use App\Models\User;
 use App\Models\WeeklyEvent;
+use App\Services\Account\AccountArchival;
 use App\Services\Account\AccountRecoveryService;
 use App\Services\Account\EmailVerificationService;
 use App\Services\Account\InstructorApplications;
@@ -22,6 +23,7 @@ use App\Services\Gamification\LearningProgression;
 use App\Services\Gamification\WeeklyEvents;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Crypt;
@@ -44,6 +46,15 @@ try {
     $session->start();
 
     $result = match ($argv[1]) {
+        'account-archive' => (function () use ($input): string {
+            try {
+                app(AccountArchival::class)->archive(User::findOrFail($input['actor_id']), $input['session_id'], $input['data']);
+
+                return 'archived';
+            } catch (AuthorizationException) {
+                return 'revoked';
+            }
+        })(),
         'creator-apply' => (function () use ($input): string {
             config(['filesystems.disks.local.root' => $input['storage_root']]);
             app(InstructorApplications::class)->submit(User::findOrFail($input['actor_id']), $input['session_id'], $input['data'],
