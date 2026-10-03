@@ -135,4 +135,15 @@ each future weekly event receives an independent three-attempt budget. The curre
 release offers free participation to verified Active Learners, Contributors and
 Instructors. Paid access, rank gates and prerequisites await supporting modules.
 See [challenge submissions](challenge-submission-implementation.md) for delivered
-scope, provider activation requirements and the still-deferred weekly workflow.
+scope and provider activation requirements. The weekly workflow is implemented
+in the [weekly event follow-up](weekly-challenge-plan.md).
+
+## Weekly event amendment — approved 2026-10-03
+
+Weekly windows run Sunday 00:00 to the following Sunday 00:00 in Asia/Manila,
+including the start and excluding the closing time. The first event release offers
+free participation with independent three-attempt budgets and verified results;
+XP, rank changes and KodeBit rewards stay deferred. Judge0 plan/credential setup
+is also deferred. The owner approved future Scheduled events while one current
+event is active; each event becomes immutable at its start. See
+[weekly events](weekly-challenge-plan.md) for implementation.

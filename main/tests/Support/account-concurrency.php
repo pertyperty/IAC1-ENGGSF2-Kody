@@ -8,6 +8,7 @@ use App\Models\InstructorApplication;
 use App\Models\LearningCourse;
 use App\Models\LearningModule;
 use App\Models\User;
+use App\Models\WeeklyEvent;
 use App\Services\Account\AccountRecoveryService;
 use App\Services\Account\EmailVerificationService;
 use App\Services\Challenges\ChallengePublishing;
@@ -16,6 +17,9 @@ use App\Services\Content\CourseLearning;
 use App\Services\Content\CoursePublishing;
 use App\Services\Content\ModulePublishing;
 use App\Services\Gamification\LearningProgression;
+use App\Services\Gamification\WeeklyEvents;
+use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
@@ -28,11 +32,30 @@ $app->make(Kernel::class)->bootstrap();
 
 try {
     $input = json_decode(Crypt::decryptString(file_get_contents($argv[2])), true, flags: JSON_THROW_ON_ERROR);
+    if (isset($input['clock'])) {
+        Carbon::setTestNow(CarbonImmutable::parse($input['clock']));
+        CarbonImmutable::setTestNow(CarbonImmutable::parse($input['clock']));
+    }
     DB::statement("SET application_name = 'kody-account-concurrency'");
     $session = app('session')->driver();
     $session->start();
 
     $result = match ($argv[1]) {
+        'weekly-configure' => app(WeeklyEvents::class)->configure(User::findOrFail($input['actor_ids'][(int) $argv[3] - 1]), 'module-test-session', $input['data']) ? 'configured' : 'error',
+        'weekly-sync' => (function (): string {
+            app(WeeklyEvents::class)->synchronize();
+
+            return 'synchronized';
+        })(),
+        'weekly-attempt' => (function () use ($input): string {
+            config($input['judge_config']);
+            $data = $input['data'];
+            if ($input['distinct']) {
+                $data['confirmation_id'] = (string) Str::uuid();
+            }
+
+            return app(ChallengeSubmissions::class)->submit(User::findOrFail($input['actor_id']), 'module-test-session', CodingChallenge::findOrFail($input['challenge_id']), $data, WeeklyEvent::findOrFail($input['event_id'])) ? 'attempted' : 'error';
+        })(),
         'register' => app(RegisterAccount::class)->handle($input) ? 'created' : 'error',
         'resend' => app(EmailVerificationService::class)->request(User::where('email', $input['email'])->sole()) ? 'queued' : 'limited',
         'verify' => app(EmailVerificationService::class)->verify($input['token']) ? 'verified' : 'invalid',

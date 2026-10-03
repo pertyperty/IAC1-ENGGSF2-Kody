@@ -7,6 +7,7 @@ use App\Http\Requests\Challenges\SubmitCodeRequest;
 use App\Models\ChallengeSubmission;
 use App\Models\CodingChallenge;
 use App\Models\CodingChallengeRevision;
+use App\Models\WeeklyEvent;
 use App\Services\Challenges\ChallengeSubmissions;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -27,8 +28,9 @@ class ChallengeSubmissionController extends Controller
     {
         Gate::authorize('view', $submission);
         $revision = CodingChallengeRevision::findOrFail($submission->revision_id, ['id', 'title', 'number', 'language']);
+        $weeklyEvent = $submission->weekly_event_id === null ? null : WeeklyEvent::findOrFail($submission->weekly_event_id);
 
-        return response()->view('challenges.attempt', compact('submission', 'revision'))->header('Cache-Control', 'no-store, private');
+        return response()->view('challenges.attempt', compact('submission', 'revision', 'weeklyEvent'))->header('Cache-Control', 'no-store, private');
     }
 
     public function status(Request $request, ChallengeSubmission $submission): JsonResponse

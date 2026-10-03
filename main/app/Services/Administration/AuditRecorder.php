@@ -7,7 +7,7 @@ use Illuminate\Support\Str;
 
 class AuditRecorder
 {
-    public function record(int $actorId, int $subjectUserId, string $event, string $subjectType, string $subjectId, array $context = []): void
+    public function record(?int $actorId, ?int $subjectUserId, string $event, string $subjectType, string $subjectId, array $context = []): void
     {
         DB::table('audit_events')->insert(['id' => (string) Str::uuid(), 'actor_id' => $actorId,
             'subject_user_id' => $subjectUserId, 'event' => $event, 'subject_type' => $subjectType,

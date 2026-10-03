@@ -10,12 +10,14 @@ use App\Http\Controllers\Challenges\ChallengeReviewController;
 use App\Http\Controllers\Challenges\ChallengeStudioController;
 use App\Http\Controllers\Challenges\ChallengeSubmissionController;
 use App\Http\Controllers\Challenges\PublishedChallengeController;
+use App\Http\Controllers\Challenges\WeeklyChallengeController;
 use App\Http\Controllers\Content\CourseLearningController;
 use App\Http\Controllers\Content\CourseReviewController;
 use App\Http\Controllers\Content\CourseStudioController;
 use App\Http\Controllers\Content\ModuleReviewController;
 use App\Http\Controllers\Content\ModuleStudioController;
 use App\Http\Controllers\Content\PublishedModuleController;
+use App\Http\Controllers\Gamification\WeeklyEventStudioController;
 use App\Http\Controllers\LearningController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PlayController;
@@ -23,12 +25,18 @@ use Illuminate\Support\Facades\Route;
 
 Route::pattern('course', '[0-9]+');
 Route::pattern('challenge', '[0-9]+');
+Route::pattern('weeklyEvent', '[0-9]+');
 
 Route::get('/', [LearningController::class, 'home'])->name('home');
 Route::get('/learn', [LearningController::class, 'catalog'])->name('learning.catalog');
 Route::get('/learn/courses', [CourseLearningController::class, 'catalog'])->name('course-learning.catalog');
 Route::get('/challenges', [PublishedChallengeController::class, 'catalog'])->name('challenges.catalog');
 Route::middleware(['auth', 'account.session'])->group(function (): void {
+    Route::get('/weekly', [WeeklyChallengeController::class, 'index'])->name('weekly-events.index');
+    Route::get('/weekly/{weeklyEvent}', [WeeklyChallengeController::class, 'show'])->name('weekly-events.show');
+    Route::post('/weekly/{weeklyEvent}/attempts', [WeeklyChallengeController::class, 'store'])->middleware('throttle:10,1,weekly-attempt:')->name('weekly-events.attempt');
+    Route::get('/manage/weekly-events', [WeeklyEventStudioController::class, 'index'])->name('weekly-studio.index');
+    Route::post('/manage/weekly-events', [WeeklyEventStudioController::class, 'store'])->middleware('throttle:10,1,weekly-configure:')->name('weekly-studio.store');
     Route::get('/challenges/{challenge}', [PublishedChallengeController::class, 'show'])->name('challenges.show');
     Route::post('/challenges/{challenge}/attempts', [ChallengeSubmissionController::class, 'store'])->middleware('throttle:10,1,challenge-attempt:')->name('challenge-attempts.store');
     Route::get('/challenge-attempts/{submission}', [ChallengeSubmissionController::class, 'show'])->whereUuid('submission')->name('challenge-attempts.show');

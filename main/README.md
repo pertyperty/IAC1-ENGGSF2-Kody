@@ -156,6 +156,13 @@ until configured Judge0 compiler IDs and limits pass `php artisan kody:judge0-ch
 See [submission setup and scope](docs/challenge-submission-implementation.md) and
 [challenge studio scope](docs/challenge-studio-implementation.md).
 
+The Play hub now presents weekly quests with their own three-attempt budgets.
+Moderators configure approved, revision-pinned events at `/manage/weekly-events`;
+the Laravel scheduler activates the Sunday-to-Sunday Manila cycle and selects an
+approved quest when no manual selection exists. Private history lives at `/weekly`.
+Judge0 setup and all XP/rank/KodeBit rewards remain deferred. See
+[weekly event scope](docs/weekly-challenge-plan.md).
+
 The target is Linux EC2, Nginx/PHP-FPM with PHP 8.4.1+, RDS PostgreSQL and S3 where required.
 Set `APP_ENV=production`, `APP_DEBUG=false`, a stable managed `APP_KEY`, HTTPS
 `APP_URL`, `SESSION_SECURE_COOKIE=true`, HttpOnly cookies and SameSite=lax.

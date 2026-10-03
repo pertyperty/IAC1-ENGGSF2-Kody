@@ -187,7 +187,7 @@ function simultaneousAccountRequests(string $mode, array $input, Closure $lock):
     try {
         $lock();
         foreach (range(1, 2) as $index) {
-            $process = new Process([PHP_BINARY, base_path('tests/Support/account-concurrency.php'), $mode, $inputPath], base_path(), timeout: 30);
+            $process = new Process([PHP_BINARY, base_path('tests/Support/account-concurrency.php'), $mode, $inputPath, (string) $index], base_path(), timeout: 30);
             $process->start();
             $processes[] = $process;
         }

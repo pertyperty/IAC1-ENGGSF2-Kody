@@ -81,7 +81,7 @@ The owner approved evaluating every confirmed challenge submission, with at most
 one active evaluation per user/challenge context and committed evaluation
 continuing after the browser closes. Standard challenges have three attempts per
 user across all published revisions. Each weekly event will have its own separate
-three-attempt budget; weekly event participation is not implemented yet. Current
+three-attempt budget. Current
 authored challenges offer free participation to verified Active Learners,
 Contributors and Instructors; token, rank and prerequisite gates await their
 supporting rules and modules. See [challenge submissions](docs/challenge-submission-implementation.md).
@@ -90,8 +90,12 @@ The owner selected Judge0 CE at https://judge0-ce.p.rapidapi.com but deferred
 API-plan setup and credentials. Keep live execution disabled until the owner is
 ready; use provider fakes and continue independent development in the meantime.
 The owner approved free weekly participation with verified results first and
-deferred XP/rank/KodeBit rewards. The weekly timezone and closing boundary remain
-pending; see [the weekly event plan](docs/weekly-challenge-plan.md).
+deferred XP/rank/KodeBit rewards. Weekly windows run from Sunday 00:00 to the next
+Sunday 00:00 in Asia/Manila, inclusive start and exclusive end. See
+[weekly event implementation](docs/weekly-challenge-plan.md). The owner approved
+future Scheduled events while the current event is active, resolving E02's
+no-active-event configuration precondition. Enforce one Active event and keep
+each event immutable after its start.
 
 You are working on **Kody: Gamified Programming Learning Platform and Course Management System (K:GPLPCMS)**.
 

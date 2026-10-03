@@ -63,6 +63,7 @@ test('A03 wrong passwords do not disclose restricted status', function () {
 });
 
 test('A03 lockouts follow the approved schedule and do not reset on cooldown', function () {
+    $this->freezeTime();
     $user = User::factory()->create();
     foreach ([3 => 15, 6 => 60, 9 => 1440, 12 => 1440] as $threshold => $minutes) {
         while ($user->fresh()->failed_login_attempts < $threshold) {

@@ -150,10 +150,12 @@ through the concurrency suite. Remote CI, authenticated browser visual checks,
 real Judge0 execution and production deployment remain unverified.
 
 C03/C04/B07 standard participation is implemented behind provider activation.
-Actual weekly event records, scheduler lifecycle, independent event participations,
-reward calculations, XP/ranks, paid admission and financial effects remain deferred.
-Client-supplied weekly IDs are rejected; the standard table cannot be repurposed
-silently for weekly budgets. No user-facing infrastructure failure is claimed to
+Weekly event records, scheduler lifecycle and independent event participations
+are implemented in the [weekly event follow-up](weekly-challenge-plan.md).
+Reward calculations, XP/ranks, paid admission and financial effects remain deferred.
+Client-supplied weekly IDs are rejected; trusted weekly routes bind their event
+and its pinned revision, while standard participation remains context zero.
+No user-facing infrastructure failure is claimed to
 be a wrong solution. Historical source retrieval/result access requires current
 verified Active account authorization.
 
@@ -163,9 +165,8 @@ Configure the approved Judge0 sandbox privately, verify actual compiler IDs and
 resource ceilings, run end-to-end sandbox submissions and failure drills, then
 record provider version/isolation/quotas and measured feedback timings when the
 owner is ready to configure the deferred API plan. Keep execution unavailable
-while that input is missing and continue independent development. Implement E02 weekly events
-later with independent participation IDs and the approved separate attempt budget;
-resolve event timing/timezone, rewards and publication policy before persisting
-financial or ranking effects. Do not create another generic teaching-site hub.
-The [weekly event plan](weekly-challenge-plan.md) records the pending boundary
-decision and approved deferred-reward scope for the next independent development step.
+while that input is missing and continue independent development. E02 weekly
+events now use independent participation IDs and the approved separate attempt
+budget; see the [weekly event implementation](weekly-challenge-plan.md).
+Resolve reward formulas and ledger ownership before adding financial or ranking
+effects. Preserve the game-first Play hub and separate Learning catalog.

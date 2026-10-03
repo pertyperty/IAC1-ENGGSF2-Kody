@@ -28,6 +28,13 @@ without exposing raw output, and a scheduler closes overdue work. Provider
 activation requires verified configured compiler mappings and resource limits.
 No reward, rank, streak or balance changes occur in this submission workflow.
 
+[Weekly events](weekly-challenge-plan.md) adds Gamification-owned approved revision
+selection and Manila scheduling. Challenge Management reuses its existing secure
+submission/evaluation pipeline with independent per-event participations. Generated
+context keys and composite foreign keys prevent mixing standard and weekly budgets
+or revisions. The calendar lock serializes moderator/scheduler/admission changes;
+financial and rank rewards remain unavailable.
+
 The project owner's [2026-10-03 game-first amendment](game-first-product-direction.md)
 sets the current product direction. The play hub is the primary experience;
 Learning is a separate catalog, and creators attach versioned game/quiz template

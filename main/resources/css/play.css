@@ -195,3 +195,4 @@
 .catalog-search select { width: 100%; padding: .8rem 1rem; border: 1px solid #d4deca; border-radius: 12px; background: white; color: #33462c; font: inherit; margin-bottom: .7rem; }
 .studio-form input[type=checkbox] { display: inline-block; width: auto; margin-right: .5rem; accent-color: #355a25; }
 .studio-form .challenge-source, pre.challenge-case { font-family: ui-monospace, monospace; white-space: pre-wrap; overflow-wrap: anywhere; tab-size: 4; }
+.weekly-card { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; margin: 28px 0; padding: 28px; background: #f4e6ff; border: 1px solid #dbc4f2; border-radius: 22px; }.weekly-card h2 { margin: 8px 0; font-size: 28px; }.weekly-card p { line-height: 1.6; }

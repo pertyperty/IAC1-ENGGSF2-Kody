@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Learning\CompleteGameRequest;
 use App\Http\Requests\Learning\CompleteQuizRequest;
+use App\Models\WeeklyEvent;
 use App\Services\Gamification\LearningProgression;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -13,7 +14,8 @@ class PlayController extends Controller
 {
     public function hub(Request $request, LearningProgression $progression): Response
     {
-        return response()->view('learning.hub', ['progress' => $progression->snapshot($request->user()->id)])->header('Cache-Control', 'no-store, private');
+        return response()->view('learning.hub', ['progress' => $progression->snapshot($request->user()->id),
+            'weekly' => WeeklyEvent::open()->with('revision:id,title,language,difficulty')->first()])->header('Cache-Control', 'no-store, private');
     }
 
     public function game(CompleteGameRequest $request, string $level, LearningProgression $progression): JsonResponse
