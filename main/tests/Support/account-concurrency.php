@@ -5,6 +5,7 @@ use App\Actions\Account\RegisterAccount;
 use App\Actions\Account\ReviewInstructorApplication;
 use App\Models\CodingChallenge;
 use App\Models\ContributorApplication;
+use App\Models\FaqEntry;
 use App\Models\GamePreset;
 use App\Models\InstructorApplication;
 use App\Models\LearningCourse;
@@ -20,6 +21,7 @@ use App\Services\Account\InstructorApplications;
 use App\Services\Account\ProfileEditing;
 use App\Services\Administration\AccountEnforcement;
 use App\Services\Administration\ContentModeration;
+use App\Services\Administration\FaqManagement;
 use App\Services\Administration\ModeratorAppointments;
 use App\Services\Administration\SupportProfileCorrections;
 use App\Services\Challenges\ChallengePublishing;
@@ -55,6 +57,22 @@ try {
     $session->start();
 
     $result = match ($argv[1]) {
+        'faq-change' => (function () use ($input, $argv): string {
+            $actor = User::findOrFail($input['actor_ids'][(int) $argv[3] - 1]);
+            $entry = FaqEntry::findOrFail($input['entry_id']);
+            if ($input['action'] === 'delete') {
+                app(FaqManagement::class)->delete($actor, 'module-test-session', $entry, 1, true);
+            } else {
+                app(FaqManagement::class)->save($actor, 'module-test-session', $input['data'], $entry);
+            }
+
+            return 'changed';
+        })(),
+        'faq-create' => (function () use ($input, $argv): string {
+            app(FaqManagement::class)->save(User::findOrFail($input['actor_ids'][(int) $argv[3] - 1]), 'module-test-session', $input['data']);
+
+            return 'created';
+        })(),
         'preset-change' => (function () use ($input, $argv): string {
             $actor = User::findOrFail($input['actor_ids'][(int) $argv[3] - 1]);
             $preset = GamePreset::findOrFail($input['preset_id']);

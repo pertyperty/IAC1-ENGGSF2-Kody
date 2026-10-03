@@ -164,6 +164,11 @@ Updates preserve existing module instances; inactivation blocks new use while
 retaining references. Use immutable preset revisions and module snapshots, never
 uploaded executable rules. See [game presets](docs/game-presets-implementation.md).
 
+The owner approved public reading/search of Active FAQs (B11), with management
+restricted to verified Active Administrators. Initial predefined topics are
+Getting started, Accounts, Playing and learning, and Creating content. Learning
+module authentication remains unchanged. See [Help](docs/faq-implementation.md).
+
 You are working on **Kody: Gamified Programming Learning Platform and Course Management System (K:GPLPCMS)**.
 
 This repository is a real Laravel application intended for deployment. Treat every production-bound change as maintainable software, not as tutorial, demo, or throwaway coursework.

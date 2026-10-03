@@ -212,6 +212,9 @@ Administrators manage reusable game/quiz defaults at `/manage/game-presets`.
 Module assessments pin immutable preset versions; updates and inactivation retain
 existing play. Rewards stay Deferred. See
 [preset workshop scope](docs/game-presets-implementation.md).
+Public Help at `/help` provides categorized, searchable answers. Verified Active
+Administrators publish, update and delete entries at `/manage/faqs`, with audited
+version checks. See [FAQ scope and verification](docs/faq-implementation.md).
 
 The target is Linux EC2, Nginx/PHP-FPM with PHP 8.4.1+, RDS PostgreSQL and S3 where required.
 Set `APP_ENV=production`, `APP_DEBUG=false`, a stable managed `APP_KEY`, HTTPS

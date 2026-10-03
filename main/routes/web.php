@@ -14,6 +14,7 @@ use App\Http\Controllers\Account\RecoveryController;
 use App\Http\Controllers\Account\RegistrationController;
 use App\Http\Controllers\Administration\AccountGovernanceController;
 use App\Http\Controllers\Administration\ContentModerationController;
+use App\Http\Controllers\Administration\FaqController;
 use App\Http\Controllers\Administration\GamePresetController;
 use App\Http\Controllers\Administration\SystemReportController;
 use App\Http\Controllers\Challenges\ChallengeReviewController;
@@ -28,6 +29,7 @@ use App\Http\Controllers\Content\ModuleReviewController;
 use App\Http\Controllers\Content\ModuleStudioController;
 use App\Http\Controllers\Content\PublishedModuleController;
 use App\Http\Controllers\Gamification\WeeklyEventStudioController;
+use App\Http\Controllers\HelpController;
 use App\Http\Controllers\LearningController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PlayController;
@@ -128,6 +130,16 @@ Route::middleware(['auth', 'account.session'])->prefix('manage/accounts')->name(
 });
 Route::get('/account/contributor-application', [ContributorApplicationController::class, 'create'])->middleware(['auth', 'account.session'])->name('contributor-application.create');
 Route::get('/manage/reports', SystemReportController::class)->middleware(['auth', 'account.session', 'throttle:10,1,system-reports:'])->name('system-reports');
+Route::get('/help', [HelpController::class, 'index'])->middleware('throttle:30,1,help:')->name('help.index');
+Route::get('/help/{entry}', [HelpController::class, 'show'])->whereNumber('entry')->middleware('throttle:30,1,help:')->name('help.show');
+Route::middleware(['auth', 'account.session'])->prefix('manage/faqs')->name('faq-management.')->group(function (): void {
+    Route::get('/', [FaqController::class, 'index'])->name('index');
+    Route::get('/create', [FaqController::class, 'create'])->name('create');
+    Route::post('/', [FaqController::class, 'store'])->middleware('throttle:10,1,faq-management:')->name('store');
+    Route::get('/{entry}/edit', [FaqController::class, 'edit'])->whereNumber('entry')->name('edit');
+    Route::put('/{entry}', [FaqController::class, 'update'])->whereNumber('entry')->middleware('throttle:10,1,faq-management:')->name('update');
+    Route::post('/{entry}/delete', [FaqController::class, 'delete'])->whereNumber('entry')->middleware('throttle:10,1,faq-management:')->name('delete');
+});
 Route::middleware(['auth', 'account.session'])->prefix('manage/game-presets')->name('game-presets.')->group(function (): void {
     Route::get('/', [GamePresetController::class, 'index'])->name('index');
     Route::get('/create', [GamePresetController::class, 'create'])->name('create');

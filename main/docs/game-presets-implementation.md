@@ -86,8 +86,8 @@ Remote CI, production deployment and browser visual checks remain unverified.
 
 ## Next implementation prompt
 
-Continue G11–G13 FAQ authoring and learner access using plain text, Administrator
-authorization, audit and versioned state changes. Resolve only genuinely ambiguous
-business rules; keep reward formulas, monetization and live Judge0 activation in
+The owner subsequently approved public categorized Help; see
+[B11/G11–G13 implementation](faq-implementation.md). Follow its next prompt for
+content feedback. Keep reward formulas, monetization and live Judge0 activation in
 the deferred-feature register. Do not present the preset workshop as a custom game
 engine or as completion of the deferred reward requirements.

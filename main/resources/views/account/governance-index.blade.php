@@ -11,5 +11,6 @@
 {{ $accounts->links() }}
 <p class="secondary-link"><a href="{{ route('content-moderation.index') }}">Staff content moderation</a></p>
 @can('viewAny', \App\Models\GamePreset::class)<p class="secondary-link"><a href="{{ route('game-presets.index') }}">Game preset workshop</a></p>@endcan
+@can('viewAny', \App\Models\FaqEntry::class)<p class="secondary-link"><a href="{{ route('faq-management.index') }}">Help workshop</a></p>@endcan
 @can('viewReports', \App\Models\User::class)<p class="secondary-link"><a href="{{ route('system-reports') }}">View system reports</a></p>@endcan
 @endsection

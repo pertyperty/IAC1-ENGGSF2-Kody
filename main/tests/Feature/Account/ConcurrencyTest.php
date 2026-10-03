@@ -21,6 +21,27 @@ use Symfony\Component\Process\Process;
 
 uses(DatabaseMigrations::class);
 
+test('G12 G13 simultaneous FAQ confirmations commit one content version and audit', function (string $action) {
+    $entry = faqFixture();
+    $first = moduleAccount(Role::Administrator);
+    $second = moduleAccount(Role::Administrator);
+    $results = simultaneousAccountRequests('faq-change', ['actor_ids' => [$first->id, $second->id], 'entry_id' => $entry->id,
+        'action' => $action, 'data' => faqData(['answer' => 'Changed answer'])], fn () => $entry->newQuery()->whereKey($entry->id)->lockForUpdate()->first());
+    sort($results);
+    expect($results)->toBe(['changed', 'duplicate'])->and($entry->fresh()->record_version)->toBe(2);
+    expect(DB::table('audit_events')->where('event', $action === 'update' ? 'faq.updated' : 'faq.deleted')->count())->toBe(1);
+})->with(['update', 'delete']);
+
+test('G11 simultaneous duplicate FAQ creations commit one entry and audit', function () {
+    $first = moduleAccount(Role::Administrator);
+    $second = moduleAccount(Role::Administrator);
+    $results = simultaneousAccountRequests('faq-create', ['actor_ids' => [$first->id, $second->id], 'data' => faqData()],
+        fn () => DB::statement('LOCK TABLE faq_entries IN SHARE MODE'));
+    sort($results);
+    expect($results)->toBe(['created', 'duplicate']);
+    expect(DB::table('faq_entries')->count())->toBe(1)->and(DB::table('audit_events')->where('event', 'faq.created')->count())->toBe(1);
+});
+
 test('G09 G10 competing administrator confirmations commit one preset transition and audit', function (string $action) {
     $preset = presetFixture();
     $first = moduleAccount(Role::Administrator);
