@@ -60,6 +60,15 @@ dictionary's single optional course_id representation. Preserve old published
 course content and ordering during draft edits and review. See
 [course composition](docs/course-composition-implementation.md).
 
+The owner approved resolving B03/B04 availability as Published content and
+verified Active accounts, without adding an Active content lifecycle state.
+D08 permits only the owning Instructor to archive a Published course. Archived
+courses leave browsing and block new enrollment; existing enrollees retain
+access and progress. Individual archived modules remain unavailable under D03.
+The owner approved free enrollment for currently authored courses in this release;
+paid enrollment stays unavailable until pricing and the KodeBit ledger exist.
+See [course learning](docs/course-learning-implementation.md).
+
 You are working on **Kody: Gamified Programming Learning Platform and Course Management System (K:GPLPCMS)**.
 
 This repository is a real Laravel application intended for deployment. Treat every production-bound change as maintainable software, not as tutorial, demo, or throwaway coursework.

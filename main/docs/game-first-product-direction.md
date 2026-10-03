@@ -107,3 +107,12 @@ versioned studio, template attachments, review queue, inbox and delivered scope.
 The owner also approved applying the same review policy to new courses and
 published course revisions. Version 1 coding challenges support Python, Java
 and C++; provider compiler IDs remain an integration configuration task.
+
+## Course learning amendment — approved 2026-10-03
+
+Published content and verified Active accounts resolve B03/B04's undefined
+Active content state. D08 permits owning Instructors to archive Published courses;
+existing enrollees retain access and progress while browsing/new enrollment stop.
+Individual archived modules remain blocked. Currently authored courses offer
+free enrollment; paid enrollment awaits pricing and the KodeBit ledger. See
+[course learning implementation](course-learning-implementation.md).

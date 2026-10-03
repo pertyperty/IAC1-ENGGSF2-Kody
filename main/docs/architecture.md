@@ -7,6 +7,13 @@ Gamification daily activity. Published revision pointers keep draft edits out of
 learner views. New modules and published replacements require Moderator/Admin
 approval; Instructor owners may archive Published modules with preserved history.
 
+[Course learning](course-learning-implementation.md) adds Content-owned free
+enrollment and revision-pinned lesson access. Every request rechecks current
+account/session and owned enrollment. Course archiving preserves enrolled access;
+module archiving still blocks that module. Gamification validates course template
+wins through the shared approved-revision writer; its ledger-free streak activity
+does not grant paid access or financial rewards.
+
 The project owner's [2026-10-03 game-first amendment](game-first-product-direction.md)
 sets the current product direction. The play hub is the primary experience;
 Learning is a separate catalog, and creators attach versioned game/quiz template

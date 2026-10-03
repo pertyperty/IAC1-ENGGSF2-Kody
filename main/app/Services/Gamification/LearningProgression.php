@@ -3,6 +3,7 @@
 namespace App\Services\Gamification;
 
 use App\Models\LearningModule;
+use App\Models\ModuleRevision;
 use App\Models\User;
 use App\Services\Account\CurrentAccountSession;
 use App\Services\Games\CommandGarden;
@@ -69,9 +70,22 @@ class LearningProgression
             app(CurrentAccountSession::class)->assert($user, $sessionId);
             $module = LearningModule::whereKey($moduleId)->lockForUpdate()->firstOrFail();
             abort_unless($module->status === 'Published' && $module->published_revision_id === $revisionId, 409, 'This adventure changed. Reload before trying again.');
-            $revision = $module->publishedRevision;
+
+            return $this->recordApprovedModule($user, $sessionId, $moduleId, $revisionId, $kind, $input);
+        });
+    }
+
+    /** Content must authorize access to a pinned revision before invoking this writer. */
+    public function recordApprovedModule(User $actor, string $sessionId, int $moduleId, int $revisionId, string $kind, array $input): array
+    {
+        return DB::transaction(function () use ($actor, $sessionId, $moduleId, $revisionId, $kind, $input): array {
+            $user = User::whereKey($actor->id)->lockForUpdate()->firstOrFail();
+            app(CurrentAccountSession::class)->assert($user, $sessionId);
+            $module = LearningModule::whereKey($moduleId)->lockForUpdate()->firstOrFail();
+            abort_unless($module->status === 'Published', 404);
+            $revision = ModuleRevision::where('module_id', $moduleId)->findOrFail($revisionId);
             $instance = $revision->assessment;
-            abort_unless($revision->review_status === 'Approved' && $instance !== null
+            abort_unless(in_array($kind, ['game', 'quiz'], true) && $revision->review_status === 'Approved' && $instance !== null
                 && $instance['template'] === ($kind === 'game' ? 'command-garden' : 'choice-quiz'), 404);
             $valid = $kind === 'game'
                 ? app(CommandGarden::class)->succeeds($instance, $input['program'], $input['repeat'] ?? false, $input['conditional'] ?? false)
@@ -79,7 +93,7 @@ class LearningProgression
             if (! $valid) {
                 throw ValidationException::withMessages(['completion' => 'That attempt did not complete the objective. Try again.']);
             }
-            $this->saveActivity($user, $this->snapshot($user->id), 'module-'.$module->id, $kind, $instance, $input + ['revision_id' => $revisionId]);
+            $this->saveActivity($user, $this->snapshot($user->id), 'module-'.$moduleId, $kind, $instance, $input + ['revision_id' => $revisionId]);
 
             return ['message' => 'Adventure win saved. Your streak is up to date.', 'progress' => $this->snapshot($user->id)];
         });

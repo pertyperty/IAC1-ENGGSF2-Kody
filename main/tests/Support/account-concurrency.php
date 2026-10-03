@@ -9,6 +9,7 @@ use App\Models\LearningModule;
 use App\Models\User;
 use App\Services\Account\AccountRecoveryService;
 use App\Services\Account\EmailVerificationService;
+use App\Services\Content\CourseLearning;
 use App\Services\Content\CoursePublishing;
 use App\Services\Content\ModulePublishing;
 use App\Services\Gamification\LearningProgression;
@@ -50,6 +51,8 @@ try {
             return 'reviewed';
         })(),
         'course-save' => app(CoursePublishing::class)->save(User::findOrFail($input['actor_id']), $input['session_id'], $input['data'], LearningCourse::findOrFail($input['course_id'])) ? 'saved' : 'error',
+        'course-enroll' => app(CourseLearning::class)->enroll(User::findOrFail($input['actor_id']), $input['session_id'], $input['course_id'], $input['revision_id']) ? 'enrolled' : 'error',
+        'course-complete' => app(CourseLearning::class)->complete(User::findOrFail($input['actor_id']), $input['session_id'], $input['course_id'], $input['slot_id'], 'game', ['program' => ['right', 'right', 'up', 'right', 'right']]) ? 'saved' : 'error',
         'module-save' => app(ModulePublishing::class)->save(User::findOrFail($input['actor_id']), $input['session_id'], $input['data'], LearningModule::findOrFail($input['module_id'])) ? 'saved' : 'error',
         'module-complete' => app(LearningProgression::class)->recordModule(User::findOrFail($input['actor_id']), $input['session_id'], $input['module_id'], $input['revision_id'], 'game', ['program' => ['right', 'right', 'up', 'right', 'right']]) ? 'saved' : 'error',
         'login' => strtolower(app(LoginAccount::class)->attempt($input['email'], $input['password'], $session)->name),

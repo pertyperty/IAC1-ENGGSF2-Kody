@@ -110,6 +110,19 @@ class CoursePublishing
         });
     }
 
+    public function archive(User $actor, string $sessionId, LearningCourse $course, int $version): void
+    {
+        DB::transaction(function () use ($actor, $sessionId, $course, $version): void {
+            $user = User::whereKey($actor->id)->lockForUpdate()->firstOrFail();
+            app(CurrentAccountSession::class)->assert($user, $sessionId);
+            $current = LearningCourse::whereKey($course->id)->lockForUpdate()->firstOrFail();
+            Gate::forUser($user)->authorize('archive', $current);
+            $this->version($current, $version);
+            $current->update(['status' => 'Archived', 'record_version' => $current->record_version + 1]);
+            $this->audit($user, $current, 'course.archived', ['revision' => $current->publishedRevision->number]);
+        });
+    }
+
     private function availableModules(CourseRevision $revision, int $ownerId): void
     {
         $slots = $revision->modules()->with('revision')->get();

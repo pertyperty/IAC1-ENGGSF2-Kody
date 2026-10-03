@@ -118,8 +118,8 @@ concurrency coverage and remaining recovery/approval/provider scope.
 
 `/login` implements A03 email/password login with durable progressive lockouts,
 consent before replacing an active session, and POST logout. The protected
-`/dashboard` currently provides an account welcome page; full B01 learning
-dashboard data is a subsequent feature. All future protected routes must use
+`/dashboard` provides the play hub, saved streak/ladder state and a link to enrolled
+course journeys; full B01 dashboard scope remains incomplete. Protected routes must use
 both `auth` and `account.session`, and sensitive actions must recheck state
 transactionally. See [login traceability](docs/login-implementation.md).
 
@@ -139,7 +139,12 @@ archive published adventures. See [creator studio scope and verification](docs/c
 
 The studio also supports `/create/courses`: versioned course drafts, ordered reuse
 of owned approved adventures, saved previews and course review at `/manage/courses`.
-Learner enrollment remains a separate step. See [course composition scope](docs/course-composition-implementation.md).
+See [course composition scope](docs/course-composition-implementation.md).
+Learners can browse `/learn/courses`, explicitly join free courses and resume
+their pinned lessons in `/learn/courses/mine`. Verified game/quiz wins save
+assessment progress and share the daily streak. Owners can archive courses;
+existing enrollees retain access while new enrollment stops. Paid enrollment is
+unavailable. See [course learning scope](docs/course-learning-implementation.md).
 
 The target is Linux EC2, Nginx/PHP-FPM with PHP 8.4.1+, RDS PostgreSQL and S3 where required.
 Set `APP_ENV=production`, `APP_DEBUG=false`, a stable managed `APP_KEY`, HTTPS

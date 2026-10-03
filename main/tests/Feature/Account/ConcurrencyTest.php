@@ -17,6 +17,29 @@ use Symfony\Component\Process\Process;
 
 uses(DatabaseMigrations::class);
 
+test('B03 overlapping free enrollments create one pinned grant and one audit', function () {
+    $course = courseFixture(true);
+    $learner = moduleAccount(Role::Learner);
+    $results = simultaneousAccountRequests('course-enroll', ['actor_id' => $learner->id, 'session_id' => 'module-test-session', 'course_id' => $course->id, 'revision_id' => $course->published_revision_id],
+        fn () => User::whereKey($learner->id)->lockForUpdate()->first());
+    expect($results)->toBe(['enrolled', 'enrolled']);
+    $this->assertDatabaseCount('course_enrollments', 1);
+    expect(DB::table('audit_events')->where('event', 'course.enrolled')->count())->toBe(1);
+});
+
+test('B04 overlapping course wins save one clearance activity and streak', function () {
+    $course = courseFixture(true);
+    $learner = moduleAccount(Role::Learner);
+    joinCourse($course, $learner);
+    $slot = $course->publishedRevision->modules->sole();
+    $results = simultaneousAccountRequests('course-complete', ['actor_id' => $learner->id, 'session_id' => 'module-test-session', 'course_id' => $course->id, 'slot_id' => $slot->id],
+        fn () => User::whereKey($learner->id)->lockForUpdate()->first());
+    expect($results)->toBe(['saved', 'saved']);
+    $this->assertDatabaseCount('course_module_progress', 1);
+    $this->assertDatabaseCount('learning_activity_days', 1);
+    $this->assertDatabaseHas('learning_progress', ['user_id' => $learner->id, 'current_streak' => 1]);
+});
+
 test('D06 concurrent course edits save one replacement and reject stale composition', function () {
     $course = courseFixture();
     $ids = $course->latestRevision->modules->pluck('module_id')->all();

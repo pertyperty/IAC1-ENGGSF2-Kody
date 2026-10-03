@@ -7,7 +7,7 @@
     @if($revision)<p class="step-pill">Revision {{ $revision->number }} · {{ $revision->review_status }}</p>@if($revision->review_notes)<p class="lesson-note">{{ $revision->review_notes }}</p>@endif @endif
     <form method="get" class="catalog-search"><label for="course-adventure-search">Find adventures to add (save changes before searching)</label><div><input id="course-adventure-search" type="search" name="q" value="{{ request('q') }}" maxlength="80" placeholder="Search your published adventures"><button class="button button-dark button-small">Find</button></div></form>
     <form class="studio-form" method="post" action="{{ $course ? route('courses.update', $course) : route('courses.store') }}">@csrf @if($course)@method('put')@endif<input type="hidden" name="record_version" value="{{ $course?->record_version ?? 1 }}">
-        <fieldset @disabled($revision?->review_status === 'Pending')><legend>Your course</legend>
+        <fieldset @disabled($revision?->review_status === 'Pending' || $course?->status === 'Archived')><legend>Your course</legend>
             <label for="title">Course title</label><input id="title" name="title" maxlength="150" value="{{ old('title', $revision?->title) }}" required>
             <label for="description">The big idea</label><textarea id="description" name="description" rows="5" maxlength="5000" required>{{ old('description', $revision?->description) }}</textarea>
             <label for="category">Category</label><input id="category" name="category" maxlength="50" value="{{ old('category', $revision?->category) }}" placeholder="Programming basics" required>
@@ -27,7 +27,9 @@
             <div class="studio-actions"><button class="button button-play">Save course draft</button><a class="quiet-link" href="{{ route('courses.index') }}">Cancel</a></div>
         </fieldset>
     </form>
-    @if($revision?->review_status === 'Draft')<form method="post" action="{{ route('courses.submit', $course) }}" class="studio-actions">@csrf<input type="hidden" name="record_version" value="{{ $course->record_version }}"><button class="button button-dark">Submit saved course for review →</button></form>@endif
+    @if($revision?->review_status === 'Draft' && $course?->status !== 'Archived')<form method="post" action="{{ route('courses.submit', $course) }}" class="studio-actions">@csrf<input type="hidden" name="record_version" value="{{ $course->record_version }}"><button class="button button-dark">Submit saved course for review →</button></form>@endif
+    @can('archive', $course)<p><a class="quiet-link" href="{{ route('courses.archive-confirmation', $course) }}">Archive this course</a></p>@endcan
+    @if($course?->status === 'Archived')<p class="lesson-note">This course is archived. Existing learners keep their journey; new learners cannot enroll.</p>@endif
     @if($revision)<h2>Try your saved journey</h2>@include('content.course-outline')@endif
 </section>
 @endsection

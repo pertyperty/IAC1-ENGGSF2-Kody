@@ -6,6 +6,7 @@ use App\Http\Controllers\Account\LoginController;
 use App\Http\Controllers\Account\ProfileController;
 use App\Http\Controllers\Account\RecoveryController;
 use App\Http\Controllers\Account\RegistrationController;
+use App\Http\Controllers\Content\CourseLearningController;
 use App\Http\Controllers\Content\CourseReviewController;
 use App\Http\Controllers\Content\CourseStudioController;
 use App\Http\Controllers\Content\ModuleReviewController;
@@ -20,7 +21,14 @@ Route::pattern('course', '[0-9]+');
 
 Route::get('/', [LearningController::class, 'home'])->name('home');
 Route::get('/learn', [LearningController::class, 'catalog'])->name('learning.catalog');
+Route::get('/learn/courses', [CourseLearningController::class, 'catalog'])->name('course-learning.catalog');
 Route::middleware(['auth', 'account.session'])->group(function (): void {
+    Route::get('/learn/courses/mine', [CourseLearningController::class, 'mine'])->name('course-learning.mine');
+    Route::get('/learn/courses/{course}', [CourseLearningController::class, 'show'])->name('course-learning.show');
+    Route::post('/learn/courses/{course}/enroll', [CourseLearningController::class, 'enroll'])->middleware('throttle:10,1,course-enroll:')->name('course-learning.enroll');
+    Route::get('/learn/courses/{course}/modules/{slot}', [CourseLearningController::class, 'lesson'])->whereNumber('slot')->name('course-learning.lesson');
+    Route::post('/learn/courses/{course}/modules/{slot}/game', [CourseLearningController::class, 'game'])->whereNumber('slot')->middleware('throttle:20,1,course-game:')->name('course-learning.game');
+    Route::post('/learn/courses/{course}/modules/{slot}/quiz', [CourseLearningController::class, 'quiz'])->whereNumber('slot')->middleware('throttle:20,1,course-quiz:')->name('course-learning.quiz');
     Route::get('/updates', [NotificationController::class, 'index'])->name('notifications.index');
     Route::post('/updates/{notification}/read', [NotificationController::class, 'read'])->whereUuid('notification')->middleware('throttle:30,1,notification-read:')->name('notifications.read');
     Route::get('/learn/modules/{module}', [PublishedModuleController::class, 'show'])->name('modules.show');
@@ -33,6 +41,8 @@ Route::middleware(['auth', 'account.session'])->group(function (): void {
     Route::get('/create/courses/{course}', [CourseStudioController::class, 'edit'])->name('courses.edit');
     Route::put('/create/courses/{course}', [CourseStudioController::class, 'update'])->middleware('throttle:20,1,course-edit:')->name('courses.update');
     Route::post('/create/courses/{course}/submit', [CourseStudioController::class, 'submit'])->middleware('throttle:10,1,course-submit:')->name('courses.submit');
+    Route::get('/create/courses/{course}/archive', [CourseStudioController::class, 'archiveConfirmation'])->name('courses.archive-confirmation');
+    Route::post('/create/courses/{course}/archive', [CourseStudioController::class, 'archive'])->middleware('throttle:10,1,course-archive:')->name('courses.archive');
     Route::get('/create/courses/{course}/modules/{slot}', [CourseStudioController::class, 'preview'])->whereNumber('slot')->name('courses.preview');
     Route::get('/manage/courses', [CourseReviewController::class, 'index'])->name('course-reviews.index');
     Route::get('/manage/courses/{course}', [CourseReviewController::class, 'show'])->name('course-reviews.show');

@@ -11,9 +11,10 @@ representation with ordered revision-specific assignments.
 D05/D06 metadata and edit scope (the source incorrectly labels Create/Edit Course
 D01/D02) and intended D07 assignment (its source heading incorrectly says D09)
 are implemented. G06's publication subset and noncritical F05 notifications also
-cover courses. D08/D09 lifecycle removal, B03/B04 enrollment/access and financial
-effects are not implemented in this slice. Published courses currently have no
-learner enrollment or lesson-access routes; owner/reviewer previews do not grant
+cover courses. This composition milestone did not include lifecycle removal,
+enrollment or financial effects. The subsequent [course learning milestone](course-learning-implementation.md)
+implements free B03/B04 enrollment/access and D08 archiving. D09 deletion and
+financial effects remain unavailable; owner/reviewer previews do not grant
 learner access.
 
 The owner separately resolved SRS 3.1.1 versus 3.4: Version 1 code challenges
@@ -103,10 +104,9 @@ Build the learner course catalog, free enrollment/access and resumable progress
 server-validated game/quiz activity writer. Paid enrollment must use a durable
 ledger and atomic access grants when the financial layer is implemented.
 
-Before enrollment/lifecycle implementation, resolve B03/B04's Published-and-Active
-preconditions against dictionaries that have Published but no Active state, and
-D08's explicit Policy A (retained access) versus Policy B (locked access).
-Course archiving roles also conflict: its Actor includes Contributor, while
-course creation/editing and the dictionary identify Instructor ownership.
-Do not silently add an Active state, select an archive access policy or invent
-pricing/paid-access behavior.
+These decisions were approved on 2026-10-03: Published content with verified
+Active accounts resolves B03/B04; D08 uses owning Instructor authorization,
+Published as archive-eligible and Policy A (retained access). Current authored
+courses may offer free enrollment; paid enrollment remains unavailable until
+pricing and the ledger exist. The implementation is documented in
+[course learning](course-learning-implementation.md).

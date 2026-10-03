@@ -3,8 +3,8 @@
 </div>
 @if($revision->assessment)
     @if($revision->assessment['template'] === 'command-garden')
-        @include('learning.game', ['game' => $revision->assessment, 'module' => null, 'completionUrl' => ($preview ?? false) ? null : route('modules.game', [$module, $revision->id]), 'trial' => false])
+        @include('learning.game', ['game' => $revision->assessment, 'module' => null, 'completionUrl' => ($preview ?? false) ? null : ($assessmentCompletionUrl ?? route('modules.game', [$module, $revision->id])), 'trial' => false])
     @else
-        @include('learning.quiz', ['quiz' => $revision->assessment, 'module' => null, 'completionUrl' => ($preview ?? false) ? null : route('modules.quiz', [$module, $revision->id])])
+        @include('learning.quiz', ['quiz' => $revision->assessment, 'module' => null, 'completionUrl' => ($preview ?? false) ? null : ($assessmentCompletionUrl ?? route('modules.quiz', [$module, $revision->id]))])
     @endif
 @endif

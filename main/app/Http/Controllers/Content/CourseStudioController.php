@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Content;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Content\ArchiveCourseRequest;
 use App\Http\Requests\Content\SaveCourseRequest;
 use App\Models\LearningCourse;
 use App\Models\LearningModule;
@@ -40,7 +41,7 @@ class CourseStudioController extends Controller
 
     public function edit(Request $request, LearningCourse $course): Response
     {
-        Gate::authorize('update', $course);
+        Gate::authorize('viewOwned', $course);
 
         $revision = $course->latestRevision->load('modules.revision');
 
@@ -66,10 +67,24 @@ class CourseStudioController extends Controller
 
     public function preview(LearningCourse $course, int $slot): Response
     {
-        abort_unless(Gate::allows('update', $course) || Gate::allows('review', $course), 403);
+        abort_unless(Gate::allows('viewOwned', $course) || Gate::allows('review', $course), 403);
         $assignment = $course->latestRevision->modules()->with('revision')->findOrFail($slot);
 
         return response()->view('content.course-preview', ['course' => $course, 'revision' => $assignment->revision])->header('Cache-Control', 'no-store, private');
+    }
+
+    public function archiveConfirmation(LearningCourse $course): Response
+    {
+        Gate::authorize('archive', $course);
+
+        return response()->view('content.course-archive', compact('course'))->header('Cache-Control', 'no-store, private');
+    }
+
+    public function archive(ArchiveCourseRequest $request, LearningCourse $course, CoursePublishing $publishing): RedirectResponse
+    {
+        $publishing->archive($request->user(), $request->session()->getId(), $course, (int) $request->validated('record_version'));
+
+        return redirect()->route('courses.edit', $course)->with('status', 'Course archived. Existing learners keep their journey.');
     }
 
     private function availableModules(array $selectedIds, Request $request): Collection
