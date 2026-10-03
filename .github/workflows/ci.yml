@@ -1,0 +1,112 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: main
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: kody_test
+          POSTGRES_USER: kody_test
+          POSTGRES_PASSWORD: ci-only-password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U kody_test -d kody_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      APP_ENV: testing
+      APP_DEBUG: 'false'
+      DB_CONNECTION: pgsql
+      DB_HOST: 127.0.0.1
+      DB_PORT: 5432
+      DB_DATABASE: kody_test
+      DB_USERNAME: kody_test
+      DB_PASSWORD: ci-only-password
+      DB_SSLMODE: disable
+      CACHE_STORE: array
+      SESSION_DRIVER: array
+      HASH_DRIVER: bcrypt
+      QUEUE_CONNECTION: sync
+      MAIL_MAILER: array
+      LOG_CHANNEL: stderr
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: ctype, curl, dom, fileinfo, filter, intl, mbstring, openssl, pdo_pgsql, tokenizer, xml, zip
+          coverage: none
+          tools: composer:v2
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: main/package-lock.json
+      - name: Validate Composer metadata
+        run: composer validate --strict
+      - name: Install locked PHP dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Audit PHP dependencies
+        run: composer audit
+      - name: Install locked frontend dependencies
+        run: npm ci
+      - name: Audit frontend dependencies
+        run: npm audit --audit-level=high
+      - name: Prepare isolated test environment
+        run: |
+          cp .env.testing.example .env
+          php artisan key:generate --force
+          php artisan about
+      - name: Verify formatting
+        run: composer lint
+      - name: Build frontend assets
+        run: npm run build
+      - name: Migrate clean PostgreSQL database
+        run: |
+          php artisan migrate --force
+          php artisan migrate:status
+      - name: Run tests
+        run: composer test
+      - name: Verify cached configuration and routes
+        run: |
+          php artisan config:cache
+          php artisan route:cache
+          php artisan view:cache
+          php artisan test --filter='HealthTest|LoginTest|SessionConflictTest|DatabaseSessionsTest|PasswordHashingTest'
+          php artisan route:list --path=up
+          php artisan route:list --path=ready
+          php artisan route:clear
+          php artisan config:clear
+          php artisan view:clear
+      - name: Record verified Git revision
+        run: printf '%s\n' "$GITHUB_SHA" > public/build/revision.txt
+      - name: Upload frontend build with revision
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-${{ github.sha }}
+          path: main/public/build/
+          if-no-files-found: error
+          retention-days: 14
