@@ -106,6 +106,11 @@ actual scope. Those implementations do not establish unmeasured NFR compliance.
 slices. The play hub now records server-validated daily streaks and level
 clearance; it does not yet issue XP, ranks, KodeBits or creator-published content.
 
+[A10 creator review](creator-review-implementation.md) adds policy-controlled
+private credential review, atomic role elevation/audit/pending notification and
+stale-write prevention. It grants Instructor access but does not yet implement
+the Creator studio or module publication.
+
 Requirement conflict detected:
 
 - SRS: 3.1.1 Code Execution API lists Python, Java, C++, JavaScript and PHP;

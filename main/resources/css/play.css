@@ -162,3 +162,15 @@
 .level-state { display: block; color: #748663; font-size: 11px; margin-top: 14px; line-height: 1.7; }.level-locked { background: #f5f6f0; }.level-locked .level-number { background: #e6e9de; color: #7f8b74; }
 .hub-logout { background: none; border: 0; cursor: pointer; padding: 0; margin-top: 20px; }
 @media (max-width: 760px) { .progress-stats { gap: 10px; }.progress-stats > div { padding: 15px; }.progress-stats b { font-size: 30px; }.progress-stats small { display: block; font-size: 11px; }.progress-stats p { display: none; }.ladder-card { grid-template-columns: 50px 1fr; gap: 15px; padding: 20px; }.ladder-card > div:last-child { grid-column: 2; }.level-number { height: 50px; font-size: 23px; } }
+.review-page { padding-top: 35px; padding-bottom: 65px; max-width: 950px; }
+.review-page h1 { font-size: 38px; letter-spacing: -1px; margin: 20px 0; font-weight: 650; }
+.review-page > p { color: #657659; font-size: 14px; line-height: 1.8; margin-bottom: 24px; }
+.review-list { display: grid; gap: 12px; margin: 30px 0; }
+.review-list > a { display: flex; gap: 20px; justify-content: space-between; align-items: center; padding: 20px; background: white; border: 1px solid #d9e2cf; border-radius: 12px; font-size: 13px; }
+.review-list span { color: #697e58; }
+.review-form { max-width: 570px; margin-top: 30px; padding: 25px; border: 1px solid #dce5d2; border-radius: 18px; background: white; }
+.review-form textarea { border: 1px solid #cdd9ca; border-radius: 8px; padding: 12px; color: #203328; width: 100%; font: inherit; }
+.review-form .review-check { display: flex; gap: 10px; align-items: flex-start; font-size: 12px; line-height: 1.7; }
+.review-form .review-check input { width: auto; margin-top: 4px; }
+@media (max-width: 760px) { .review-list > a { flex-wrap: wrap; }.review-page h1 { font-size: 30px; } }
+.learning-page .overline { text-decoration: none; }

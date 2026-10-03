@@ -1,7 +1,9 @@
 <?php
 
+use App\Enums\Role;
 use App\Models\AccountRecovery;
 use App\Models\EmailVerification;
+use App\Models\InstructorApplication;
 use App\Models\User;
 use App\Models\VerificationDelivery;
 use App\Services\Account\AccountRecoveryService;
@@ -12,6 +14,18 @@ use Illuminate\Support\Facades\DB;
 use Symfony\Component\Process\Process;
 
 uses(DatabaseMigrations::class);
+
+test('A10 concurrent reviews apply one role elevation audit and notification', function () {
+    $applicant = User::factory()->create();
+    $application = InstructorApplication::create(['user_id' => $applicant->id, 'institution_name' => 'Test Institute', 'specialization' => 'Coding', 'credential_disk' => 'local', 'credential_path' => 'instructor-credentials/test.pdf']);
+    $reviewer = User::factory()->create(['account_role' => Role::Moderator, 'active_session_hash' => hash('sha256', 'test-review-session'), 'active_session_expires_at' => now()->addHour()]);
+    $results = simultaneousAccountRequests('creator-review', ['actor_id' => $reviewer->id, 'session_id' => 'test-review-session', 'application_id' => $application->id], fn () => User::whereKey($applicant->id)->lockForUpdate()->first());
+    sort($results);
+    expect($results)->toBe(['duplicate', 'reviewed'])->and($applicant->fresh()->account_role)->toBe(Role::Instructor);
+    $this->assertDatabaseCount('audit_events', 1);
+    $this->assertDatabaseCount('creator_decision_deliveries', 1);
+    $this->assertDatabaseCount('jobs', 1);
+});
 
 test('game-first progression overlapping wins cannot duplicate daily streak or level grants', function () {
     $user = User::factory()->create(['active_session_hash' => hash('sha256', 'test-learning-session'), 'active_session_expires_at' => now()->addHour()]);

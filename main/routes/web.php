@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Account\EmailVerificationController;
+use App\Http\Controllers\Account\InstructorReviewController;
 use App\Http\Controllers\Account\LoginController;
 use App\Http\Controllers\Account\ProfileController;
 use App\Http\Controllers\Account\RecoveryController;
@@ -34,3 +35,9 @@ Route::post('/play/{level}/game', [PlayController::class, 'game'])->middleware([
 Route::post('/play/{level}/quiz', [PlayController::class, 'quiz'])->middleware(['auth', 'account.session', 'throttle:20,1,play-quiz:'])->name('play.quiz');
 Route::get('/account', ProfileController::class)->middleware(['auth', 'account.session'])->name('account.show');
 Route::post('/logout', [LoginController::class, 'destroy'])->middleware('auth')->name('logout');
+Route::middleware(['auth', 'account.session'])->prefix('manage/instructors')->name('instructor-reviews.')->group(function (): void {
+    Route::get('/', [InstructorReviewController::class, 'index'])->name('index');
+    Route::get('/{application}', [InstructorReviewController::class, 'show'])->name('show');
+    Route::get('/{application}/credential', [InstructorReviewController::class, 'credential'])->middleware('throttle:20,1,credential-read:')->name('credential');
+    Route::post('/{application}', [InstructorReviewController::class, 'review'])->middleware('throttle:10,1,creator-review:')->name('review');
+});

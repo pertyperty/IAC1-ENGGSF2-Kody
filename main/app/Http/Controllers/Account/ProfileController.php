@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Account;
 
 use App\Http\Controllers\Controller;
+use App\Models\InstructorApplication;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
@@ -22,6 +23,8 @@ class ProfileController extends Controller
             'joined_at' => $user->created_at?->format('F j, Y'),
         ];
 
-        return response()->view('account.profile', compact('profile'))->header('Cache-Control', 'no-store, private');
+        $application = InstructorApplication::where('user_id', $user->id)->first(['verification_status', 'verification_notes', 'verified_at']);
+
+        return response()->view('account.profile', compact('profile', 'application'))->header('Cache-Control', 'no-store, private');
     }
 }

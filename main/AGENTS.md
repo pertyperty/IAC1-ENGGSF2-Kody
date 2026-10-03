@@ -33,6 +33,15 @@ This is an approved product amendment, not a claim that the original SRS/SDD
 files have been revised or that the full game, creator or monetization systems
 are implemented. Keep traceability and clearly label preview-only behavior.
 
+The owner approved daily streak qualification by a server-validated game/quiz
+win, midnight Asia/Manila boundaries, reset after a missed day and no freezes.
+Clearing a game objective unlocks the next level; XP/ranks stay separate.
+The owner also approved A10 Pending/Approved/Rejected states, rejection preserving
+Learner access, Moderator/Administrator review, and format checks plus manual
+credibility review without an invented domain allowlist. See
+[play implementation](docs/play-implementation.md) and
+[creator review](docs/creator-review-implementation.md) for scope and tests.
+
 You are working on **Kody: Gamified Programming Learning Platform and Course Management System (K:GPLPCMS)**.
 
 This repository is a real Laravel application intended for deployment. Treat every production-bound change as maintainable software, not as tutorial, demo, or throwaway coursework.

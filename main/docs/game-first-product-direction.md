@@ -42,6 +42,10 @@ progression. Never convert browser success into direct XP or ledger writes.
 
 ## Reuse research
 
+Creator-approval decisions are also resolved: Pending/Approved/Rejected,
+rejection preserving existing access, Moderator/Administrator review, and format
+checks plus manual credibility review. See [review scope](creator-review-implementation.md).
+
 The project owner prefers adapting suitable internet-sourced games and permits
 scratch games. [Blockly Games](https://github.com/blockly-games/blockly-games)
 is an Apache-2.0 candidate with Maze, Turtle and other programming games.

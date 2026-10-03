@@ -10,6 +10,7 @@ return [
         'disk' => env('INSTRUCTOR_CREDENTIAL_DISK', 'local'),
         'max_kilobytes' => max(1, (int) env('INSTRUCTOR_CREDENTIAL_MAX_KILOBYTES', 5120)),
     ],
+    'notifications' => ['mailer' => env('ACCOUNT_NOTIFICATION_MAILER', env('ACCOUNT_VERIFICATION_MAILER', 'smtp'))],
     'recovery' => [
         // A04 specifies expiry/rate limits but no numeric values: operational defaults.
         'expires_minutes' => max(1, (int) env('ACCOUNT_RECOVERY_EXPIRES_MINUTES', 60)),

@@ -2,6 +2,8 @@
 
 use App\Actions\Account\LoginAccount;
 use App\Actions\Account\RegisterAccount;
+use App\Actions\Account\ReviewInstructorApplication;
+use App\Models\InstructorApplication;
 use App\Models\User;
 use App\Services\Account\AccountRecoveryService;
 use App\Services\Account\EmailVerificationService;
@@ -28,6 +30,11 @@ try {
         'recover-request' => app(AccountRecoveryService::class)->request(User::findOrFail($input['user_id'])) ? 'queued' : 'limited',
         'recover-complete' => app(AccountRecoveryService::class)->complete($input['proof'], $input['password']) ? 'recovered' : 'invalid',
         'learning-complete' => app(LearningProgression::class)->record(User::findOrFail($input['user_id']), $input['session_id'], 'sequences', 'game', ['program' => ['right', 'right', 'up', 'right', 'right']]) ? 'saved' : 'error',
+        'creator-review' => (function () use ($input): string {
+            app(ReviewInstructorApplication::class)->handle(User::findOrFail($input['actor_id']), $input['session_id'], InstructorApplication::findOrFail($input['application_id']), 1, 'Approved', null, true);
+
+            return 'reviewed';
+        })(),
         'login' => strtolower(app(LoginAccount::class)->attempt($input['email'], $input['password'], $session)->name),
         'confirm' => (function () use ($input, $session): string {
             $session->put('login_confirmation', $input['confirmation']);
