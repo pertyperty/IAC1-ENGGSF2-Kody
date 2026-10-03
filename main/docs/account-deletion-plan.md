@@ -102,7 +102,12 @@ build and diff checks passed. Focused tests use the suite-wide name filter so
 existing cross-file fixtures are loaded. Remote CI,
 live provider/storage delivery, browser visual checks and deployment are unverified.
 
-Creator deletion remains in the deferred-feature register. Next independent scope
+Creator deletion remains in the deferred-feature register.
+G02 Moderator appointment records retain only minimal role/audit references after
+deletion; queued appointment notices cancel against the Deleted tombstone. See
+[Moderator appointment scope](moderator-appointments-implementation.md).
+
+The next independent scope after initial deletion
 was A09/G05 Contributor applications, now implemented under approved eligibility,
 text, history and Pending-overlap rules. See [Contributor scope](contributor-application-plan.md).
 Keep paid purchases, paid admission,

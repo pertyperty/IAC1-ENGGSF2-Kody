@@ -31,6 +31,16 @@ class UserPolicy
             && $actor->email_verified_at !== null;
     }
 
+    public function changeModeratorRole(User $actor, User $account): bool
+    {
+        $participantRoles = [Role::Learner, Role::Contributor, Role::Instructor];
+
+        return $this->viewAny($actor) && $actor->account_role === Role::Administrator && $actor->id !== $account->id
+            && $account->account_status === AccountStatus::Active && $account->email_verified_at !== null && $account->anonymized_at === null
+            && ((in_array($account->account_role, $participantRoles, true) && $account->moderator_prior_role === null)
+                || ($account->account_role === Role::Moderator && in_array($account->moderator_prior_role, $participantRoles, true)));
+    }
+
     public function archive(User $actor, User $account): bool
     {
         return $this->update($actor, $account) && in_array($actor->account_role, [Role::Learner, Role::Contributor, Role::Instructor], true);

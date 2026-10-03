@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\VerificationDelivery;
 use App\Services\Account\AccountRecoveryService;
 use App\Services\Account\EmailVerificationService;
+use App\Services\Administration\ModeratorAppointments;
 use App\Services\Challenges\ChallengePublishing;
 use App\Services\Content\CoursePublishing;
 use App\Services\Content\ModulePublishing;
@@ -19,6 +20,23 @@ use Illuminate\Support\Facades\Storage;
 use Symfony\Component\Process\Process;
 
 uses(DatabaseMigrations::class);
+
+test('G02 simultaneous appointments and removals preserve one prior role and commit one transition', function (string $action) {
+    $first = moduleAccount(Role::Administrator);
+    $second = moduleAccount(Role::Administrator);
+    $target = moduleAccount(Role::Instructor);
+    if ($action === 'Removed') {
+        app(ModeratorAppointments::class)->change($first, 'module-test-session', $target, moderatorChangeData($target));
+    }
+    $results = simultaneousAccountRequests('moderator-change', ['actor_ids' => [$first->id, $second->id], 'target_id' => $target->id,
+        'data' => moderatorChangeData($target, ['action' => $action])], fn () => User::whereKey($target->id)->lockForUpdate()->first());
+    sort($results);
+    expect($results)->toBe(['changed', 'duplicate']);
+    expect(DB::table('account_role_changes')->where('action', $action)->count())->toBe(1)
+        ->and($target->fresh()->account_role)->toBe($action === 'Appointed' ? Role::Moderator : Role::Instructor)
+        ->and($target->fresh()->moderator_prior_role)->toBe($action === 'Appointed' ? Role::Instructor : null);
+    expect(DB::table('audit_events')->where('event', 'account.moderator-'.strtolower($action))->count())->toBe(1);
+})->with(['Appointed', 'Removed']);
 
 test('G03 G04 simultaneous staff confirmations commit one state transition and audit', function (string $action) {
     $first = moduleAccount(Role::Moderator);

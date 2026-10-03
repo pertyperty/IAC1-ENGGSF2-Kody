@@ -95,6 +95,8 @@ Moderators. Block self-enforcement and Administrator targets in this release,
 protecting the last Administrator. Implement fresh authorization, versioned locked
 Active/Suspended transitions, immediate session revocation, durable audit and queued
 notices. Preserve committed coding evaluation and unrelated user/content data.
-See [governance scope](account-governance-implementation.md). Next resolve G02
-assignment/demotion hierarchy and administrative field scope before general editing.
+See [governance scope](account-governance-implementation.md). The approved G02
+Moderator appointment/removal hierarchy is now implemented; see
+[role scope](moderator-appointments-implementation.md). Administrative personal-field
+scope still needs owner input before general editing.
 Keep owner-deferred purchases, Judge0 activation and rewards unavailable.

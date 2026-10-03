@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Administration;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Administration\BrowseAccountsRequest;
+use App\Http\Requests\Administration\ChangeModeratorRequest;
 use App\Http\Requests\Administration\EnforceAccountRequest;
 use App\Models\User;
 use App\Services\Administration\AccountEnforcement;
+use App\Services\Administration\ModeratorAppointments;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
@@ -41,8 +43,9 @@ class AccountGovernanceController extends Controller
     {
         Gate::authorize('viewAny', User::class);
         $history = DB::table('account_enforcements')->where('user_id', $account->id)->latest('created_at')->paginate(10);
+        $roleHistory = DB::table('account_role_changes')->where('user_id', $account->id)->latest('created_at')->paginate(10, ['*'], 'roles_page');
 
-        return response()->view('account.governance-account', compact('account', 'history'))->header('Cache-Control', 'no-store, private');
+        return response()->view('account.governance-account', compact('account', 'history', 'roleHistory'))->header('Cache-Control', 'no-store, private');
     }
 
     public function enforce(EnforceAccountRequest $request, User $account, AccountEnforcement $enforcement): RedirectResponse
@@ -50,5 +53,12 @@ class AccountGovernanceController extends Controller
         $enforcement->change($request->user(), $request->session()->getId(), $account, $request->validated());
 
         return redirect()->route('account-governance.show', $account)->with('status', 'Account action applied. The account holder will be notified.');
+    }
+
+    public function moderator(ChangeModeratorRequest $request, User $account, ModeratorAppointments $appointments): RedirectResponse
+    {
+        $appointments->change($request->user(), $request->session()->getId(), $account, $request->validated());
+
+        return redirect()->route('account-governance.show', $account)->with('status', 'Moderator role action applied. The account holder must sign in again and will be notified.');
     }
 }

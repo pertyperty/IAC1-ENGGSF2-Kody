@@ -12,7 +12,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 #[Fillable(['name', 'email', 'password', 'username', 'first_name', 'last_name'])]
-#[Hidden(['password', 'remember_token', 'active_session_hash', 'active_session_expires_at', 'failed_login_attempts', 'login_locked_until'])]
+#[Hidden(['password', 'remember_token', 'active_session_hash', 'active_session_expires_at', 'failed_login_attempts', 'login_locked_until', 'moderator_prior_role'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
@@ -29,6 +29,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'account_role' => Role::class,
+            'moderator_prior_role' => Role::class,
             'account_status' => AccountStatus::class,
             'failed_login_attempts' => 'integer',
             'login_locked_until' => 'immutable_datetime',

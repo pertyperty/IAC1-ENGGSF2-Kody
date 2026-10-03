@@ -83,16 +83,14 @@ Remote CI, live delivery, browser visual checks and deployment are unverified.
 ## Next implementation prompt
 
 G02 permits Administrator account editing and says role changes must follow
-defined hierarchy rules, but does not define those assignment/demotion rules or
-how they interact with approved A09/A10 contributor/creator review. Resolve allowed
-role transitions and administrative field scope before building general account
-editing; do not silently create a route that bypasses credential review or lets
-an Administrator remove the last Administrator. Owner-deferred purchases, Judge0
-activation and rewards remain unavailable.
+defined hierarchy rules. Its initial role ambiguity is now resolved by the owner
+approval below. Resolve administrative field scope before building general
+account editing. Owner-deferred purchases, Judge0 activation and rewards remain
+unavailable.
 
-Proposed next role scope for owner decision: Administrator appointment of
-Moderators from verified Active participant accounts, and removal to the recorded
-prior participant role; keep Contributor/Instructor elevation in A09/A10 and block
-self/Administrator role changes. Existing Moderators without a recorded prior
-role need an explicit resolution before demotion. This proposal is not approved
-or implemented. Administrative personal-field editing remains a separate scope.
+The owner approved Administrator appointment of Moderators from verified Active
+participant accounts and removal to the recorded prior participant role, keeping
+Contributor/Instructor elevation in A09/A10 and blocking self/Administrator role
+changes. Existing Moderators without a recorded prior role remain protected.
+See [G02 implementation](moderator-appointments-implementation.md).
+Administrative personal-field editing remains a separate unresolved scope.

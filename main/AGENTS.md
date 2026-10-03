@@ -137,6 +137,13 @@ the last Administrator. This does not authorize G02 role or personal-field edits
 See [account governance](docs/account-governance-implementation.md) for implementation,
 session revocation, audit/delivery records and PostgreSQL concurrency coverage.
 
+The owner approved the first G02 role-editing scope: Administrators may appoint
+Moderators from verified Active Learner/Contributor/Instructor accounts and remove
+them to their recorded prior participant role. Preserve A09/A10 elevation workflows;
+block self/Administrator changes and removal of existing Moderators with unknown
+prior roles. Administrative personal-field editing remains a separate scope.
+See [Moderator appointments](docs/moderator-appointments-implementation.md).
+
 You are working on **Kody: Gamified Programming Learning Platform and Course Management System (K:GPLPCMS)**.
 
 This repository is a real Laravel application intended for deployment. Treat every production-bound change as maintainable software, not as tutorial, demo, or throwaway coursework.

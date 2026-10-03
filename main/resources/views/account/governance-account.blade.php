@@ -1,5 +1,5 @@
 @extends('layouts.account')
-@section('title', 'Account enforcement — Kody')
+@section('title', 'Account governance — Kody')
 @section('content')
 <h1>{{ $account->username ?? 'Account #'.$account->id }}</h1><p>{{ $account->account_role->name }} · {{ $account->account_status->value }}</p>
 @if(session('status'))<p class="notice" role="status">{{ session('status') }}</p>@endif
@@ -14,6 +14,18 @@
 <button class="primary-button">{{ $account->account_status === \App\Enums\AccountStatus::Active ? 'Confirm suspension' : 'Confirm reinstatement' }}</button></form>
 @endif
 @endcan
+@can('changeModeratorRole', $account)
+<h2>{{ $account->account_role === \App\Enums\Role::Moderator ? 'Remove Moderator appointment' : 'Appoint a Moderator' }}</h2>
+<form class="account-form" method="POST" action="{{ route('account-governance.moderator', $account) }}">@csrf
+<input type="hidden" name="profile_version" value="{{ $account->profile_version }}">
+<input type="hidden" name="action" value="{{ $account->account_role === \App\Enums\Role::Moderator ? 'Removed' : 'Appointed' }}">
+<p>{{ $account->account_role === \App\Enums\Role::Moderator ? 'Removal returns this account to '.$account->moderator_prior_role->value.'.' : 'Appointment changes this account’s current role to Moderator and records its prior role for later removal.' }} Existing content, learning records and applications remain intact. Available tools follow the current role.</p>
+<p>This ends the account holder’s sessions. They must sign in again.</p>
+<label>Your current Administrator password<input type="password" name="current_password" maxlength="1024" autocomplete="current-password" required></label>
+<label><input type="checkbox" name="confirmed" value="1" required> I confirm this Moderator role action.</label><button class="primary-button">Confirm role action</button></form>
+@endcan
+<h2>Moderator appointment history</h2>@forelse($roleHistory as $change)<p>{{ $change->action }} · {{ $change->previous_role }} → {{ $change->resulting_role }} · Staff account #{{ $change->actor_id }} · {{ \Carbon\CarbonImmutable::parse($change->created_at)->setTimezone('Asia/Manila')->format('M j, Y g:i A') }} Asia/Manila</p>@empty<p>No recorded Moderator appointments.</p>@endforelse
+{{ $roleHistory->links() }}
 <h2>Enforcement history</h2>@forelse($history as $event)<p>{{ $event->action }} · Staff account #{{ $event->actor_id }} · {{ \Carbon\CarbonImmutable::parse($event->created_at)->setTimezone('Asia/Manila')->format('M j, Y g:i A') }} Asia/Manila</p>@empty<p>No recorded enforcement actions.</p>@endforelse
 {{ $history->links() }}<p class="secondary-link"><a href="{{ route('account-governance.index') }}">Back to accounts</a></p>
 @endsection

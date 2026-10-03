@@ -192,6 +192,11 @@ at `/manage/accounts`. Confirmed suspension immediately revokes sessions;
 reinstatement requires a new login. The approved hierarchy protects self/Admin
 targets, and committed coding evaluations continue. See
 [G01/G03/G04 scope](docs/account-governance-implementation.md).
+Administrators can also appoint verified Active participant accounts as Moderators
+and remove them to their recorded prior role. Confirmation requires the current
+Administrator password, revokes target sessions and records audit/notification
+history. Self/Admin targets and legacy Moderators with unknown prior roles remain
+protected. See [G02 role scope](docs/moderator-appointments-implementation.md).
 
 The target is Linux EC2, Nginx/PHP-FPM with PHP 8.4.1+, RDS PostgreSQL and S3 where required.
 Set `APP_ENV=production`, `APP_DEBUG=false`, a stable managed `APP_KEY`, HTTPS

@@ -5,12 +5,33 @@ use App\Models\User;
 use App\Models\VerificationDelivery;
 use App\Services\Account\AccountRecoveryService;
 use App\Services\Administration\AccountEnforcement;
+use App\Services\Administration\ModeratorAppointments;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use Illuminate\Testing\TestResponse;
 use Tests\TestCase;
 
 uses(RefreshDatabase::class);
+
+test('G02 appointment and removal revoke database sessions and old Moderator privileges', function () {
+    $target = User::factory()->create();
+    $credentials = ['email' => $target->email, 'password' => 'password'];
+    databaseBrowserRequest($this, 'post', route('login.store'), $credentials)->assertRedirect(route('dashboard'));
+    $oldBrowser = session()->getId();
+    $admin = moduleAccount(Role::Administrator);
+    $service = app(ModeratorAppointments::class);
+    $service->change($admin, 'module-test-session', $target, moderatorChangeData($target));
+    $this->assertDatabaseMissing('sessions', ['id' => $oldBrowser]);
+    databaseBrowserRequest($this, 'get', route('account-governance.index'), sessionId: $oldBrowser)->assertRedirect(route('login'));
+    databaseBrowserRequest($this, 'post', route('login.store'), $credentials)->assertRedirect(route('dashboard'));
+    $moderatorBrowser = session()->getId();
+    databaseBrowserRequest($this, 'get', route('account-governance.index'), sessionId: $moderatorBrowser)->assertOk();
+    $service->change($admin, 'module-test-session', $target, moderatorChangeData($target, ['action' => 'Removed']));
+    $this->assertDatabaseMissing('sessions', ['id' => $moderatorBrowser]);
+    databaseBrowserRequest($this, 'get', route('account-governance.index'), sessionId: $moderatorBrowser)->assertRedirect(route('login'));
+    databaseBrowserRequest($this, 'post', route('login.store'), $credentials)->assertRedirect(route('dashboard'));
+    databaseBrowserRequest($this, 'get', route('account-governance.index'), sessionId: session()->getId())->assertForbidden();
+});
 
 test('G03 G04 remove target database sessions and reinstatement cannot restore an old browser', function () {
     $target = User::factory()->create();
