@@ -204,6 +204,10 @@ Administrators can view read-only account, content, validated learning and codin
 attempt totals at `/manage/reports`, with retained date filters and consistent
 PostgreSQL snapshots. Financial/reward reporting remains unavailable. See
 [G07 scope and count definitions](docs/system-reports-implementation.md).
+Moderators/Administrators can withdraw and restore Published/Archived content at
+`/manage/content`. Staff withdrawal blocks enrolled learners too, preserving
+content, progress and committed evaluations. Creator edits cannot lift the block.
+See [G06 scope and rollback safeguards](docs/content-withdrawal-implementation.md).
 
 The target is Linux EC2, Nginx/PHP-FPM with PHP 8.4.1+, RDS PostgreSQL and S3 where required.
 Set `APP_ENV=production`, `APP_DEBUG=false`, a stable managed `APP_KEY`, HTTPS

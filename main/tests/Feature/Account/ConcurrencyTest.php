@@ -21,6 +21,22 @@ use Symfony\Component\Process\Process;
 
 uses(DatabaseMigrations::class);
 
+test('G06 simultaneous withdrawal and restoration confirmations commit one state version audit and notice', function (string $kind, string $action) {
+    $item = moderationFixture($kind);
+    $first = moduleAccount(Role::Moderator);
+    $second = moduleAccount(Role::Administrator);
+    if ($action === 'Restored') {
+        staffWithdraw($kind, $item, $first);
+    }
+    $results = simultaneousAccountRequests('content-moderate', ['actor_ids' => [$first->id, $second->id], 'kind' => $kind, 'content_id' => $item->id,
+        'data' => moderationData($item, ['action' => $action])], fn () => $item->newQuery()->whereKey($item->id)->lockForUpdate()->first());
+    sort($results);
+    expect($results)->toBe(['duplicate', 'moderated']);
+    expect(DB::table('content_moderation_actions')->where('action', $action)->count())->toBe(1)
+        ->and($item->fresh()->isWithdrawn())->toBe($action === 'Withdrawn');
+    expect(DB::table('audit_events')->where('event', 'content.'.strtolower($action))->count())->toBe(1);
+})->with([['module', 'Withdrawn'], ['module', 'Restored'], ['course', 'Withdrawn'], ['course', 'Restored'], ['challenge', 'Withdrawn'], ['challenge', 'Restored']]);
+
 test('G02 support simultaneous confirmations commit one correction version audit and notice', function () {
     $first = moduleAccount(Role::Administrator);
     $second = moduleAccount(Role::Administrator);

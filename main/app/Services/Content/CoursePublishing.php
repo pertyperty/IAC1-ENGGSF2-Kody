@@ -50,7 +50,7 @@ class CoursePublishing
             $modules = LearningModule::whereIn('id', $data['module_ids'])->with('publishedRevision')->orderBy('id')->lockForUpdate()->get()->keyBy('id');
             foreach ($data['module_ids'] as $position => $id) {
                 $module = $modules->get($id);
-                if ($module === null || $module->created_by !== $user->id || $module->status !== 'Published' || $module->publishedRevision?->review_status !== 'Approved') {
+                if ($module === null || $module->created_by !== $user->id || $module->status !== 'Published' || $module->isWithdrawn() || $module->publishedRevision?->review_status !== 'Approved') {
                     throw ValidationException::withMessages(['module_ids' => 'Choose your own published adventures. Archived or unapproved modules cannot be assigned.']);
                 }
                 CourseRevisionModule::create(['course_revision_id' => $revision->id, 'module_id' => $module->id,
@@ -129,7 +129,7 @@ class CoursePublishing
         $modules = LearningModule::whereIn('id', $slots->pluck('module_id'))->orderBy('id')->lockForUpdate()->get()->keyBy('id');
         foreach ($slots as $slot) {
             $module = $modules->get($slot->module_id);
-            if ($module === null || $module->created_by !== $ownerId || $module->status !== 'Published' || $slot->revision->review_status !== 'Approved') {
+            if ($module === null || $module->created_by !== $ownerId || $module->status !== 'Published' || $module->isWithdrawn() || $slot->revision->review_status !== 'Approved') {
                 throw ValidationException::withMessages(['module_ids' => 'A saved adventure is no longer available. Save an updated course draft before publishing.']);
             }
         }

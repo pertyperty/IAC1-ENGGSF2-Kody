@@ -1,7 +1,11 @@
 @extends('layouts.learning')
 @section('title', 'Build an adventure — Kody')
 @section('content')
+
+
 <section class="review-page page-width">
+@if($module?->isWithdrawn())<p class="lesson-note">Staff withdrawal is active. Learner access is blocked. Draft corrections, publication review and creator archival do not lift this block; only staff restoration can do that.</p>@endif
+
     <a class="quiet-link" href="{{ route('studio.index') }}">← Your studio</a><h1>{{ $module ? 'Shape your adventure.' : 'Start with a spark.' }}</h1>
     <p>Teach a small idea with a lesson and a playful activity. Save a draft, try it out, then submit it for review.</p>
     @if(session('status'))<p role="status" class="lesson-note">{{ session('status') }}</p>@endif

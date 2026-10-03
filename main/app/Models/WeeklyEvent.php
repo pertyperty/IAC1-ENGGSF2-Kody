@@ -28,7 +28,7 @@ class WeeklyEvent extends Model
     public function scopeOpen(Builder $query): Builder
     {
         return $query->whereIn('status', ['Scheduled', 'Active'])->where('starts_at', '<=', now())->where('ends_at', '>', now())
-            ->whereHas('challenge', fn ($builder) => $builder->where('status', 'Published'))
+            ->whereHas('challenge', fn ($builder) => $builder->where('status', 'Published')->whereNull('staff_withdrawn_at'))
             ->whereHas('revision', fn ($builder) => $builder->where('review_status', 'Approved'));
     }
 }

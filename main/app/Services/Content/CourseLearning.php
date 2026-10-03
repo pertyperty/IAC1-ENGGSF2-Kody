@@ -21,6 +21,7 @@ class CourseLearning
         return DB::transaction(function () use ($actor, $sessionId, $courseId, $revisionId): CourseEnrollment {
             $user = $this->account($actor, $sessionId);
             $course = LearningCourse::whereKey($courseId)->lockForUpdate()->firstOrFail();
+            abort_if($course->isWithdrawn(), 404);
             $existing = CourseEnrollment::where('user_id', $user->id)->where('course_id', $course->id)->first();
             if ($existing !== null && in_array($course->status, ['Published', 'Archived'], true)) {
                 return $existing;
@@ -30,7 +31,7 @@ class CourseLearning
             abort_unless($revision?->review_status === 'Approved', 404);
             $slots = $revision->modules()->with('revision')->get();
             $modules = LearningModule::whereIn('id', $slots->pluck('module_id'))->orderBy('id')->lockForUpdate()->get()->keyBy('id');
-            if ($slots->isEmpty() || $slots->contains(fn ($slot) => $modules->get($slot->module_id)?->status !== 'Published' || $slot->revision->review_status !== 'Approved')) {
+            if ($slots->isEmpty() || $slots->contains(fn ($slot) => $modules->get($slot->module_id)?->status !== 'Published' || $modules->get($slot->module_id)?->isWithdrawn() || $slot->revision->review_status !== 'Approved')) {
                 throw ValidationException::withMessages(['course' => 'An adventure in this course is unavailable. Try another journey.']);
             }
             $enrollment = CourseEnrollment::create(['user_id' => $user->id, 'course_id' => $course->id,
@@ -47,6 +48,7 @@ class CourseLearning
         return DB::transaction(function () use ($actor, $sessionId, $courseId): array {
             $user = $this->account($actor, $sessionId);
             $course = LearningCourse::whereKey($courseId)->lockForUpdate()->firstOrFail();
+            abort_if($course->isWithdrawn(), 404);
             $enrollment = CourseEnrollment::where('user_id', $user->id)->where('course_id', $course->id)->first();
             abort_unless($course->status === 'Published' || ($course->status === 'Archived' && $enrollment !== null), 404);
             $revision = $enrollment?->revision ?? $course->publishedRevision;
@@ -97,12 +99,13 @@ class CourseLearning
     private function entitlement(User $user, int $courseId, int $slotId): array
     {
         $course = LearningCourse::whereKey($courseId)->lockForUpdate()->firstOrFail();
+        abort_if($course->isWithdrawn(), 404);
         abort_unless(in_array($course->status, ['Published', 'Archived'], true), 404);
         $enrollment = CourseEnrollment::where('user_id', $user->id)->where('course_id', $course->id)->first();
         abort_unless($enrollment !== null, 403, 'Join this course to open its adventures.');
         $slot = CourseRevisionModule::where('course_revision_id', $enrollment->course_revision_id)->with('revision')->findOrFail($slotId);
         $module = LearningModule::whereKey($slot->module_id)->lockForUpdate()->firstOrFail();
-        abort_unless($module->status === 'Published' && $slot->revision->review_status === 'Approved' && $enrollment->revision->review_status === 'Approved', 404);
+        abort_unless($module->status === 'Published' && ! $module->isWithdrawn() && $slot->revision->review_status === 'Approved' && $enrollment->revision->review_status === 'Approved', 404);
 
         return [$course, $enrollment, $slot];
     }

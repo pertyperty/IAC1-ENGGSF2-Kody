@@ -18,6 +18,7 @@ use App\Services\Account\EmailVerificationService;
 use App\Services\Account\InstructorApplications;
 use App\Services\Account\ProfileEditing;
 use App\Services\Administration\AccountEnforcement;
+use App\Services\Administration\ContentModeration;
 use App\Services\Administration\ModeratorAppointments;
 use App\Services\Administration\SupportProfileCorrections;
 use App\Services\Challenges\ChallengePublishing;
@@ -52,6 +53,12 @@ try {
     $session->start();
 
     $result = match ($argv[1]) {
+        'content-moderate' => (function () use ($input, $argv): string {
+            app(ContentModeration::class)->change(User::findOrFail($input['actor_ids'][(int) $argv[3] - 1]), 'module-test-session',
+                $input['kind'], $input['content_id'], $input['data']);
+
+            return 'moderated';
+        })(),
         'support-correct' => (function () use ($input, $argv): string {
             app(SupportProfileCorrections::class)->correct(User::findOrFail($input['actor_ids'][(int) $argv[3] - 1]), 'module-test-session',
                 User::findOrFail($input['target_id']), $input['data']);

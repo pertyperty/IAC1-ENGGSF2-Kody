@@ -19,6 +19,7 @@
 .intro { color: #617467; line-height: 1.6; margin-bottom: 28px; }
 .account-form { display: grid; gap: 18px; }
 .report-table { width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 14px; }
+.moderation-details pre { white-space: pre-wrap; overflow-wrap: anywhere; }
 .report-table caption { text-align: left; font-weight: 700; margin-bottom: 12px; }
 .report-table th, .report-table td { padding: 12px 8px; border-bottom: 1px solid #dce3d5; text-align: left; overflow-wrap: anywhere; }
 .report-table tbody th { font-weight: 400; }

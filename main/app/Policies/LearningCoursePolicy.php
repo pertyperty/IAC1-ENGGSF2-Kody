@@ -44,4 +44,9 @@ class LearningCoursePolicy
     {
         return $this->viewAny($user) && $course->created_by !== $user->id;
     }
+
+    public function moderate(User $user, LearningCourse $content): bool
+    {
+        return $this->review($user, $content) && in_array($content->status, ['Published', 'Archived'], true);
+    }
 }

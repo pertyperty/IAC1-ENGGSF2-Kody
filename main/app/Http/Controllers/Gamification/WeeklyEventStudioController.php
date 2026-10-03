@@ -24,7 +24,7 @@ class WeeklyEventStudioController extends Controller
         $event = WeeklyEvent::where('starts_at', $start->utc())->with('revision:id,title,language')->first();
         $query = trim($data['q'] ?? '');
         $revisions = CodingChallengeRevision::where('review_status', 'Approved')
-            ->whereHas('challenge', fn ($builder) => $builder->where('status', 'Published')->whereColumn('published_revision_id', 'coding_challenge_revisions.id'))
+            ->whereHas('challenge', fn ($builder) => $builder->where('status', 'Published')->whereNull('staff_withdrawn_at')->whereColumn('published_revision_id', 'coding_challenge_revisions.id'))
             ->when($query !== '', fn ($builder) => $builder->where('title', 'ilike', '%'.addcslashes($query, '%_\\').'%'))
             ->orderByDesc('id')->paginate(12, ['id', 'challenge_id', 'title', 'language'])->withQueryString();
         $upcoming = WeeklyEvent::with('revision:id,title,language')->orderByDesc('starts_at')->limit(12)->get();

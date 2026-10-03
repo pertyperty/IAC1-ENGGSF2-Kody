@@ -13,6 +13,7 @@ use App\Http\Controllers\Account\ProfileEditingController;
 use App\Http\Controllers\Account\RecoveryController;
 use App\Http\Controllers\Account\RegistrationController;
 use App\Http\Controllers\Administration\AccountGovernanceController;
+use App\Http\Controllers\Administration\ContentModerationController;
 use App\Http\Controllers\Administration\SystemReportController;
 use App\Http\Controllers\Challenges\ChallengeReviewController;
 use App\Http\Controllers\Challenges\ChallengeStudioController;
@@ -126,6 +127,11 @@ Route::middleware(['auth', 'account.session'])->prefix('manage/accounts')->name(
 });
 Route::get('/account/contributor-application', [ContributorApplicationController::class, 'create'])->middleware(['auth', 'account.session'])->name('contributor-application.create');
 Route::get('/manage/reports', SystemReportController::class)->middleware(['auth', 'account.session', 'throttle:10,1,system-reports:'])->name('system-reports');
+Route::middleware(['auth', 'account.session'])->prefix('manage/content')->name('content-moderation.')->group(function (): void {
+    Route::get('/', [ContentModerationController::class, 'index'])->name('index');
+    Route::get('/{kind}/{content}', [ContentModerationController::class, 'show'])->whereIn('kind', ['module', 'course', 'challenge'])->whereNumber('content')->name('show');
+    Route::post('/{kind}/{content}', [ContentModerationController::class, 'change'])->whereIn('kind', ['module', 'course', 'challenge'])->whereNumber('content')->middleware('throttle:10,1,content-moderation:')->name('change');
+});
 Route::post('/account/contributor-application', [ContributorApplicationController::class, 'store'])->middleware(['auth', 'account.session', 'throttle:5,1,contributor-apply:'])->name('contributor-application.store');
 Route::middleware(['auth', 'account.session'])->prefix('manage/contributors')->name('contributor-reviews.')->group(function (): void {
     Route::get('/', [ContributorReviewController::class, 'index'])->name('index');

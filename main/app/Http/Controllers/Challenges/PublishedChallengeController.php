@@ -23,7 +23,7 @@ class PublishedChallengeController extends Controller
             'difficulty' => ['nullable', Rule::in(['Easy', 'Medium', 'Hard'])]]);
         $query = $filters['q'] ?? '';
         $challenges = CodingChallengeRevision::select(['id', 'challenge_id', 'title', 'language', 'difficulty'])
-            ->where('review_status', 'Approved')->whereHas('challenge', fn ($builder) => $builder->where('status', 'Published')->whereColumn('published_revision_id', 'coding_challenge_revisions.id'))
+            ->where('review_status', 'Approved')->whereHas('challenge', fn ($builder) => $builder->where('status', 'Published')->whereNull('staff_withdrawn_at')->whereColumn('published_revision_id', 'coding_challenge_revisions.id'))
             ->when(trim($query) !== '', fn ($builder) => $builder->where('title', 'ilike', '%'.addcslashes(trim($query), '%_\\').'%'))
             ->when($filters['language'] ?? null, fn ($builder, $language) => $builder->where('language', $language))
             ->when($filters['difficulty'] ?? null, fn ($builder, $difficulty) => $builder->where('difficulty', $difficulty))
@@ -34,7 +34,7 @@ class PublishedChallengeController extends Controller
 
     public function show(Request $request, CodingChallenge $challenge): Response
     {
-        abort_unless($challenge->status === 'Published', 404);
+        abort_unless($challenge->status === 'Published' && ! $challenge->isWithdrawn(), 404);
         $revision = CodingChallengeRevision::whereKey($challenge->published_revision_id)->where('challenge_id', $challenge->id)->where('review_status', 'Approved')
             ->firstOrFail(['id', 'title', 'description', 'language', 'difficulty', 'rules', 'input_format', 'output_format', 'cpu_time_ms', 'memory_kib']);
         // Hidden tests are excluded by SQL and never loaded into the learner view.

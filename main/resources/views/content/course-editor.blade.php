@@ -1,7 +1,11 @@
 @extends('layouts.learning')
 @section('title', 'Shape a course — Kody')
 @section('content')
-<section class="review-page page-width"><a class="quiet-link" href="{{ route('courses.index') }}">← Your courses</a><h1>Give your journey a shape.</h1><p>Start with one clear goal. Build toward it with small adventures.</p>
+
+
+<section class="review-page page-width">
+@if($course?->isWithdrawn())<p class="lesson-note">Staff withdrawal is active. Learner access is blocked. Draft corrections, publication review and creator archival do not lift this block; only staff restoration can do that.</p>@endif
+<a class="quiet-link" href="{{ route('courses.index') }}">← Your courses</a><h1>Give your journey a shape.</h1><p>Start with one clear goal. Build toward it with small adventures.</p>
     @if(session('status'))<p class="lesson-note" role="status">{{ session('status') }}</p>@endif
     @if($errors->any())<div class="studio-errors" role="alert">@foreach($errors->all() as $error)<p>{{ $error }}</p>@endforeach</div>@endif
     @if($revision)<p class="step-pill">Revision {{ $revision->number }} · {{ $revision->review_status }}</p>@if($revision->review_notes)<p class="lesson-note">{{ $revision->review_notes }}</p>@endif @endif
@@ -29,7 +33,7 @@
     </form>
     @if($revision?->review_status === 'Draft' && $course?->status !== 'Archived')<form method="post" action="{{ route('courses.submit', $course) }}" class="studio-actions">@csrf<input type="hidden" name="record_version" value="{{ $course->record_version }}"><button class="button button-dark">Submit saved course for review →</button></form>@endif
     @can('archive', $course)<p><a class="quiet-link" href="{{ route('courses.archive-confirmation', $course) }}">Archive this course</a></p>@endcan
-    @if($course?->status === 'Archived')<p class="lesson-note">This course is archived. Existing learners keep their journey; new learners cannot enroll.</p>@endif
+    @if($course?->status === 'Archived')<p class="lesson-note">This course is archived. Enrollments and progress are retained; new learners cannot enroll. Existing learners can continue while no staff withdrawal is active.</p>@endif
     @if($revision)<h2>Try your saved journey</h2>@include('content.course-outline')@endif
 </section>
 @endsection

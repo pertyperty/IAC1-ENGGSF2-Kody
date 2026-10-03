@@ -1,7 +1,11 @@
 @extends('layouts.learning')
 @section('title', 'Shape a coding quest — Kody')
 @section('content')
-<section class="review-page page-width"><a class="quiet-link" href="{{ route('challenges.index') }}">← Your challenges</a><h1>Turn a problem into possibility.</h1><p>Help someone discover what their code can do.</p>
+
+
+<section class="review-page page-width">
+@if($challenge?->isWithdrawn())<p class="lesson-note">Staff withdrawal is active. Learner access is blocked. Draft corrections, publication review and creator archival do not lift this block; only staff restoration can do that.</p>@endif
+<a class="quiet-link" href="{{ route('challenges.index') }}">← Your challenges</a><h1>Turn a problem into possibility.</h1><p>Help someone discover what their code can do.</p>
 @if(session('status'))<p class="lesson-note" role="status">{{ session('status') }}</p>@endif
 @if($errors->any())<div class="studio-errors" role="alert">@foreach($errors->all() as $error)<p>{{ $error }}</p>@endforeach</div>@endif
 @if($revision)<p class="step-pill">{{ $challenge->status }} · Revision {{ $revision->number }} · {{ $revision->review_status }}</p>@if($revision->review_notes)<p class="lesson-note">{{ $revision->review_notes }}</p>@endif @endif

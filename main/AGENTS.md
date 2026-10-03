@@ -151,6 +151,13 @@ revocation and notice. Self/Administrator targets retain A06, and email/password
 changes remain in owner A06/A04 flows. See
 [support corrections](docs/support-profile-corrections-implementation.md).
 
+The owner approved G06 staff withdrawal/restoration for Published/Archived modules,
+courses and challenges: block all learner access including existing enrollees,
+preserve content/revisions/progress/audit and finish committed evaluations. Keep a
+separate staff block from owner archival; only staff restoration can remove it,
+and creator edits/republication must retain it. See
+[content withdrawal](docs/content-withdrawal-implementation.md).
+
 You are working on **Kody: Gamified Programming Learning Platform and Course Management System (K:GPLPCMS)**.
 
 This repository is a real Laravel application intended for deployment. Treat every production-bound change as maintainable software, not as tutorial, demo, or throwaway coursework.

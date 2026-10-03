@@ -30,6 +30,7 @@ preserves valid selections. Invalid filters cannot replace the last valid filter
 | Coding attempts | `submitted_at` | Durable submissions grouped by current outcome/status, including standard and weekly attempts. A pass completed later can change the current outcome of an earlier submitted attempt. |
 
 The page explains current-snapshot semantics, generated time, record-based counts
+and that lifecycle counts include staff-withdrawn items whose lifecycle is retained,
 and the exclusion of erased private learning/submission records. It never labels
 these as immutable historical totals, unique learning clearances or reward grants.
 
@@ -77,9 +78,8 @@ unverified. Judge0 tests use the existing provider fake; live execution stays de
 
 ## Next implementation prompt
 
-G06 publication review already exists for modules, courses and challenges. Staff
-withdrawal/restoration of published content needs approved moderation transitions
-and access rules for existing enrollees, pinned revisions and committed evaluations.
-Do not treat owner archival (which preserves enrolled course access) as staff
-withdrawal without a decision. Retain owner-deferred purchases, rewards and live
-Judge0 activation in the deferred-feature register.
+The owner approved G06 staff withdrawal and restoration, now implemented with a
+separate block that covers existing enrollees and pinned revisions while preserving
+committed evaluations. See [withdrawal scope](content-withdrawal-implementation.md).
+Next resolve G08's first-release preset reward mode, retaining owner-deferred
+purchases, rewards and live Judge0 activation in the deferred-feature register.
