@@ -173,6 +173,48 @@ Paid purchases and other postponed scope are tracked in the
 Learners, Contributors and Instructors can archive their own accounts with
 password confirmation, retaining data and returning through A04 recovery.
 See [A07 archival scope](docs/account-archival-implementation.md).
+Participant accounts without authored modules, courses or challenges can request
+permanent deletion at `/account/delete`, using password and explicit confirmation.
+Active evaluations must finish first; Archived users reactivate through A04 first.
+Deletion removes private learning/submission records and revokes sessions. Private
+credential files use encrypted, retryable cleanup records. Keep database workers
+and the scheduler running; `php artisan kody:account-erasures-retry` requeues
+unfinished cleanup without duplicating pending jobs. See
+[deletion scope and operational limits](docs/account-deletion-plan.md).
+Learners can apply for Contributor access at `/account/contributor-application`
+after 30 days, 25 distinct validated module completions and 50 distinct passed
+coding challenges. Moderator/Admin review at `/manage/contributors` controls
+elevation. Rejected applications retain history; only one Pending role application
+is allowed at a time. Supporting files stay private and notices use database jobs.
+See [A09/G05 scope](docs/contributor-application-plan.md).
+Moderators and Administrators can browse account status and enforcement history
+at `/manage/accounts`. Confirmed suspension immediately revokes sessions;
+reinstatement requires a new login. The approved hierarchy protects self/Admin
+targets, and committed coding evaluations continue. See
+[G01/G03/G04 scope](docs/account-governance-implementation.md).
+Administrators can also appoint verified Active participant accounts as Moderators
+and remove them to their recorded prior role. Confirmation requires the current
+Administrator password, revokes target sessions and records audit/notification
+history. Self/Admin targets and legacy Moderators with unknown prior roles remain
+protected. See [G02 role scope](docs/moderator-appointments-implementation.md).
+Administrators can correct username and first/last name for eligible accounts
+when the user requests help, with password confirmation, audit, session revocation
+and a queued notice. See [G02 support scope](docs/support-profile-corrections-implementation.md).
+Administrators can view read-only account, content, validated learning and coding
+attempt totals at `/manage/reports`, with retained date filters and consistent
+PostgreSQL snapshots. Financial/reward reporting remains unavailable. See
+[G07 scope and count definitions](docs/system-reports-implementation.md).
+Moderators/Administrators can withdraw and restore Published/Archived content at
+`/manage/content`. Staff withdrawal blocks enrolled learners too, preserving
+content, progress and committed evaluations. Creator edits cannot lift the block.
+See [G06 scope and rollback safeguards](docs/content-withdrawal-implementation.md).
+Administrators manage reusable game/quiz defaults at `/manage/game-presets`.
+Module assessments pin immutable preset versions; updates and inactivation retain
+existing play. Rewards stay Deferred. See
+[preset workshop scope](docs/game-presets-implementation.md).
+Public Help at `/help` provides categorized, searchable answers. Verified Active
+Administrators publish, update and delete entries at `/manage/faqs`, with audited
+version checks. See [FAQ scope and verification](docs/faq-implementation.md).
 
 The target is Linux EC2, Nginx/PHP-FPM with PHP 8.4.1+, RDS PostgreSQL and S3 where required.
 Set `APP_ENV=production`, `APP_DEBUG=false`, a stable managed `APP_KEY`, HTTPS

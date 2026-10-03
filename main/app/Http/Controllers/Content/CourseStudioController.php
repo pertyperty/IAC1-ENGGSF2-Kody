@@ -84,13 +84,13 @@ class CourseStudioController extends Controller
     {
         $publishing->archive($request->user(), $request->session()->getId(), $course, (int) $request->validated('record_version'));
 
-        return redirect()->route('courses.edit', $course)->with('status', 'Course archived. Existing learners keep their journey.');
+        return redirect()->route('courses.edit', $course)->with('status', 'Course archived. Enrollment and progress are retained; any staff withdrawal continues.');
     }
 
     private function availableModules(array $selectedIds, Request $request): Collection
     {
         $query = $request->validate(['q' => ['nullable', 'string', 'max:80']])['q'] ?? '';
-        $recentIds = LearningModule::where('created_by', $request->user()->id)->where('status', 'Published')
+        $recentIds = LearningModule::where('created_by', $request->user()->id)->where('status', 'Published')->whereNull('staff_withdrawn_at')
             ->when(trim($query) !== '', fn ($builder) => $builder->whereHas('publishedRevision', fn ($revision) => $revision->where('title', 'ilike', '%'.addcslashes(trim($query), '%_\\').'%')))
             ->orderByDesc('id')->limit(200)->pluck('id');
 

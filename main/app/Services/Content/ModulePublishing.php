@@ -7,6 +7,7 @@ use App\Models\ModuleRevision;
 use App\Models\User;
 use App\Services\Account\CurrentAccountSession;
 use App\Services\Administration\AuditRecorder;
+use App\Services\Games\GamePresets;
 use App\Services\Notifications\InAppNotifications;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -37,7 +38,8 @@ class ModulePublishing
             ModuleRevision::create(['module_id' => $current->id, 'number' => $number,
                 'title' => $data['title'], 'description' => $data['description'], 'content' => $data['content'],
                 'type' => $data['type'], 'video_url' => $data['type'] === 'Video' ? $data['video_url'] : null,
-                'assessment' => $this->assessment($data)]);
+                'assessment' => $this->assessment($data),
+                'game_preset_revision_id' => $data['assessment_kind'] === 'preset' ? (int) $data['managed_preset'] : null]);
             $this->audit($user, $current, 'module.saved', ['revision' => $number]);
 
             return $current;
@@ -115,6 +117,7 @@ class ModulePublishing
     private function assessment(array $data): ?array
     {
         return match ($data['assessment_kind']) {
+            'preset' => array_replace(app(GamePresets::class)->snapshot((int) $data['managed_preset']), ['title' => $data['preset_title']]),
             'game' => array_replace(config('learning.instances')[$data['game_preset']], ['preset' => $data['game_preset'],
                 'title' => $data['game_title'], 'instructions' => $data['game_instructions'], 'hint' => $data['game_hint'], 'learningIdea' => $data['game_learning_idea']]),
             'quiz' => ['template' => 'choice-quiz', 'version' => 1, 'title' => $data['quiz_title'], 'question' => $data['quiz_question'],

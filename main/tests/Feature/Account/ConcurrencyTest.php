@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\AccountStatus;
 use App\Enums\Role;
 use App\Models\AccountRecovery;
 use App\Models\EmailVerification;
@@ -8,6 +9,7 @@ use App\Models\User;
 use App\Models\VerificationDelivery;
 use App\Services\Account\AccountRecoveryService;
 use App\Services\Account\EmailVerificationService;
+use App\Services\Administration\ModeratorAppointments;
 use App\Services\Challenges\ChallengePublishing;
 use App\Services\Content\CoursePublishing;
 use App\Services\Content\ModulePublishing;
@@ -18,6 +20,146 @@ use Illuminate\Support\Facades\Storage;
 use Symfony\Component\Process\Process;
 
 uses(DatabaseMigrations::class);
+
+test('G12 G13 simultaneous FAQ confirmations commit one content version and audit', function (string $action) {
+    $entry = faqFixture();
+    $first = moduleAccount(Role::Administrator);
+    $second = moduleAccount(Role::Administrator);
+    $results = simultaneousAccountRequests('faq-change', ['actor_ids' => [$first->id, $second->id], 'entry_id' => $entry->id,
+        'action' => $action, 'data' => faqData(['answer' => 'Changed answer'])], fn () => $entry->newQuery()->whereKey($entry->id)->lockForUpdate()->first());
+    sort($results);
+    expect($results)->toBe(['changed', 'duplicate'])->and($entry->fresh()->record_version)->toBe(2);
+    expect(DB::table('audit_events')->where('event', $action === 'update' ? 'faq.updated' : 'faq.deleted')->count())->toBe(1);
+})->with(['update', 'delete']);
+
+test('G11 simultaneous duplicate FAQ creations commit one entry and audit', function () {
+    $first = moduleAccount(Role::Administrator);
+    $second = moduleAccount(Role::Administrator);
+    $results = simultaneousAccountRequests('faq-create', ['actor_ids' => [$first->id, $second->id], 'data' => faqData()],
+        fn () => DB::statement('LOCK TABLE faq_entries IN SHARE MODE'));
+    sort($results);
+    expect($results)->toBe(['created', 'duplicate']);
+    expect(DB::table('faq_entries')->count())->toBe(1)->and(DB::table('audit_events')->where('event', 'faq.created')->count())->toBe(1);
+});
+
+test('G09 G10 competing administrator confirmations commit one preset transition and audit', function (string $action) {
+    $preset = presetFixture();
+    $first = moduleAccount(Role::Administrator);
+    $second = moduleAccount(Role::Administrator);
+    $results = simultaneousAccountRequests('preset-change', ['actor_ids' => [$first->id, $second->id], 'preset_id' => $preset->id,
+        'action' => $action, 'data' => presetData(['title' => 'Changed'])], fn () => $preset->newQuery()->whereKey($preset->id)->lockForUpdate()->first());
+    sort($results);
+    expect($results)->toBe(['changed', 'duplicate'])->and($preset->fresh()->record_version)->toBe(2);
+    expect(DB::table('game_preset_revisions')->count())->toBe($action === 'update' ? 2 : 1);
+    expect(DB::table('audit_events')->where('event', $action === 'update' ? 'game_preset.updated' : 'game_preset.inactivated')->count())->toBe(1);
+})->with(['update', 'inactivate']);
+
+test('G08 competing same-name creations commit one preset revision and audit', function () {
+    $first = moduleAccount(Role::Administrator);
+    $second = moduleAccount(Role::Administrator);
+    $results = simultaneousAccountRequests('preset-create', ['actor_ids' => [$first->id, $second->id], 'data' => presetData()],
+        fn () => DB::statement('LOCK TABLE game_presets IN SHARE MODE'));
+    sort($results);
+    expect($results)->toBe(['created', 'duplicate']);
+    expect(DB::table('game_presets')->count())->toBe(1)->and(DB::table('game_preset_revisions')->count())->toBe(1);
+    expect(DB::table('audit_events')->where('event', 'game_preset.created')->count())->toBe(1);
+});
+
+test('G06 simultaneous withdrawal and restoration confirmations commit one state version audit and notice', function (string $kind, string $action) {
+    $item = moderationFixture($kind);
+    $first = moduleAccount(Role::Moderator);
+    $second = moduleAccount(Role::Administrator);
+    if ($action === 'Restored') {
+        staffWithdraw($kind, $item, $first);
+    }
+    $results = simultaneousAccountRequests('content-moderate', ['actor_ids' => [$first->id, $second->id], 'kind' => $kind, 'content_id' => $item->id,
+        'data' => moderationData($item, ['action' => $action])], fn () => $item->newQuery()->whereKey($item->id)->lockForUpdate()->first());
+    sort($results);
+    expect($results)->toBe(['duplicate', 'moderated']);
+    expect(DB::table('content_moderation_actions')->where('action', $action)->count())->toBe(1)
+        ->and($item->fresh()->isWithdrawn())->toBe($action === 'Withdrawn');
+    expect(DB::table('audit_events')->where('event', 'content.'.strtolower($action))->count())->toBe(1);
+})->with([['module', 'Withdrawn'], ['module', 'Restored'], ['course', 'Withdrawn'], ['course', 'Restored'], ['challenge', 'Withdrawn'], ['challenge', 'Restored']]);
+
+test('G02 support simultaneous confirmations commit one correction version audit and notice', function () {
+    $first = moduleAccount(Role::Administrator);
+    $second = moduleAccount(Role::Administrator);
+    $target = moduleAccount(Role::Learner);
+    $results = simultaneousAccountRequests('support-correct', ['actor_ids' => [$first->id, $second->id], 'target_id' => $target->id,
+        'data' => supportCorrectionData($target)], fn () => User::whereKey($target->id)->lockForUpdate()->first());
+    sort($results);
+    expect($results)->toBe(['corrected', 'duplicate']);
+    expect(DB::table('account_support_corrections')->count())->toBe(1)->and($target->fresh()->profile_version)->toBe(2);
+    expect(DB::table('audit_events')->where('event', 'account.support-corrected')->count())->toBe(1)->and(DB::table('jobs')->count())->toBe(1);
+});
+
+test('G02 simultaneous appointments and removals preserve one prior role and commit one transition', function (string $action) {
+    $first = moduleAccount(Role::Administrator);
+    $second = moduleAccount(Role::Administrator);
+    $target = moduleAccount(Role::Instructor);
+    if ($action === 'Removed') {
+        app(ModeratorAppointments::class)->change($first, 'module-test-session', $target, moderatorChangeData($target));
+    }
+    $results = simultaneousAccountRequests('moderator-change', ['actor_ids' => [$first->id, $second->id], 'target_id' => $target->id,
+        'data' => moderatorChangeData($target, ['action' => $action])], fn () => User::whereKey($target->id)->lockForUpdate()->first());
+    sort($results);
+    expect($results)->toBe(['changed', 'duplicate']);
+    expect(DB::table('account_role_changes')->where('action', $action)->count())->toBe(1)
+        ->and($target->fresh()->account_role)->toBe($action === 'Appointed' ? Role::Moderator : Role::Instructor)
+        ->and($target->fresh()->moderator_prior_role)->toBe($action === 'Appointed' ? Role::Instructor : null);
+    expect(DB::table('audit_events')->where('event', 'account.moderator-'.strtolower($action))->count())->toBe(1);
+})->with(['Appointed', 'Removed']);
+
+test('G03 G04 simultaneous staff confirmations commit one state transition and audit', function (string $action) {
+    $first = moduleAccount(Role::Moderator);
+    $second = moduleAccount(Role::Administrator);
+    $target = moduleAccount(Role::Learner);
+    if ($action === 'Reinstated') {
+        $target->forceFill(['account_status' => AccountStatus::Suspended])->save();
+    }
+    $results = simultaneousAccountRequests('account-enforce', ['actor_ids' => [$first->id, $second->id], 'target_id' => $target->id,
+        'data' => enforcementData($target, ['action' => $action])], fn () => User::whereKey($target->id)->lockForUpdate()->first());
+    sort($results);
+    expect($results)->toBe(['duplicate', 'enforced']);
+    expect(DB::table('account_enforcements')->count())->toBe(1)->and($target->fresh()->profile_version)->toBe(2);
+    expect(DB::table('audit_events')->where('event', 'account.'.strtolower($action))->count())->toBe(1);
+})->with(['Suspended', 'Reinstated']);
+
+test('A09 concurrent same-kind and cross-kind role applications admit only one Pending request', function (bool $mixed) {
+    Storage::fake('local');
+    $user = contributorQualifiedUser();
+    $results = simultaneousAccountRequests('role-apply', ['actor_id' => $user->id, 'mixed' => $mixed,
+        'storage_root' => Storage::disk('local')->path(''), 'data' => ['previous_application_id' => 0, 'request_message' => 'Build quests.', 'confirmed' => true],
+        'instructor_data' => ['record_version' => 0, 'institution_name' => 'Teaching Institute', 'specialization' => 'Programming']],
+        fn () => User::whereKey($user->id)->lockForUpdate()->first());
+    sort($results);
+    expect($results)->toBe(['applied', 'duplicate'])->and(Storage::disk('local')->allFiles())->toHaveCount(1);
+    expect(DB::table('contributor_applications')->where('approval_status', 'Pending')->count()
+        + DB::table('instructor_applications')->where('verification_status', 'Pending')->count())->toBe(1);
+})->with([false, true]);
+
+test('G05 concurrent reviews grant Contributor and record a single decision and outcome', function () {
+    $user = contributorQualifiedUser();
+    $application = contributorSubmit($user);
+    $first = moduleAccount(Role::Moderator);
+    $second = moduleAccount(Role::Administrator);
+    $results = simultaneousAccountRequests('contributor-review', ['actor_ids' => [$first->id, $second->id],
+        'application_id' => $application->id, 'data' => contributorDecision()],
+        fn () => User::whereKey($user->id)->lockForUpdate()->first());
+    sort($results);
+    expect($results)->toBe(['duplicate', 'reviewed'])->and($user->fresh()->account_role)->toBe(Role::Contributor);
+    expect(DB::table('audit_events')->where('event', 'contributor_application.reviewed')->count())->toBe(1);
+    expect(DB::table('contributor_notice_deliveries')->where('kind', 'Approved')->count())->toBe(1);
+});
+
+test('Delete Account simultaneous confirmations remove data and write one deletion audit', function () {
+    $user = moduleAccount(Role::Learner);
+    $results = simultaneousAccountRequests('account-delete', ['actor_id' => $user->id, 'session_id' => 'module-test-session', 'data' => deletionData($user)],
+        fn () => User::whereKey($user->id)->lockForUpdate()->first());
+    sort($results);
+    expect($results)->toBe(['deleted', 'revoked']);
+    expect(DB::table('audit_events')->where('event', 'account.deleted')->count())->toBe(1);
+});
 
 afterEach(function () {
     // Disposable kody_test only; production down migrations preserve credential history.

@@ -69,7 +69,7 @@ class LearningProgression
             $user = User::whereKey($actor->id)->lockForUpdate()->firstOrFail();
             app(CurrentAccountSession::class)->assert($user, $sessionId);
             $module = LearningModule::whereKey($moduleId)->lockForUpdate()->firstOrFail();
-            abort_unless($module->status === 'Published' && $module->published_revision_id === $revisionId, 409, 'This adventure changed. Reload before trying again.');
+            abort_unless($module->status === 'Published' && ! $module->isWithdrawn() && $module->published_revision_id === $revisionId, 409, 'This adventure changed. Reload before trying again.');
 
             return $this->recordApprovedModule($user, $sessionId, $moduleId, $revisionId, $kind, $input);
         });
@@ -82,7 +82,7 @@ class LearningProgression
             $user = User::whereKey($actor->id)->lockForUpdate()->firstOrFail();
             app(CurrentAccountSession::class)->assert($user, $sessionId);
             $module = LearningModule::whereKey($moduleId)->lockForUpdate()->firstOrFail();
-            abort_unless($module->status === 'Published', 404);
+            abort_unless($module->status === 'Published' && ! $module->isWithdrawn(), 404);
             $revision = ModuleRevision::where('module_id', $moduleId)->findOrFail($revisionId);
             $instance = $revision->assessment;
             abort_unless(in_array($kind, ['game', 'quiz'], true) && $revision->review_status === 'Approved' && $instance !== null

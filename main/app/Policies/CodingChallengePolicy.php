@@ -39,4 +39,9 @@ class CodingChallengePolicy
     {
         return $this->viewAny($user) && $challenge->created_by !== $user->id;
     }
+
+    public function moderate(User $user, CodingChallenge $content): bool
+    {
+        return $this->review($user, $content) && in_array($content->status, ['Published', 'Archived'], true);
+    }
 }

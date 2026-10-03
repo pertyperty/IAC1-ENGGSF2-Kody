@@ -43,9 +43,9 @@ on clean test databases. Pint, Vite build, diff checks and the previously verifi
 16 frontend tests passed. Remote CI, live providers, authenticated browser visual
 checks and production deployment remain unverified.
 
-Next, resolve the deletion use case's authentication precondition before building
-it: the SRS allows Active or Archived accounts but requires authentication, while
-A07 terminates Archived sessions and A03 rejects their login. Account data must
-be removed/anonymized with referential/audit integrity preserved. The source labels
-both deletion and Instructor verification A10; name the intended use case explicitly
+The owner resolved the deletion authentication conflict: Archived accounts must
+reactivate through A04 before authenticated deletion. The first deletion release
+covers accounts without authored content and waits for active evaluations to
+finish. See [deletion scope](account-deletion-plan.md). The source labels both
+deletion and Instructor verification A10; name the intended use case explicitly
 in traceability instead of conflating them.

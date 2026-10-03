@@ -15,6 +15,7 @@ export function mountModuleEditor(root) {
     const update = () => {
         root.querySelector('[data-game-fields]').hidden = kind.value !== 'game';
         root.querySelector('[data-quiz-fields]').hidden = kind.value !== 'quiz';
+        root.querySelector('[data-preset-fields]').hidden = kind.value !== 'preset';
         root.querySelector('[data-video-fields]').hidden = type.value !== 'Video';
     };
     kind.addEventListener('change', update);

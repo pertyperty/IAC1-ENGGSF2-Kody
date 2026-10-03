@@ -40,7 +40,7 @@ class WeeklyEvents
             }
             $this->lockCalendar();
             $challenge = CodingChallenge::whereKey($data['challenge_id'])->lockForUpdate()->firstOrFail();
-            if ($challenge->status !== 'Published' || $challenge->published_revision_id !== (int) $data['revision_id']) {
+            if ($challenge->status !== 'Published' || $challenge->isWithdrawn() || $challenge->published_revision_id !== (int) $data['revision_id']) {
                 throw ValidationException::withMessages(['challenge_id' => 'Choose the current approved Published challenge revision.']);
             }
             $revision = CodingChallengeRevision::whereKey($challenge->published_revision_id)->where('review_status', 'Approved')->firstOrFail();
@@ -76,6 +76,10 @@ class WeeklyEvents
                     return;
                 }
                 $challenge = CodingChallenge::whereKey($existing->challenge_id)->lockForUpdate()->firstOrFail();
+                if ($challenge->isWithdrawn()) {
+                    // Temporary moderation blocks access without ending or replacing the pinned weekly event.
+                    return;
+                }
                 if ($challenge->status !== 'Published' || $existing->revision->review_status !== 'Approved') {
                     $existing->update(['status' => 'Unavailable', 'record_version' => $existing->record_version + 1]);
                     $this->audit($existing, 'weekly.unavailable');
@@ -86,13 +90,13 @@ class WeeklyEvents
 
                 return;
             }
-            $candidate = CodingChallenge::where('status', 'Published')->whereHas('publishedRevision', fn ($query) => $query->where('review_status', 'Approved'))
+            $candidate = CodingChallenge::where('status', 'Published')->whereNull('staff_withdrawn_at')->whereHas('publishedRevision', fn ($query) => $query->where('review_status', 'Approved'))
                 ->inRandomOrder()->first(['id']);
             if ($candidate === null) {
                 return;
             }
             $challenge = CodingChallenge::whereKey($candidate->id)->lockForUpdate()->firstOrFail();
-            if ($challenge->status !== 'Published') {
+            if ($challenge->status !== 'Published' || $challenge->isWithdrawn()) {
                 return;
             }
             $revision = $challenge->publishedRevision;
@@ -113,7 +117,7 @@ class WeeklyEvents
             || $event->starts_at->isFuture() || $event->ends_at->lessThanOrEqualTo(now())) {
             throw ValidationException::withMessages(['weekly_event' => 'This weekly event is not open for submissions.']);
         }
-        if ($challenge->status !== 'Published' || $event->revision->review_status !== 'Approved') {
+        if ($challenge->status !== 'Published' || $challenge->isWithdrawn() || $event->revision->review_status !== 'Approved') {
             throw ValidationException::withMessages(['weekly_event' => 'This weekly quest is unavailable.']);
         }
         if ($event->status === 'Scheduled') {

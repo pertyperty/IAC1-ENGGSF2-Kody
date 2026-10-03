@@ -18,4 +18,9 @@ class ModuleRevision extends Model
     {
         return $this->belongsTo(LearningModule::class, 'module_id');
     }
+
+    public function gamePresetRevision(): BelongsTo
+    {
+        return $this->belongsTo(GamePresetRevision::class);
+    }
 }

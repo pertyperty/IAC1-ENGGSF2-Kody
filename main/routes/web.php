@@ -1,6 +1,9 @@
 <?php
 
 use App\Http\Controllers\Account\AccountArchivalController;
+use App\Http\Controllers\Account\AccountDeletionController;
+use App\Http\Controllers\Account\ContributorApplicationController;
+use App\Http\Controllers\Account\ContributorReviewController;
 use App\Http\Controllers\Account\EmailVerificationController;
 use App\Http\Controllers\Account\InstructorApplicationController;
 use App\Http\Controllers\Account\InstructorReviewController;
@@ -9,6 +12,11 @@ use App\Http\Controllers\Account\ProfileController;
 use App\Http\Controllers\Account\ProfileEditingController;
 use App\Http\Controllers\Account\RecoveryController;
 use App\Http\Controllers\Account\RegistrationController;
+use App\Http\Controllers\Administration\AccountGovernanceController;
+use App\Http\Controllers\Administration\ContentModerationController;
+use App\Http\Controllers\Administration\FaqController;
+use App\Http\Controllers\Administration\GamePresetController;
+use App\Http\Controllers\Administration\SystemReportController;
 use App\Http\Controllers\Challenges\ChallengeReviewController;
 use App\Http\Controllers\Challenges\ChallengeStudioController;
 use App\Http\Controllers\Challenges\ChallengeSubmissionController;
@@ -21,6 +29,7 @@ use App\Http\Controllers\Content\ModuleReviewController;
 use App\Http\Controllers\Content\ModuleStudioController;
 use App\Http\Controllers\Content\PublishedModuleController;
 use App\Http\Controllers\Gamification\WeeklyEventStudioController;
+use App\Http\Controllers\HelpController;
 use App\Http\Controllers\LearningController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PlayController;
@@ -112,8 +121,49 @@ Route::get('/dashboard', [PlayController::class, 'hub'])->middleware(['auth', 'a
 Route::post('/play/{level}/game', [PlayController::class, 'game'])->middleware(['auth', 'account.session', 'throttle:20,1,play-game:'])->name('play.game');
 Route::post('/play/{level}/quiz', [PlayController::class, 'quiz'])->middleware(['auth', 'account.session', 'throttle:20,1,play-quiz:'])->name('play.quiz');
 Route::get('/account', ProfileController::class)->middleware(['auth', 'account.session'])->name('account.show');
+Route::middleware(['auth', 'account.session'])->prefix('manage/accounts')->name('account-governance.')->group(function (): void {
+    Route::get('/', [AccountGovernanceController::class, 'index'])->name('index');
+    Route::get('/{account}', [AccountGovernanceController::class, 'show'])->name('show');
+    Route::post('/{account}/enforce', [AccountGovernanceController::class, 'enforce'])->middleware('throttle:10,1,account-enforce:')->name('enforce');
+    Route::post('/{account}/moderator', [AccountGovernanceController::class, 'moderator'])->middleware('throttle:5,1,moderator-change:')->name('moderator');
+    Route::patch('/{account}/profile', [AccountGovernanceController::class, 'correctProfile'])->middleware('throttle:5,1,support-correction:')->name('profile');
+});
+Route::get('/account/contributor-application', [ContributorApplicationController::class, 'create'])->middleware(['auth', 'account.session'])->name('contributor-application.create');
+Route::get('/manage/reports', SystemReportController::class)->middleware(['auth', 'account.session', 'throttle:10,1,system-reports:'])->name('system-reports');
+Route::get('/help', [HelpController::class, 'index'])->middleware('throttle:30,1,help:')->name('help.index');
+Route::get('/help/{entry}', [HelpController::class, 'show'])->whereNumber('entry')->middleware('throttle:30,1,help:')->name('help.show');
+Route::middleware(['auth', 'account.session'])->prefix('manage/faqs')->name('faq-management.')->group(function (): void {
+    Route::get('/', [FaqController::class, 'index'])->name('index');
+    Route::get('/create', [FaqController::class, 'create'])->name('create');
+    Route::post('/', [FaqController::class, 'store'])->middleware('throttle:10,1,faq-management:')->name('store');
+    Route::get('/{entry}/edit', [FaqController::class, 'edit'])->whereNumber('entry')->name('edit');
+    Route::put('/{entry}', [FaqController::class, 'update'])->whereNumber('entry')->middleware('throttle:10,1,faq-management:')->name('update');
+    Route::post('/{entry}/delete', [FaqController::class, 'delete'])->whereNumber('entry')->middleware('throttle:10,1,faq-management:')->name('delete');
+});
+Route::middleware(['auth', 'account.session'])->prefix('manage/game-presets')->name('game-presets.')->group(function (): void {
+    Route::get('/', [GamePresetController::class, 'index'])->name('index');
+    Route::get('/create', [GamePresetController::class, 'create'])->name('create');
+    Route::post('/', [GamePresetController::class, 'store'])->middleware('throttle:10,1,game-presets:')->name('store');
+    Route::get('/{preset}/edit', [GamePresetController::class, 'edit'])->whereNumber('preset')->name('edit');
+    Route::put('/{preset}', [GamePresetController::class, 'update'])->whereNumber('preset')->middleware('throttle:10,1,game-presets:')->name('update');
+    Route::post('/{preset}/inactivate', [GamePresetController::class, 'inactivate'])->whereNumber('preset')->middleware('throttle:10,1,game-presets:')->name('inactivate');
+});
+Route::middleware(['auth', 'account.session'])->prefix('manage/content')->name('content-moderation.')->group(function (): void {
+    Route::get('/', [ContentModerationController::class, 'index'])->name('index');
+    Route::get('/{kind}/{content}', [ContentModerationController::class, 'show'])->whereIn('kind', ['module', 'course', 'challenge'])->whereNumber('content')->name('show');
+    Route::post('/{kind}/{content}', [ContentModerationController::class, 'change'])->whereIn('kind', ['module', 'course', 'challenge'])->whereNumber('content')->middleware('throttle:10,1,content-moderation:')->name('change');
+});
+Route::post('/account/contributor-application', [ContributorApplicationController::class, 'store'])->middleware(['auth', 'account.session', 'throttle:5,1,contributor-apply:'])->name('contributor-application.store');
+Route::middleware(['auth', 'account.session'])->prefix('manage/contributors')->name('contributor-reviews.')->group(function (): void {
+    Route::get('/', [ContributorReviewController::class, 'index'])->name('index');
+    Route::get('/{application}', [ContributorReviewController::class, 'show'])->name('show');
+    Route::get('/{application}/credential', [ContributorReviewController::class, 'credential'])->middleware('throttle:20,1,contributor-credential:')->name('credential');
+    Route::post('/{application}', [ContributorReviewController::class, 'review'])->middleware('throttle:10,1,contributor-review:')->name('review');
+});
 Route::get('/account/edit', [ProfileEditingController::class, 'edit'])->middleware(['auth', 'account.session'])->name('account.edit');
 Route::get('/account/archive', [AccountArchivalController::class, 'confirm'])->middleware(['auth', 'account.session'])->name('account.archive');
+Route::get('/account/delete', [AccountDeletionController::class, 'confirm'])->middleware(['auth', 'account.session'])->name('account.delete');
+Route::post('/account/delete', [AccountDeletionController::class, 'store'])->middleware(['auth', 'account.session', 'throttle:5,1,account-delete:'])->name('account.delete.store');
 Route::post('/account/archive', [AccountArchivalController::class, 'store'])->middleware(['auth', 'account.session', 'throttle:5,1,account-archive:'])->name('account.archive.store');
 Route::get('/account/creator-application', [InstructorApplicationController::class, 'create'])->middleware(['auth', 'account.session'])->name('instructor-application.create');
 Route::post('/account/creator-application', [InstructorApplicationController::class, 'store'])->middleware(['auth', 'account.session', 'throttle:5,1,creator-apply:'])->name('instructor-application.store');

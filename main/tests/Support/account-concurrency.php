@@ -4,21 +4,32 @@ use App\Actions\Account\LoginAccount;
 use App\Actions\Account\RegisterAccount;
 use App\Actions\Account\ReviewInstructorApplication;
 use App\Models\CodingChallenge;
+use App\Models\ContributorApplication;
+use App\Models\FaqEntry;
+use App\Models\GamePreset;
 use App\Models\InstructorApplication;
 use App\Models\LearningCourse;
 use App\Models\LearningModule;
 use App\Models\User;
 use App\Models\WeeklyEvent;
 use App\Services\Account\AccountArchival;
+use App\Services\Account\AccountDeletion;
 use App\Services\Account\AccountRecoveryService;
+use App\Services\Account\ContributorApplications;
 use App\Services\Account\EmailVerificationService;
 use App\Services\Account\InstructorApplications;
 use App\Services\Account\ProfileEditing;
+use App\Services\Administration\AccountEnforcement;
+use App\Services\Administration\ContentModeration;
+use App\Services\Administration\FaqManagement;
+use App\Services\Administration\ModeratorAppointments;
+use App\Services\Administration\SupportProfileCorrections;
 use App\Services\Challenges\ChallengePublishing;
 use App\Services\Challenges\ChallengeSubmissions;
 use App\Services\Content\CourseLearning;
 use App\Services\Content\CoursePublishing;
 use App\Services\Content\ModulePublishing;
+use App\Services\Games\GamePresets;
 use App\Services\Gamification\LearningProgression;
 use App\Services\Gamification\WeeklyEvents;
 use Carbon\Carbon;
@@ -46,6 +57,89 @@ try {
     $session->start();
 
     $result = match ($argv[1]) {
+        'faq-change' => (function () use ($input, $argv): string {
+            $actor = User::findOrFail($input['actor_ids'][(int) $argv[3] - 1]);
+            $entry = FaqEntry::findOrFail($input['entry_id']);
+            if ($input['action'] === 'delete') {
+                app(FaqManagement::class)->delete($actor, 'module-test-session', $entry, 1, true);
+            } else {
+                app(FaqManagement::class)->save($actor, 'module-test-session', $input['data'], $entry);
+            }
+
+            return 'changed';
+        })(),
+        'faq-create' => (function () use ($input, $argv): string {
+            app(FaqManagement::class)->save(User::findOrFail($input['actor_ids'][(int) $argv[3] - 1]), 'module-test-session', $input['data']);
+
+            return 'created';
+        })(),
+        'preset-change' => (function () use ($input, $argv): string {
+            $actor = User::findOrFail($input['actor_ids'][(int) $argv[3] - 1]);
+            $preset = GamePreset::findOrFail($input['preset_id']);
+            if ($input['action'] === 'inactivate') {
+                app(GamePresets::class)->inactivate($actor, 'module-test-session', $preset, 1, true);
+            } else {
+                app(GamePresets::class)->save($actor, 'module-test-session', $input['data'], $preset);
+            }
+
+            return 'changed';
+        })(),
+        'preset-create' => (function () use ($input, $argv): string {
+            app(GamePresets::class)->save(User::findOrFail($input['actor_ids'][(int) $argv[3] - 1]), 'module-test-session', $input['data']);
+
+            return 'created';
+        })(),
+        'content-moderate' => (function () use ($input, $argv): string {
+            app(ContentModeration::class)->change(User::findOrFail($input['actor_ids'][(int) $argv[3] - 1]), 'module-test-session',
+                $input['kind'], $input['content_id'], $input['data']);
+
+            return 'moderated';
+        })(),
+        'support-correct' => (function () use ($input, $argv): string {
+            app(SupportProfileCorrections::class)->correct(User::findOrFail($input['actor_ids'][(int) $argv[3] - 1]), 'module-test-session',
+                User::findOrFail($input['target_id']), $input['data']);
+
+            return 'corrected';
+        })(),
+        'moderator-change' => (function () use ($input, $argv): string {
+            app(ModeratorAppointments::class)->change(User::findOrFail($input['actor_ids'][(int) $argv[3] - 1]), 'module-test-session',
+                User::findOrFail($input['target_id']), $input['data']);
+
+            return 'changed';
+        })(),
+        'account-enforce' => (function () use ($input, $argv): string {
+            app(AccountEnforcement::class)->change(User::findOrFail($input['actor_ids'][(int) $argv[3] - 1]), 'module-test-session',
+                User::findOrFail($input['target_id']), $input['data']);
+
+            return 'enforced';
+        })(),
+        'contributor-review' => (function () use ($input, $argv): string {
+            app(ContributorApplications::class)->review(User::findOrFail($input['actor_ids'][(int) $argv[3] - 1]), 'module-test-session',
+                ContributorApplication::findOrFail($input['application_id']), $input['data']);
+
+            return 'reviewed';
+        })(),
+        'role-apply' => (function () use ($input, $argv): string {
+            config(['filesystems.disks.local.root' => $input['storage_root']]);
+            $credential = UploadedFile::fake()->createWithContent('proof.pdf', "%PDF-1.4\n%%EOF");
+            $actor = User::findOrFail($input['actor_id']);
+            if ($input['mixed'] && (int) $argv[3] === 2) {
+                app(InstructorApplications::class)->submit($actor, 'module-test-session', $input['instructor_data'], $credential);
+            } else {
+                app(ContributorApplications::class)->submit($actor, 'module-test-session', $input['data'], $credential);
+            }
+
+            return 'applied';
+        })(),
+        'account-delete' => (function () use ($input): string {
+            try {
+                app(AccountDeletion::class)->delete(User::findOrFail($input['actor_id']), $input['session_id'], $input['data']);
+
+                return 'deleted';
+            } catch (AuthorizationException) {
+                return 'revoked';
+            }
+        })(),
         'account-archive' => (function () use ($input): string {
             try {
                 app(AccountArchival::class)->archive(User::findOrFail($input['actor_id']), $input['session_id'], $input['data']);

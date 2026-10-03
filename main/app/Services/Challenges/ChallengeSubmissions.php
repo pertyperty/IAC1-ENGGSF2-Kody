@@ -46,7 +46,7 @@ class ChallengeSubmissions
             }
             $event = $weeklyEvent === null ? null : app(WeeklyEvents::class)->admit($weeklyEvent->id, $current);
             $revisionId = $event?->revision_id ?? $current->published_revision_id;
-            if ($current->status !== 'Published' || $revisionId !== (int) $data['revision_id']) {
+            if ($current->status !== 'Published' || $current->isWithdrawn() || $revisionId !== (int) $data['revision_id']) {
                 throw ValidationException::withMessages(['revision_id' => 'This quest changed or is unavailable. Reload before submitting.']);
             }
             $revision = CodingChallengeRevision::whereKey($revisionId)->where('challenge_id', $current->id)->where('review_status', 'Approved')->firstOrFail();

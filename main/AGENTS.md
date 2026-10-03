@@ -115,8 +115,59 @@ paid admission and rewards; do not silently enable those scopes.
 A07 archival is implemented for its SRS actors: Learner, Contributor and
 Instructor. Keep profile/progress/content data intact, terminate sessions and
 preserve approved A04 recovery. See [archival](docs/account-archival-implementation.md).
-Permanent deletion remains separate; resolve its Archived authentication conflict
-in [the deletion plan](docs/account-deletion-plan.md) before implementing that scope.
+The owner approved requiring Archived users to reactivate through A04 before
+authenticated deletion. The first deletion release covers accounts without any
+authored modules/courses/challenges; creator deletion awaits retention/removal
+rules. The owner approved waiting for Queued/Evaluating submissions to finish
+before deletion removes submission data. See [the deletion plan](docs/account-deletion-plan.md).
+
+For A09/G05 Contributor applications, the owner approved 500-character application
+messages and reviewer feedback with matching storage, resolving the dictionary's
+varchar(255)/500-character conflict. The owner approved requiring account age of
+at least 30 days AND 25 distinct server-validated completed modules AND 50 distinct
+passed coding challenges, with repeats counted once. Rejected Contributor
+applicants may resubmit with prior decisions and credentials preserved. Permit
+only one Pending role application (Contributor or Instructor) at a time. See
+[the Contributor application plan](docs/contributor-application-plan.md).
+
+The owner approved G03/G04 enforcement hierarchy: Moderators may suspend/reinstate
+Learners, Contributors and Instructors; Administrators may also manage Moderators.
+Block self-enforcement and Administrator targets in the first release, protecting
+the last Administrator. This does not authorize G02 role or personal-field edits.
+See [account governance](docs/account-governance-implementation.md) for implementation,
+session revocation, audit/delivery records and PostgreSQL concurrency coverage.
+
+The owner approved the first G02 role-editing scope: Administrators may appoint
+Moderators from verified Active Learner/Contributor/Instructor accounts and remove
+them to their recorded prior participant role. Preserve A09/A10 elevation workflows;
+block self/Administrator changes and removal of existing Moderators with unknown
+prior roles. Administrative personal-field editing remains a separate scope.
+See [Moderator appointments](docs/moderator-appointments-implementation.md).
+
+The owner approved G02 support corrections to username and first/last name on
+verified Active participant/Moderator accounts when the user requests help, with
+current Administrator password, explicit confirmation, audit, target-session
+revocation and notice. Self/Administrator targets retain A06, and email/password
+changes remain in owner A06/A04 flows. See
+[support corrections](docs/support-profile-corrections-implementation.md).
+
+The owner approved G06 staff withdrawal/restoration for Published/Archived modules,
+courses and challenges: block all learner access including existing enrollees,
+preserve content/revisions/progress/audit and finish committed evaluations. Keep a
+separate staff block from owner archival; only staff restoration can remove it,
+and creator edits/republication must retain it. See
+[content withdrawal](docs/content-withdrawal-implementation.md).
+
+The owner approved G08–G10 Administrator-managed game/quiz presets using existing
+server-validated win rules, explicit Deferred rewards and no XP/KodeBit grants.
+Updates preserve existing module instances; inactivation blocks new use while
+retaining references. Use immutable preset revisions and module snapshots, never
+uploaded executable rules. See [game presets](docs/game-presets-implementation.md).
+
+The owner approved public reading/search of Active FAQs (B11), with management
+restricted to verified Active Administrators. Initial predefined topics are
+Getting started, Accounts, Playing and learning, and Creating content. Learning
+module authentication remains unchanged. See [Help](docs/faq-implementation.md).
 
 You are working on **Kody: Gamified Programming Learning Platform and Course Management System (K:GPLPCMS)**.
 

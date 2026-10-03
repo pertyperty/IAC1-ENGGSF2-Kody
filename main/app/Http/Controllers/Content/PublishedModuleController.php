@@ -14,7 +14,7 @@ class PublishedModuleController extends Controller
 {
     public function show(LearningModule $module): Response
     {
-        abort_unless($module->status === 'Published' && $module->publishedRevision?->review_status === 'Approved', 404);
+        abort_unless($module->status === 'Published' && ! $module->isWithdrawn() && $module->publishedRevision?->review_status === 'Approved', 404);
 
         return response()->view('content.published', ['module' => $module, 'revision' => $module->publishedRevision])->header('Cache-Control', 'no-store, private');
     }

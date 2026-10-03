@@ -18,6 +18,13 @@
 .account-shell h1 { font-size: 34px; line-height: 1.15; letter-spacing: -1px; font-weight: 700; margin: 0 0 16px; }
 .intro { color: #617467; line-height: 1.6; margin-bottom: 28px; }
 .account-form { display: grid; gap: 18px; }
+.report-table { width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 14px; }
+.moderation-details pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.faq-answer { white-space: pre-wrap; overflow-wrap: anywhere; }
+.report-table caption { text-align: left; font-weight: 700; margin-bottom: 12px; }
+.report-table th, .report-table td { padding: 12px 8px; border-bottom: 1px solid #dce3d5; text-align: left; overflow-wrap: anywhere; }
+.report-table tbody th { font-weight: 400; }
+.report-table td, .report-table thead th:last-child { text-align: right; font-variant-numeric: tabular-nums; }
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .account-form label { display: grid; gap: 7px; font-size: 13px; font-weight: 600; }
 .account-form input, .account-form select { width: 100%; padding: 11px 12px; border: 1px solid #cdd9ca; border-radius: 8px; background: #fbfcfa; color: #203328; font-size: 15px; box-sizing: border-box; }

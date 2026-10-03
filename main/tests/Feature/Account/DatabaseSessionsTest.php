@@ -1,14 +1,73 @@
 <?php
 
+use App\Enums\Role;
 use App\Models\User;
 use App\Models\VerificationDelivery;
 use App\Services\Account\AccountRecoveryService;
+use App\Services\Administration\AccountEnforcement;
+use App\Services\Administration\ModeratorAppointments;
+use App\Services\Administration\SupportProfileCorrections;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use Illuminate\Testing\TestResponse;
 use Tests\TestCase;
 
 uses(RefreshDatabase::class);
+
+test('G02 support correction removes database sessions and the corrected username appears only after new login', function () {
+    $target = User::factory()->create();
+    $credentials = ['email' => $target->email, 'password' => 'password'];
+    databaseBrowserRequest($this, 'post', route('login.store'), $credentials)->assertRedirect(route('dashboard'));
+    $oldBrowser = session()->getId();
+    $admin = moduleAccount(Role::Administrator);
+    app(SupportProfileCorrections::class)->correct($admin, 'module-test-session', $target, supportCorrectionData($target));
+    $this->assertDatabaseMissing('sessions', ['id' => $oldBrowser]);
+    databaseBrowserRequest($this, 'get', route('account.show'), sessionId: $oldBrowser)->assertRedirect(route('login'));
+    databaseBrowserRequest($this, 'post', route('login.store'), $credentials)->assertRedirect(route('dashboard'));
+    databaseBrowserRequest($this, 'get', route('account.show'), sessionId: session()->getId())->assertOk()->assertSee('correctedplayer');
+});
+
+test('G02 appointment and removal revoke database sessions and old Moderator privileges', function () {
+    $target = User::factory()->create();
+    $credentials = ['email' => $target->email, 'password' => 'password'];
+    databaseBrowserRequest($this, 'post', route('login.store'), $credentials)->assertRedirect(route('dashboard'));
+    $oldBrowser = session()->getId();
+    $admin = moduleAccount(Role::Administrator);
+    $service = app(ModeratorAppointments::class);
+    $service->change($admin, 'module-test-session', $target, moderatorChangeData($target));
+    $this->assertDatabaseMissing('sessions', ['id' => $oldBrowser]);
+    databaseBrowserRequest($this, 'get', route('account-governance.index'), sessionId: $oldBrowser)->assertRedirect(route('login'));
+    databaseBrowserRequest($this, 'post', route('login.store'), $credentials)->assertRedirect(route('dashboard'));
+    $moderatorBrowser = session()->getId();
+    databaseBrowserRequest($this, 'get', route('account-governance.index'), sessionId: $moderatorBrowser)->assertOk();
+    $service->change($admin, 'module-test-session', $target, moderatorChangeData($target, ['action' => 'Removed']));
+    $this->assertDatabaseMissing('sessions', ['id' => $moderatorBrowser]);
+    databaseBrowserRequest($this, 'get', route('account-governance.index'), sessionId: $moderatorBrowser)->assertRedirect(route('login'));
+    databaseBrowserRequest($this, 'post', route('login.store'), $credentials)->assertRedirect(route('dashboard'));
+    databaseBrowserRequest($this, 'get', route('account-governance.index'), sessionId: session()->getId())->assertForbidden();
+});
+
+test('G03 G04 remove target database sessions and reinstatement cannot restore an old browser', function () {
+    $target = User::factory()->create();
+    databaseBrowserRequest($this, 'post', route('login.store'), ['email' => $target->email, 'password' => 'password']);
+    $oldBrowser = session()->getId();
+    $actor = moduleAccount(Role::Moderator);
+    app(AccountEnforcement::class)->change($actor, 'module-test-session', $target, enforcementData($target));
+    $this->assertDatabaseMissing('sessions', ['id' => $oldBrowser]);
+    databaseBrowserRequest($this, 'get', route('account.show'), sessionId: $oldBrowser)->assertRedirect(route('login'));
+    app(AccountEnforcement::class)->change($actor, 'module-test-session', $target, enforcementData($target, ['action' => 'Reinstated']));
+    databaseBrowserRequest($this, 'get', route('account.show'), sessionId: $oldBrowser)->assertRedirect(route('login'));
+    databaseBrowserRequest($this, 'post', route('login.store'), ['email' => $target->email, 'password' => 'password'])->assertRedirect(route('dashboard'));
+});
+
+test('Delete Account removes authenticated database sessions and prevents old-browser access', function () {
+    $user = User::factory()->create();
+    databaseBrowserRequest($this, 'post', route('login.store'), ['email' => $user->email, 'password' => 'password']);
+    $oldBrowser = session()->getId();
+    databaseBrowserRequest($this, 'post', route('account.delete.store'), deletionData($user), $oldBrowser)->assertRedirect(route('login'));
+    $this->assertDatabaseMissing('sessions', ['id' => $oldBrowser]);
+    databaseBrowserRequest($this, 'get', route('account.show'), sessionId: $oldBrowser)->assertRedirect(route('login'));
+});
 
 test('A07 archival removes database sessions and the old browser cannot access its profile', function () {
     $user = User::factory()->create();

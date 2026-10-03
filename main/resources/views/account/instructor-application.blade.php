@@ -5,7 +5,8 @@
 <p class="intro">Share your teaching credentials for review. Keep learning while your application is checked.</p>
 @if($errors->any())<div class="form-errors" role="alert">@foreach($errors->all() as $error)<p>{{ $error }}</p>@endforeach</div>@endif
 @if($application)<p class="notice">Application: {{ $application->verification_status }}</p>@endif
-@if(!$application || $application->verification_status === 'Rejected')
+@if($pendingContributor)<p class="notice">Your Contributor application is awaiting review. Wait for its decision before applying for Instructor access.</p>
+@elseif(!$application || $application->verification_status === 'Rejected')
 <form class="account-form" method="POST" enctype="multipart/form-data" action="{{ route('instructor-application.store') }}">@csrf
 <input type="hidden" name="record_version" value="{{ $application?->record_version ?? 0 }}">
 <label>Institution<input name="institution_name" value="{{ old('institution_name') }}" maxlength="100" required></label>
