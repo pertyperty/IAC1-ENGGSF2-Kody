@@ -3,6 +3,7 @@
 use App\Actions\Account\LoginAccount;
 use App\Actions\Account\RegisterAccount;
 use App\Models\User;
+use App\Services\Account\AccountRecoveryService;
 use App\Services\Account\EmailVerificationService;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Support\Facades\Crypt;
@@ -23,6 +24,8 @@ try {
         'register' => app(RegisterAccount::class)->handle($input) ? 'created' : 'error',
         'resend' => app(EmailVerificationService::class)->request(User::where('email', $input['email'])->sole()) ? 'queued' : 'limited',
         'verify' => app(EmailVerificationService::class)->verify($input['token']) ? 'verified' : 'invalid',
+        'recover-request' => app(AccountRecoveryService::class)->request(User::findOrFail($input['user_id'])) ? 'queued' : 'limited',
+        'recover-complete' => app(AccountRecoveryService::class)->complete($input['proof'], $input['password']) ? 'recovered' : 'invalid',
         'login' => strtolower(app(LoginAccount::class)->attempt($input['email'], $input['password'], $session)->name),
         'confirm' => (function () use ($input, $session): string {
             $session->put('login_confirmation', $input['confirmation']);

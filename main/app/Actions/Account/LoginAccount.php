@@ -5,6 +5,7 @@ namespace App\Actions\Account;
 use App\Enums\AccountStatus;
 use App\Enums\LoginOutcome;
 use App\Models\User;
+use App\Support\AccountPasswords;
 use Illuminate\Contracts\Session\Session;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -29,7 +30,7 @@ class LoginAccount
             if ($user->login_locked_until?->isFuture()) {
                 return LoginOutcome::Locked;
             }
-            if (! $this->verifyPassword($password, $user->password)) {
+            if (! AccountPasswords::matches($password, $user->password)) {
                 $attempts = min($user->failed_login_attempts + 1, 2147483647);
                 $minutes = match (true) {
                     $attempts >= 9 => 1440,
@@ -110,19 +111,6 @@ class LoginAccount
         }
 
         return $user->email_verified_at === null ? LoginOutcome::Unverified : null;
-    }
-
-    private function verifyPassword(#[\SensitiveParameter] string $password, string $hash): bool
-    {
-        // Explicitly permit Laravel's supported legacy hashes during an algorithm upgrade.
-        $driver = match (password_get_info($hash)['algoName']) {
-            'bcrypt' => 'bcrypt',
-            'argon2i' => 'argon',
-            'argon2id' => 'argon2id',
-            default => null,
-        };
-
-        return $driver !== null && Hash::driver($driver)->check($password, $hash);
     }
 
     private function authenticate(User $user, Session $session): LoginOutcome

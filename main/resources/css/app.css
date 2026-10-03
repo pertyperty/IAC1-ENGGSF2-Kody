@@ -33,4 +33,7 @@
 .form-errors { background: #fff1ee; color: #912e22; padding: 14px; border-radius: 10px; margin-bottom: 20px; font-size: 13px; }
 .form-errors ul { padding-left: 20px; list-style: disc; }
 .account-footer { text-align: center; color: #617467; font-size: 11px; padding: 24px; }
+.profile-details { display: grid; grid-template-columns: 110px 1fr; gap: 16px; font-size: 14px; }
+.profile-details dt { color: #617467; }
+.profile-details dd { margin: 0; overflow-wrap: anywhere; }
 @media (max-width: 600px) { .account-shell { margin: 10px 16px 30px; padding: 25px; } .account-header { padding: 20px; } .account-header > span { display: none; } .form-row { grid-template-columns: 1fr; } .account-shell h1 { font-size: 30px; } }

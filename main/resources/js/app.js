@@ -26,3 +26,25 @@ if (verificationForm && verificationInput && window.location.hash) {
         verificationForm.submit();
     }
 }
+
+const recoveryForm = document.querySelector('#recovery-token-form');
+const recoveryToken = document.querySelector('#recovery-token');
+if (recoveryForm && recoveryToken && window.location.hash) {
+    const token = new URLSearchParams(window.location.hash.slice(1)).get('recovery');
+    window.history.replaceState(null, '', window.location.pathname);
+    if (token && /^[a-f0-9]{64}$/.test(token)) {
+        recoveryToken.value = token;
+        recoveryForm.submit();
+    }
+}
+
+const cooldown = document.querySelector('[data-recovery-cooldown]');
+if (cooldown) {
+    const updateCooldown = () => {
+        const seconds = Math.max(0, Number(cooldown.dataset.recoveryCooldown) - Math.floor(Date.now() / 1000));
+        cooldown.textContent = seconds > 0 ? `Wait ${seconds} seconds before requesting again.` : 'You can request another recovery email.';
+        if (seconds === 0) clearInterval(timer);
+    };
+    const timer = setInterval(updateCooldown, 1000);
+    updateCooldown();
+}

@@ -23,7 +23,7 @@ test('A03 verified users of every role can sign in with a rotated session', func
         ->and($user->fresh()->last_login_at)->not->toBeNull()
         ->and($user->fresh()->active_session_hash)->toBe(hash('sha256', session()->getId()));
     $this->withCookie(config('session.cookie'), session()->getId());
-    $this->get(route('dashboard'))->assertOk()->assertSee($user->email)
+    $this->get(route('dashboard'))->assertOk()->assertSee('View your profile')
         ->assertHeader('Cache-Control', 'no-store, private');
 })->with(Role::cases());
 

@@ -1,8 +1,10 @@
 <?php
 
+use App\Models\AccountRecovery;
 use App\Models\EmailVerification;
 use App\Models\User;
 use App\Models\VerificationDelivery;
+use App\Services\Account\AccountRecoveryService;
 use App\Services\Account\EmailVerificationService;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Crypt;
@@ -10,6 +12,26 @@ use Illuminate\Support\Facades\DB;
 use Symfony\Component\Process\Process;
 
 uses(DatabaseMigrations::class);
+
+test('A04 simultaneous recovery requests cannot exceed the hourly cap', function () {
+    $user = User::factory()->create();
+    app(AccountRecoveryService::class)->request($user);
+    AccountRecovery::query()->update(['request_count' => 4, 'last_requested_at' => now()->subMinutes(2)]);
+    $results = simultaneousAccountRequests('recover-request', ['user_id' => $user->id], fn () => User::whereKey($user->id)->lockForUpdate()->first());
+    sort($results);
+    expect($results)->toBe(['limited', 'queued'])->and(AccountRecovery::sole()->request_count)->toBe(5);
+    $this->assertDatabaseCount('jobs', 2);
+});
+
+test('A04 simultaneous password resets consume one recovery token exactly once', function () {
+    $user = User::factory()->create();
+    $service = app(AccountRecoveryService::class);
+    $service->request($user);
+    $proof = $service->authorization(VerificationDelivery::sole()->token);
+    $results = simultaneousAccountRequests('recover-complete', ['proof' => $proof, 'password' => 'NewStrongPass12!'], fn () => User::whereKey($user->id)->lockForUpdate()->first());
+    sort($results);
+    expect($results)->toBe(['invalid', 'recovered'])->and(AccountRecovery::sole()->token_hash)->toBeNull();
+});
 
 function simultaneousAccountRequests(string $mode, array $input, Closure $lock): array
 {
