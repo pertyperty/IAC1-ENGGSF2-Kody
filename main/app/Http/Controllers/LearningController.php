@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ModuleRevision;
 use App\Services\Gamification\LearningProgression;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -18,7 +19,11 @@ class LearningController extends Controller
         $query = $request->validate(['q' => ['nullable', 'string', 'max:80']])['q'] ?? '';
         $modules = collect(config('learning.modules'))->filter(fn (array $module) => str_contains(mb_strtolower(implode(' ', $module)), mb_strtolower(trim($query))))->all();
 
-        return response()->view('learning.catalog', compact('modules', 'query'));
+        $published = ModuleRevision::where('review_status', 'Approved')->whereHas('module', fn ($builder) => $builder->where('status', 'Published')->whereColumn('published_revision_id', 'module_revisions.id'))
+            ->when(trim($query) !== '', fn ($builder) => $builder->where(fn ($search) => $search->where('title', 'ilike', '%'.addcslashes(trim($query), '%_\\').'%')->orWhere('description', 'ilike', '%'.addcslashes(trim($query), '%_\\').'%')))
+            ->orderByDesc('id')->paginate(12)->withQueryString();
+
+        return response()->view('learning.catalog', compact('modules', 'query', 'published'));
     }
 
     public function show(Request $request, string $module, LearningProgression $progression): Response

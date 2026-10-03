@@ -131,6 +131,12 @@ password login. The additive migrations do not rewrite existing passwords.
 
 ## Production preparation
 
+Approved Instructors can build adventures in `/create`, attach configurable games
+or quizzes and submit drafts. Moderator/Admin review at `/manage/modules` controls
+publication and replacements. Learning shows approved revisions; verified wins
+qualify the Manila daily streak. Creators receive reviews at `/updates` and can
+archive published adventures. See [creator studio scope and verification](docs/creator-studio-implementation.md).
+
 The target is Linux EC2, Nginx/PHP-FPM with PHP 8.4.1+, RDS PostgreSQL and S3 where required.
 Set `APP_ENV=production`, `APP_DEBUG=false`, a stable managed `APP_KEY`, HTTPS
 `APP_URL`, `SESSION_SECURE_COOKIE=true`, HttpOnly cookies and SameSite=lax.

@@ -6,12 +6,34 @@ use App\Http\Controllers\Account\LoginController;
 use App\Http\Controllers\Account\ProfileController;
 use App\Http\Controllers\Account\RecoveryController;
 use App\Http\Controllers\Account\RegistrationController;
+use App\Http\Controllers\Content\ModuleReviewController;
+use App\Http\Controllers\Content\ModuleStudioController;
+use App\Http\Controllers\Content\PublishedModuleController;
 use App\Http\Controllers\LearningController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PlayController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [LearningController::class, 'home'])->name('home');
 Route::get('/learn', [LearningController::class, 'catalog'])->name('learning.catalog');
+Route::middleware(['auth', 'account.session'])->group(function (): void {
+    Route::get('/updates', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/updates/{notification}/read', [NotificationController::class, 'read'])->whereUuid('notification')->middleware('throttle:30,1,notification-read:')->name('notifications.read');
+    Route::get('/learn/modules/{module}', [PublishedModuleController::class, 'show'])->name('modules.show');
+    Route::post('/learn/modules/{module}/revisions/{revision}/game', [PublishedModuleController::class, 'game'])->whereNumber('revision')->middleware('throttle:20,1,module-game:')->name('modules.game');
+    Route::post('/learn/modules/{module}/revisions/{revision}/quiz', [PublishedModuleController::class, 'quiz'])->whereNumber('revision')->middleware('throttle:20,1,module-quiz:')->name('modules.quiz');
+    Route::get('/create', [ModuleStudioController::class, 'index'])->name('studio.index');
+    Route::get('/create/modules/new', [ModuleStudioController::class, 'create'])->name('studio.create');
+    Route::post('/create/modules', [ModuleStudioController::class, 'store'])->middleware('throttle:10,1,module-create:')->name('studio.store');
+    Route::get('/create/modules/{module}', [ModuleStudioController::class, 'edit'])->name('studio.edit');
+    Route::put('/create/modules/{module}', [ModuleStudioController::class, 'update'])->middleware('throttle:20,1,module-edit:')->name('studio.update');
+    Route::post('/create/modules/{module}/submit', [ModuleStudioController::class, 'submit'])->middleware('throttle:10,1,module-submit:')->name('studio.submit');
+    Route::get('/create/modules/{module}/archive', [ModuleStudioController::class, 'archiveConfirmation'])->name('studio.archive-confirmation');
+    Route::post('/create/modules/{module}/archive', [ModuleStudioController::class, 'archive'])->middleware('throttle:10,1,module-archive:')->name('studio.archive');
+    Route::get('/manage/modules', [ModuleReviewController::class, 'index'])->name('module-reviews.index');
+    Route::get('/manage/modules/{module}', [ModuleReviewController::class, 'show'])->name('module-reviews.show');
+    Route::post('/manage/modules/{module}', [ModuleReviewController::class, 'review'])->middleware('throttle:10,1,module-review:')->name('module-reviews.review');
+});
 Route::get('/learn/{module}', [LearningController::class, 'show'])->middleware(['auth', 'account.session'])->name('learning.show');
 
 Route::middleware('guest')->group(function (): void {

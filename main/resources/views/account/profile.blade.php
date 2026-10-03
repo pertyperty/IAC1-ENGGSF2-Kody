@@ -15,5 +15,8 @@
     </dl>
     @if($application)<div class="notice"><b>Instructor application: {{ $application->verification_status }}</b>@if($application->verification_notes)<p>{{ $application->verification_notes }}</p>@endif</div>@endif
     @can('viewAny', \App\Models\InstructorApplication::class)<p class="secondary-link"><a href="{{ route('instructor-reviews.index') }}">Review instructor applications</a></p>@endcan
+    @can('create', \App\Models\LearningModule::class)<p class="secondary-link"><a href="{{ route('studio.index') }}">Open your creator studio</a></p>@endcan
+    @can('viewAny', \App\Models\LearningModule::class)<p class="secondary-link"><a href="{{ route('module-reviews.index') }}">Review adventures</a></p>@endcan
+    <p class="secondary-link"><a href="{{ route('notifications.index') }}">Your updates</a></p>
     <p class="secondary-link"><a href="{{ route('dashboard') }}">Back to your account home</a></p>
 @endsection

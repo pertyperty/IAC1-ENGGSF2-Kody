@@ -73,3 +73,7 @@ moderation; define publication policy before exposing creator content to learner
 Keep Draft/Published/Archived/Deleted lifecycle labels, with separate moderation
 state if a queue is selected. Built-in practice games are not published creator
 modules; uploads/authoring are not implemented yet.
+
+The owner has now resolved those authoring and publication decisions. The
+[creator studio implementation](creator-studio-implementation.md) records the
+delivered versioned authoring/review workflow and current next-step prompt.

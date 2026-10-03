@@ -93,3 +93,13 @@ Streak and level-unlock rules above are now resolved and implemented; the
 remaining scoring/publication decisions do not block the public trial,
 template contract or catalog UI. See [implementation scope](play-implementation.md).
 Record an explicit amendment when they are resolved.
+
+## Creator publication amendment — approved 2026-10-03
+
+Approved Instructors author modules; Contributors author coding challenges.
+Moderator/Administrator approval gates both first publication and revisions of
+published modules. D03's undefined Active label means Published for archiving;
+archived modules block learner access while preserving history. These decisions
+supersede the older authoring/publication ambiguity described above. See the
+[creator studio implementation](creator-studio-implementation.md) for the
+versioned studio, template attachments, review queue, inbox and delivered scope.

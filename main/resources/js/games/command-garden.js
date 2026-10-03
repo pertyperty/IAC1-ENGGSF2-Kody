@@ -19,7 +19,7 @@ export function validateInstance(instance) {
     if (!path.has(key(instance.start)) || !path.has(key(instance.goal)) || !instance.crystals.every((p) => path.has(key(p)))
         || new Set(instance.crystals.map(key)).size !== instance.crystals.length) throw new Error('Invalid game objectives.');
     for (const field of ['title', 'concept', 'instructions', 'hint', 'learningIdea']) {
-        if (typeof instance[field] !== 'string' || instance[field].length > 1000) throw new Error('Invalid game content.');
+        if (typeof instance[field] !== 'string' || [...instance[field]].length > 1000) throw new Error('Invalid game content.');
     }
     return instance;
 }

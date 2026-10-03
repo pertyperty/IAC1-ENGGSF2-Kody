@@ -75,3 +75,7 @@ authorization/state under locks, prevent duplicate review, queue notifications
 atomically and cover security/error/concurrency paths. Then add creator-owned
 module drafts and template-instance attachment under the Content module, resolving
 source publication/moderation conflicts before persisting their transitions.
+
+Creator-published adventures now join Learning and use the same server-validated
+daily-activity writer. They do not skip the built-in ladder. See
+[creator studio implementation](creator-studio-implementation.md).

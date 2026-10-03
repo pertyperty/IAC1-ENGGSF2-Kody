@@ -8,12 +8,45 @@ use App\Models\User;
 use App\Models\VerificationDelivery;
 use App\Services\Account\AccountRecoveryService;
 use App\Services\Account\EmailVerificationService;
+use App\Services\Content\ModulePublishing;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\Process\Process;
 
 uses(DatabaseMigrations::class);
+
+test('D02 concurrent draft edits save one new revision and reject the stale edit', function () {
+    $module = moduleFixture();
+    $results = simultaneousAccountRequests('module-save', ['actor_id' => $module->created_by, 'session_id' => 'module-test-session', 'module_id' => $module->id, 'data' => moduleData()],
+        fn () => User::whereKey($module->created_by)->lockForUpdate()->first());
+    sort($results);
+    expect($results)->toBe(['duplicate', 'saved'])->and($module->fresh()->record_version)->toBe(2);
+    $this->assertDatabaseCount('module_revisions', 2);
+    $this->assertDatabaseCount('audit_events', 2);
+});
+
+test('G06 concurrent publication reviews publish and audit only once', function () {
+    $module = moduleFixture();
+    app(ModulePublishing::class)->submit(User::find($module->created_by), 'module-test-session', $module, 1);
+    $reviewer = moduleAccount(Role::Moderator);
+    $results = simultaneousAccountRequests('module-review', ['actor_id' => $reviewer->id, 'session_id' => 'module-test-session', 'module_id' => $module->id],
+        fn () => User::whereKey($module->created_by)->lockForUpdate()->first());
+    sort($results);
+    expect($results)->toBe(['duplicate', 'reviewed'])->and($module->fresh()->status)->toBe('Published');
+    $this->assertDatabaseCount('audit_events', 3);
+    $this->assertDatabaseCount('notifications', 1);
+});
+
+test('creator adventure overlapping wins save one activity and one streak day', function () {
+    $module = moduleFixture(true);
+    $learner = moduleAccount(Role::Learner);
+    $results = simultaneousAccountRequests('module-complete', ['actor_id' => $learner->id, 'session_id' => 'module-test-session', 'module_id' => $module->id, 'revision_id' => $module->published_revision_id],
+        fn () => User::whereKey($learner->id)->lockForUpdate()->first());
+    expect($results)->toBe(['saved', 'saved']);
+    $this->assertDatabaseCount('learning_activity_days', 1);
+    $this->assertDatabaseHas('learning_progress', ['user_id' => $learner->id, 'current_streak' => 1]);
+});
 
 test('A10 concurrent reviews apply one role elevation audit and notification', function () {
     $applicant = User::factory()->create();

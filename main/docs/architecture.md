@@ -1,5 +1,12 @@
 # Foundation conventions
 
+The [creator studio](creator-studio-implementation.md) adds Content-owned versioned
+module publishing, Administration-authorized review and audit, noncritical
+in-app notification delivery, and server-validated assessments feeding existing
+Gamification daily activity. Published revision pointers keep draft edits out of
+learner views. New modules and published replacements require Moderator/Admin
+approval; Instructor owners may archive Published modules with preserved history.
+
 The project owner's [2026-10-03 game-first amendment](game-first-product-direction.md)
 sets the current product direction. The play hub is the primary experience;
 Learning is a separate catalog, and creators attach versioned game/quiz template

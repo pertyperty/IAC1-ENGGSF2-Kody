@@ -42,6 +42,12 @@ credibility review without an invented domain allowlist. See
 [play implementation](docs/play-implementation.md) and
 [creator review](docs/creator-review-implementation.md) for scope and tests.
 
+The owner subsequently approved Instructor-only module authoring (Contributors
+author coding challenges), Moderator/Administrator approval of new modules and
+published revisions, and Published as D03's archive-eligible state. Archived
+modules are hidden from learners while revisions, activity and audit history are
+preserved. See [creator studio](docs/creator-studio-implementation.md).
+
 You are working on **Kody: Gamified Programming Learning Platform and Course Management System (K:GPLPCMS)**.
 
 This repository is a real Laravel application intended for deployment. Treat every production-bound change as maintainable software, not as tutorial, demo, or throwaway coursework.

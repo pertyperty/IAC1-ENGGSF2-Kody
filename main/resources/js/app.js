@@ -1,5 +1,8 @@
+import { mountModuleEditor } from './module-editor.js';
 import { mountGarden } from './games/command-garden.js';
 import { mountQuiz } from './games/choice-quiz.js';
+
+document.querySelectorAll('[data-module-editor]').forEach(mountModuleEditor);
 
 document.querySelectorAll('[data-coding-game]').forEach(mountGarden);
 document.querySelectorAll('[data-practice-quiz]').forEach(mountQuiz);

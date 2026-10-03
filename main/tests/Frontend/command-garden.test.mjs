@@ -6,6 +6,14 @@ import { runProgram, validateInstance } from '../../resources/js/games/command-g
 // Exercise the actual built-in creator-slot data, not a duplicate fixture map.
 const { instances } = JSON.parse(execFileSync(process.env.KODY_TEST_PHP || 'php', ['-r', 'echo json_encode(require "config/learning.php");'], { encoding: 'utf8' }));
 
+test('game placeholder limits match server Unicode character counts', () => {
+    const instance = structuredClone(instances.sequences);
+    instance.instructions = '\u{1f600}'.repeat(1000);
+    assert.equal(validateInstance(instance), instance);
+    instance.instructions += 'x';
+    assert.throws(() => validateInstance(instance));
+});
+
 test('sequences teach order and finish only at the goal', () => {
     assert.equal(runProgram(instances.sequences, ['right', 'right', 'up', 'right', 'right']).success, true);
     assert.equal(runProgram(instances.sequences, ['up', 'right']).success, false);

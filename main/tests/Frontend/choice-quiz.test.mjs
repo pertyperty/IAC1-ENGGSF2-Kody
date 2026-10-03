@@ -5,6 +5,14 @@ import { checkPracticeAnswer, validateQuiz } from '../../resources/js/games/choi
 
 const { quizzes } = JSON.parse(execFileSync(process.env.KODY_TEST_PHP || 'php', ['-r', 'echo json_encode(require "config/learning.php");'], { encoding: 'utf8' }));
 
+test('quiz character limits match server Unicode character counts', () => {
+    const quiz = structuredClone(quizzes.sequences);
+    quiz.explanation = '\u{1f600}'.repeat(1000);
+    assert.equal(validateQuiz(quiz), quiz);
+    quiz.explanation += 'x';
+    assert.throws(() => validateQuiz(quiz));
+});
+
 test('each practice quiz distinguishes correct, wrong and missing answers', () => {
     for (const quiz of Object.values(quizzes)) {
         assert.equal(checkPracticeAnswer(quiz, quiz.answer).correct, true);
