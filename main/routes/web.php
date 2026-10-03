@@ -5,6 +5,7 @@ use App\Http\Controllers\Account\AccountDeletionController;
 use App\Http\Controllers\Account\ContributorApplicationController;
 use App\Http\Controllers\Account\ContributorReviewController;
 use App\Http\Controllers\Account\EmailVerificationController;
+use App\Http\Controllers\Account\GoogleAuthenticationController;
 use App\Http\Controllers\Account\InstructorApplicationController;
 use App\Http\Controllers\Account\InstructorReviewController;
 use App\Http\Controllers\Account\LoginController;
@@ -35,6 +36,7 @@ use App\Http\Controllers\HelpController;
 use App\Http\Controllers\LearningController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PlayController;
+use App\Http\Middleware\GoogleCallbackPrivacy;
 use Illuminate\Support\Facades\Route;
 
 Route::pattern('course', '[0-9]+');
@@ -175,6 +177,13 @@ Route::get('/account/creator-application', [InstructorApplicationController::cla
 Route::post('/account/creator-application', [InstructorApplicationController::class, 'store'])->middleware(['auth', 'account.session', 'throttle:5,1,creator-apply:'])->name('instructor-application.store');
 Route::patch('/account', [ProfileEditingController::class, 'update'])->middleware(['auth', 'account.session', 'throttle:10,1,profile-edit:'])->name('account.update');
 Route::post('/logout', [LoginController::class, 'destroy'])->middleware('auth')->name('logout');
+Route::post('/auth/google', [GoogleAuthenticationController::class, 'start'])->middleware(['guest', 'throttle:10,1,google-login:'])->name('google.start');
+Route::get('/auth/google/callback', [GoogleAuthenticationController::class, 'callback'])->middleware([GoogleCallbackPrivacy::class, 'throttle:20,1,google-callback:'])->name('google.callback');
+Route::middleware(['auth', 'account.session'])->group(function (): void {
+    Route::get('/account/google', [GoogleAuthenticationController::class, 'show'])->name('account.google');
+    Route::post('/account/google/link', [GoogleAuthenticationController::class, 'link'])->middleware('throttle:5,1,google-link:')->name('google.link');
+    Route::post('/account/google/unlink', [GoogleAuthenticationController::class, 'unlink'])->middleware('throttle:5,1,google-unlink:')->name('google.unlink');
+});
 Route::middleware(['auth', 'account.session'])->prefix('manage/instructors')->name('instructor-reviews.')->group(function (): void {
     Route::get('/', [InstructorReviewController::class, 'index'])->name('index');
     Route::get('/{application}', [InstructorReviewController::class, 'show'])->name('show');

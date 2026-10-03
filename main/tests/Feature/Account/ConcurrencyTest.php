@@ -18,9 +18,39 @@ use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Symfony\Component\Process\Process;
 
 uses(DatabaseMigrations::class);
+
+test('A03 Google simultaneous callback claims permit only one provider exchange', function () {
+    $sessionId = Str::random(40);
+    $attemptId = (string) Str::uuid();
+    DB::table('google_auth_attempts')->insert(['id' => $attemptId, 'session_hash' => hash('sha256', $sessionId),
+        'state_hash' => hash('sha256', 'test-state'), 'intent' => 'login', 'created_at' => now(), 'expires_at' => now()->addMinutes(5)]);
+    $results = simultaneousAccountRequests('google-claim', ['session_id' => $sessionId, 'attempt_id' => $attemptId, 'state' => 'test-state'],
+        fn () => DB::table('google_auth_attempts')->where('id', $attemptId)->lockForUpdate()->first());
+    sort($results);
+    expect($results)->toBe(['claimed', 'invalid'])->and(DB::table('google_auth_attempts')->value('consumed_at'))->not->toBeNull();
+});
+
+test('A03 Google concurrent sign-ins authenticate one session and prompt the other', function () {
+    $user = User::factory()->create();
+    $hash = googleIdentity($user);
+    $results = simultaneousAccountRequests('google-login', ['subject_hash' => $hash], fn () => User::whereKey($user->id)->lockForUpdate()->first());
+    sort($results);
+    expect($results)->toBe(['authenticated', 'conflict']);
+});
+
+test('A06 Google concurrent links preserve unique ownership and one audit', function () {
+    $sessionId = Str::random(40);
+    $users = User::factory()->count(2)->create(['active_session_hash' => hash('sha256', $sessionId), 'active_session_expires_at' => now()->addHour()]);
+    $results = simultaneousAccountRequests('google-link', ['session_id' => $sessionId, 'user_ids' => $users->pluck('id')->all(), 'subject_hash' => hash('sha256', 'shared-google-subject')],
+        fn () => DB::statement('LOCK TABLE google_identities IN SHARE MODE'));
+    sort($results);
+    expect($results)->toBe(['linked', 'rejected'])->and(DB::table('google_identities')->count())->toBe(1)
+        ->and(DB::table('audit_events')->where('event', 'account.google-linked')->count())->toBe(1);
+});
 
 test('D04 D09 C07 simultaneous deletion commits one purge and audit', function (string $kind) {
     $content = moderationFixture($kind);

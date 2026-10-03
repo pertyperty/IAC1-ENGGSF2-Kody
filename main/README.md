@@ -6,6 +6,13 @@ layered over playable experiences. See the approved
 modular monolith; business use cases are implemented incrementally.
 Read `AGENTS.md` and [architecture conventions](docs/architecture.md) first.
 
+[Google sign-in](docs/google-authentication-implementation.md) supports explicitly
+linked existing verified accounts, with password-confirmed linking/unlinking,
+PKCE, single-use callback records and existing account/session restrictions.
+Deploy its additive migration. It is disabled by default until private OAuth
+configuration and a live verification round trip are completed. Email matching
+never links accounts or creates new users.
+
 [Content feedback](docs/content-feedback-implementation.md) lets verified Active
 Learners, Contributors and Instructors choose one Like, Helpful or Favorite after
 opening available content. Enrolled courses also accept feedback; choices can be

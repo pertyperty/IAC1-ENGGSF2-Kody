@@ -1,5 +1,12 @@
 # Foundation conventions
 
+[Google authentication](google-authentication-implementation.md) is Account-owned.
+A dedicated Socialite adapter translates server-verified provider identity into
+a namespaced subject digest. Explicit password-confirmed linking, database-owned
+callback consumption and fresh account locks protect identity ownership; sign-in
+reuses the existing lockout/status/session rules. No other module handles OAuth
+tokens, and provider email never grants an account or role.
+
 The [creator studio](creator-studio-implementation.md) adds Content-owned versioned
 module publishing, Administration-authorized review and audit, noncritical
 in-app notification delivery, and server-validated assessments feeding existing

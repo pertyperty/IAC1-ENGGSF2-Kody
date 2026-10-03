@@ -11,6 +11,13 @@
         <label>Password<input type="password" name="password" autocomplete="current-password" maxlength="1024" required></label>
         <button type="submit" class="primary-button">Sign in</button>
     </form>
+    @if(app(\App\Services\Account\GoogleOAuth::class)->available())
+        <form method="post" action="{{ route('google.start') }}" class="account-form">
+            @csrf
+            <button type="submit" class="primary-button">Continue with linked Google account</button>
+        </form>
+        <p>Already have Kody? Sign in with your password first to connect Google from your profile.</p>
+    @endif
     <p class="secondary-link"><a href="{{ route('verification.notice') }}">Need to verify your email?</a></p>
     <p class="secondary-link"><a href="{{ route('recovery.request') }}">Forgot your password?</a></p>
     <p class="secondary-link"><a href="{{ route('register') }}">Create an account</a></p>

@@ -2,6 +2,14 @@
 
 ## Mission
 
+The owner approved the first Google identity slice for existing verified Active
+accounts: explicit linking after confirming the current Kody password, followed
+by sign-in through the linked provider subject. Never automatically link by email
+or create Google-only accounts; new registration remains A01/A02. All five roles
+retain the existing account-status, lockout and single-session rules. Linking and
+unlinking are sensitive account changes and revoke sessions. See
+[Google authentication](docs/google-authentication-implementation.md).
+
 The owner approved B10 one replaceable Like/Helpful/Favorite reaction per user
 and content, with removal; numeric ratings are deferred. The owner delegated the
 prior-access policy to platform judgment: verified Active Learners, Contributors

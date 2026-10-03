@@ -97,7 +97,7 @@ jobs:
           php artisan config:cache
           php artisan route:cache
           php artisan view:cache
-          php artisan test --filter='HealthTest|LoginTest|SessionConflictTest|DatabaseSessionsTest|PasswordHashingTest|RecoveryTest|ProfileTest|LearningTest|LearningProgressionTest|InstructorReviewTest|ModulePublishingTest|CoursePublishingTest|GamePresetsTest|ContentModerationTest|FaqTest|ContentFeedbackTest|ContentDeletionTest'
+          php artisan test --filter='HealthTest|LoginTest|SessionConflictTest|DatabaseSessionsTest|PasswordHashingTest|RecoveryTest|ProfileTest|LearningTest|LearningProgressionTest|InstructorReviewTest|ModulePublishingTest|CoursePublishingTest|GamePresetsTest|ContentModerationTest|FaqTest|ContentFeedbackTest|ContentDeletionTest|GoogleAuthenticationTest'
           php artisan route:list --path=up
           php artisan route:list --path=ready
           php artisan route:clear

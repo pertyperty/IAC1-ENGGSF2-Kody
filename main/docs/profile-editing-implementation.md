@@ -1,5 +1,10 @@
 # A06 self-profile editing and Instructor applications
 
+The approved [Google linking/unlinking slice](google-authentication-implementation.md)
+adds a separate own-account sign-in option. It requires the current password and
+fresh profile/identity versions, revokes sessions and advances the profile version.
+Provider email does not change profile email, role or local verification.
+
 ## Approved decisions and scope
 
 Account Management owns these operations and calls the shared verification,

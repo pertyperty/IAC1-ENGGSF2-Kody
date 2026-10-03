@@ -106,11 +106,10 @@ Remote CI, deployment and browser visual checks remain unverified.
 
 ## Next implementation prompt
 
-Google identity is an approved integration, but explicit account-linking and
-passwordless registration rules are undefined. The proposed first slice links
-existing verified accounts only after current-password confirmation, preserving
-the existing registration, verification, account status and session policies.
-Resolve that policy before adding identity persistence. Provider credentials and
-real OAuth round trips must be configured and verified privately before activation.
+The owner approved explicit password-confirmed Google linking for existing
+verified accounts, preserving registration, verification, account status and
+session policies. See [Google authentication](google-authentication-implementation.md).
+Provider credentials and real OAuth round trips must be configured and verified
+privately before activation.
 Keep purchases, numeric ratings, reward formulas and live Judge0 in the deferred
 register; do not re-request already deferred credentials.

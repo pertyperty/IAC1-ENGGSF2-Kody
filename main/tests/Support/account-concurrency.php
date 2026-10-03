@@ -17,6 +17,7 @@ use App\Services\Account\AccountDeletion;
 use App\Services\Account\AccountRecoveryService;
 use App\Services\Account\ContributorApplications;
 use App\Services\Account\EmailVerificationService;
+use App\Services\Account\GoogleAuthentication;
 use App\Services\Account\InstructorApplications;
 use App\Services\Account\ProfileEditing;
 use App\Services\Administration\AccountEnforcement;
@@ -40,6 +41,7 @@ use Carbon\CarbonImmutable;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
@@ -61,6 +63,35 @@ try {
     $session->start();
 
     $result = match ($argv[1]) {
+        'google-claim' => (function () use ($input, $session): string {
+            $session->setId($input['session_id']);
+            $session->put('google_attempt_id', $input['attempt_id']);
+            $request = Request::create('/auth/google/callback', 'GET', ['state' => $input['state']]);
+            $request->setLaravelSession($session);
+            try {
+                app(GoogleAuthentication::class)->claim($request);
+
+                return 'claimed';
+            } catch (RuntimeException) {
+                return 'invalid';
+            }
+        })(),
+        'google-login' => strtolower(app(LoginAccount::class)->fromGoogle($input['subject_hash'], $session)->name),
+        'google-link' => (function () use ($input, $session, $argv): string {
+            $user = User::findOrFail($input['user_ids'][(int) $argv[3] - 1]);
+            $session->setId($input['session_id']);
+            $request = Request::create('/auth/google/callback');
+            $request->setLaravelSession($session);
+            $request->setUserResolver(fn () => $user);
+            try {
+                app(GoogleAuthentication::class)->link($request,
+                    (object) ['user_id' => $user->id, 'profile_version' => 1, 'identity_version' => 0], $input['subject_hash']);
+
+                return 'linked';
+            } catch (RuntimeException) {
+                return 'rejected';
+            }
+        })(),
         'content-delete' => (function () use ($input, $argv): string {
             $index = (int) $argv[3] - 1;
             $actor = User::findOrFail($input['actor_ids'][$index]);

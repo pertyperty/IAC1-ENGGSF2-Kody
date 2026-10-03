@@ -1,5 +1,10 @@
 # A03 login and session management
 
+The approved [Google linking/sign-in slice](google-authentication-implementation.md)
+now reuses this account eligibility, lockout and single-session workflow. Google
+identity is explicitly linked after password confirmation; email matching never
+links accounts. The original password-only slice described below remains available.
+
 Sources: SRS v1.4 UC A03 and account dictionary; A07 archive restrictions;
 SDD 3.3/4.1/4.2; AGENTS.md. Account Management owns authentication and session state.
 
