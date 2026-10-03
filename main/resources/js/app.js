@@ -1,12 +1,14 @@
 import { mountModuleEditor } from './module-editor.js';
 import { mountCourseComposer } from './course-composer.js';
 import { mountTestCaseEditor } from './test-case-editor.js';
+import { mountChallengeStatus } from './challenge-status.js';
 import { mountGarden } from './games/command-garden.js';
 import { mountQuiz } from './games/choice-quiz.js';
 
 document.querySelectorAll('[data-module-editor]').forEach(mountModuleEditor);
 document.querySelectorAll('[data-course-composer]').forEach(mountCourseComposer);
 document.querySelectorAll('[data-test-case-editor]').forEach(mountTestCaseEditor);
+document.querySelectorAll('[data-challenge-status]').forEach(mountChallengeStatus);
 
 document.querySelectorAll('[data-coding-game]').forEach(mountGarden);
 document.querySelectorAll('[data-practice-quiz]').forEach(mountQuiz);

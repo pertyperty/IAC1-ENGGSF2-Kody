@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Services\Account\AccountRecoveryService;
 use App\Services\Account\EmailVerificationService;
 use App\Services\Challenges\ChallengePublishing;
+use App\Services\Challenges\ChallengeSubmissions;
 use App\Services\Content\CourseLearning;
 use App\Services\Content\CoursePublishing;
 use App\Services\Content\ModulePublishing;
@@ -18,6 +19,7 @@ use App\Services\Gamification\LearningProgression;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 require dirname(__DIR__, 2).'/vendor/autoload.php';
@@ -54,6 +56,15 @@ try {
         })(),
         'course-save' => app(CoursePublishing::class)->save(User::findOrFail($input['actor_id']), $input['session_id'], $input['data'], LearningCourse::findOrFail($input['course_id'])) ? 'saved' : 'error',
         'challenge-save' => app(ChallengePublishing::class)->save(User::findOrFail($input['actor_id']), $input['session_id'], $input['data'], CodingChallenge::findOrFail($input['challenge_id'])) ? 'saved' : 'error',
+        'challenge-attempt' => (function () use ($input): string {
+            config($input['judge_config']);
+            $data = $input['data'];
+            if ($input['distinct']) {
+                $data['confirmation_id'] = (string) Str::uuid();
+            }
+
+            return app(ChallengeSubmissions::class)->submit(User::findOrFail($input['actor_id']), $input['session_id'], CodingChallenge::findOrFail($input['challenge_id']), $data) ? 'attempted' : 'error';
+        })(),
         'challenge-review' => (function () use ($input): string {
             app(ChallengePublishing::class)->review(User::findOrFail($input['actor_id']), $input['session_id'], CodingChallenge::findOrFail($input['challenge_id']), 2, 'Approved', null);
 

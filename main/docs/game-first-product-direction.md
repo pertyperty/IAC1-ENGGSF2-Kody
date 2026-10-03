@@ -125,3 +125,14 @@ approved and archive-eligible. Published replacements require Moderator/Admin
 review; the approved version remains available while the replacement is pending,
 including in B06 browsing. Future submissions retain their original revision.
 See [challenge studio](challenge-studio-implementation.md).
+
+## Challenge participation amendment — approved 2026-10-03
+
+Every confirmed submission receives evaluation/feedback. Only one evaluation may
+be active per user/challenge context; committed work continues after leaving the
+browser. Standard attempts are capped at three across all published revisions;
+each future weekly event receives an independent three-attempt budget. The current
+release offers free participation to verified Active Learners, Contributors and
+Instructors. Paid access, rank gates and prerequisites await supporting modules.
+See [challenge submissions](challenge-submission-implementation.md) for delivered
+scope, provider activation requirements and the still-deferred weekly workflow.

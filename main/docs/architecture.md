@@ -20,6 +20,14 @@ Moderator/Admin review and audited publication/archiving. Learner previews query
 only reviewed problem fields and public samples; hidden tests stay within creator
 and reviewer access. No learner code runs in PHP or on the application host.
 
+[Challenge submissions](challenge-submission-implementation.md) adds Challenge-owned
+revision-pinned attempts and private asynchronous evaluation. A database queue job
+commits with the attempt; PostgreSQL uniqueness/locks enforce lifetime attempt
+limits and one active evaluation. The Judge0 adapter translates provider verdicts
+without exposing raw output, and a scheduler closes overdue work. Provider
+activation requires verified configured compiler mappings and resource limits.
+No reward, rank, streak or balance changes occur in this submission workflow.
+
 The project owner's [2026-10-03 game-first amendment](game-first-product-direction.md)
 sets the current product direction. The play hub is the primary experience;
 Learning is a separate catalog, and creators attach versioned game/quiz template
@@ -102,12 +110,13 @@ PHT semantics against the SRS before implementing them.
 
 ## External boundaries
 
-Introduce adapters in `app/Integrations/{Google,Judge0,SendGrid,Xendit}` only with
+Introduce dedicated provider adapters only with
 the owning use case. Define a narrow contract for test doubles; translate
 provider responses to internal results. Configure secrets through config files,
 never controller `env()` calls. Validate responses, bound timeouts, sanitize logs,
 retry only safe operations, and enforce durable idempotency for financial effects.
-CI must use fakes; no real provider integration is implemented in this foundation.
+CI must use fakes. The Judge0 submission adapter is implemented behind verified
+configuration; no live provider execution has been verified.
 
 ## Traceability and unresolved decisions
 

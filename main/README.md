@@ -150,7 +150,10 @@ Contributors and Instructors can author coding quests in `/create/challenges`,
 with versioned problems, execution settings and sample/hidden tests. Moderator/Admin
 review at `/manage/challenges` controls publication and replacements; owners can
 archive published quests. `/challenges` exposes approved metadata and authenticated
-sample previews. Code submission/execution awaits the Judge0 workflow. See
+sample previews. Confirmed free attempts now pin the approved revision, enforce
+three lifetime attempts and queue private evaluation. Execution stays unavailable
+until configured Judge0 compiler IDs and limits pass `php artisan kody:judge0-check`.
+See [submission setup and scope](docs/challenge-submission-implementation.md) and
 [challenge studio scope](docs/challenge-studio-implementation.md).
 
 The target is Linux EC2, Nginx/PHP-FPM with PHP 8.4.1+, RDS PostgreSQL and S3 where required.

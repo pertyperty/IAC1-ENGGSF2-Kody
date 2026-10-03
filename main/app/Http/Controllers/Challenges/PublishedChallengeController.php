@@ -3,10 +3,15 @@
 namespace App\Http\Controllers\Challenges;
 
 use App\Http\Controllers\Controller;
+use App\Models\ChallengeSubmission;
 use App\Models\CodingChallenge;
 use App\Models\CodingChallengeRevision;
+use App\Services\Challenges\Judge0\ProviderReadiness;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class PublishedChallengeController extends Controller
@@ -27,14 +32,18 @@ class PublishedChallengeController extends Controller
         return response()->view('challenges.catalog', compact('challenges', 'query', 'filters'));
     }
 
-    public function show(CodingChallenge $challenge): Response
+    public function show(Request $request, CodingChallenge $challenge): Response
     {
         abort_unless($challenge->status === 'Published', 404);
         $revision = CodingChallengeRevision::whereKey($challenge->published_revision_id)->where('challenge_id', $challenge->id)->where('review_status', 'Approved')
             ->firstOrFail(['id', 'title', 'description', 'language', 'difficulty', 'rules', 'input_format', 'output_format', 'cpu_time_ms', 'memory_kib']);
         // Hidden tests are excluded by SQL and never loaded into the learner view.
         $samples = $revision->testCases()->where('hidden', false)->get(['position', 'input', 'expected_output']);
+        $participation = DB::table('challenge_participations')->where('user_id', $request->user()->id)->where('challenge_id', $challenge->id)->first();
+        $attempts = $participation === null ? collect() : ChallengeSubmission::where('participation_id', $participation->id)->orderByDesc('attempt')->get(['id', 'attempt', 'status']);
+        $ready = Gate::allows('create', ChallengeSubmission::class) && app(ProviderReadiness::class)->profile($revision) !== null;
+        $confirmationId = (string) Str::uuid();
 
-        return response()->view('challenges.published', compact('revision', 'samples'))->header('Cache-Control', 'no-store, private');
+        return response()->view('challenges.published', compact('revision', 'samples', 'challenge', 'participation', 'attempts', 'ready', 'confirmationId'))->header('Cache-Control', 'no-store, private');
     }
 }

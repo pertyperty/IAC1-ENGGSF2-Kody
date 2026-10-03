@@ -8,6 +8,7 @@ use App\Http\Controllers\Account\RecoveryController;
 use App\Http\Controllers\Account\RegistrationController;
 use App\Http\Controllers\Challenges\ChallengeReviewController;
 use App\Http\Controllers\Challenges\ChallengeStudioController;
+use App\Http\Controllers\Challenges\ChallengeSubmissionController;
 use App\Http\Controllers\Challenges\PublishedChallengeController;
 use App\Http\Controllers\Content\CourseLearningController;
 use App\Http\Controllers\Content\CourseReviewController;
@@ -29,6 +30,9 @@ Route::get('/learn/courses', [CourseLearningController::class, 'catalog'])->name
 Route::get('/challenges', [PublishedChallengeController::class, 'catalog'])->name('challenges.catalog');
 Route::middleware(['auth', 'account.session'])->group(function (): void {
     Route::get('/challenges/{challenge}', [PublishedChallengeController::class, 'show'])->name('challenges.show');
+    Route::post('/challenges/{challenge}/attempts', [ChallengeSubmissionController::class, 'store'])->middleware('throttle:10,1,challenge-attempt:')->name('challenge-attempts.store');
+    Route::get('/challenge-attempts/{submission}', [ChallengeSubmissionController::class, 'show'])->whereUuid('submission')->name('challenge-attempts.show');
+    Route::get('/challenge-attempts/{submission}/status', [ChallengeSubmissionController::class, 'status'])->whereUuid('submission')->middleware('throttle:90,1,challenge-result:')->name('challenge-attempts.status');
     Route::get('/create/challenges', [ChallengeStudioController::class, 'index'])->name('challenges.index');
     Route::get('/create/challenges/new', [ChallengeStudioController::class, 'create'])->name('challenges.create');
     Route::post('/create/challenges', [ChallengeStudioController::class, 'store'])->middleware('throttle:10,1,challenge-create:')->name('challenges.store');

@@ -194,3 +194,4 @@
 .challenge-case textarea, .challenge-case pre { font-family: ui-monospace, monospace; white-space: pre-wrap; overflow-wrap: anywhere; }
 .catalog-search select { width: 100%; padding: .8rem 1rem; border: 1px solid #d4deca; border-radius: 12px; background: white; color: #33462c; font: inherit; margin-bottom: .7rem; }
 .studio-form input[type=checkbox] { display: inline-block; width: auto; margin-right: .5rem; accent-color: #355a25; }
+.studio-form .challenge-source, pre.challenge-case { font-family: ui-monospace, monospace; white-space: pre-wrap; overflow-wrap: anywhere; tab-size: 4; }

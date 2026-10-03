@@ -118,19 +118,12 @@ passed. Pint, Vite build and diff checks passed. All fourteen migrations execute
 on clean disposable PostgreSQL databases through concurrency tests. Remote CI,
 authenticated browser visual checks and deployment remain unverified.
 
-## Next implementation prompt and required decisions
+## Submission follow-up
 
-Build durable revision-pinned challenge submissions, server-side attempt limits,
-private status/feedback and a bounded Judge0 adapter with provider fakes in CI.
-Never run learner code on the application host. Keep paid/rank/prerequisite
-access gates unavailable until their rules and supporting modules exist.
-
-Resolve C03/C04/B07 before scheduling evaluations: C03 forwards each submission
-for evaluation, B07 continues committed evaluation server-side, but C04 says
-only one submission can be evaluated and describes confirmation/cancellation
-while attempts remain. C03's maximum three submissions also lacks a clearly
-defined lifetime/revision reset scope for standard challenges; E02 requires
-weekly participation isolated from prior historical submissions. Do not silently
-choose either workflow or reset attempt budgets when publications change.
-Judge0 endpoint/compiler IDs, limits, response handling and sandbox credentials
-must be verified against the configured provider before live execution.
+The owner resolved C03/C04/B07: every confirmed submission is evaluated, one
+evaluation per user/challenge context may be active, and committed work continues
+after browser closure. Three standard attempts span all publications; future
+weekly events have separate three-attempt budgets. Current challenge participation
+is free for verified Active Learners, Contributors and Instructors. See
+[challenge submissions](challenge-submission-implementation.md) for durable records,
+provider-faked evaluation and the remaining live-provider activation requirement.

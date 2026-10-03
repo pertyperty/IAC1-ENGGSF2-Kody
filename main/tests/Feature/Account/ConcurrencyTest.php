@@ -18,6 +18,24 @@ use Symfony\Component\Process\Process;
 
 uses(DatabaseMigrations::class);
 
+test('C03 overlapping final attempts cannot exceed the lifetime budget or create two active evaluations', function (bool $distinct) {
+    readyJudge();
+    $challenge = challengeFixture(true);
+    $user = moduleAccount(Role::Learner);
+    for ($i = 0; $i < 2; $i++) {
+        evaluateAttempt(submitAttempt($challenge, $user));
+    }
+    $results = simultaneousAccountRequests('challenge-attempt', ['actor_id' => $user->id, 'session_id' => 'module-test-session',
+        'challenge_id' => $challenge->id, 'judge_config' => judgeConfiguration(), 'distinct' => $distinct, 'data' => attemptData($challenge)],
+        fn () => User::whereKey($user->id)->lockForUpdate()->first());
+    sort($results);
+    expect($results)->toBe($distinct ? ['attempted', 'duplicate'] : ['attempted', 'attempted']);
+    $this->assertDatabaseCount('challenge_submissions', 3);
+    $this->assertDatabaseCount('jobs', 3);
+    expect(DB::table('challenge_participations')->value('attempts'))->toBe(3);
+    expect(DB::table('challenge_submissions')->whereIn('status', ['Queued', 'Evaluating'])->count())->toBe(1);
+})->with([true, false]);
+
 test('C05 overlapping challenge edits preserve one new revision and its test snapshot', function () {
     $challenge = challengeFixture();
     $results = simultaneousAccountRequests('challenge-save', ['actor_id' => $challenge->created_by, 'session_id' => 'module-test-session', 'challenge_id' => $challenge->id, 'data' => challengeData()],

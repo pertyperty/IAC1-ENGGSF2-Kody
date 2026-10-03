@@ -23,10 +23,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->redirectGuestsTo(fn () => route('login'));
         $middleware->redirectUsersTo(fn () => route('dashboard'));
         // Test-case whitespace is part of the expected program behavior.
-        $middleware->trimStrings(except: ['test_cases.*.input', 'test_cases.*.expected_output']);
+        $middleware->trimStrings(except: ['test_cases.*.input', 'test_cases.*.expected_output', 'source_code']);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        $exceptions->dontFlash(['verification_token', 'recovery_token']);
+        $exceptions->dontFlash(['verification_token', 'recovery_token', 'source_code']);
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );
