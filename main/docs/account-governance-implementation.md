@@ -2,8 +2,8 @@
 
 Administration and Governance owns staff account browsing and enforcement.
 Account Management owns session/proof revocation; Coding Challenge Management
-continues to own already-committed evaluation. G02 role/personal-field editing
-is separate and is not implemented by these routes.
+continues to own already-committed evaluation. G02 role/support editing has
+separate actions documented in the linked implementation records below.
 
 ## Approved hierarchy and scope
 
@@ -93,4 +93,5 @@ participant accounts and removal to the recorded prior participant role, keeping
 Contributor/Instructor elevation in A09/A10 and blocking self/Administrator role
 changes. Existing Moderators without a recorded prior role remain protected.
 See [G02 implementation](moderator-appointments-implementation.md).
-Administrative personal-field editing remains a separate unresolved scope.
+The owner subsequently approved limited Administrator support corrections; see
+[G02 support scope](support-profile-corrections-implementation.md).

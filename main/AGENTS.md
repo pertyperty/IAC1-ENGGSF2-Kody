@@ -144,6 +144,13 @@ block self/Administrator changes and removal of existing Moderators with unknown
 prior roles. Administrative personal-field editing remains a separate scope.
 See [Moderator appointments](docs/moderator-appointments-implementation.md).
 
+The owner approved G02 support corrections to username and first/last name on
+verified Active participant/Moderator accounts when the user requests help, with
+current Administrator password, explicit confirmation, audit, target-session
+revocation and notice. Self/Administrator targets retain A06, and email/password
+changes remain in owner A06/A04 flows. See
+[support corrections](docs/support-profile-corrections-implementation.md).
+
 You are working on **Kody: Gamified Programming Learning Platform and Course Management System (K:GPLPCMS)**.
 
 This repository is a real Laravel application intended for deployment. Treat every production-bound change as maintainable software, not as tutorial, demo, or throwaway coursework.

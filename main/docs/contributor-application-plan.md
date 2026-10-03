@@ -98,5 +98,5 @@ notices. Preserve committed coding evaluation and unrelated user/content data.
 See [governance scope](account-governance-implementation.md). The approved G02
 Moderator appointment/removal hierarchy is now implemented; see
 [role scope](moderator-appointments-implementation.md). Administrative personal-field
-scope still needs owner input before general editing.
+scope is now approved for limited [support corrections](support-profile-corrections-implementation.md).
 Keep owner-deferred purchases, Judge0 activation and rewards unavailable.

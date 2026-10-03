@@ -197,6 +197,9 @@ and remove them to their recorded prior role. Confirmation requires the current
 Administrator password, revokes target sessions and records audit/notification
 history. Self/Admin targets and legacy Moderators with unknown prior roles remain
 protected. See [G02 role scope](docs/moderator-appointments-implementation.md).
+Administrators can correct username and first/last name for eligible accounts
+when the user requests help, with password confirmation, audit, session revocation
+and a queued notice. See [G02 support scope](docs/support-profile-corrections-implementation.md).
 
 The target is Linux EC2, Nginx/PHP-FPM with PHP 8.4.1+, RDS PostgreSQL and S3 where required.
 Set `APP_ENV=production`, `APP_DEBUG=false`, a stable managed `APP_KEY`, HTTPS

@@ -21,6 +21,18 @@ use Symfony\Component\Process\Process;
 
 uses(DatabaseMigrations::class);
 
+test('G02 support simultaneous confirmations commit one correction version audit and notice', function () {
+    $first = moduleAccount(Role::Administrator);
+    $second = moduleAccount(Role::Administrator);
+    $target = moduleAccount(Role::Learner);
+    $results = simultaneousAccountRequests('support-correct', ['actor_ids' => [$first->id, $second->id], 'target_id' => $target->id,
+        'data' => supportCorrectionData($target)], fn () => User::whereKey($target->id)->lockForUpdate()->first());
+    sort($results);
+    expect($results)->toBe(['corrected', 'duplicate']);
+    expect(DB::table('account_support_corrections')->count())->toBe(1)->and($target->fresh()->profile_version)->toBe(2);
+    expect(DB::table('audit_events')->where('event', 'account.support-corrected')->count())->toBe(1)->and(DB::table('jobs')->count())->toBe(1);
+});
+
 test('G02 simultaneous appointments and removals preserve one prior role and commit one transition', function (string $action) {
     $first = moduleAccount(Role::Administrator);
     $second = moduleAccount(Role::Administrator);

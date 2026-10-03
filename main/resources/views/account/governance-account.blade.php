@@ -26,6 +26,21 @@
 @endcan
 <h2>Moderator appointment history</h2>@forelse($roleHistory as $change)<p>{{ $change->action }} · {{ $change->previous_role }} → {{ $change->resulting_role }} · Staff account #{{ $change->actor_id }} · {{ \Carbon\CarbonImmutable::parse($change->created_at)->setTimezone('Asia/Manila')->format('M j, Y g:i A') }} Asia/Manila</p>@empty<p>No recorded Moderator appointments.</p>@endforelse
 {{ $roleHistory->links() }}
+@can('correctProfile', $account)
+<h2>Help with profile details</h2>
+<form class="account-form" method="POST" action="{{ route('account-governance.profile', $account) }}">@csrf @method('PATCH')
+<input type="hidden" name="profile_version" value="{{ $account->profile_version }}">
+<p>Correct these details only when the account holder requests help. Saving a correction ends their sessions and sends a notice.</p>
+<label>Username<input name="username" value="{{ old('username', $account->username) }}" minlength="6" maxlength="30" required></label>
+<label>First name<input name="first_name" value="{{ old('first_name', $account->first_name) }}" maxlength="50" required></label>
+<label>Last name<input name="last_name" value="{{ old('last_name', $account->last_name) }}" maxlength="50" required></label>
+<label>Your current Administrator password<input type="password" name="current_password" maxlength="1024" autocomplete="current-password" required></label>
+<label><input type="checkbox" name="support_requested" value="1" required> The account holder requested help correcting these details.</label>
+<label><input type="checkbox" name="confirmed" value="1" required> I confirm this profile correction.</label>
+<button class="primary-button">Save support correction</button></form>
+@endcan
+<h2>Support correction history</h2>@forelse($supportHistory as $correction)<p>Profile correction · Staff account #{{ $correction->actor_id }} · {{ \Carbon\CarbonImmutable::parse($correction->created_at)->setTimezone('Asia/Manila')->format('M j, Y g:i A') }} Asia/Manila</p>@empty<p>No recorded support corrections.</p>@endforelse
+{{ $supportHistory->links() }}
 <h2>Enforcement history</h2>@forelse($history as $event)<p>{{ $event->action }} · Staff account #{{ $event->actor_id }} · {{ \Carbon\CarbonImmutable::parse($event->created_at)->setTimezone('Asia/Manila')->format('M j, Y g:i A') }} Asia/Manila</p>@empty<p>No recorded enforcement actions.</p>@endforelse
 {{ $history->links() }}<p class="secondary-link"><a href="{{ route('account-governance.index') }}">Back to accounts</a></p>
 @endsection

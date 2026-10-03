@@ -41,6 +41,12 @@ class UserPolicy
                 || ($account->account_role === Role::Moderator && in_array($account->moderator_prior_role, $participantRoles, true)));
     }
 
+    public function correctProfile(User $actor, User $account): bool
+    {
+        return $actor->account_role === Role::Administrator && $this->manage($actor, $account)
+            && $account->account_status === AccountStatus::Active && $account->email_verified_at !== null;
+    }
+
     public function archive(User $actor, User $account): bool
     {
         return $this->update($actor, $account) && in_array($actor->account_role, [Role::Learner, Role::Contributor, Role::Instructor], true);

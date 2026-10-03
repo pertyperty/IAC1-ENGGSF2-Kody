@@ -5,10 +5,12 @@ namespace App\Http\Controllers\Administration;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Administration\BrowseAccountsRequest;
 use App\Http\Requests\Administration\ChangeModeratorRequest;
+use App\Http\Requests\Administration\CorrectProfileRequest;
 use App\Http\Requests\Administration\EnforceAccountRequest;
 use App\Models\User;
 use App\Services\Administration\AccountEnforcement;
 use App\Services\Administration\ModeratorAppointments;
+use App\Services\Administration\SupportProfileCorrections;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
@@ -44,8 +46,9 @@ class AccountGovernanceController extends Controller
         Gate::authorize('viewAny', User::class);
         $history = DB::table('account_enforcements')->where('user_id', $account->id)->latest('created_at')->paginate(10);
         $roleHistory = DB::table('account_role_changes')->where('user_id', $account->id)->latest('created_at')->paginate(10, ['*'], 'roles_page');
+        $supportHistory = DB::table('account_support_corrections')->where('user_id', $account->id)->latest('created_at')->paginate(10, ['*'], 'support_page');
 
-        return response()->view('account.governance-account', compact('account', 'history', 'roleHistory'))->header('Cache-Control', 'no-store, private');
+        return response()->view('account.governance-account', compact('account', 'history', 'roleHistory', 'supportHistory'))->header('Cache-Control', 'no-store, private');
     }
 
     public function enforce(EnforceAccountRequest $request, User $account, AccountEnforcement $enforcement): RedirectResponse
@@ -60,5 +63,13 @@ class AccountGovernanceController extends Controller
         $appointments->change($request->user(), $request->session()->getId(), $account, $request->validated());
 
         return redirect()->route('account-governance.show', $account)->with('status', 'Moderator role action applied. The account holder must sign in again and will be notified.');
+    }
+
+    public function correctProfile(CorrectProfileRequest $request, User $account, SupportProfileCorrections $corrections): RedirectResponse
+    {
+        $changed = $corrections->correct($request->user(), $request->session()->getId(), $account, $request->validated());
+
+        return redirect()->route('account-governance.show', $account)->with('status', $changed
+            ? 'Support correction saved. The account holder must sign in again and will be notified.' : 'No profile fields changed.');
     }
 }

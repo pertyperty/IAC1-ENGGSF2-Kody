@@ -19,6 +19,7 @@ use App\Services\Account\InstructorApplications;
 use App\Services\Account\ProfileEditing;
 use App\Services\Administration\AccountEnforcement;
 use App\Services\Administration\ModeratorAppointments;
+use App\Services\Administration\SupportProfileCorrections;
 use App\Services\Challenges\ChallengePublishing;
 use App\Services\Challenges\ChallengeSubmissions;
 use App\Services\Content\CourseLearning;
@@ -51,6 +52,12 @@ try {
     $session->start();
 
     $result = match ($argv[1]) {
+        'support-correct' => (function () use ($input, $argv): string {
+            app(SupportProfileCorrections::class)->correct(User::findOrFail($input['actor_ids'][(int) $argv[3] - 1]), 'module-test-session',
+                User::findOrFail($input['target_id']), $input['data']);
+
+            return 'corrected';
+        })(),
         'moderator-change' => (function () use ($input, $argv): string {
             app(ModeratorAppointments::class)->change(User::findOrFail($input['actor_ids'][(int) $argv[3] - 1]), 'module-test-session',
                 User::findOrFail($input['target_id']), $input['data']);

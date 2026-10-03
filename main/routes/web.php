@@ -121,6 +121,7 @@ Route::middleware(['auth', 'account.session'])->prefix('manage/accounts')->name(
     Route::get('/{account}', [AccountGovernanceController::class, 'show'])->name('show');
     Route::post('/{account}/enforce', [AccountGovernanceController::class, 'enforce'])->middleware('throttle:10,1,account-enforce:')->name('enforce');
     Route::post('/{account}/moderator', [AccountGovernanceController::class, 'moderator'])->middleware('throttle:5,1,moderator-change:')->name('moderator');
+    Route::patch('/{account}/profile', [AccountGovernanceController::class, 'correctProfile'])->middleware('throttle:5,1,support-correction:')->name('profile');
 });
 Route::get('/account/contributor-application', [ContributorApplicationController::class, 'create'])->middleware(['auth', 'account.session'])->name('contributor-application.create');
 Route::post('/account/contributor-application', [ContributorApplicationController::class, 'store'])->middleware(['auth', 'account.session', 'throttle:5,1,contributor-apply:'])->name('contributor-application.store');

@@ -9,7 +9,8 @@ returned to their recorded prior participant role on removal. Self and
 Administrator targets are blocked. Existing Moderators without a recorded prior
 role cannot be removed through this workflow. Contributor and Instructor elevation
 remains in A09/A10 review. This implements the approved role subset of G02;
-general administrative personal-field or permission editing is not implemented.
+limited support editing is documented separately below. General permission
+editing is not implemented.
 
 Administration and Governance owns the action and audit. Account Management owns
 session/proof revocation and private notification transport. No financial effect
@@ -77,12 +78,10 @@ Remote CI, live mail delivery, browser visual checks and deployment are unverifi
 
 ## Next implementation prompt
 
-Resolve G02 administrative personal-field scope before implementing a broader
-account editor. The SRS does not identify the allowed profile attributes or a
-staff email/password correction process. Recommended next scope for owner decision:
-Administrator corrections to username and first/last name on verified Active
-participant/Moderator accounts, with current Administrator password, confirmation,
-audit, session revocation and a notice; retain owner email/password flows in A06/A04,
-and keep self/Administrator targets in self-profile editing. This proposal is not
-approved or implemented. Owner-deferred purchases, live Judge0 activation and
-rewards remain tracked in `docs/deferred-features.md`.
+The owner approved Administrator support corrections to username and first/last
+name on verified Active participant/Moderator accounts when help is requested,
+with password confirmation, audit, target-session revocation and a notice. See
+[support implementation](support-profile-corrections-implementation.md).
+Email/password remain in A06/A04 and self/Administrator targets use self-profile
+editing. Broader permission or identity editing is not authorized. Owner-deferred
+purchases, live Judge0 activation and rewards remain in `docs/deferred-features.md`.

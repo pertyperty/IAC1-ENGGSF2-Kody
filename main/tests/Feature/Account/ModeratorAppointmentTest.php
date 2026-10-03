@@ -61,7 +61,7 @@ test('G02 blocks self Admin and legacy Moderator targets without inventing a pri
     $legacyModerator = moduleAccount(Role::Moderator);
     moduleSignIn($this, $admin);
     foreach ([$admin, $otherAdmin, $legacyModerator] as $target) {
-        $this->get(route('account-governance.show', $target))->assertOk()->assertDontSee('name="current_password"', false);
+        $this->get(route('account-governance.show', $target))->assertOk()->assertDontSee('action="'.route('account-governance.moderator', $target).'"', false);
         $this->post(route('account-governance.moderator', $target), moderatorChangeData($target, ['action' => 'Removed']))->assertForbidden();
     }
     expect($legacyModerator->fresh()->moderator_prior_role)->toBeNull();

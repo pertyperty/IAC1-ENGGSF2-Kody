@@ -6,12 +6,26 @@ use App\Models\VerificationDelivery;
 use App\Services\Account\AccountRecoveryService;
 use App\Services\Administration\AccountEnforcement;
 use App\Services\Administration\ModeratorAppointments;
+use App\Services\Administration\SupportProfileCorrections;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use Illuminate\Testing\TestResponse;
 use Tests\TestCase;
 
 uses(RefreshDatabase::class);
+
+test('G02 support correction removes database sessions and the corrected username appears only after new login', function () {
+    $target = User::factory()->create();
+    $credentials = ['email' => $target->email, 'password' => 'password'];
+    databaseBrowserRequest($this, 'post', route('login.store'), $credentials)->assertRedirect(route('dashboard'));
+    $oldBrowser = session()->getId();
+    $admin = moduleAccount(Role::Administrator);
+    app(SupportProfileCorrections::class)->correct($admin, 'module-test-session', $target, supportCorrectionData($target));
+    $this->assertDatabaseMissing('sessions', ['id' => $oldBrowser]);
+    databaseBrowserRequest($this, 'get', route('account.show'), sessionId: $oldBrowser)->assertRedirect(route('login'));
+    databaseBrowserRequest($this, 'post', route('login.store'), $credentials)->assertRedirect(route('dashboard'));
+    databaseBrowserRequest($this, 'get', route('account.show'), sessionId: session()->getId())->assertOk()->assertSee('correctedplayer');
+});
 
 test('G02 appointment and removal revoke database sessions and old Moderator privileges', function () {
     $target = User::factory()->create();
