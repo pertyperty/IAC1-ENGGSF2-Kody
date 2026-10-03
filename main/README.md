@@ -1,7 +1,9 @@
 # Kody
 
-Gamified Programming Learning Platform and Course Management System. This is a
-Laravel modular monolith; business use cases will be implemented incrementally.
+Game-first coding platform with learning modules, creator content and monetization
+layered over playable experiences. See the approved
+[product amendment](docs/game-first-product-direction.md). This is a Laravel
+modular monolith; business use cases are implemented incrementally.
 Read `AGENTS.md` and [architecture conventions](docs/architecture.md) first.
 
 ## Development setup
@@ -64,6 +66,7 @@ composer lint
 composer test
 composer audit
 npm audit --audit-level=high
+npm run test:games
 npm run build
 ```
 

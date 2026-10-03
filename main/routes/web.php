@@ -5,11 +5,12 @@ use App\Http\Controllers\Account\LoginController;
 use App\Http\Controllers\Account\ProfileController;
 use App\Http\Controllers\Account\RecoveryController;
 use App\Http\Controllers\Account\RegistrationController;
+use App\Http\Controllers\LearningController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [LearningController::class, 'home'])->name('home');
+Route::get('/learn', [LearningController::class, 'catalog'])->name('learning.catalog');
+Route::get('/learn/{module}', [LearningController::class, 'show'])->middleware(['auth', 'account.session'])->name('learning.show');
 
 Route::middleware('guest')->group(function (): void {
     Route::get('/recover', [RecoveryController::class, 'create'])->name('recovery.request');

@@ -2,6 +2,37 @@
 
 ## Mission
 
+### Product direction amendment — approved 2026-10-03
+
+Kody is a game-first coding platform. The project owner explicitly approved this
+direction in chat; it supersedes older presentation guidance and the previous
+feature sequencing where they would produce a conventional learning website.
+See [the product amendment](docs/game-first-product-direction.md).
+
+- Center the experience on playable games, daily streaks and a ladder of levels.
+- Let guests play an immediate landing-page trial. Require authentication for
+  learning modules, with clear sign-in and registration routes.
+- Give Learning its own browse/search catalog rather than making it the play hub.
+- Treat instructors as learning content creators. Modules compose learning
+  material with game/quiz assessments instantiated from reusable templates.
+- Separate game mechanics from creator-supplied content. Define typed, versioned
+  placeholders for instructions, scenarios, objectives, questions and feedback.
+  Placeholders are data, never uploaded executable JavaScript/PHP or HTML.
+- Prefer suitable open-source games after checking their licenses, assets,
+  dependencies, security and adaptation cost. Scratch implementations are allowed.
+  Record provenance, retain required notices and pin any imported code version.
+- Use Coddy/Duolingo as interaction inspiration, with original Kody branding and
+  assets. Favor accessible, playful, modern interaction over rigid document styling.
+- Keep account security, PostgreSQL integrity, server-side authorization,
+  deterministic rewards, ledger ownership and deployment safeguards intact.
+  Browser practice results cannot directly grant XP, ranks or KodeBits.
+- Do not invent streak qualification/timezone/reset rules or ladder thresholds.
+  Record unresolved decisions before persisting progression or issuing rewards.
+
+This is an approved product amendment, not a claim that the original SRS/SDD
+files have been revised or that the full game, creator or monetization systems
+are implemented. Keep traceability and clearly label preview-only behavior.
+
 You are working on **Kody: Gamified Programming Learning Platform and Course Management System (K:GPLPCMS)**.
 
 This repository is a real Laravel application intended for deployment. Treat every production-bound change as maintainable software, not as tutorial, demo, or throwaway coursework.
@@ -1037,6 +1068,12 @@ A release is deployable only when:
 ---
 
 ## 32. Initial Engineering Order
+
+The product amendment above changes product sequencing: establish a playable
+game hub and reusable template contract now, then layer creator learning content,
+verified progression and monetization over it. Maintain the technical dependencies
+below for privileged publishing, evaluation and financial effects. Do not wait
+until the final gamification phase to make the user experience game-first.
 
 Unless project management explicitly changes sequencing, prefer this dependency order:
 

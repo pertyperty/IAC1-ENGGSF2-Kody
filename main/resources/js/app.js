@@ -1,3 +1,9 @@
+import { mountGarden } from './games/command-garden.js';
+import { mountQuiz } from './games/choice-quiz.js';
+
+document.querySelectorAll('[data-coding-game]').forEach(mountGarden);
+document.querySelectorAll('[data-practice-quiz]').forEach(mountQuiz);
+
 const accountType = document.querySelector('#account-type');
 const instructorFields = document.querySelector('#instructor-fields');
 

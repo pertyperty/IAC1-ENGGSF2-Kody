@@ -3,6 +3,7 @@
     "private": true,
     "type": "module",
     "scripts": {
+        "test:games": "node --test tests/Frontend/*.test.mjs",
         "build": "vite build",
         "dev": "vite"
     },

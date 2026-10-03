@@ -1,5 +1,20 @@
 # Foundation conventions
 
+The project owner's [2026-10-03 game-first amendment](game-first-product-direction.md)
+sets the current product direction. The play hub is the primary experience;
+Learning is a separate catalog, and creators attach versioned game/quiz template
+instances to modules. Logical module boundaries still protect authorization,
+content ownership, verified assessments and financial integrity. Presentation
+does not need to mimic a conventional LMS or older document styling.
+
+Game template definitions belong to the game runtime; Content owns creator
+instances and publication; Challenge owns graded submissions/evaluation;
+Gamification owns streaks, ladder state and deterministic progression;
+Transaction owns monetization and KodeBit ledger effects. A template runtime
+accepts validated data and emits a practice result. Graded results must go through
+server validation and durable idempotent submission records before progression.
+Client animation or local storage is never authoritative achievement evidence.
+
 Authority: `AGENTS.md`, approved SRS v1.4, and the current SDD through Section 4.
 The SRS (`Kody-SRS-V1.4-APPROVED.docx`) and SDD
 (`Kody_GPLPCMS-SDD-upto-Section-4.pdf`) were supplied in the main checkout;

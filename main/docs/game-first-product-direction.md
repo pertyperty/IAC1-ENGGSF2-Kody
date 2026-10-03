@@ -1,0 +1,89 @@
+# Game-first product direction
+
+Approved by the project owner in chat on 2026-10-03. This later amendment changes
+product presentation and sequencing. It does not rewrite the original SRS/SDD
+or waive their security, data integrity, approval and financial requirements.
+
+## Experience
+
+Kody starts as a game platform for learning to code. The landing page must offer
+a game guests can actually play, with clear feedback and approachable controls.
+The signed-in play hub will center daily activity, a streak and a ladder of
+levels. Learning, creator content management and monetization extend this core.
+The Learning tab has a catalog users can browse and search. Guests can view the
+catalog; opening modules routes them to sign-in, where registration is available.
+
+Instructors are content creators who compose learning modules and attach game
+or quiz assessments. Creating an assessment means configuring a reusable game
+template, not asking every instructor to build a game engine. The interface
+should welcome both technical and nontechnical learners.
+
+Coddy's playful introduction and catalog and Duolingo's streak/progression
+patterns are references, not branding or code to copy. Use original visuals;
+never fabricate user counts, earned XP, streaks, certificates or leaderboard data.
+
+## Template contract
+
+Use a versioned template ID, immutable published instance version and validated
+placeholder data. Initial slots: title, instructions, board/scenario, starting
+state, goal, allowed commands, limits, hint, success feedback and learning idea.
+Quiz templates additionally define prompt, options, answer key and explanation.
+Private assessment answers and hidden cases stay server-side.
+
+Template mechanics stay separate from content. Reject unknown template IDs,
+unsupported schema versions, invalid geometry, oversized text/boards and arbitrary
+scripts. Render text with escaping/textContent. No eval, new Function, uploaded
+scripts, arbitrary remote frames or creator HTML. Creators own drafts; publication
+uses authorization, moderation and immutable versions to avoid stale grading.
+
+A trial emits only local practice results. Future graded activity needs durable
+attempts, concurrency-safe limits, authoritative evaluation and exactly-once
+progression. Never convert browser success into direct XP or ledger writes.
+
+## Reuse research
+
+The project owner prefers adapting suitable internet-sourced games and permits
+scratch games. [Blockly Games](https://github.com/blockly-games/blockly-games)
+is an Apache-2.0 candidate with Maze, Turtle and other programming games.
+Its [Maze source](https://github.com/blockly-games/blockly-games/tree/master/appengine/maze)
+teaches control flow. Its [build documentation](https://github.com/blockly-games/blockly-games/wiki/Build)
+requires a dedicated build pipeline; importing the full project is not a small
+drop-in change. Evaluate it for a richer block editor/template adaptation before
+adding dependencies. The first small command-grid template is implemented
+locally to establish the content contract and a playable experience immediately;
+no Blockly source or assets are copied. Reuse decisions must include license and
+asset notices, pinned revision, dependency review and a tested adaptation.
+
+## Phases and traceability
+
+1. Playable guest game, shared playful visual language, separate searchable
+   Learning catalog and reusable configurable game templates (this amendment).
+2. A06/A07 security and audit primitives; authorized creator drafts, uploads,
+   module composition and template configuration (D01–D09, A09/A10, G governance).
+3. Durable evaluated assessments and learner participation (C/B), plus validated
+   activity driving daily streaks and the level ladder (E).
+4. Creator publishing/moderation and monetization (D/G/F), with ledger-backed
+   access and rewards rather than mutable UI counters.
+
+Existing A01–A05 account behavior remains part of the foundation. Do not claim
+the trial completes C/E/D/F workflows, authoring tools or course progress storage.
+
+## Decisions needed before persisted progression
+
+The owner subsequently approved: at least one server-validated game or quiz
+completion qualifies a day; days end at midnight Asia/Manila; a missed day resets
+the streak; no freezes in the first release. Clear levels to unlock the next,
+keeping XP/ranks separate. Initial levels follow Sequences → Loops → Conditions.
+The level's game objective clears it; an associated practice quiz reinforces
+learning and qualifies daily activity without skipping a game objective.
+
+- Qualifying activity: which verified game/quiz/module completion counts?
+- Daily boundary: account timezone or a fixed business timezone, and whether
+  missed days have grace/freeze behavior.
+- Ladder thresholds, reset behavior, prerequisite/unlock rules and relationship
+  to the SRS rank/XP system; avoid granting the same achievement twice.
+- Creator moderation, allowed attachments and approved quiz/game scoring rules.
+- Existing SRS language-list, application-state and account-deletion conflicts.
+
+These decisions do not block the public trial, template contract or catalog UI.
+Record an explicit amendment when they are resolved.
