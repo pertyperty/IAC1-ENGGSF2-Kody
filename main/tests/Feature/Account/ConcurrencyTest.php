@@ -1,15 +1,218 @@
 <?php
 
+use App\Enums\Role;
+use App\Models\AccountRecovery;
 use App\Models\EmailVerification;
+use App\Models\InstructorApplication;
 use App\Models\User;
 use App\Models\VerificationDelivery;
+use App\Services\Account\AccountRecoveryService;
 use App\Services\Account\EmailVerificationService;
+use App\Services\Challenges\ChallengePublishing;
+use App\Services\Content\CoursePublishing;
+use App\Services\Content\ModulePublishing;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Symfony\Component\Process\Process;
 
 uses(DatabaseMigrations::class);
+
+afterEach(function () {
+    // Disposable kody_test only; production down migrations preserve credential history.
+    $this->artisan('migrate:fresh')->assertSuccessful();
+});
+
+test('A07 competing archive confirmations change status and audit exactly once', function () {
+    $user = moduleAccount(Role::Learner);
+    $results = simultaneousAccountRequests('account-archive', ['actor_id' => $user->id, 'session_id' => 'module-test-session', 'data' => archiveData($user)],
+        fn () => User::whereKey($user->id)->lockForUpdate()->first());
+    sort($results);
+    expect($results)->toBe(['archived', 'revoked']);
+    expect(DB::table('audit_events')->where('event', 'account.archived')->count())->toBe(1);
+});
+
+test('A06 simultaneous creator applications save one pending version and clean up the losing upload', function () {
+    Storage::fake('local');
+    $user = moduleAccount(Role::Learner);
+    $results = simultaneousAccountRequests('creator-apply', ['actor_id' => $user->id, 'session_id' => 'module-test-session',
+        'storage_root' => Storage::disk('local')->path(''), 'data' => ['record_version' => 0, 'institution_name' => 'Teaching Institute', 'specialization' => 'Programming']],
+        fn () => User::whereKey($user->id)->lockForUpdate()->first());
+    sort($results);
+    expect($results)->toBe(['applied', 'duplicate'])->and(Storage::disk('local')->allFiles())->toHaveCount(1);
+    $this->assertDatabaseCount('instructor_applications', 1);
+    $this->assertDatabaseCount('instructor_application_versions', 1);
+    expect(DB::table('audit_events')->where('event', 'instructor_application.submitted')->count())->toBe(1);
+});
+
+test('A06 overlapping profile saves commit one version and one audit without stale overwrites', function () {
+    $user = moduleAccount(Role::Learner);
+    $results = simultaneousAccountRequests('profile-edit', ['actor_id' => $user->id, 'session_id' => 'module-test-session', 'data' => profileEditData($user)],
+        fn () => User::whereKey($user->id)->lockForUpdate()->first());
+    sort($results);
+    expect($results)->toBe(['duplicate', 'saved'])->and($user->fresh()->profile_version)->toBe(2);
+    expect(DB::table('audit_events')->where('event', 'account.profile-updated')->count())->toBe(1);
+});
+
+test('C03 overlapping final attempts cannot exceed the lifetime budget or create two active evaluations', function (bool $distinct) {
+    readyJudge();
+    $challenge = challengeFixture(true);
+    $user = moduleAccount(Role::Learner);
+    for ($i = 0; $i < 2; $i++) {
+        evaluateAttempt(submitAttempt($challenge, $user));
+    }
+    $results = simultaneousAccountRequests('challenge-attempt', ['actor_id' => $user->id, 'session_id' => 'module-test-session',
+        'challenge_id' => $challenge->id, 'judge_config' => judgeConfiguration(), 'distinct' => $distinct, 'data' => attemptData($challenge)],
+        fn () => User::whereKey($user->id)->lockForUpdate()->first());
+    sort($results);
+    expect($results)->toBe($distinct ? ['attempted', 'duplicate'] : ['attempted', 'attempted']);
+    $this->assertDatabaseCount('challenge_submissions', 3);
+    $this->assertDatabaseCount('jobs', 3);
+    expect(DB::table('challenge_participations')->value('attempts'))->toBe(3);
+    expect(DB::table('challenge_submissions')->whereIn('status', ['Queued', 'Evaluating'])->count())->toBe(1);
+})->with([true, false]);
+
+test('C05 overlapping challenge edits preserve one new revision and its test snapshot', function () {
+    $challenge = challengeFixture();
+    $results = simultaneousAccountRequests('challenge-save', ['actor_id' => $challenge->created_by, 'session_id' => 'module-test-session', 'challenge_id' => $challenge->id, 'data' => challengeData()],
+        fn () => User::whereKey($challenge->created_by)->lockForUpdate()->first());
+    sort($results);
+    expect($results)->toBe(['duplicate', 'saved']);
+    $this->assertDatabaseCount('coding_challenge_revisions', 2);
+    $this->assertDatabaseCount('challenge_test_cases', 4);
+});
+
+test('C02 overlapping challenge reviews publish audit and notify exactly once', function () {
+    $challenge = challengeFixture();
+    app(ChallengePublishing::class)->submit(User::find($challenge->created_by), 'module-test-session', $challenge, 1);
+    $reviewer = moduleAccount(Role::Moderator);
+    $results = simultaneousAccountRequests('challenge-review', ['actor_id' => $reviewer->id, 'session_id' => 'module-test-session', 'challenge_id' => $challenge->id],
+        fn () => User::whereKey($challenge->created_by)->lockForUpdate()->first());
+    sort($results);
+    expect($results)->toBe(['duplicate', 'reviewed']);
+    expect(DB::table('audit_events')->where('event', 'challenge.reviewed')->count())->toBe(1);
+    expect(DB::table('notifications')->where('type', 'challenge.reviewed')->count())->toBe(1);
+});
+
+test('B03 overlapping free enrollments create one pinned grant and one audit', function () {
+    $course = courseFixture(true);
+    $learner = moduleAccount(Role::Learner);
+    $results = simultaneousAccountRequests('course-enroll', ['actor_id' => $learner->id, 'session_id' => 'module-test-session', 'course_id' => $course->id, 'revision_id' => $course->published_revision_id],
+        fn () => User::whereKey($learner->id)->lockForUpdate()->first());
+    expect($results)->toBe(['enrolled', 'enrolled']);
+    $this->assertDatabaseCount('course_enrollments', 1);
+    expect(DB::table('audit_events')->where('event', 'course.enrolled')->count())->toBe(1);
+});
+
+test('B04 overlapping course wins save one clearance activity and streak', function () {
+    $course = courseFixture(true);
+    $learner = moduleAccount(Role::Learner);
+    joinCourse($course, $learner);
+    $slot = $course->publishedRevision->modules->sole();
+    $results = simultaneousAccountRequests('course-complete', ['actor_id' => $learner->id, 'session_id' => 'module-test-session', 'course_id' => $course->id, 'slot_id' => $slot->id],
+        fn () => User::whereKey($learner->id)->lockForUpdate()->first());
+    expect($results)->toBe(['saved', 'saved']);
+    $this->assertDatabaseCount('course_module_progress', 1);
+    $this->assertDatabaseCount('learning_activity_days', 1);
+    $this->assertDatabaseHas('learning_progress', ['user_id' => $learner->id, 'current_streak' => 1]);
+});
+
+test('D06 concurrent course edits save one replacement and reject stale composition', function () {
+    $course = courseFixture();
+    $ids = $course->latestRevision->modules->pluck('module_id')->all();
+    $results = simultaneousAccountRequests('course-save', ['actor_id' => $course->created_by, 'session_id' => 'module-test-session', 'course_id' => $course->id, 'data' => courseData($ids)],
+        fn () => User::whereKey($course->created_by)->lockForUpdate()->first());
+    sort($results);
+    expect($results)->toBe(['duplicate', 'saved'])->and($course->fresh()->record_version)->toBe(2);
+    $this->assertDatabaseCount('course_revisions', 2);
+    $this->assertDatabaseCount('course_revision_modules', 2);
+});
+
+test('G06 concurrent course reviews publish and notify only once', function () {
+    $course = courseFixture();
+    app(CoursePublishing::class)->submit(User::find($course->created_by), 'module-test-session', $course, 1);
+    $reviewer = moduleAccount(Role::Moderator);
+    $results = simultaneousAccountRequests('course-review', ['actor_id' => $reviewer->id, 'session_id' => 'module-test-session', 'course_id' => $course->id],
+        fn () => User::whereKey($course->created_by)->lockForUpdate()->first());
+    sort($results);
+    expect($results)->toBe(['duplicate', 'reviewed'])->and($course->fresh()->status)->toBe('Published');
+    expect(DB::table('audit_events')->where('event', 'course.reviewed')->count())->toBe(1);
+    expect(DB::table('notifications')->where('type', 'course.reviewed')->count())->toBe(1);
+});
+
+test('D02 concurrent draft edits save one new revision and reject the stale edit', function () {
+    $module = moduleFixture();
+    $results = simultaneousAccountRequests('module-save', ['actor_id' => $module->created_by, 'session_id' => 'module-test-session', 'module_id' => $module->id, 'data' => moduleData()],
+        fn () => User::whereKey($module->created_by)->lockForUpdate()->first());
+    sort($results);
+    expect($results)->toBe(['duplicate', 'saved'])->and($module->fresh()->record_version)->toBe(2);
+    $this->assertDatabaseCount('module_revisions', 2);
+    $this->assertDatabaseCount('audit_events', 2);
+});
+
+test('G06 concurrent publication reviews publish and audit only once', function () {
+    $module = moduleFixture();
+    app(ModulePublishing::class)->submit(User::find($module->created_by), 'module-test-session', $module, 1);
+    $reviewer = moduleAccount(Role::Moderator);
+    $results = simultaneousAccountRequests('module-review', ['actor_id' => $reviewer->id, 'session_id' => 'module-test-session', 'module_id' => $module->id],
+        fn () => User::whereKey($module->created_by)->lockForUpdate()->first());
+    sort($results);
+    expect($results)->toBe(['duplicate', 'reviewed'])->and($module->fresh()->status)->toBe('Published');
+    $this->assertDatabaseCount('audit_events', 3);
+    $this->assertDatabaseCount('notifications', 1);
+});
+
+test('creator adventure overlapping wins save one activity and one streak day', function () {
+    $module = moduleFixture(true);
+    $learner = moduleAccount(Role::Learner);
+    $results = simultaneousAccountRequests('module-complete', ['actor_id' => $learner->id, 'session_id' => 'module-test-session', 'module_id' => $module->id, 'revision_id' => $module->published_revision_id],
+        fn () => User::whereKey($learner->id)->lockForUpdate()->first());
+    expect($results)->toBe(['saved', 'saved']);
+    $this->assertDatabaseCount('learning_activity_days', 1);
+    $this->assertDatabaseHas('learning_progress', ['user_id' => $learner->id, 'current_streak' => 1]);
+});
+
+test('A10 concurrent reviews apply one role elevation audit and notification', function () {
+    $applicant = User::factory()->create();
+    $application = InstructorApplication::create(['user_id' => $applicant->id, 'institution_name' => 'Test Institute', 'specialization' => 'Coding', 'credential_disk' => 'local', 'credential_path' => 'instructor-credentials/test.pdf']);
+    $reviewer = User::factory()->create(['account_role' => Role::Moderator, 'active_session_hash' => hash('sha256', 'test-review-session'), 'active_session_expires_at' => now()->addHour()]);
+    $results = simultaneousAccountRequests('creator-review', ['actor_id' => $reviewer->id, 'session_id' => 'test-review-session', 'application_id' => $application->id], fn () => User::whereKey($applicant->id)->lockForUpdate()->first());
+    sort($results);
+    expect($results)->toBe(['duplicate', 'reviewed'])->and($applicant->fresh()->account_role)->toBe(Role::Instructor);
+    $this->assertDatabaseCount('audit_events', 1);
+    $this->assertDatabaseCount('creator_decision_deliveries', 1);
+    $this->assertDatabaseCount('jobs', 1);
+});
+
+test('game-first progression overlapping wins cannot duplicate daily streak or level grants', function () {
+    $user = User::factory()->create(['active_session_hash' => hash('sha256', 'test-learning-session'), 'active_session_expires_at' => now()->addHour()]);
+    $results = simultaneousAccountRequests('learning-complete', ['user_id' => $user->id, 'session_id' => 'test-learning-session'], fn () => User::whereKey($user->id)->lockForUpdate()->first());
+    expect($results)->toBe(['saved', 'saved']);
+    $this->assertDatabaseCount('learning_activity_days', 1);
+    $this->assertDatabaseCount('learning_level_completions', 1);
+    $this->assertDatabaseHas('learning_progress', ['user_id' => $user->id, 'current_streak' => 1, 'longest_streak' => 1]);
+});
+
+test('A04 simultaneous recovery requests cannot exceed the hourly cap', function () {
+    $user = User::factory()->create();
+    app(AccountRecoveryService::class)->request($user);
+    AccountRecovery::query()->update(['request_count' => 4, 'last_requested_at' => now()->subMinutes(2)]);
+    $results = simultaneousAccountRequests('recover-request', ['user_id' => $user->id], fn () => User::whereKey($user->id)->lockForUpdate()->first());
+    sort($results);
+    expect($results)->toBe(['limited', 'queued'])->and(AccountRecovery::sole()->request_count)->toBe(5);
+    $this->assertDatabaseCount('jobs', 2);
+});
+
+test('A04 simultaneous password resets consume one recovery token exactly once', function () {
+    $user = User::factory()->create();
+    $service = app(AccountRecoveryService::class);
+    $service->request($user);
+    $proof = $service->authorization(VerificationDelivery::sole()->token);
+    $results = simultaneousAccountRequests('recover-complete', ['proof' => $proof, 'password' => 'NewStrongPass12!'], fn () => User::whereKey($user->id)->lockForUpdate()->first());
+    sort($results);
+    expect($results)->toBe(['invalid', 'recovered'])->and(AccountRecovery::sole()->token_hash)->toBeNull();
+});
 
 function simultaneousAccountRequests(string $mode, array $input, Closure $lock): array
 {
@@ -21,7 +224,7 @@ function simultaneousAccountRequests(string $mode, array $input, Closure $lock):
     try {
         $lock();
         foreach (range(1, 2) as $index) {
-            $process = new Process([PHP_BINARY, base_path('tests/Support/account-concurrency.php'), $mode, $inputPath], base_path(), timeout: 30);
+            $process = new Process([PHP_BINARY, base_path('tests/Support/account-concurrency.php'), $mode, $inputPath, (string) $index], base_path(), timeout: 30);
             $process->start();
             $processes[] = $process;
         }

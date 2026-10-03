@@ -1,12 +1,49 @@
 <?php
 
 use App\Models\User;
+use App\Models\VerificationDelivery;
+use App\Services\Account\AccountRecoveryService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use Illuminate\Testing\TestResponse;
 use Tests\TestCase;
 
 uses(RefreshDatabase::class);
+
+test('A07 archival removes database sessions and the old browser cannot access its profile', function () {
+    $user = User::factory()->create();
+    databaseBrowserRequest($this, 'post', route('login.store'), ['email' => $user->email, 'password' => 'password']);
+    $oldBrowser = session()->getId();
+    databaseBrowserRequest($this, 'post', route('account.archive.store'), archiveData($user), $oldBrowser)->assertRedirect(route('login'));
+    $this->assertDatabaseMissing('sessions', ['id' => $oldBrowser]);
+    databaseBrowserRequest($this, 'get', route('account.show'), sessionId: $oldBrowser)->assertRedirect(route('login'));
+});
+
+test('A06 password editing deletes authenticated database sessions and rejects the old browser', function () {
+    $user = User::factory()->create();
+    databaseBrowserRequest($this, 'post', route('login.store'), ['email' => $user->email, 'password' => 'password']);
+    $oldBrowser = session()->getId();
+    databaseBrowserRequest($this, 'patch', route('account.update'), profileEditData($user, ['current_password' => 'password',
+        'password' => 'StrongNewPass12!', 'password_confirmation' => 'StrongNewPass12!']), $oldBrowser)->assertRedirect(route('login'));
+    $this->assertDatabaseMissing('sessions', ['id' => $oldBrowser]);
+    databaseBrowserRequest($this, 'get', route('account.show'), sessionId: $oldBrowser)->assertRedirect(route('login'));
+});
+
+test('A04 successful recovery removes authenticated database sessions and requires a new login', function () {
+    $user = User::factory()->create();
+    databaseBrowserRequest($this, 'post', route('login.store'), ['email' => $user->email, 'password' => 'password']);
+    $oldBrowser = session()->getId();
+    app(AccountRecoveryService::class)->request($user);
+    $token = VerificationDelivery::sole()->token;
+    databaseBrowserRequest($this, 'post', route('recovery.authorize'), ['recovery_token' => $token])->assertRedirect(route('recovery.reset'));
+    $guestBrowser = session()->getId();
+    databaseBrowserRequest($this, 'post', route('recovery.complete'), ['password' => 'NewStrongPass12!', 'password_confirmation' => 'NewStrongPass12!'], $guestBrowser)
+        ->assertRedirect(route('login'));
+    $this->assertDatabaseMissing('sessions', ['id' => $oldBrowser]);
+    expect($user->fresh()->active_session_hash)->toBeNull();
+    databaseBrowserRequest($this, 'get', route('account.show'), sessionId: $oldBrowser)->assertRedirect(route('login'));
+    databaseBrowserRequest($this, 'post', route('login.store'), ['email' => $user->email, 'password' => 'NewStrongPass12!'])->assertRedirect(route('dashboard'));
+});
 
 function databaseBrowserRequest(TestCase $test, string $method, string $route, array $data = [], ?string $sessionId = null): TestResponse
 {
@@ -35,7 +72,7 @@ test('A03 independent database sessions require consent and reject the previous 
     $replacementBrowser = session()->getId();
     expect($replacementBrowser)->not->toBe($secondBrowser);
     databaseBrowserRequest($this, 'get', route('dashboard'), sessionId: $firstBrowser)->assertRedirect(route('login'));
-    databaseBrowserRequest($this, 'get', route('dashboard'), sessionId: $replacementBrowser)->assertOk()->assertSee($user->email);
+    databaseBrowserRequest($this, 'get', route('dashboard'), sessionId: $replacementBrowser)->assertOk()->assertSee('View your profile');
 });
 
 test('A03 confirmation proof is bound to its guest browser and cancelling preserves the original browser', function () {

@@ -12,5 +12,6 @@
         <button type="submit" class="primary-button">Sign in</button>
     </form>
     <p class="secondary-link"><a href="{{ route('verification.notice') }}">Need to verify your email?</a></p>
+    <p class="secondary-link"><a href="{{ route('recovery.request') }}">Forgot your password?</a></p>
     <p class="secondary-link"><a href="{{ route('register') }}">Create an account</a></p>
 @endsection

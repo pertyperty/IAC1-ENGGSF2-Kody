@@ -1,14 +1,17 @@
-@extends('layouts.account')
-
-@section('title', 'Kody — Learn programming')
-
+@extends('layouts.learning')
 @section('content')
-    <section class="account-card">
-        <p class="eyebrow">WELCOME TO KODY</p>
-        <h1>Your next programming milestone starts here.</h1>
-        <p class="intro">Create your account to begin your learning journey.</p>
-        <p><a href="{{ route('register') }}">Create an account</a></p>
-        <p><a href="{{ route('login') }}">Sign in</a></p>
-        <p><a href="{{ route('verification.notice') }}">Verify your email</a></p>
+    <section class="hero page-width" aria-labelledby="hero-heading">
+        <div class="hero-copy">
+            <p class="overline"><span class="live-dot"></span> BIG IDEAS START WITH A LITTLE PLAY</p>
+            <h1 id="hero-heading">Less scrolling.<br>More <span class="headline-play">“I made that.”<svg viewBox="0 0 430 20" aria-hidden="true"><path d="M3 14 Q210 -6 425 10"/></svg></span></h1>
+            <p class="hero-description">Learn to code by making things happen. Solve tiny puzzles, explore new worlds, and turn <em>what if?</em> into <em>look what I can do.</em></p>
+            <div class="hero-actions"><a class="button button-dark" href="#try-it">Try your first game <span aria-hidden="true">→</span></a><a class="quiet-link" href="{{ route('learning.catalog') }}">Explore learning ↗︎</a></div>
+            <p class="hero-note"><span aria-hidden="true">✦</span> No experience. No download. Just curiosity.</p>
+            <div class="concept-strip"><span>Build a sequence</span><span>Find a pattern</span><span>Make a choice</span></div>
+        </div>
+        <div class="hero-game" id="try-it">@include('learning.game', ['trial' => true])<p class="game-caption"><span aria-hidden="true">↖︎</span> This isn’t a screenshot. Give it a go!</p></div>
     </section>
+    <section class="learning-ribbon" aria-label="How you learn"><div class="page-width"><span><b>01</b> Play a little</span><span class="ribbon-arrow" aria-hidden="true">→</span><span><b>02</b> Learn the idea</span><span class="ribbon-arrow" aria-hidden="true">→</span><span><b>03</b> Make it your own</span><span class="ribbon-spark" aria-hidden="true">✳︎</span></div></section>
+    <section class="journey-section page-width"><div><p class="overline">A PLAYGROUND FOR YOUR BRAIN</p><h2>One little win.<br>Then another.</h2><p>Start with a puzzle you can finish today. Find the patterns, try something new, and build a little confidence along the way.</p><a class="quiet-link" href="{{ route('learning.catalog') }}">Meet the learning modules →</a></div><div class="journey-preview"><span class="preview-label">YOUR FIRST THREE STEPS</span><div class="ladder-steps" aria-label="Level ladder preview"><span class="ladder-node">01 <small>Sequences</small></span><span class="ladder-node">02 <small>Loops</small></span><span class="ladder-node">03 <small>Conditions</small></span></div><p>Sign in to build a daily streak and clear your level ladder. This guest trial is for exploring; it doesn’t save progress or award XP.</p></div></section>
+    <section class="creator-section page-width" id="creators" aria-labelledby="creators-heading"><div class="creator-art" aria-hidden="true"><span class="creator-window"><span class="window-dots">● ● ●</span><span class="creator-code">idea + play<br><b>= possibility</b></span></span><span class="creator-sticker">made by you ✦</span></div><div><p class="overline">FOR THE PEOPLE WHO LOVE TO TEACH</p><h2 id="creators-heading">Great teachers.<br>Even better world builders.</h2><p>Turn your expertise into adventures. Kody’s creator studio lets approved instructors build modules and attach games and quizzes from reusable templates.</p><a class="quiet-link" href="{{ route('register') }}">Apply as an instructor →</a><small>Make a lesson, add a playful activity, and send your adventure for review.</small></div></section>
 @endsection

@@ -7,10 +7,10 @@ use App\Mail\Account\VerificationLink;
 use App\Models\EmailVerification;
 use App\Models\User;
 use App\Models\VerificationDelivery;
+use App\Services\Account\SecureAccountMailer;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
 use RuntimeException;
 use Throwable;
 
@@ -31,7 +31,7 @@ class SendVerificationEmail implements ShouldQueue
 
     public function handle(): void
     {
-        $accountId = VerificationDelivery::whereKey($this->deliveryId)->value('user_id');
+        $accountId = VerificationDelivery::whereKey($this->deliveryId)->where('purpose', 'verification')->value('user_id');
         if ($accountId === null) {
             return;
         }
@@ -54,15 +54,9 @@ class SendVerificationEmail implements ShouldQueue
             }
 
             try {
-                $mailer = config('account.verification.mailer');
-                $transport = config('mail.mailers.'.$mailer.'.transport');
-                if ($transport !== 'smtp' && ! (app()->environment('testing') && $transport === 'array')) {
-                    throw new RuntimeException('Verification mail requires a transport that does not log tokens.');
-                }
-
                 // Use the trusted application URL, never a request's Host header.
                 $url = rtrim(config('app.url'), '/').route('verification.notice', absolute: false).'#token='.$delivery->token;
-                Mail::mailer($mailer)->to($user->email)->send(new VerificationLink($url, $delivery->token));
+                app(SecureAccountMailer::class)->send('verification', $user->email, new VerificationLink($url, $delivery->token));
                 $delivery->update(['token' => null, 'sent_at' => now(), 'failed_at' => null]);
 
                 return false;

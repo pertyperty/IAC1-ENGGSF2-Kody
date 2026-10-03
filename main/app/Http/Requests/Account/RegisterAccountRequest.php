@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests\Account;
 
+use App\Support\AccountPasswords;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules\Password;
 
 class RegisterAccountRequest extends FormRequest
 {
@@ -27,7 +27,7 @@ class RegisterAccountRequest extends FormRequest
             'email' => ['required', 'string', 'email', 'max:100', Rule::unique('users', 'email')],
             'first_name' => ['required', 'string', 'max:50', 'regex:/\A\p{L}+\z/u'],
             'last_name' => ['required', 'string', 'max:50', 'regex:/\A\p{L}+\z/u'],
-            'password' => ['required', 'string', 'max:32', 'confirmed', Password::min(12)->mixedCase()->numbers()->symbols()],
+            'password' => AccountPasswords::rules(),
             'account_type' => ['required', Rule::in(['learner', 'instructor'])],
             'account_role' => ['prohibited'],
             'account_status' => ['prohibited'],

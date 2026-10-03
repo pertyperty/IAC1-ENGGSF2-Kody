@@ -23,7 +23,7 @@ test('A03 verified users of every role can sign in with a rotated session', func
         ->and($user->fresh()->last_login_at)->not->toBeNull()
         ->and($user->fresh()->active_session_hash)->toBe(hash('sha256', session()->getId()));
     $this->withCookie(config('session.cookie'), session()->getId());
-    $this->get(route('dashboard'))->assertOk()->assertSee($user->email)
+    $this->get(route('dashboard'))->assertOk()->assertSee('View your profile')
         ->assertHeader('Cache-Control', 'no-store, private');
 })->with(Role::cases());
 
@@ -63,6 +63,7 @@ test('A03 wrong passwords do not disclose restricted status', function () {
 });
 
 test('A03 lockouts follow the approved schedule and do not reset on cooldown', function () {
+    $this->freezeTime();
     $user = User::factory()->create();
     foreach ([3 => 15, 6 => 60, 9 => 1440, 12 => 1440] as $threshold => $minutes) {
         while ($user->fresh()->failed_login_attempts < $threshold) {

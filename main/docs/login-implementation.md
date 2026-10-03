@@ -96,11 +96,11 @@ threshold, only one simultaneous login authenticates directly, and only one
 confirmation replaces a particular session. Database-session tests prove
 replacement revocation and protect the successor from stale logout requests.
 
-A04 recovery, A09/A10 approval, Google OAuth and the full B01 dashboard remain
+A09/A10 approval, Google OAuth and the full B01 dashboard remain
 separate slices. Terms acceptance appears in SRS's functional summary but is
 absent from detailed A01, and no approved Terms document/version was supplied;
 record the requirement decision and legal content before claiming A01 complete.
-No recovery link is shown until its workflow exists. Production monitoring,
+A04 recovery and A05 profile are covered in [their implementation record](recovery-profile-implementation.md). Production monitoring,
 provider validation, CI execution on GitHub and performance targets have not
 been proven by local tests.
 

@@ -1,7 +1,9 @@
 # Kody
 
-Gamified Programming Learning Platform and Course Management System. This is a
-Laravel modular monolith; business use cases will be implemented incrementally.
+Game-first coding platform with learning modules, creator content and monetization
+layered over playable experiences. See the approved
+[product amendment](docs/game-first-product-direction.md). This is a Laravel
+modular monolith; business use cases are implemented incrementally.
 Read `AGENTS.md` and [architecture conventions](docs/architecture.md) first.
 
 ## Development setup
@@ -48,8 +50,8 @@ php artisan queue:work database --sleep=3 --tries=3 --timeout=60
 php artisan schedule:work
 ```
 
-The scheduler currently has no Kody tasks. `routes/console.php` is its future
-entrypoint. `composer dev` retains the existing Laravel development command.
+The scheduler closes/activates weekly events and recovers overdue submissions
+through `routes/console.php`. `composer dev` retains the existing Laravel development command.
 Boost is already locked as a development dependency. Browser URL logging is
 disabled to protect verification fragments. Its MCP server can be run
 with `php artisan boost:mcp`; inspect installation options before configuring
@@ -64,6 +66,7 @@ composer lint
 composer test
 composer audit
 npm audit --audit-level=high
+npm run test:games
 npm run build
 ```
 
@@ -115,8 +118,8 @@ concurrency coverage and remaining recovery/approval/provider scope.
 
 `/login` implements A03 email/password login with durable progressive lockouts,
 consent before replacing an active session, and POST logout. The protected
-`/dashboard` currently provides an account welcome page; full B01 learning
-dashboard data is a subsequent feature. All future protected routes must use
+`/dashboard` provides the play hub, saved streak/ladder state and a link to enrolled
+course journeys; full B01 dashboard scope remains incomplete. Protected routes must use
 both `auth` and `account.session`, and sensitive actions must recheck state
 transactionally. See [login traceability](docs/login-implementation.md).
 
@@ -127,6 +130,49 @@ Existing recognized bcrypt/Argon hashes can sign in and upgrade on successful
 password login. The additive migrations do not rewrite existing passwords.
 
 ## Production preparation
+
+Approved Instructors can build adventures in `/create`, attach configurable games
+or quizzes and submit drafts. Moderator/Admin review at `/manage/modules` controls
+publication and replacements. Learning shows approved revisions; verified wins
+qualify the Manila daily streak. Creators receive reviews at `/updates` and can
+archive published adventures. See [creator studio scope and verification](docs/creator-studio-implementation.md).
+
+The studio also supports `/create/courses`: versioned course drafts, ordered reuse
+of owned approved adventures, saved previews and course review at `/manage/courses`.
+See [course composition scope](docs/course-composition-implementation.md).
+Learners can browse `/learn/courses`, explicitly join free courses and resume
+their pinned lessons in `/learn/courses/mine`. Verified game/quiz wins save
+assessment progress and share the daily streak. Owners can archive courses;
+existing enrollees retain access while new enrollment stops. Paid enrollment is
+unavailable. See [course learning scope](docs/course-learning-implementation.md).
+
+Contributors and Instructors can author coding quests in `/create/challenges`,
+with versioned problems, execution settings and sample/hidden tests. Moderator/Admin
+review at `/manage/challenges` controls publication and replacements; owners can
+archive published quests. `/challenges` exposes approved metadata and authenticated
+sample previews. Confirmed free attempts now pin the approved revision, enforce
+three lifetime attempts and queue private evaluation. Execution stays unavailable
+until configured Judge0 compiler IDs and limits pass `php artisan kody:judge0-check`.
+See [submission setup and scope](docs/challenge-submission-implementation.md) and
+[challenge studio scope](docs/challenge-studio-implementation.md).
+
+The Play hub now presents weekly quests with their own three-attempt budgets.
+Moderators configure approved, revision-pinned events at `/manage/weekly-events`;
+the Laravel scheduler activates the Sunday-to-Sunday Manila cycle and selects an
+approved quest when no manual selection exists. Private history lives at `/weekly`.
+Judge0 setup and all XP/rank/KodeBit rewards remain deferred. See
+[weekly event scope](docs/weekly-challenge-plan.md).
+
+All five roles can edit their own profile at `/account/edit`. Email/password
+changes require the current password and end sessions; changed email requires
+verification again. Learners and Contributors can apply to become creators and
+resubmit after rejection, with private credentials and prior decisions preserved.
+See [A06 scope and verification](docs/profile-editing-implementation.md).
+Paid purchases and other postponed scope are tracked in the
+[deferred-feature register](docs/deferred-features.md).
+Learners, Contributors and Instructors can archive their own accounts with
+password confirmation, retaining data and returning through A04 recovery.
+See [A07 archival scope](docs/account-archival-implementation.md).
 
 The target is Linux EC2, Nginx/PHP-FPM with PHP 8.4.1+, RDS PostgreSQL and S3 where required.
 Set `APP_ENV=production`, `APP_DEBUG=false`, a stable managed `APP_KEY`, HTTPS

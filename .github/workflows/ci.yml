@@ -82,6 +82,8 @@ jobs:
           php artisan about
       - name: Verify formatting
         run: composer lint
+      - name: Test configurable game templates
+        run: npm run test:games
       - name: Build frontend assets
         run: npm run build
       - name: Migrate clean PostgreSQL database
@@ -95,7 +97,7 @@ jobs:
           php artisan config:cache
           php artisan route:cache
           php artisan view:cache
-          php artisan test --filter='HealthTest|LoginTest|SessionConflictTest|DatabaseSessionsTest|PasswordHashingTest'
+          php artisan test --filter='HealthTest|LoginTest|SessionConflictTest|DatabaseSessionsTest|PasswordHashingTest|RecoveryTest|ProfileTest|LearningTest|LearningProgressionTest|InstructorReviewTest|ModulePublishingTest|CoursePublishingTest'
           php artisan route:list --path=up
           php artisan route:list --path=ready
           php artisan route:clear

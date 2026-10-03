@@ -1,0 +1,1 @@
+<div class="review-list">@forelse($revision->modules as $slot)<a href="{{ route('courses.preview', [$course, $slot->id]) }}"><b>{{ $slot->position }}. {{ $slot->revision->title }}</b><span>Saved module revision {{ $slot->revision->number }} · Try it →</span></a>@empty<p>Save a draft with adventures to preview your course.</p>@endforelse</div>

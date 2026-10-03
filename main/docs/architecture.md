@@ -1,5 +1,55 @@
 # Foundation conventions
 
+The [creator studio](creator-studio-implementation.md) adds Content-owned versioned
+module publishing, Administration-authorized review and audit, noncritical
+in-app notification delivery, and server-validated assessments feeding existing
+Gamification daily activity. Published revision pointers keep draft edits out of
+learner views. New modules and published replacements require Moderator/Admin
+approval; Instructor owners may archive Published modules with preserved history.
+
+[Course learning](course-learning-implementation.md) adds Content-owned free
+enrollment and revision-pinned lesson access. Every request rechecks current
+account/session and owned enrollment. Course archiving preserves enrolled access;
+module archiving still blocks that module. Gamification validates course template
+wins through the shared approved-revision writer; its ledger-free streak activity
+does not grant paid access or financial rewards.
+
+[Challenge studio](challenge-studio-implementation.md) adds Challenge-owned
+immutable definitions and test snapshots, Contributor/Instructor ownership,
+Moderator/Admin review and audited publication/archiving. Learner previews query
+only reviewed problem fields and public samples; hidden tests stay within creator
+and reviewer access. No learner code runs in PHP or on the application host.
+
+[Challenge submissions](challenge-submission-implementation.md) adds Challenge-owned
+revision-pinned attempts and private asynchronous evaluation. A database queue job
+commits with the attempt; PostgreSQL uniqueness/locks enforce lifetime attempt
+limits and one active evaluation. The Judge0 adapter translates provider verdicts
+without exposing raw output, and a scheduler closes overdue work. Provider
+activation requires verified configured compiler mappings and resource limits.
+No reward, rank, streak or balance changes occur in this submission workflow.
+
+[Weekly events](weekly-challenge-plan.md) adds Gamification-owned approved revision
+selection and Manila scheduling. Challenge Management reuses its existing secure
+submission/evaluation pipeline with independent per-event participations. Generated
+context keys and composite foreign keys prevent mixing standard and weekly budgets
+or revisions. The calendar lock serializes moderator/scheduler/admission changes;
+financial and rank rewards remain unavailable.
+
+The project owner's [2026-10-03 game-first amendment](game-first-product-direction.md)
+sets the current product direction. The play hub is the primary experience;
+Learning is a separate catalog, and creators attach versioned game/quiz template
+instances to modules. Logical module boundaries still protect authorization,
+content ownership, verified assessments and financial integrity. Presentation
+does not need to mimic a conventional LMS or older document styling.
+
+Game template definitions belong to the game runtime; Content owns creator
+instances and publication; Challenge owns graded submissions/evaluation;
+Gamification owns streaks, ladder state and deterministic progression;
+Transaction owns monetization and KodeBit ledger effects. A template runtime
+accepts validated data and emits a practice result. Graded results must go through
+server validation and durable idempotent submission records before progression.
+Client animation or local storage is never authoritative achievement evidence.
+
 Authority: `AGENTS.md`, approved SRS v1.4, and the current SDD through Section 4.
 The SRS (`Kody-SRS-V1.4-APPROVED.docx`) and SDD
 (`Kody_GPLPCMS-SDD-upto-Section-4.pdf`) were supplied in the main checkout;
@@ -67,12 +117,13 @@ PHT semantics against the SRS before implementing them.
 
 ## External boundaries
 
-Introduce adapters in `app/Integrations/{Google,Judge0,SendGrid,Xendit}` only with
+Introduce dedicated provider adapters only with
 the owning use case. Define a narrow contract for test doubles; translate
 provider responses to internal results. Configure secrets through config files,
 never controller `env()` calls. Validate responses, bound timeouts, sanitize logs,
 retry only safe operations, and enforce durable idempotency for financial effects.
-CI must use fakes; no real provider integration is implemented in this foundation.
+CI must use fakes. The Judge0 submission adapter is implemented behind verified
+configuration; no live provider execution has been verified.
 
 ## Traceability and unresolved decisions
 
@@ -86,13 +137,25 @@ Subsequent account slices are documented in
 [A03 login](login-implementation.md), including their approved amendments and
 actual scope. Those implementations do not establish unmeasured NFR compliance.
 
+[A04/A05 recovery/profile](recovery-profile-implementation.md) and the
+[play implementation](play-implementation.md) document the subsequent tested
+slices. The play hub now records server-validated daily streaks and level
+clearance; it does not yet issue XP, ranks or KodeBits. Creator-published adventures are
+implemented by the Content studio slice.
+
+[A10 creator review](creator-review-implementation.md) adds policy-controlled
+private credential review, atomic role elevation/audit/pending notification and
+stale-write prevention. It grants Instructor access; the subsequent Creator studio adds owned module
+authoring and moderated publication.
+
 Requirement conflict detected:
 
 - SRS: 3.1.1 Code Execution API lists Python, Java, C++, JavaScript and PHP;
   3.4 Technical Environment Constraints restrict Version 1 to Python, Java, C++.
 - SDD: 3.3 / 4.1 delegate evaluation behavior to the SRS and do not resolve this.
-- Consequence: language validation and Judge0 mapping cannot be finalized.
-- Recommendation: approve one Version 1 language list before C03/C04 integration.
+- Resolution approved by the owner: Version 1 supports Python, Java and C++.
+  JavaScript/PHP are excluded. Provider compiler IDs still require verification
+  against the configured Judge0 instance before integration.
 
 Requirement conflict detected:
 

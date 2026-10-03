@@ -2,6 +2,122 @@
 
 ## Mission
 
+### Product direction amendment — approved 2026-10-03
+
+Kody is a game-first coding platform. The project owner explicitly approved this
+direction in chat; it supersedes older presentation guidance and the previous
+feature sequencing where they would produce a conventional learning website.
+See [the product amendment](docs/game-first-product-direction.md).
+
+- Center the experience on playable games, daily streaks and a ladder of levels.
+- Let guests play an immediate landing-page trial. Require authentication for
+  learning modules, with clear sign-in and registration routes.
+- Give Learning its own browse/search catalog rather than making it the play hub.
+- Treat instructors as learning content creators. Modules compose learning
+  material with game/quiz assessments instantiated from reusable templates.
+- Separate game mechanics from creator-supplied content. Define typed, versioned
+  placeholders for instructions, scenarios, objectives, questions and feedback.
+  Placeholders are data, never uploaded executable JavaScript/PHP or HTML.
+- Prefer suitable open-source games after checking their licenses, assets,
+  dependencies, security and adaptation cost. Scratch implementations are allowed.
+  Record provenance, retain required notices and pin any imported code version.
+- Use Coddy/Duolingo as interaction inspiration, with original Kody branding and
+  assets. Favor accessible, playful, modern interaction over rigid document styling.
+- Keep account security, PostgreSQL integrity, server-side authorization,
+  deterministic rewards, ledger ownership and deployment safeguards intact.
+  Browser practice results cannot directly grant XP, ranks or KodeBits.
+- Do not invent streak qualification/timezone/reset rules or ladder thresholds.
+  Record unresolved decisions before persisting progression or issuing rewards.
+
+This is an approved product amendment, not a claim that the original SRS/SDD
+files have been revised or that the full game, creator or monetization systems
+are implemented. Keep traceability and clearly label preview-only behavior.
+
+The owner approved daily streak qualification by a server-validated game/quiz
+win, midnight Asia/Manila boundaries, reset after a missed day and no freezes.
+Clearing a game objective unlocks the next level; XP/ranks stay separate.
+The owner also approved A10 Pending/Approved/Rejected states, rejection preserving
+Learner access, Moderator/Administrator review, and format checks plus manual
+credibility review without an invented domain allowlist. See
+[play implementation](docs/play-implementation.md) and
+[creator review](docs/creator-review-implementation.md) for scope and tests.
+
+The owner subsequently approved Instructor-only module authoring (Contributors
+author coding challenges), Moderator/Administrator approval of new modules and
+published revisions, and Published as D03's archive-eligible state. Archived
+modules are hidden from learners while revisions, activity and audit history are
+preserved. See [creator studio](docs/creator-studio-implementation.md).
+
+The owner approved extending the same Moderator/Administrator review policy to
+new courses and published course revisions. Version 1 coding-challenge languages
+are Python, Java and C++, resolving SRS sections 3.1.1 and 3.4; JavaScript and PHP
+are excluded from Version 1. Judge0 language IDs must still be verified against
+the configured provider before integration.
+
+The owner approved reusing owned modules across multiple courses, with each
+course revision pinning its approved module revisions. This supersedes the
+dictionary's single optional course_id representation. Preserve old published
+course content and ordering during draft edits and review. See
+[course composition](docs/course-composition-implementation.md).
+
+The owner approved resolving B03/B04 availability as Published content and
+verified Active accounts, without adding an Active content lifecycle state.
+D08 permits only the owning Instructor to archive a Published course. Archived
+courses leave browsing and block new enrollment; existing enrollees retain
+access and progress. Individual archived modules remain unavailable under D03.
+The owner approved free enrollment for currently authored courses in this release;
+paid enrollment stays unavailable until pricing and the KodeBit ledger exist.
+See [course learning](docs/course-learning-implementation.md).
+
+The owner approved Draft/Published/Archived/Deleted coding-challenge lifecycle
+states with separate Draft/Pending/Approved/Rejected revision review states.
+Published means approved and archive-eligible, resolving C01/C02/C06 versus the
+challenge dictionary. Published replacement revisions require Moderator/Admin
+approval; the last approved version remains available during review. Submissions
+must retain their original challenge revision. See
+[challenge studio](docs/challenge-studio-implementation.md).
+
+The owner approved evaluating every confirmed challenge submission, with at most
+one active evaluation per user/challenge context and committed evaluation
+continuing after the browser closes. Standard challenges have three attempts per
+user across all published revisions. Each weekly event will have its own separate
+three-attempt budget. Current
+authored challenges offer free participation to verified Active Learners,
+Contributors and Instructors; token, rank and prerequisite gates await their
+supporting rules and modules. See [challenge submissions](docs/challenge-submission-implementation.md).
+
+The owner selected Judge0 CE at https://judge0-ce.p.rapidapi.com but deferred
+API-plan setup and credentials. Keep live execution disabled until the owner is
+ready; use provider fakes and continue independent development in the meantime.
+The owner approved free weekly participation with verified results first and
+deferred XP/rank/KodeBit rewards. Weekly windows run from Sunday 00:00 to the next
+Sunday 00:00 in Asia/Manila, inclusive start and exclusive end. See
+[weekly event implementation](docs/weekly-challenge-plan.md). The owner approved
+future Scheduled events while the current event is active, resolving E02's
+no-active-event configuration precondition. Enforce one Active event and keep
+each event immutable after its start.
+
+The owner approved A06 self-profile editing for all five roles. Email/password
+changes require the current password; username and first/last name use normal
+validated edits. Changed email becomes Unverified and ends the session until A02
+verification. Profile editing cannot directly change roles/status. Verified Active
+Learners and Contributors may submit Instructor credentials, including a fresh
+submission after rejection. Block duplicate Pending applications, preserve
+credential versions/decisions, and grant Instructor only after the existing
+Moderator/Administrator review. See [account editing](docs/profile-editing-implementation.md).
+
+The owner explicitly deferred F01 paid token purchases until package prices,
+currency and KodeBit quantities are decided. Keep purchases unavailable and
+continue independent features. Track deferred work in
+[the deferred-feature register](docs/deferred-features.md), including Judge0 setup,
+paid admission and rewards; do not silently enable those scopes.
+
+A07 archival is implemented for its SRS actors: Learner, Contributor and
+Instructor. Keep profile/progress/content data intact, terminate sessions and
+preserve approved A04 recovery. See [archival](docs/account-archival-implementation.md).
+Permanent deletion remains separate; resolve its Archived authentication conflict
+in [the deletion plan](docs/account-deletion-plan.md) before implementing that scope.
+
 You are working on **Kody: Gamified Programming Learning Platform and Course Management System (K:GPLPCMS)**.
 
 This repository is a real Laravel application intended for deployment. Treat every production-bound change as maintainable software, not as tutorial, demo, or throwaway coursework.
@@ -1037,6 +1153,12 @@ A release is deployable only when:
 ---
 
 ## 32. Initial Engineering Order
+
+The product amendment above changes product sequencing: establish a playable
+game hub and reusable template contract now, then layer creator learning content,
+verified progression and monetization over it. Maintain the technical dependencies
+below for privileged publishing, evaluation and financial effects. Do not wait
+until the final gamification phase to make the user experience game-first.
 
 Unless project management explicitly changes sequencing, prefer this dependency order:
 

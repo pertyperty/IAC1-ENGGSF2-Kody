@@ -39,7 +39,7 @@ class EmailVerificationService
                 'last_requested_at' => now(),
             ]);
 
-            VerificationDelivery::where('user_id', $user->id)->whereNull('sent_at')->whereNull('cancelled_at')
+            VerificationDelivery::where('user_id', $user->id)->where('purpose', 'verification')->whereNull('sent_at')->whereNull('cancelled_at')
                 ->update(['token' => null, 'cancelled_at' => now()]);
 
             $delivery = VerificationDelivery::create([
@@ -86,7 +86,7 @@ class EmailVerificationService
 
             $user->forceFill(['account_status' => AccountStatus::Active, 'email_verified_at' => now()])->save();
             $verification->update(['token_hash' => null, 'expires_at' => null]);
-            VerificationDelivery::where('user_id', $accountId)->whereNull('sent_at')->whereNull('cancelled_at')
+            VerificationDelivery::where('user_id', $accountId)->where('purpose', 'verification')->whereNull('sent_at')->whereNull('cancelled_at')
                 ->update(['token' => null, 'cancelled_at' => now()]);
 
             return true;
