@@ -19,6 +19,33 @@ use Symfony\Component\Process\Process;
 
 uses(DatabaseMigrations::class);
 
+test('A09 concurrent same-kind and cross-kind role applications admit only one Pending request', function (bool $mixed) {
+    Storage::fake('local');
+    $user = contributorQualifiedUser();
+    $results = simultaneousAccountRequests('role-apply', ['actor_id' => $user->id, 'mixed' => $mixed,
+        'storage_root' => Storage::disk('local')->path(''), 'data' => ['previous_application_id' => 0, 'request_message' => 'Build quests.', 'confirmed' => true],
+        'instructor_data' => ['record_version' => 0, 'institution_name' => 'Teaching Institute', 'specialization' => 'Programming']],
+        fn () => User::whereKey($user->id)->lockForUpdate()->first());
+    sort($results);
+    expect($results)->toBe(['applied', 'duplicate'])->and(Storage::disk('local')->allFiles())->toHaveCount(1);
+    expect(DB::table('contributor_applications')->where('approval_status', 'Pending')->count()
+        + DB::table('instructor_applications')->where('verification_status', 'Pending')->count())->toBe(1);
+})->with([false, true]);
+
+test('G05 concurrent reviews grant Contributor and record a single decision and outcome', function () {
+    $user = contributorQualifiedUser();
+    $application = contributorSubmit($user);
+    $first = moduleAccount(Role::Moderator);
+    $second = moduleAccount(Role::Administrator);
+    $results = simultaneousAccountRequests('contributor-review', ['actor_ids' => [$first->id, $second->id],
+        'application_id' => $application->id, 'data' => contributorDecision()],
+        fn () => User::whereKey($user->id)->lockForUpdate()->first());
+    sort($results);
+    expect($results)->toBe(['duplicate', 'reviewed'])->and($user->fresh()->account_role)->toBe(Role::Contributor);
+    expect(DB::table('audit_events')->where('event', 'contributor_application.reviewed')->count())->toBe(1);
+    expect(DB::table('contributor_notice_deliveries')->where('kind', 'Approved')->count())->toBe(1);
+});
+
 test('Delete Account simultaneous confirmations remove data and write one deletion audit', function () {
     $user = moduleAccount(Role::Learner);
     $results = simultaneousAccountRequests('account-delete', ['actor_id' => $user->id, 'session_id' => 'module-test-session', 'data' => deletionData($user)],

@@ -4,6 +4,7 @@ use App\Actions\Account\LoginAccount;
 use App\Actions\Account\RegisterAccount;
 use App\Actions\Account\ReviewInstructorApplication;
 use App\Models\CodingChallenge;
+use App\Models\ContributorApplication;
 use App\Models\InstructorApplication;
 use App\Models\LearningCourse;
 use App\Models\LearningModule;
@@ -12,6 +13,7 @@ use App\Models\WeeklyEvent;
 use App\Services\Account\AccountArchival;
 use App\Services\Account\AccountDeletion;
 use App\Services\Account\AccountRecoveryService;
+use App\Services\Account\ContributorApplications;
 use App\Services\Account\EmailVerificationService;
 use App\Services\Account\InstructorApplications;
 use App\Services\Account\ProfileEditing;
@@ -47,6 +49,24 @@ try {
     $session->start();
 
     $result = match ($argv[1]) {
+        'contributor-review' => (function () use ($input, $argv): string {
+            app(ContributorApplications::class)->review(User::findOrFail($input['actor_ids'][(int) $argv[3] - 1]), 'module-test-session',
+                ContributorApplication::findOrFail($input['application_id']), $input['data']);
+
+            return 'reviewed';
+        })(),
+        'role-apply' => (function () use ($input, $argv): string {
+            config(['filesystems.disks.local.root' => $input['storage_root']]);
+            $credential = UploadedFile::fake()->createWithContent('proof.pdf', "%PDF-1.4\n%%EOF");
+            $actor = User::findOrFail($input['actor_id']);
+            if ($input['mixed'] && (int) $argv[3] === 2) {
+                app(InstructorApplications::class)->submit($actor, 'module-test-session', $input['instructor_data'], $credential);
+            } else {
+                app(ContributorApplications::class)->submit($actor, 'module-test-session', $input['data'], $credential);
+            }
+
+            return 'applied';
+        })(),
         'account-delete' => (function () use ($input): string {
             try {
                 app(AccountDeletion::class)->delete(User::findOrFail($input['actor_id']), $input['session_id'], $input['data']);

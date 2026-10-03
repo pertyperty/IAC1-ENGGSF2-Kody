@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Account\AccountArchivalController;
 use App\Http\Controllers\Account\AccountDeletionController;
+use App\Http\Controllers\Account\ContributorApplicationController;
+use App\Http\Controllers\Account\ContributorReviewController;
 use App\Http\Controllers\Account\EmailVerificationController;
 use App\Http\Controllers\Account\InstructorApplicationController;
 use App\Http\Controllers\Account\InstructorReviewController;
@@ -113,6 +115,14 @@ Route::get('/dashboard', [PlayController::class, 'hub'])->middleware(['auth', 'a
 Route::post('/play/{level}/game', [PlayController::class, 'game'])->middleware(['auth', 'account.session', 'throttle:20,1,play-game:'])->name('play.game');
 Route::post('/play/{level}/quiz', [PlayController::class, 'quiz'])->middleware(['auth', 'account.session', 'throttle:20,1,play-quiz:'])->name('play.quiz');
 Route::get('/account', ProfileController::class)->middleware(['auth', 'account.session'])->name('account.show');
+Route::get('/account/contributor-application', [ContributorApplicationController::class, 'create'])->middleware(['auth', 'account.session'])->name('contributor-application.create');
+Route::post('/account/contributor-application', [ContributorApplicationController::class, 'store'])->middleware(['auth', 'account.session', 'throttle:5,1,contributor-apply:'])->name('contributor-application.store');
+Route::middleware(['auth', 'account.session'])->prefix('manage/contributors')->name('contributor-reviews.')->group(function (): void {
+    Route::get('/', [ContributorReviewController::class, 'index'])->name('index');
+    Route::get('/{application}', [ContributorReviewController::class, 'show'])->name('show');
+    Route::get('/{application}/credential', [ContributorReviewController::class, 'credential'])->middleware('throttle:20,1,contributor-credential:')->name('credential');
+    Route::post('/{application}', [ContributorReviewController::class, 'review'])->middleware('throttle:10,1,contributor-review:')->name('review');
+});
 Route::get('/account/edit', [ProfileEditingController::class, 'edit'])->middleware(['auth', 'account.session'])->name('account.edit');
 Route::get('/account/archive', [AccountArchivalController::class, 'confirm'])->middleware(['auth', 'account.session'])->name('account.archive');
 Route::get('/account/delete', [AccountDeletionController::class, 'confirm'])->middleware(['auth', 'account.session'])->name('account.delete');

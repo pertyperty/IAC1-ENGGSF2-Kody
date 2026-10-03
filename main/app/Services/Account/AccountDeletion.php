@@ -74,6 +74,13 @@ class AccountDeletion
 
     private function removePrivateData(User $user): void
     {
+        DB::table('contributor_applications')->where('user_id', $user->id)->chunkById(100, function ($applications) use ($user): void {
+            foreach ($applications as $application) {
+                $this->queueFile($user, $application->credential_disk, $application->credential_path);
+                DB::table('notifications')->whereIn('id', DB::table('contributor_notice_deliveries')->where('application_id', $application->id)->select('id'))->delete();
+            }
+        });
+        DB::table('contributor_applications')->where('user_id', $user->id)->delete();
         $application = DB::table('instructor_applications')->where('user_id', $user->id)->first();
         if ($application !== null) {
             if ((config('queue.connections.database.connection') ?? config('database.default')) !== config('database.default')) {
@@ -104,6 +111,9 @@ class AccountDeletion
 
     private function queueFile(User $user, string $disk, string $path): void
     {
+        if ((config('queue.connections.database.connection') ?? config('database.default')) !== config('database.default')) {
+            throw new LogicException('Account erasure requires the application database queue.');
+        }
         $erasure = AccountFileErasure::firstOrCreate(['user_id' => $user->id, 'disk' => $disk, 'path_digest' => hash('sha256', $path)],
             ['id' => (string) Str::uuid(), 'path' => $path, 'last_queued_at' => now()]);
         if ($erasure->wasRecentlyCreated) {

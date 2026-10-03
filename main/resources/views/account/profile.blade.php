@@ -20,6 +20,8 @@
     @can('create', \App\Models\LearningModule::class)<p class="secondary-link"><a href="{{ route('studio.index') }}">Open your creator studio</a></p>@endcan
     @can('viewAny', \App\Models\LearningModule::class)<p class="secondary-link"><a href="{{ route('module-reviews.index') }}">Review adventures</a></p>@endcan
     <p class="secondary-link"><a href="{{ route('notifications.index') }}">Your updates</a></p>
+    @can('viewOwn', \App\Models\ContributorApplication::class)<p class="secondary-link"><a href="{{ route('contributor-application.create') }}">Contributor application and history</a></p>@endcan
+    @can('viewAny', \App\Models\ContributorApplication::class)<p class="secondary-link"><a href="{{ route('contributor-reviews.index') }}">Review Contributor applications</a></p>@endcan
     @can('archive', auth()->user())<p class="secondary-link"><a href="{{ route('account.archive') }}">Take a break: archive your account</a></p>@endcan
     @can('delete', auth()->user())<p class="secondary-link"><a href="{{ route('account.delete') }}">Permanently delete your account</a></p>@endcan
     <p class="secondary-link"><a href="{{ route('dashboard') }}">Back to your account home</a></p>

@@ -181,6 +181,12 @@ credential files use encrypted, retryable cleanup records. Keep database workers
 and the scheduler running; `php artisan kody:account-erasures-retry` requeues
 unfinished cleanup without duplicating pending jobs. See
 [deletion scope and operational limits](docs/account-deletion-plan.md).
+Learners can apply for Contributor access at `/account/contributor-application`
+after 30 days, 25 distinct validated module completions and 50 distinct passed
+coding challenges. Moderator/Admin review at `/manage/contributors` controls
+elevation. Rejected applications retain history; only one Pending role application
+is allowed at a time. Supporting files stay private and notices use database jobs.
+See [A09/G05 scope](docs/contributor-application-plan.md).
 
 The target is Linux EC2, Nginx/PHP-FPM with PHP 8.4.1+, RDS PostgreSQL and S3 where required.
 Set `APP_ENV=production`, `APP_DEBUG=false`, a stable managed `APP_KEY`, HTTPS

@@ -32,6 +32,10 @@ history. Committed queue jobs contain UUIDs and become harmless when their delet
 logical records are absent. Guest authentication proofs lose validity; their
 short-lived opaque session metadata expires under existing session retention.
 
+A09/G05 adds Contributor applications and delivery history to this inventory.
+Deletion also removes related staff notices and queues current/historical
+Contributor supporting files through the same encrypted erasure boundary.
+
 A minimal users row retains the stable audit reference, synthetic random email,
 `Deleted account` label, neutral Learner role and anonymized timestamp. Original
 names/username/email/hash are removed or replaced, verification/session/remember
@@ -99,6 +103,7 @@ existing cross-file fixtures are loaded. Remote CI,
 live provider/storage delivery, browser visual checks and deployment are unverified.
 
 Creator deletion remains in the deferred-feature register. Next independent scope
-is A09/G05 Contributor applications, whose eligibility and text constraints need
-requirements decisions before persistence. Keep paid purchases, paid admission,
+was A09/G05 Contributor applications, now implemented under approved eligibility,
+text, history and Pending-overlap rules. See [Contributor scope](contributor-application-plan.md).
+Keep paid purchases, paid admission,
 Judge0 activation and reward formulas deferred as approved.

@@ -46,6 +46,9 @@ class InstructorApplications
                 if (! in_array($user->account_role, [Role::Learner, Role::Contributor], true)) {
                     throw new AuthorizationException('Learners and Contributors may apply for Instructor access.');
                 }
+                if (DB::table('contributor_applications')->where('user_id', $user->id)->where('approval_status', 'Pending')->exists()) {
+                    throw ValidationException::withMessages(['record_version' => 'Your Contributor application is awaiting review. Wait for its decision before applying for Instructor access.']);
+                }
                 $application = InstructorApplication::where('user_id', $user->id)->lockForUpdate()->first();
                 if (($application?->record_version ?? 0) !== (int) $data['record_version']
                     || ($application !== null && $application->verification_status !== 'Rejected')) {

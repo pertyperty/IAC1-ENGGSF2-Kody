@@ -123,8 +123,17 @@ before deletion removes submission data. See [the deletion plan](docs/account-de
 
 For A09/G05 Contributor applications, the owner approved 500-character application
 messages and reviewer feedback with matching storage, resolving the dictionary's
-varchar(255)/500-character conflict. Eligibility thresholds remain unresolved; see
+varchar(255)/500-character conflict. The owner approved requiring account age of
+at least 30 days AND 25 distinct server-validated completed modules AND 50 distinct
+passed coding challenges, with repeats counted once. Rejected Contributor
+applicants may resubmit with prior decisions and credentials preserved. Permit
+only one Pending role application (Contributor or Instructor) at a time. See
 [the Contributor application plan](docs/contributor-application-plan.md).
+
+The owner approved G03/G04 enforcement hierarchy: Moderators may suspend/reinstate
+Learners, Contributors and Instructors; Administrators may also manage Moderators.
+Block self-enforcement and Administrator targets in the first release, protecting
+the last Administrator. This does not authorize G02 role or personal-field edits.
 
 You are working on **Kody: Gamified Programming Learning Platform and Course Management System (K:GPLPCMS)**.
 
