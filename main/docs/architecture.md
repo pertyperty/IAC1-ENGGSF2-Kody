@@ -186,3 +186,5 @@ Technology mismatch: composer.json declares PHP ^8.3, but locked Symfony 8.1
 runtime packages and PHPUnit 13 require PHP >=8.4.1. Dependencies are preserved;
 development, CI and deployment instructions require 8.4.1+. Align the declared
 minimum in a separate dependency-baseline decision if PHP 8.3 support is required.
+The exact locked versions and proposed options are recorded in the
+[pending runtime decision](runtime-baseline-decision.md).
