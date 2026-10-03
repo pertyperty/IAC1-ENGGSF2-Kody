@@ -1,9 +1,11 @@
 <?php
 
 use App\Http\Controllers\Account\EmailVerificationController;
+use App\Http\Controllers\Account\InstructorApplicationController;
 use App\Http\Controllers\Account\InstructorReviewController;
 use App\Http\Controllers\Account\LoginController;
 use App\Http\Controllers\Account\ProfileController;
+use App\Http\Controllers\Account\ProfileEditingController;
 use App\Http\Controllers\Account\RecoveryController;
 use App\Http\Controllers\Account\RegistrationController;
 use App\Http\Controllers\Challenges\ChallengeReviewController;
@@ -109,6 +111,10 @@ Route::get('/dashboard', [PlayController::class, 'hub'])->middleware(['auth', 'a
 Route::post('/play/{level}/game', [PlayController::class, 'game'])->middleware(['auth', 'account.session', 'throttle:20,1,play-game:'])->name('play.game');
 Route::post('/play/{level}/quiz', [PlayController::class, 'quiz'])->middleware(['auth', 'account.session', 'throttle:20,1,play-quiz:'])->name('play.quiz');
 Route::get('/account', ProfileController::class)->middleware(['auth', 'account.session'])->name('account.show');
+Route::get('/account/edit', [ProfileEditingController::class, 'edit'])->middleware(['auth', 'account.session'])->name('account.edit');
+Route::get('/account/creator-application', [InstructorApplicationController::class, 'create'])->middleware(['auth', 'account.session'])->name('instructor-application.create');
+Route::post('/account/creator-application', [InstructorApplicationController::class, 'store'])->middleware(['auth', 'account.session', 'throttle:5,1,creator-apply:'])->name('instructor-application.store');
+Route::patch('/account', [ProfileEditingController::class, 'update'])->middleware(['auth', 'account.session', 'throttle:10,1,profile-edit:'])->name('account.update');
 Route::post('/logout', [LoginController::class, 'destroy'])->middleware('auth')->name('logout');
 Route::middleware(['auth', 'account.session'])->prefix('manage/instructors')->name('instructor-reviews.')->group(function (): void {
     Route::get('/', [InstructorReviewController::class, 'index'])->name('index');

@@ -59,10 +59,9 @@ fallback warning remains. No live providers, remote CI or deployment were run.
 
 ## Next implementation prompt
 
-Implement A06 own-account editing and A07 archival using the SRS flows, durable
-audit history, immediate authorization checks and account row locking. Preserve
-the approved A04 recovery eligibility. Resolve A06's sensitive-field definition,
-email re-verification cross-reference and instructor application state labels
-before claiming those flows complete. The user's later product direction takes
-priority for the interface: playable games, an approachable module catalog and
-instructors as learning content creators.
+A06 own-account editing and existing-account Instructor applications are now
+implemented in the [profile editing follow-up](profile-editing-implementation.md)
+under the owner's approved sensitive-field, actor and resubmission decisions.
+A07 archival remains separate: preserve approved A04 recovery eligibility,
+durable audit history, immediate authorization checks and account row locking.
+Keep the playable game hub, separate Learning catalog and creator workflows.

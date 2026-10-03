@@ -7,6 +7,7 @@ use App\Enums\Role;
 use App\Models\InstructorApplication;
 use App\Models\User;
 use App\Services\Account\EmailVerificationService;
+use App\Services\Account\InstructorApplications;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
@@ -52,7 +53,7 @@ class RegisterAccount
                 $user->forceFill(['account_role' => Role::Learner, 'account_status' => AccountStatus::Unverified])->save();
 
                 if ($path !== null) {
-                    InstructorApplication::create([
+                    $application = InstructorApplication::create([
                         'user_id' => $user->id,
                         'institution_name' => $data['institution_name'],
                         'specialization' => $data['specialization'],
@@ -60,6 +61,7 @@ class RegisterAccount
                         'credential_path' => $path,
                         'verification_status' => 'Pending',
                     ]);
+                    app(InstructorApplications::class)->snapshot($application);
                 }
 
                 $this->verification->request($user);

@@ -14,9 +14,37 @@ use App\Services\Content\ModulePublishing;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Symfony\Component\Process\Process;
 
 uses(DatabaseMigrations::class);
+
+afterEach(function () {
+    // Disposable kody_test only; production down migrations preserve credential history.
+    $this->artisan('migrate:fresh')->assertSuccessful();
+});
+
+test('A06 simultaneous creator applications save one pending version and clean up the losing upload', function () {
+    Storage::fake('local');
+    $user = moduleAccount(Role::Learner);
+    $results = simultaneousAccountRequests('creator-apply', ['actor_id' => $user->id, 'session_id' => 'module-test-session',
+        'storage_root' => Storage::disk('local')->path(''), 'data' => ['record_version' => 0, 'institution_name' => 'Teaching Institute', 'specialization' => 'Programming']],
+        fn () => User::whereKey($user->id)->lockForUpdate()->first());
+    sort($results);
+    expect($results)->toBe(['applied', 'duplicate'])->and(Storage::disk('local')->allFiles())->toHaveCount(1);
+    $this->assertDatabaseCount('instructor_applications', 1);
+    $this->assertDatabaseCount('instructor_application_versions', 1);
+    expect(DB::table('audit_events')->where('event', 'instructor_application.submitted')->count())->toBe(1);
+});
+
+test('A06 overlapping profile saves commit one version and one audit without stale overwrites', function () {
+    $user = moduleAccount(Role::Learner);
+    $results = simultaneousAccountRequests('profile-edit', ['actor_id' => $user->id, 'session_id' => 'module-test-session', 'data' => profileEditData($user)],
+        fn () => User::whereKey($user->id)->lockForUpdate()->first());
+    sort($results);
+    expect($results)->toBe(['duplicate', 'saved'])->and($user->fresh()->profile_version)->toBe(2);
+    expect(DB::table('audit_events')->where('event', 'account.profile-updated')->count())->toBe(1);
+});
 
 test('C03 overlapping final attempts cannot exceed the lifetime budget or create two active evaluations', function (bool $distinct) {
     readyJudge();

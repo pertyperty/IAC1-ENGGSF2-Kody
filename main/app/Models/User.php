@@ -33,6 +33,7 @@ class User extends Authenticatable
             'failed_login_attempts' => 'integer',
             'login_locked_until' => 'immutable_datetime',
             'last_login_at' => 'immutable_datetime',
+            'profile_version' => 'integer',
             'active_session_expires_at' => 'immutable_datetime',
         ];
     }

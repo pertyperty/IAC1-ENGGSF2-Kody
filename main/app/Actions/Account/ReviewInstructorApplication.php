@@ -7,6 +7,7 @@ use App\Enums\Role;
 use App\Jobs\Account\SendCreatorDecision;
 use App\Models\InstructorApplication;
 use App\Models\User;
+use App\Services\Account\InstructorApplications;
 use App\Services\Administration\AuditRecorder;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\DB;
@@ -42,6 +43,9 @@ class ReviewInstructorApplication
                 throw ValidationException::withMessages(['decision' => 'The applicant must have verified Active Learner or Contributor access before approval.']);
             }
             $previousRole = $applicant->account_role->value;
+            app(InstructorApplications::class)->snapshot($current);
+            DB::table('instructor_application_versions')->where('instructor_application_id', $current->id)->where('application_version', $version)
+                ->update(['verification_status' => $decision, 'verification_notes' => $notes, 'reviewed_by' => $reviewer->id, 'verified_at' => now()]);
             $current->update(['verification_status' => $decision, 'verification_notes' => $notes,
                 'reviewed_by' => $reviewer->id, 'verified_at' => now(), 'record_version' => $version + 1]);
             if ($decision === 'Approved') {

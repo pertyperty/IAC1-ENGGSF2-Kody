@@ -97,6 +97,21 @@ future Scheduled events while the current event is active, resolving E02's
 no-active-event configuration precondition. Enforce one Active event and keep
 each event immutable after its start.
 
+The owner approved A06 self-profile editing for all five roles. Email/password
+changes require the current password; username and first/last name use normal
+validated edits. Changed email becomes Unverified and ends the session until A02
+verification. Profile editing cannot directly change roles/status. Verified Active
+Learners and Contributors may submit Instructor credentials, including a fresh
+submission after rejection. Block duplicate Pending applications, preserve
+credential versions/decisions, and grant Instructor only after the existing
+Moderator/Administrator review. See [account editing](docs/profile-editing-implementation.md).
+
+The owner explicitly deferred F01 paid token purchases until package prices,
+currency and KodeBit quantities are decided. Keep purchases unavailable and
+continue independent features. Track deferred work in
+[the deferred-feature register](docs/deferred-features.md), including Judge0 setup,
+paid admission and rewards; do not silently enable those scopes.
+
 You are working on **Kody: Gamified Programming Learning Platform and Course Management System (K:GPLPCMS)**.
 
 This repository is a real Laravel application intended for deployment. Treat every production-bound change as maintainable software, not as tutorial, demo, or throwaway coursework.

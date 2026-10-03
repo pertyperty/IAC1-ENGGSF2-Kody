@@ -147,3 +147,14 @@ XP, rank changes and KodeBit rewards stay deferred. Judge0 plan/credential setup
 is also deferred. The owner approved future Scheduled events while one current
 event is active; each event becomes immutable at its start. See
 [weekly events](weekly-challenge-plan.md) for implementation.
+
+## Profile and creator applications — approved 2026-10-03
+
+All five roles may edit their own personal profile fields. Current password
+confirmation is required for email/password changes; changed email becomes
+Unverified and ends the session until verification. Roles/status are protected.
+Verified Active Learners and Contributors may submit teaching credentials,
+including a new version after rejection. Block duplicate Pending applications,
+preserve decisions and private document versions, and require the existing
+Moderator/Administrator approval before Instructor access. See
+[account editing](profile-editing-implementation.md).

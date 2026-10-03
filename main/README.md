@@ -50,8 +50,8 @@ php artisan queue:work database --sleep=3 --tries=3 --timeout=60
 php artisan schedule:work
 ```
 
-The scheduler currently has no Kody tasks. `routes/console.php` is its future
-entrypoint. `composer dev` retains the existing Laravel development command.
+The scheduler closes/activates weekly events and recovers overdue submissions
+through `routes/console.php`. `composer dev` retains the existing Laravel development command.
 Boost is already locked as a development dependency. Browser URL logging is
 disabled to protect verification fragments. Its MCP server can be run
 with `php artisan boost:mcp`; inspect installation options before configuring
@@ -162,6 +162,14 @@ the Laravel scheduler activates the Sunday-to-Sunday Manila cycle and selects an
 approved quest when no manual selection exists. Private history lives at `/weekly`.
 Judge0 setup and all XP/rank/KodeBit rewards remain deferred. See
 [weekly event scope](docs/weekly-challenge-plan.md).
+
+All five roles can edit their own profile at `/account/edit`. Email/password
+changes require the current password and end sessions; changed email requires
+verification again. Learners and Contributors can apply to become creators and
+resubmit after rejection, with private credentials and prior decisions preserved.
+See [A06 scope and verification](docs/profile-editing-implementation.md).
+Paid purchases and other postponed scope are tracked in the
+[deferred-feature register](docs/deferred-features.md).
 
 The target is Linux EC2, Nginx/PHP-FPM with PHP 8.4.1+, RDS PostgreSQL and S3 where required.
 Set `APP_ENV=production`, `APP_DEBUG=false`, a stable managed `APP_KEY`, HTTPS

@@ -10,6 +10,16 @@ use Tests\TestCase;
 
 uses(RefreshDatabase::class);
 
+test('A06 password editing deletes authenticated database sessions and rejects the old browser', function () {
+    $user = User::factory()->create();
+    databaseBrowserRequest($this, 'post', route('login.store'), ['email' => $user->email, 'password' => 'password']);
+    $oldBrowser = session()->getId();
+    databaseBrowserRequest($this, 'patch', route('account.update'), profileEditData($user, ['current_password' => 'password',
+        'password' => 'StrongNewPass12!', 'password_confirmation' => 'StrongNewPass12!']), $oldBrowser)->assertRedirect(route('login'));
+    $this->assertDatabaseMissing('sessions', ['id' => $oldBrowser]);
+    databaseBrowserRequest($this, 'get', route('account.show'), sessionId: $oldBrowser)->assertRedirect(route('login'));
+});
+
 test('A04 successful recovery removes authenticated database sessions and requires a new login', function () {
     $user = User::factory()->create();
     databaseBrowserRequest($this, 'post', route('login.store'), ['email' => $user->email, 'password' => 'password']);

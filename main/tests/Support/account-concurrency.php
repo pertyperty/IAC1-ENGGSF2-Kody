@@ -11,6 +11,8 @@ use App\Models\User;
 use App\Models\WeeklyEvent;
 use App\Services\Account\AccountRecoveryService;
 use App\Services\Account\EmailVerificationService;
+use App\Services\Account\InstructorApplications;
+use App\Services\Account\ProfileEditing;
 use App\Services\Challenges\ChallengePublishing;
 use App\Services\Challenges\ChallengeSubmissions;
 use App\Services\Content\CourseLearning;
@@ -21,6 +23,7 @@ use App\Services\Gamification\WeeklyEvents;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -41,6 +44,14 @@ try {
     $session->start();
 
     $result = match ($argv[1]) {
+        'creator-apply' => (function () use ($input): string {
+            config(['filesystems.disks.local.root' => $input['storage_root']]);
+            app(InstructorApplications::class)->submit(User::findOrFail($input['actor_id']), $input['session_id'], $input['data'],
+                UploadedFile::fake()->createWithContent('proof.pdf', "%PDF-1.4\n%%EOF"));
+
+            return 'applied';
+        })(),
+        'profile-edit' => app(ProfileEditing::class)->update(User::findOrFail($input['actor_id']), $input['session_id'], $input['data']),
         'weekly-configure' => app(WeeklyEvents::class)->configure(User::findOrFail($input['actor_ids'][(int) $argv[3] - 1]), 'module-test-session', $input['data']) ? 'configured' : 'error',
         'weekly-sync' => (function (): string {
             app(WeeklyEvents::class)->synchronize();

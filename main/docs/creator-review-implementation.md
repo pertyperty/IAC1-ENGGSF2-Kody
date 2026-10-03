@@ -2,7 +2,10 @@
 
 Implements A10's review slice, fed by private Pending applications from A01.
 Instructors are Kody's learning content creators. Subsequent Content milestones
-implement module/course authoring and publication; A06 resubmission is separate.
+implement module/course authoring and publication. A06 first applications and
+rejected resubmissions from existing accounts are implemented in the
+[account editing follow-up](profile-editing-implementation.md), with retained
+credential versions and decisions. Registration and review now share that history.
 
 The owner approved Pending/Approved/Rejected dictionary labels, rejection
 preserving Learner access, Moderator/Administrator review (A10 actors rather
