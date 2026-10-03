@@ -1,58 +1,160 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Kody
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Gamified Programming Learning Platform and Course Management System. This is a
+Laravel modular monolith; business use cases will be implemented incrementally.
+Read `AGENTS.md` and [architecture conventions](docs/architecture.md) first.
 
-## About Laravel
+## Development setup
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Commands below run from the Laravel directory (`main/` in this repository).
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Requirements: Composer 2; PHP 8.4.1+ for the locked runtime and test dependencies
+(application declaration remains PHP ^8.3); Node 22.12+ with npm; PostgreSQL 17
+(CI's baseline). Enable PHP ctype, curl, dom, fileinfo, filter, intl, mbstring,
+openssl, PDO/pdo_pgsql, tokenizer, xml and zip. Use `composer check-platform-reqs`
+to verify the actual lock file. Do not downgrade dependencies to suit old XAMPP.
+XAMPP may supply compatible local PHP/Apache; PostgreSQL runs separately, and
+Apache must serve only `public/`. No application path depends on XAMPP.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Create separate local PostgreSQL login roles and owned databases `kody` and
+`kody_test`. Give the test role access only to the disposable test database;
+never configure tests with a production login. Supply local passwords privately.
 
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
-
-```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+```sh
+composer install
+cp .env.example .env
+cp .env.testing.example .env.testing
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+PowerShell uses `Copy-Item` instead of `cp`. Edit DB host/port/login/password in
+each local environment file. `.env.testing` uses the dedicated test role.
 
-## Contributing
+```sh
+php artisan key:generate
+php artisan key:generate --env=testing
+php artisan migrate
+php artisan migrate --env=testing
+npm ci
+npm run build
+php artisan about
+php artisan migrate:status
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Run `php artisan serve` and `npm run dev` in separate terminals. Run the database
+worker in another terminal:
 
-## Code of Conduct
+```sh
+php artisan queue:work database --sleep=3 --tries=3 --timeout=60
+php artisan schedule:work
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+The scheduler currently has no Kody tasks. `routes/console.php` is its future
+entrypoint. `composer dev` retains the existing Laravel development command.
+Boost is already locked as a development dependency. Browser URL logging is
+disabled to protect verification fragments. Its MCP server can be run
+with `php artisan boost:mcp`; inspect installation options before configuring
+an editor, and preserve the project's authoritative `AGENTS.md`.
 
-## Security Vulnerabilities
+## Tests and quality checks
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```sh
+composer validate --strict
+composer check-platform-reqs
+composer lint
+composer test
+composer audit
+npm audit --audit-level=high
+npm run build
+```
 
-## License
+`composer format` applies Pint formatting. There is no configured static analyzer.
+Tests cover health, PostgreSQL persistence/constraints/concurrency, registration,
+verification, login lockouts, session replacement, real database browser sessions,
+rollback, CSRF and authorization/mass-assignment boundaries.
+The full suite requires PostgreSQL. `phpunit.xml` forces `testing`, `pgsql`, an
+empty DB URL and database `kody_test`; `.env.testing` supplies host/login/port.
+RefreshDatabase may reset the test schema: use only a disposable database.
+Run `php artisan config:clear` before changing environments or running tests.
+The frontend's existing Bunny font plugin downloads fonts at build time, so the
+build requires outbound HTTPS. The build then serves fonts locally.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+GitHub Actions runs from repository-root `.github/workflows/ci.yml`, with commands
+in `main/`: PHP 8.4, Node 22, isolated PostgreSQL 17, lock-file installs, audits,
+Pint, frontend build, clean migrations, Pest tests and configuration/route cache
+checks. A frontend artifact carries the verified Git SHA; it is not a complete
+production release. PRs and main pushes trigger CI; deployment is separate.
+
+## Health and environment conventions
+
+`GET /up` returns `200 {"status":"ok"}` after application boot, without querying
+the database. `GET /ready` runs `SELECT 1`; success is 200, database failure is
+`503 {"status":"unavailable"}`. Both use fixed JSON with no-store caching and
+no web/session middleware. Failure logging contains only a fixed message.
+Maintenance mode returns Laravel's 503 for both probes. Readiness checks database
+connectivity, not mail, external providers, worker health or scheduler execution.
+
+Keep local, testing, staging and production configuration separate. Never commit
+environment files or real credentials; only sanitized examples are tracked.
+Use `config()` inside application code and `env()` only in configuration files.
+UTC is canonical. Database queues dispatch after commit by default; test queues are sync.
+Account verification persists its database job inside the account transaction.
+The base seeder creates no accounts or production credentials.
+
+## Account registration milestone
+
+`/register` implements A01 registration and pending Instructor applications;
+`/email/verify` implements A02 single-use activation and limited resends.
+Configure `ACCOUNT_VERIFICATION_MAILER=smtp` with sandbox SMTP credentials and
+run `php artisan queue:work database --tries=3 --timeout=60` for delivery.
+Do not use a log mailer for verification tokens. Credentials use the private
+local disk by default; preserve its storage across release switches.
+
+See [account implementation and traceability](docs/account-implementation-plan.md)
+for approved requirement decisions, migration preflight, token protection,
+concurrency coverage and remaining recovery/approval/provider scope.
+
+`/login` implements A03 email/password login with durable progressive lockouts,
+consent before replacing an active session, and POST logout. The protected
+`/dashboard` currently provides an account welcome page; full B01 learning
+dashboard data is a subsequent feature. All future protected routes must use
+both `auth` and `account.session`, and sensitive actions must recheck state
+transactionally. See [login traceability](docs/login-implementation.md).
+
+Use `HASH_DRIVER=argon2id` outside disposable tests; verify `password_algos()`
+includes `argon2id` in the deployment PHP runtime. Laravel's default Argon2
+settings are retained; benchmark on deployment hardware before claiming NFRs.
+Existing recognized bcrypt/Argon hashes can sign in and upgrade on successful
+password login. The additive migrations do not rewrite existing passwords.
+
+## Production preparation
+
+The target is Linux EC2, Nginx/PHP-FPM with PHP 8.4.1+, RDS PostgreSQL and S3 where required.
+Set `APP_ENV=production`, `APP_DEBUG=false`, a stable managed `APP_KEY`, HTTPS
+`APP_URL`, `SESSION_SECURE_COOKIE=true`, HttpOnly cookies and SameSite=lax.
+Secure cookies default to true in staging/production. Use RDS
+`DB_SSLMODE=verify-full` and `DB_SSLROOTCERT` pointing to the current AWS CA bundle.
+`DB_CONNECT_TIMEOUT` bounds connection establishment; it is not a query deadline.
+Use managed secrets and least-privilege service/deployment identities. The S3
+driver package and provider integrations must be added/tested when needed.
+
+Supervise the worker with systemd/Supervisor under the application user, from the
+active release, using the worker command above and automatic restart. Its 60s
+timeout stays below database `retry_after=90`; allow at least 90s for graceful
+shutdown and review these values when real jobs arrive. Monitor failed jobs and
+queue latency. Run `php artisan queue:restart` after deployment.
+
+Use one production cron entry under the application user:
+
+```cron
+* * * * * cd /var/www/kody/current && php artisan schedule:run >> /var/log/kody-scheduler.log 2>&1
+```
+
+Rotate/monitor that log; define overlap/single-server locks for future tasks.
+Expose only `public/`, enforce HTTPS and secure headers/request limits, and keep
+private storage outside disposable releases. Deploy immutable releases with safe
+`migrate --force`, cached configuration/routes/views and `/up`/`/ready` smoke
+checks. Roll back application releases independently of database migrations.
+Monitor HTTP, queues, database and scheduled work; configure encrypted backups
+at least every 24h per SRS 4.2 and test restoration before a production release.
+AWS deployment, TLS/encryption, backup restoration and availability targets
+have not been provisioned or verified by this foundation task.

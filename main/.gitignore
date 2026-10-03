@@ -3,6 +3,11 @@
 .env
 .env.backup
 .env.production
+.env.*
+!.env.example
+!.env.testing.example
+*.sqlite
+*.sqlite-*
 .phpactor.json
 .phpunit.result.cache
 /.codex
@@ -14,6 +19,7 @@
 /.zed
 /auth.json
 /node_modules
+/.npm-cache
 /public/build
 /public/fonts-manifest.dev.json
 /public/hot
