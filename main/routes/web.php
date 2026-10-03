@@ -6,6 +6,9 @@ use App\Http\Controllers\Account\LoginController;
 use App\Http\Controllers\Account\ProfileController;
 use App\Http\Controllers\Account\RecoveryController;
 use App\Http\Controllers\Account\RegistrationController;
+use App\Http\Controllers\Challenges\ChallengeReviewController;
+use App\Http\Controllers\Challenges\ChallengeStudioController;
+use App\Http\Controllers\Challenges\PublishedChallengeController;
 use App\Http\Controllers\Content\CourseLearningController;
 use App\Http\Controllers\Content\CourseReviewController;
 use App\Http\Controllers\Content\CourseStudioController;
@@ -18,11 +21,25 @@ use App\Http\Controllers\PlayController;
 use Illuminate\Support\Facades\Route;
 
 Route::pattern('course', '[0-9]+');
+Route::pattern('challenge', '[0-9]+');
 
 Route::get('/', [LearningController::class, 'home'])->name('home');
 Route::get('/learn', [LearningController::class, 'catalog'])->name('learning.catalog');
 Route::get('/learn/courses', [CourseLearningController::class, 'catalog'])->name('course-learning.catalog');
+Route::get('/challenges', [PublishedChallengeController::class, 'catalog'])->name('challenges.catalog');
 Route::middleware(['auth', 'account.session'])->group(function (): void {
+    Route::get('/challenges/{challenge}', [PublishedChallengeController::class, 'show'])->name('challenges.show');
+    Route::get('/create/challenges', [ChallengeStudioController::class, 'index'])->name('challenges.index');
+    Route::get('/create/challenges/new', [ChallengeStudioController::class, 'create'])->name('challenges.create');
+    Route::post('/create/challenges', [ChallengeStudioController::class, 'store'])->middleware('throttle:10,1,challenge-create:')->name('challenges.store');
+    Route::get('/create/challenges/{challenge}', [ChallengeStudioController::class, 'edit'])->name('challenges.edit');
+    Route::put('/create/challenges/{challenge}', [ChallengeStudioController::class, 'update'])->middleware('throttle:20,1,challenge-edit:')->name('challenges.update');
+    Route::post('/create/challenges/{challenge}/submit', [ChallengeStudioController::class, 'submit'])->middleware('throttle:10,1,challenge-submit:')->name('challenges.submit');
+    Route::get('/create/challenges/{challenge}/archive', [ChallengeStudioController::class, 'archiveConfirmation'])->name('challenges.archive-confirmation');
+    Route::post('/create/challenges/{challenge}/archive', [ChallengeStudioController::class, 'archive'])->middleware('throttle:10,1,challenge-archive:')->name('challenges.archive');
+    Route::get('/manage/challenges', [ChallengeReviewController::class, 'index'])->name('challenge-reviews.index');
+    Route::get('/manage/challenges/{challenge}', [ChallengeReviewController::class, 'show'])->name('challenge-reviews.show');
+    Route::post('/manage/challenges/{challenge}', [ChallengeReviewController::class, 'review'])->middleware('throttle:10,1,challenge-review:')->name('challenge-reviews.review');
     Route::get('/learn/courses/mine', [CourseLearningController::class, 'mine'])->name('course-learning.mine');
     Route::get('/learn/courses/{course}', [CourseLearningController::class, 'show'])->name('course-learning.show');
     Route::post('/learn/courses/{course}/enroll', [CourseLearningController::class, 'enroll'])->middleware('throttle:10,1,course-enroll:')->name('course-learning.enroll');

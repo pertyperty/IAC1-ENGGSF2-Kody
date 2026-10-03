@@ -22,6 +22,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias(['account.session' => EnsureActiveAccountSession::class]);
         $middleware->redirectGuestsTo(fn () => route('login'));
         $middleware->redirectUsersTo(fn () => route('dashboard'));
+        // Test-case whitespace is part of the expected program behavior.
+        $middleware->trimStrings(except: ['test_cases.*.input', 'test_cases.*.expected_output']);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->dontFlash(['verification_token', 'recovery_token']);

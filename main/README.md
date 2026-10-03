@@ -146,6 +146,13 @@ assessment progress and share the daily streak. Owners can archive courses;
 existing enrollees retain access while new enrollment stops. Paid enrollment is
 unavailable. See [course learning scope](docs/course-learning-implementation.md).
 
+Contributors and Instructors can author coding quests in `/create/challenges`,
+with versioned problems, execution settings and sample/hidden tests. Moderator/Admin
+review at `/manage/challenges` controls publication and replacements; owners can
+archive published quests. `/challenges` exposes approved metadata and authenticated
+sample previews. Code submission/execution awaits the Judge0 workflow. See
+[challenge studio scope](docs/challenge-studio-implementation.md).
+
 The target is Linux EC2, Nginx/PHP-FPM with PHP 8.4.1+, RDS PostgreSQL and S3 where required.
 Set `APP_ENV=production`, `APP_DEBUG=false`, a stable managed `APP_KEY`, HTTPS
 `APP_URL`, `SESSION_SECURE_COOKIE=true`, HttpOnly cookies and SameSite=lax.

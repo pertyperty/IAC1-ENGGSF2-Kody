@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\VerificationDelivery;
 use App\Services\Account\AccountRecoveryService;
 use App\Services\Account\EmailVerificationService;
+use App\Services\Challenges\ChallengePublishing;
 use App\Services\Content\CoursePublishing;
 use App\Services\Content\ModulePublishing;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
@@ -16,6 +17,28 @@ use Illuminate\Support\Facades\DB;
 use Symfony\Component\Process\Process;
 
 uses(DatabaseMigrations::class);
+
+test('C05 overlapping challenge edits preserve one new revision and its test snapshot', function () {
+    $challenge = challengeFixture();
+    $results = simultaneousAccountRequests('challenge-save', ['actor_id' => $challenge->created_by, 'session_id' => 'module-test-session', 'challenge_id' => $challenge->id, 'data' => challengeData()],
+        fn () => User::whereKey($challenge->created_by)->lockForUpdate()->first());
+    sort($results);
+    expect($results)->toBe(['duplicate', 'saved']);
+    $this->assertDatabaseCount('coding_challenge_revisions', 2);
+    $this->assertDatabaseCount('challenge_test_cases', 4);
+});
+
+test('C02 overlapping challenge reviews publish audit and notify exactly once', function () {
+    $challenge = challengeFixture();
+    app(ChallengePublishing::class)->submit(User::find($challenge->created_by), 'module-test-session', $challenge, 1);
+    $reviewer = moduleAccount(Role::Moderator);
+    $results = simultaneousAccountRequests('challenge-review', ['actor_id' => $reviewer->id, 'session_id' => 'module-test-session', 'challenge_id' => $challenge->id],
+        fn () => User::whereKey($challenge->created_by)->lockForUpdate()->first());
+    sort($results);
+    expect($results)->toBe(['duplicate', 'reviewed']);
+    expect(DB::table('audit_events')->where('event', 'challenge.reviewed')->count())->toBe(1);
+    expect(DB::table('notifications')->where('type', 'challenge.reviewed')->count())->toBe(1);
+});
 
 test('B03 overlapping free enrollments create one pinned grant and one audit', function () {
     $course = courseFixture(true);

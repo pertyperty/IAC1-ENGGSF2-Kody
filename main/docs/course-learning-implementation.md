@@ -104,6 +104,8 @@ Implement versioned coding-challenge authoring and review (C01/C02/C05) for the
 approved Python/Java/C++ list, with hidden test isolation, bounded execution
 settings, auditable ownership and stable revisions. Keep all learner code
 execution behind the future Judge0 adapter. Resolve the challenge lifecycle
-conflict first: C01 requires Draft, C02 says Approved and Published, C06 says
-Active, while the dictionary allows Pending/Approved/Archived/Deleted only.
-Do not invent a reconciled lifecycle or Judge0 limits/provider IDs.
+conflict was subsequently resolved by the owner: Draft/Published/Archived/Deleted
+challenge lifecycle with separate revision review states, and fresh moderation
+for published replacements. See [challenge studio](challenge-studio-implementation.md)
+for the resulting authoring/review milestone. Judge0 limits/provider IDs still
+require verification against the configured provider.

@@ -3,12 +3,14 @@
 use App\Actions\Account\LoginAccount;
 use App\Actions\Account\RegisterAccount;
 use App\Actions\Account\ReviewInstructorApplication;
+use App\Models\CodingChallenge;
 use App\Models\InstructorApplication;
 use App\Models\LearningCourse;
 use App\Models\LearningModule;
 use App\Models\User;
 use App\Services\Account\AccountRecoveryService;
 use App\Services\Account\EmailVerificationService;
+use App\Services\Challenges\ChallengePublishing;
 use App\Services\Content\CourseLearning;
 use App\Services\Content\CoursePublishing;
 use App\Services\Content\ModulePublishing;
@@ -51,6 +53,12 @@ try {
             return 'reviewed';
         })(),
         'course-save' => app(CoursePublishing::class)->save(User::findOrFail($input['actor_id']), $input['session_id'], $input['data'], LearningCourse::findOrFail($input['course_id'])) ? 'saved' : 'error',
+        'challenge-save' => app(ChallengePublishing::class)->save(User::findOrFail($input['actor_id']), $input['session_id'], $input['data'], CodingChallenge::findOrFail($input['challenge_id'])) ? 'saved' : 'error',
+        'challenge-review' => (function () use ($input): string {
+            app(ChallengePublishing::class)->review(User::findOrFail($input['actor_id']), $input['session_id'], CodingChallenge::findOrFail($input['challenge_id']), 2, 'Approved', null);
+
+            return 'reviewed';
+        })(),
         'course-enroll' => app(CourseLearning::class)->enroll(User::findOrFail($input['actor_id']), $input['session_id'], $input['course_id'], $input['revision_id']) ? 'enrolled' : 'error',
         'course-complete' => app(CourseLearning::class)->complete(User::findOrFail($input['actor_id']), $input['session_id'], $input['course_id'], $input['slot_id'], 'game', ['program' => ['right', 'right', 'up', 'right', 'right']]) ? 'saved' : 'error',
         'module-save' => app(ModulePublishing::class)->save(User::findOrFail($input['actor_id']), $input['session_id'], $input['data'], LearningModule::findOrFail($input['module_id'])) ? 'saved' : 'error',

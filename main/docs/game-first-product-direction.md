@@ -116,3 +116,12 @@ existing enrollees retain access and progress while browsing/new enrollment stop
 Individual archived modules remain blocked. Currently authored courses offer
 free enrollment; paid enrollment awaits pricing and the KodeBit ledger. See
 [course learning implementation](course-learning-implementation.md).
+
+## Challenge publication amendment — approved 2026-10-03
+
+Coding challenges use Draft/Published/Archived/Deleted lifecycle states and
+separate Draft/Pending/Approved/Rejected revision review states. Published is
+approved and archive-eligible. Published replacements require Moderator/Admin
+review; the approved version remains available while the replacement is pending,
+including in B06 browsing. Future submissions retain their original revision.
+See [challenge studio](challenge-studio-implementation.md).

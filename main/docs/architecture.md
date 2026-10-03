@@ -14,6 +14,12 @@ module archiving still blocks that module. Gamification validates course templat
 wins through the shared approved-revision writer; its ledger-free streak activity
 does not grant paid access or financial rewards.
 
+[Challenge studio](challenge-studio-implementation.md) adds Challenge-owned
+immutable definitions and test snapshots, Contributor/Instructor ownership,
+Moderator/Admin review and audited publication/archiving. Learner previews query
+only reviewed problem fields and public samples; hidden tests stay within creator
+and reviewer access. No learner code runs in PHP or on the application host.
+
 The project owner's [2026-10-03 game-first amendment](game-first-product-direction.md)
 sets the current product direction. The play hub is the primary experience;
 Learning is a separate catalog, and creators attach versioned game/quiz template

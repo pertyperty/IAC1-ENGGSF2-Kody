@@ -69,6 +69,14 @@ The owner approved free enrollment for currently authored courses in this releas
 paid enrollment stays unavailable until pricing and the KodeBit ledger exist.
 See [course learning](docs/course-learning-implementation.md).
 
+The owner approved Draft/Published/Archived/Deleted coding-challenge lifecycle
+states with separate Draft/Pending/Approved/Rejected revision review states.
+Published means approved and archive-eligible, resolving C01/C02/C06 versus the
+challenge dictionary. Published replacement revisions require Moderator/Admin
+approval; the last approved version remains available during review. Submissions
+must retain their original challenge revision. See
+[challenge studio](docs/challenge-studio-implementation.md).
+
 You are working on **Kody: Gamified Programming Learning Platform and Course Management System (K:GPLPCMS)**.
 
 This repository is a real Laravel application intended for deployment. Treat every production-bound change as maintainable software, not as tutorial, demo, or throwaway coursework.
