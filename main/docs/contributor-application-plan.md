@@ -89,10 +89,12 @@ are unverified; this workflow alone does not claim privacy-compliance certificat
 
 ## Next implementation prompt
 
-Continue G01/G03/G04 account governance with the owner's approved hierarchy:
+G01/G03/G04 account governance now implements the owner's approved hierarchy:
 Moderators manage Learners/Contributors/Instructors; Administrators may also manage
 Moderators. Block self-enforcement and Administrator targets in this release,
 protecting the last Administrator. Implement fresh authorization, versioned locked
 Active/Suspended transitions, immediate session revocation, durable audit and queued
 notices. Preserve committed coding evaluation and unrelated user/content data.
+See [governance scope](account-governance-implementation.md). Next resolve G02
+assignment/demotion hierarchy and administrative field scope before general editing.
 Keep owner-deferred purchases, Judge0 activation and rewards unavailable.

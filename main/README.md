@@ -187,6 +187,11 @@ coding challenges. Moderator/Admin review at `/manage/contributors` controls
 elevation. Rejected applications retain history; only one Pending role application
 is allowed at a time. Supporting files stay private and notices use database jobs.
 See [A09/G05 scope](docs/contributor-application-plan.md).
+Moderators and Administrators can browse account status and enforcement history
+at `/manage/accounts`. Confirmed suspension immediately revokes sessions;
+reinstatement requires a new login. The approved hierarchy protects self/Admin
+targets, and committed coding evaluations continue. See
+[G01/G03/G04 scope](docs/account-governance-implementation.md).
 
 The target is Linux EC2, Nginx/PHP-FPM with PHP 8.4.1+, RDS PostgreSQL and S3 where required.
 Set `APP_ENV=production`, `APP_DEBUG=false`, a stable managed `APP_KEY`, HTTPS

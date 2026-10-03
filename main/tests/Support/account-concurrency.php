@@ -17,6 +17,7 @@ use App\Services\Account\ContributorApplications;
 use App\Services\Account\EmailVerificationService;
 use App\Services\Account\InstructorApplications;
 use App\Services\Account\ProfileEditing;
+use App\Services\Administration\AccountEnforcement;
 use App\Services\Challenges\ChallengePublishing;
 use App\Services\Challenges\ChallengeSubmissions;
 use App\Services\Content\CourseLearning;
@@ -49,6 +50,12 @@ try {
     $session->start();
 
     $result = match ($argv[1]) {
+        'account-enforce' => (function () use ($input, $argv): string {
+            app(AccountEnforcement::class)->change(User::findOrFail($input['actor_ids'][(int) $argv[3] - 1]), 'module-test-session',
+                User::findOrFail($input['target_id']), $input['data']);
+
+            return 'enforced';
+        })(),
         'contributor-review' => (function () use ($input, $argv): string {
             app(ContributorApplications::class)->review(User::findOrFail($input['actor_ids'][(int) $argv[3] - 1]), 'module-test-session',
                 ContributorApplication::findOrFail($input['application_id']), $input['data']);

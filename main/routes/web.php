@@ -12,6 +12,7 @@ use App\Http\Controllers\Account\ProfileController;
 use App\Http\Controllers\Account\ProfileEditingController;
 use App\Http\Controllers\Account\RecoveryController;
 use App\Http\Controllers\Account\RegistrationController;
+use App\Http\Controllers\Administration\AccountGovernanceController;
 use App\Http\Controllers\Challenges\ChallengeReviewController;
 use App\Http\Controllers\Challenges\ChallengeStudioController;
 use App\Http\Controllers\Challenges\ChallengeSubmissionController;
@@ -115,6 +116,11 @@ Route::get('/dashboard', [PlayController::class, 'hub'])->middleware(['auth', 'a
 Route::post('/play/{level}/game', [PlayController::class, 'game'])->middleware(['auth', 'account.session', 'throttle:20,1,play-game:'])->name('play.game');
 Route::post('/play/{level}/quiz', [PlayController::class, 'quiz'])->middleware(['auth', 'account.session', 'throttle:20,1,play-quiz:'])->name('play.quiz');
 Route::get('/account', ProfileController::class)->middleware(['auth', 'account.session'])->name('account.show');
+Route::middleware(['auth', 'account.session'])->prefix('manage/accounts')->name('account-governance.')->group(function (): void {
+    Route::get('/', [AccountGovernanceController::class, 'index'])->name('index');
+    Route::get('/{account}', [AccountGovernanceController::class, 'show'])->name('show');
+    Route::post('/{account}/enforce', [AccountGovernanceController::class, 'enforce'])->middleware('throttle:10,1,account-enforce:')->name('enforce');
+});
 Route::get('/account/contributor-application', [ContributorApplicationController::class, 'create'])->middleware(['auth', 'account.session'])->name('contributor-application.create');
 Route::post('/account/contributor-application', [ContributorApplicationController::class, 'store'])->middleware(['auth', 'account.session', 'throttle:5,1,contributor-apply:'])->name('contributor-application.store');
 Route::middleware(['auth', 'account.session'])->prefix('manage/contributors')->name('contributor-reviews.')->group(function (): void {

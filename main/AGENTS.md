@@ -134,6 +134,8 @@ The owner approved G03/G04 enforcement hierarchy: Moderators may suspend/reinsta
 Learners, Contributors and Instructors; Administrators may also manage Moderators.
 Block self-enforcement and Administrator targets in the first release, protecting
 the last Administrator. This does not authorize G02 role or personal-field edits.
+See [account governance](docs/account-governance-implementation.md) for implementation,
+session revocation, audit/delivery records and PostgreSQL concurrency coverage.
 
 You are working on **Kody: Gamified Programming Learning Platform and Course Management System (K:GPLPCMS)**.
 

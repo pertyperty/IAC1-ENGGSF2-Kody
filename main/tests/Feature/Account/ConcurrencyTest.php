@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\AccountStatus;
 use App\Enums\Role;
 use App\Models\AccountRecovery;
 use App\Models\EmailVerification;
@@ -18,6 +19,21 @@ use Illuminate\Support\Facades\Storage;
 use Symfony\Component\Process\Process;
 
 uses(DatabaseMigrations::class);
+
+test('G03 G04 simultaneous staff confirmations commit one state transition and audit', function (string $action) {
+    $first = moduleAccount(Role::Moderator);
+    $second = moduleAccount(Role::Administrator);
+    $target = moduleAccount(Role::Learner);
+    if ($action === 'Reinstated') {
+        $target->forceFill(['account_status' => AccountStatus::Suspended])->save();
+    }
+    $results = simultaneousAccountRequests('account-enforce', ['actor_ids' => [$first->id, $second->id], 'target_id' => $target->id,
+        'data' => enforcementData($target, ['action' => $action])], fn () => User::whereKey($target->id)->lockForUpdate()->first());
+    sort($results);
+    expect($results)->toBe(['duplicate', 'enforced']);
+    expect(DB::table('account_enforcements')->count())->toBe(1)->and($target->fresh()->profile_version)->toBe(2);
+    expect(DB::table('audit_events')->where('event', 'account.'.strtolower($action))->count())->toBe(1);
+})->with(['Suspended', 'Reinstated']);
 
 test('A09 concurrent same-kind and cross-kind role applications admit only one Pending request', function (bool $mixed) {
     Storage::fake('local');

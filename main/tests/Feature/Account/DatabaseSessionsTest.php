@@ -1,14 +1,29 @@
 <?php
 
+use App\Enums\Role;
 use App\Models\User;
 use App\Models\VerificationDelivery;
 use App\Services\Account\AccountRecoveryService;
+use App\Services\Administration\AccountEnforcement;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use Illuminate\Testing\TestResponse;
 use Tests\TestCase;
 
 uses(RefreshDatabase::class);
+
+test('G03 G04 remove target database sessions and reinstatement cannot restore an old browser', function () {
+    $target = User::factory()->create();
+    databaseBrowserRequest($this, 'post', route('login.store'), ['email' => $target->email, 'password' => 'password']);
+    $oldBrowser = session()->getId();
+    $actor = moduleAccount(Role::Moderator);
+    app(AccountEnforcement::class)->change($actor, 'module-test-session', $target, enforcementData($target));
+    $this->assertDatabaseMissing('sessions', ['id' => $oldBrowser]);
+    databaseBrowserRequest($this, 'get', route('account.show'), sessionId: $oldBrowser)->assertRedirect(route('login'));
+    app(AccountEnforcement::class)->change($actor, 'module-test-session', $target, enforcementData($target, ['action' => 'Reinstated']));
+    databaseBrowserRequest($this, 'get', route('account.show'), sessionId: $oldBrowser)->assertRedirect(route('login'));
+    databaseBrowserRequest($this, 'post', route('login.store'), ['email' => $target->email, 'password' => 'password'])->assertRedirect(route('dashboard'));
+});
 
 test('Delete Account removes authenticated database sessions and prevents old-browser access', function () {
     $user = User::factory()->create();
