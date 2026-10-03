@@ -115,8 +115,11 @@ paid admission and rewards; do not silently enable those scopes.
 A07 archival is implemented for its SRS actors: Learner, Contributor and
 Instructor. Keep profile/progress/content data intact, terminate sessions and
 preserve approved A04 recovery. See [archival](docs/account-archival-implementation.md).
-Permanent deletion remains separate; resolve its Archived authentication conflict
-in [the deletion plan](docs/account-deletion-plan.md) before implementing that scope.
+The owner approved requiring Archived users to reactivate through A04 before
+authenticated deletion. The first deletion release covers accounts without any
+authored modules/courses/challenges; creator deletion awaits retention/removal
+rules. The owner approved waiting for Queued/Evaluating submissions to finish
+before deletion removes submission data. See [the deletion plan](docs/account-deletion-plan.md).
 
 You are working on **Kody: Gamified Programming Learning Platform and Course Management System (K:GPLPCMS)**.
 

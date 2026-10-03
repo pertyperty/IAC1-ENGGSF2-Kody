@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Account\AccountArchivalController;
+use App\Http\Controllers\Account\AccountDeletionController;
 use App\Http\Controllers\Account\EmailVerificationController;
 use App\Http\Controllers\Account\InstructorApplicationController;
 use App\Http\Controllers\Account\InstructorReviewController;
@@ -114,6 +115,8 @@ Route::post('/play/{level}/quiz', [PlayController::class, 'quiz'])->middleware([
 Route::get('/account', ProfileController::class)->middleware(['auth', 'account.session'])->name('account.show');
 Route::get('/account/edit', [ProfileEditingController::class, 'edit'])->middleware(['auth', 'account.session'])->name('account.edit');
 Route::get('/account/archive', [AccountArchivalController::class, 'confirm'])->middleware(['auth', 'account.session'])->name('account.archive');
+Route::get('/account/delete', [AccountDeletionController::class, 'confirm'])->middleware(['auth', 'account.session'])->name('account.delete');
+Route::post('/account/delete', [AccountDeletionController::class, 'store'])->middleware(['auth', 'account.session', 'throttle:5,1,account-delete:'])->name('account.delete.store');
 Route::post('/account/archive', [AccountArchivalController::class, 'store'])->middleware(['auth', 'account.session', 'throttle:5,1,account-archive:'])->name('account.archive.store');
 Route::get('/account/creator-application', [InstructorApplicationController::class, 'create'])->middleware(['auth', 'account.session'])->name('instructor-application.create');
 Route::post('/account/creator-application', [InstructorApplicationController::class, 'store'])->middleware(['auth', 'account.session', 'throttle:5,1,creator-apply:'])->name('instructor-application.store');

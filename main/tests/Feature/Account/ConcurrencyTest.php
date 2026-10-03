@@ -19,6 +19,15 @@ use Symfony\Component\Process\Process;
 
 uses(DatabaseMigrations::class);
 
+test('Delete Account simultaneous confirmations remove data and write one deletion audit', function () {
+    $user = moduleAccount(Role::Learner);
+    $results = simultaneousAccountRequests('account-delete', ['actor_id' => $user->id, 'session_id' => 'module-test-session', 'data' => deletionData($user)],
+        fn () => User::whereKey($user->id)->lockForUpdate()->first());
+    sort($results);
+    expect($results)->toBe(['deleted', 'revoked']);
+    expect(DB::table('audit_events')->where('event', 'account.deleted')->count())->toBe(1);
+});
+
 afterEach(function () {
     // Disposable kody_test only; production down migrations preserve credential history.
     $this->artisan('migrate:fresh')->assertSuccessful();

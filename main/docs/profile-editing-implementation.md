@@ -89,7 +89,9 @@ authenticated browser visual checks and deployment remain unverified.
 ## Next implementation prompt
 
 The owner deferred F01 purchases; see the [deferred-feature register](deferred-features.md).
-Continue A07 own-account archival with password confirmation, current session
-checks and A04 recovery eligibility preserved. Before later paid purchases,
+A07 archival and the first content-free account deletion release now exist; see
+[archival](account-archival-implementation.md) and
+[deletion](account-deletion-plan.md). Continue A09/G05 Contributor applications
+after resolving the documented eligibility and text-length conflicts. Before later paid purchases,
 obtain exact package prices/currency/quantities, use server-owned snapshots and
 an idempotent ledger, and credit only after a verified provider callback.

@@ -34,6 +34,7 @@ class User extends Authenticatable
             'login_locked_until' => 'immutable_datetime',
             'last_login_at' => 'immutable_datetime',
             'profile_version' => 'integer',
+            'anonymized_at' => 'immutable_datetime',
             'active_session_expires_at' => 'immutable_datetime',
         ];
     }

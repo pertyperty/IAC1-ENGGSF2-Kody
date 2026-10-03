@@ -173,6 +173,14 @@ Paid purchases and other postponed scope are tracked in the
 Learners, Contributors and Instructors can archive their own accounts with
 password confirmation, retaining data and returning through A04 recovery.
 See [A07 archival scope](docs/account-archival-implementation.md).
+Participant accounts without authored modules, courses or challenges can request
+permanent deletion at `/account/delete`, using password and explicit confirmation.
+Active evaluations must finish first; Archived users reactivate through A04 first.
+Deletion removes private learning/submission records and revokes sessions. Private
+credential files use encrypted, retryable cleanup records. Keep database workers
+and the scheduler running; `php artisan kody:account-erasures-retry` requeues
+unfinished cleanup without duplicating pending jobs. See
+[deletion scope and operational limits](docs/account-deletion-plan.md).
 
 The target is Linux EC2, Nginx/PHP-FPM with PHP 8.4.1+, RDS PostgreSQL and S3 where required.
 Set `APP_ENV=production`, `APP_DEBUG=false`, a stable managed `APP_KEY`, HTTPS

@@ -21,5 +21,6 @@
     @can('viewAny', \App\Models\LearningModule::class)<p class="secondary-link"><a href="{{ route('module-reviews.index') }}">Review adventures</a></p>@endcan
     <p class="secondary-link"><a href="{{ route('notifications.index') }}">Your updates</a></p>
     @can('archive', auth()->user())<p class="secondary-link"><a href="{{ route('account.archive') }}">Take a break: archive your account</a></p>@endcan
+    @can('delete', auth()->user())<p class="secondary-link"><a href="{{ route('account.delete') }}">Permanently delete your account</a></p>@endcan
     <p class="secondary-link"><a href="{{ route('dashboard') }}">Back to your account home</a></p>
 @endsection

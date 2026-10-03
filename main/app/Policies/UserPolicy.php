@@ -18,4 +18,9 @@ class UserPolicy
     {
         return $this->update($actor, $account) && in_array($actor->account_role, [Role::Learner, Role::Contributor, Role::Instructor], true);
     }
+
+    public function delete(User $actor, User $account): bool
+    {
+        return $this->archive($actor, $account);
+    }
 }

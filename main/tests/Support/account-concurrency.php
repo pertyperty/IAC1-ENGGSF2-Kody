@@ -10,6 +10,7 @@ use App\Models\LearningModule;
 use App\Models\User;
 use App\Models\WeeklyEvent;
 use App\Services\Account\AccountArchival;
+use App\Services\Account\AccountDeletion;
 use App\Services\Account\AccountRecoveryService;
 use App\Services\Account\EmailVerificationService;
 use App\Services\Account\InstructorApplications;
@@ -46,6 +47,15 @@ try {
     $session->start();
 
     $result = match ($argv[1]) {
+        'account-delete' => (function () use ($input): string {
+            try {
+                app(AccountDeletion::class)->delete(User::findOrFail($input['actor_id']), $input['session_id'], $input['data']);
+
+                return 'deleted';
+            } catch (AuthorizationException) {
+                return 'revoked';
+            }
+        })(),
         'account-archive' => (function () use ($input): string {
             try {
                 app(AccountArchival::class)->archive(User::findOrFail($input['actor_id']), $input['session_id'], $input['data']);

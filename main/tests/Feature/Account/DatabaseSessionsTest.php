@@ -10,6 +10,15 @@ use Tests\TestCase;
 
 uses(RefreshDatabase::class);
 
+test('Delete Account removes authenticated database sessions and prevents old-browser access', function () {
+    $user = User::factory()->create();
+    databaseBrowserRequest($this, 'post', route('login.store'), ['email' => $user->email, 'password' => 'password']);
+    $oldBrowser = session()->getId();
+    databaseBrowserRequest($this, 'post', route('account.delete.store'), deletionData($user), $oldBrowser)->assertRedirect(route('login'));
+    $this->assertDatabaseMissing('sessions', ['id' => $oldBrowser]);
+    databaseBrowserRequest($this, 'get', route('account.show'), sessionId: $oldBrowser)->assertRedirect(route('login'));
+});
+
 test('A07 archival removes database sessions and the old browser cannot access its profile', function () {
     $user = User::factory()->create();
     databaseBrowserRequest($this, 'post', route('login.store'), ['email' => $user->email, 'password' => 'password']);
