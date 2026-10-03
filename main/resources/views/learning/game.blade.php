@@ -1,4 +1,4 @@
-<section class="game-card" data-coding-game="{{ json_encode($game, JSON_THROW_ON_ERROR) }}" aria-label="{{ $game['title'] }} coding game">
+<section class="game-card" data-coding-game="{{ json_encode($game, JSON_THROW_ON_ERROR) }}" @if(isset($module)) data-completion-url="{{ route('play.game', $module) }}" @endif aria-label="{{ $game['title'] }} coding game">
     <div class="game-heading"><div><span class="game-kicker">A LITTLE CODING ADVENTURE</span><h2>{{ $game['title'] }} <span aria-hidden="true">✿</span></h2></div><span class="game-badge">{{ ($trial ?? false) ? 'FREE TO TRY' : 'PRACTICE' }}</span></div>
     <div class="game-world"><div class="world-label"><span>Guide Kody to the flag</span><span data-game-progress>Ready to explore</span></div><div class="game-board" data-game-board role="img" aria-label="Garden path. Kody starts at the left. The flag is on the right."></div></div>
     <div class="game-controls"><div class="game-instructions"><span class="step-pill">{{ $game['concept'] }}</span><p>{{ $game['instructions'] }}</p></div>

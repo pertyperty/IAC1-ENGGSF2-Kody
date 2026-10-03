@@ -101,6 +101,11 @@ Subsequent account slices are documented in
 [A03 login](login-implementation.md), including their approved amendments and
 actual scope. Those implementations do not establish unmeasured NFR compliance.
 
+[A04/A05 recovery/profile](recovery-profile-implementation.md) and the
+[play implementation](play-implementation.md) document the subsequent tested
+slices. The play hub now records server-validated daily streaks and level
+clearance; it does not yet issue XP, ranks, KodeBits or creator-published content.
+
 Requirement conflict detected:
 
 - SRS: 3.1.1 Code Execution API lists Python, Java, C++, JavaScript and PHP;

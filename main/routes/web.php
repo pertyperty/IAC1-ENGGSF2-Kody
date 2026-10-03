@@ -6,6 +6,7 @@ use App\Http\Controllers\Account\ProfileController;
 use App\Http\Controllers\Account\RecoveryController;
 use App\Http\Controllers\Account\RegistrationController;
 use App\Http\Controllers\LearningController;
+use App\Http\Controllers\PlayController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [LearningController::class, 'home'])->name('home');
@@ -28,6 +29,8 @@ Route::middleware('guest')->group(function (): void {
     Route::post('/email/verification-link', [EmailVerificationController::class, 'resend'])->middleware('throttle:6,1')->name('verification.resend');
 });
 Route::post('/email/verify', [EmailVerificationController::class, 'verify'])->middleware('throttle:30,1')->name('verification.verify');
-Route::view('/dashboard', 'account.dashboard')->middleware(['auth', 'account.session'])->name('dashboard');
+Route::get('/dashboard', [PlayController::class, 'hub'])->middleware(['auth', 'account.session'])->name('dashboard');
+Route::post('/play/{level}/game', [PlayController::class, 'game'])->middleware(['auth', 'account.session', 'throttle:20,1,play-game:'])->name('play.game');
+Route::post('/play/{level}/quiz', [PlayController::class, 'quiz'])->middleware(['auth', 'account.session', 'throttle:20,1,play-quiz:'])->name('play.quiz');
 Route::get('/account', ProfileController::class)->middleware(['auth', 'account.session'])->name('account.show');
 Route::post('/logout', [LoginController::class, 'destroy'])->middleware('auth')->name('logout');

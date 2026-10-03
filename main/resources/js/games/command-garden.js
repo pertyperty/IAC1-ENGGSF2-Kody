@@ -1,3 +1,5 @@
+import { saveCompletion } from './save-completion.js';
+
 const moves = Object.freeze({ up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] });
 const key = ([x, y]) => `${x},${y}`;
 
@@ -126,6 +128,10 @@ export function mountGarden(root) {
                 programTrack.querySelectorAll('.program-step').forEach((step, index) => step.classList.toggle('executing', index === frame.index));
             }
             feedback.textContent = result.message; success.hidden = !result.success;
+            if (result.success) {
+                const saved = await saveCompletion(root, { program, repeat: !!root.querySelector('[data-game-repeat]')?.checked, conditional: !!root.querySelector('[data-game-conditional]')?.checked });
+                if (saved) feedback.textContent = `${result.message} ${saved}`;
+            }
             progress.textContent = result.success ? 'Adventure complete ✦' : 'Try another idea';
         } finally {
             running = false;

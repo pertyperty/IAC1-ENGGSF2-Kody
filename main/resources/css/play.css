@@ -145,3 +145,20 @@
 .game-instructions p, .game-feedback { font-size: 12px; color: #5e704f; }
 .game-caption, .hero-note, .catalog-note { color: #5e704f; }
 .game-controls .program-track { color: #667659; }
+.play-hub { padding-top: 45px; padding-bottom: 70px; }
+.progress-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin: 35px 0 20px; }
+.progress-stats > div { border: 1px solid #dce5d2; background: #f1f6e8; border-radius: 18px; padding: 25px; }
+.progress-stats > div:nth-child(2) { background: #fff0e2; border-color: #ecdbc7; }
+.progress-stats > div:nth-child(3) { background: #f1ebfa; border-color: #e0d7eb; }
+.progress-stats span { font-size: 12px; color: #6e805c; }
+.progress-stats b { display: block; font-size: 40px; margin: 12px 0; letter-spacing: -1px; }
+.progress-stats small { font-size: 14px; font-weight: 500; letter-spacing: 0; }
+.progress-stats p { color: #68765d; font-size: 12px; margin: 0; }
+.level-ladder { display: grid; gap: 18px; padding: 30px 0; }
+.ladder-card { display: grid; grid-template-columns: 70px 1fr 180px; gap: 24px; align-items: center; padding: 25px; background: white; border: 1px solid #dce4d4; border-radius: 18px; }
+.level-number { border-radius: 18px; background: #e8f3d9; display: grid; place-items: center; height: 65px; font-size: 26px; color: #6d8d4d; font-weight: 650; }
+.peach .level-number { background: #ffe9d3; color: #a47f5c; }.lavender .level-number { background: #eee6f8; color: #977eb2; }
+.ladder-card h2 { font-size: 24px; letter-spacing: -.5px; margin: 8px 0; }.ladder-card p { color: #6e7c62; font-size: 12px; line-height: 1.8; margin: 0; }
+.level-state { display: block; color: #748663; font-size: 11px; margin-top: 14px; line-height: 1.7; }.level-locked { background: #f5f6f0; }.level-locked .level-number { background: #e6e9de; color: #7f8b74; }
+.hub-logout { background: none; border: 0; cursor: pointer; padding: 0; margin-top: 20px; }
+@media (max-width: 760px) { .progress-stats { gap: 10px; }.progress-stats > div { padding: 15px; }.progress-stats b { font-size: 30px; }.progress-stats small { display: block; font-size: 11px; }.progress-stats p { display: none; }.ladder-card { grid-template-columns: 50px 1fr; gap: 15px; padding: 20px; }.ladder-card > div:last-child { grid-column: 2; }.level-number { height: 50px; font-size: 23px; } }

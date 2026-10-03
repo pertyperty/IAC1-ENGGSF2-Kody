@@ -3,12 +3,14 @@
 use App\Enums\AccountStatus;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 uses(RefreshDatabase::class);
 
 test('game-first amendment offers a public playable trial and separate learning tab', function () {
     $this->get(route('home'))->assertOk()->assertSee('data-coding-game', false)->assertSee('Run my code')->assertSee('Logic Garden')
-        ->assertSee(route('learning.catalog'))->assertSee('Daily streaks and a level ladder are coming');
+        ->assertSee(route('learning.catalog'))->assertSee('Sign in to build a daily streak');
     $this->assertDatabaseCount('users', 0);
 });
 
@@ -31,6 +33,9 @@ test('guest module access redirects to sign-in with registration available', fun
 
 test('authenticated module games use the correct template instance and remain practice only', function (string $slug) {
     $user = User::factory()->create();
+    foreach (array_slice(['sequences', 'loops', 'conditions'], 0, array_search($slug, ['sequences', 'loops', 'conditions'])) as $previous) {
+        DB::table('learning_level_completions')->insert(['id' => (string) Str::uuid(), 'user_id' => $user->id, 'level' => $previous, 'template_version' => 1, 'completed_at' => now()]);
+    }
     $this->post(route('login.store'), ['email' => $user->email, 'password' => 'password']);
     $this->withCookie(config('session.cookie'), session()->getId());
     $this->get(route('learning.show', $slug))->assertOk()->assertSee(config('learning.instances.'.$slug.'.title'))

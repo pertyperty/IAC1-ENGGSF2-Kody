@@ -58,3 +58,14 @@ test('a different creator scenario can use the same mechanics', () => {
     assert.equal(runProgram(custom, ['right', 'right']).success, true);
     assert.equal(runProgram(custom, ['right']).success, false);
 });
+
+test('browser preview and authoritative PHP evaluator agree on success and failure', () => {
+    const cases = [];
+    for (const level of Object.keys(instances)) {
+        for (const program of [[], ['right'], ['up'], ['right', 'right', 'up', 'right', 'right'], ['right', 'up', 'right'], ['left', 'right'], Array(13).fill('right'), ['constructor']]) {
+            for (const repeat of [false, true]) for (const conditional of [false, true]) cases.push({ level, program, repeat, conditional });
+        }
+    }
+    const server = JSON.parse(execFileSync(process.env.KODY_TEST_PHP || 'php', ['tests/Support/game-evaluation.php'], { input: JSON.stringify(cases), encoding: 'utf8' }));
+    assert.deepEqual(server, cases.map(({level, program, repeat, conditional}) => runProgram(instances[level], program, {repeat, conditional}).success));
+});

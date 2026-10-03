@@ -13,6 +13,15 @@ use Symfony\Component\Process\Process;
 
 uses(DatabaseMigrations::class);
 
+test('game-first progression overlapping wins cannot duplicate daily streak or level grants', function () {
+    $user = User::factory()->create(['active_session_hash' => hash('sha256', 'test-learning-session'), 'active_session_expires_at' => now()->addHour()]);
+    $results = simultaneousAccountRequests('learning-complete', ['user_id' => $user->id, 'session_id' => 'test-learning-session'], fn () => User::whereKey($user->id)->lockForUpdate()->first());
+    expect($results)->toBe(['saved', 'saved']);
+    $this->assertDatabaseCount('learning_activity_days', 1);
+    $this->assertDatabaseCount('learning_level_completions', 1);
+    $this->assertDatabaseHas('learning_progress', ['user_id' => $user->id, 'current_streak' => 1, 'longest_streak' => 1]);
+});
+
 test('A04 simultaneous recovery requests cannot exceed the hourly cap', function () {
     $user = User::factory()->create();
     app(AccountRecoveryService::class)->request($user);

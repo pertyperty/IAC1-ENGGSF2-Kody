@@ -85,5 +85,7 @@ learning and qualifies daily activity without skipping a game objective.
 - Creator moderation, allowed attachments and approved quiz/game scoring rules.
 - Existing SRS language-list, application-state and account-deletion conflicts.
 
-These decisions do not block the public trial, template contract or catalog UI.
+Streak and level-unlock rules above are now resolved and implemented; the
+remaining scoring/publication decisions do not block the public trial,
+template contract or catalog UI. See [implementation scope](play-implementation.md).
 Record an explicit amendment when they are resolved.
