@@ -128,9 +128,10 @@ unverified. No production credentials or provider calls were used in tests.
 Primary integration references: [Google OpenID Connect](https://developers.google.com/identity/openid-connect/openid-connect)
 and the installed [Laravel Socialite source](https://github.com/laravel/socialite/tree/v5.31.0).
 
-Next: privately configure the Google OAuth Web application and run the documented
-staging/local round trips before activation. If the owner defers Google setup,
-record that alongside the existing deferred integrations and continue an
-independent requirement. Google-only registration needs an explicit profile,
+The owner deferred private Google setup and live verification after implementation.
+See the [deferred register](deferred-features.md); keep Google disabled and continue
+independent development without repeatedly asking for credentials. Resume with the
+documented local/staging round trips when the owner is ready.
+Google-only registration needs an explicit profile,
 password/recovery and registration policy before implementation. Purchases,
 numeric ratings, rewards and live Judge0 retain their existing deferrals.

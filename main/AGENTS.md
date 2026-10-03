@@ -9,6 +9,9 @@ or create Google-only accounts; new registration remains A01/A02. All five roles
 retain the existing account-status, lockout and single-session rules. Linking and
 unlinking are sensitive account changes and revoke sessions. See
 [Google authentication](docs/google-authentication-implementation.md).
+The owner subsequently deferred Google OAuth configuration/live verification.
+Keep it disabled and track setup in the [deferred register](docs/deferred-features.md);
+continue independent development without requesting those credentials again.
 
 The owner approved B10 one replaceable Like/Helpful/Favorite reaction per user
 and content, with removal; numeric ratings are deferred. The owner delegated the
