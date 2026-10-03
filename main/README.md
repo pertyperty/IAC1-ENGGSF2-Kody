@@ -6,6 +6,12 @@ layered over playable experiences. See the approved
 modular monolith; business use cases are implemented incrementally.
 Read `AGENTS.md` and [architecture conventions](docs/architecture.md) first.
 
+[Content feedback](docs/content-feedback-implementation.md) lets verified Active
+Learners, Contributors and Instructors choose one Like, Helpful or Favorite after
+opening available content. Enrolled courses also accept feedback; choices can be
+replaced or removed without interrupting game practice. Numeric ratings and
+rewards remain deferred. Deploy the additive feedback migration and rebuild assets.
+
 ## Development setup
 
 Commands below run from the Laravel directory (`main/` in this repository).

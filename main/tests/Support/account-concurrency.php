@@ -29,6 +29,7 @@ use App\Services\Challenges\ChallengeSubmissions;
 use App\Services\Content\CourseLearning;
 use App\Services\Content\CoursePublishing;
 use App\Services\Content\ModulePublishing;
+use App\Services\Engagement\ContentFeedback;
 use App\Services\Games\GamePresets;
 use App\Services\Gamification\LearningProgression;
 use App\Services\Gamification\WeeklyEvents;
@@ -57,6 +58,13 @@ try {
     $session->start();
 
     $result = match ($argv[1]) {
+        'content-react' => (function () use ($input, $argv): string {
+            $index = (int) $argv[3] - 1;
+            app(ContentFeedback::class)->change(User::findOrFail($input['actor_ids'][$index]), 'module-test-session',
+                'module', $input['module_id'], $input['version'], $input['reactions'][$index]);
+
+            return 'saved';
+        })(),
         'faq-change' => (function () use ($input, $argv): string {
             $actor = User::findOrFail($input['actor_ids'][(int) $argv[3] - 1]);
             $entry = FaqEntry::findOrFail($input['entry_id']);

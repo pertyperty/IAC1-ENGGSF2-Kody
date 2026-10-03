@@ -9,6 +9,7 @@ use App\Models\CodingChallenge;
 use App\Models\WeeklyEvent;
 use App\Services\Challenges\ChallengeSubmissions;
 use App\Services\Challenges\Judge0\ProviderReadiness;
+use App\Services\Engagement\ContentFeedback;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -31,7 +32,7 @@ class WeeklyChallengeController extends Controller
         return response()->view('weekly.index', compact('current', 'attempts'))->header('Cache-Control', 'no-store, private');
     }
 
-    public function show(Request $request, WeeklyEvent $weeklyEvent): Response
+    public function show(Request $request, WeeklyEvent $weeklyEvent, ContentFeedback $feedbackService): Response
     {
         abort_unless(WeeklyEvent::open()->whereKey($weeklyEvent->id)->exists(), 404);
         $revision = $weeklyEvent->revision()->where('review_status', 'Approved')->firstOrFail(['id', 'title', 'description', 'language', 'difficulty', 'rules', 'input_format', 'output_format', 'cpu_time_ms', 'memory_kib']);
@@ -42,8 +43,9 @@ class WeeklyChallengeController extends Controller
         $confirmationId = (string) Str::uuid();
         $attemptAction = route('weekly-events.attempt', $weeklyEvent);
         $attemptScope = 'this weekly event. Your standard quest attempts are separate';
+        $feedback = $feedbackService->read($request->user(), $request->session()->getId(), 'challenge', $weeklyEvent->challenge_id, true);
 
-        return response()->view('weekly.play', compact('weeklyEvent', 'revision', 'samples', 'participation', 'attempts', 'ready', 'confirmationId', 'attemptAction', 'attemptScope'))->header('Cache-Control', 'no-store, private');
+        return response()->view('weekly.play', compact('weeklyEvent', 'revision', 'samples', 'participation', 'attempts', 'ready', 'confirmationId', 'attemptAction', 'attemptScope', 'feedback'))->header('Cache-Control', 'no-store, private');
     }
 
     public function store(SubmitCodeRequest $request, WeeklyEvent $weeklyEvent, ChallengeSubmissions $submissions): RedirectResponse

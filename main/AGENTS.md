@@ -2,6 +2,14 @@
 
 ## Mission
 
+The owner approved B10 one replaceable Like/Helpful/Favorite reaction per user
+and content, with removal; numeric ratings are deferred. The owner delegated the
+prior-access policy to platform judgment: verified Active Learners, Contributors
+and Instructors need current access and a server-recorded authorized opening or
+validated completion. Course reactions also require enrollment. Catalog browsing,
+creator/staff previews and browser assertions do not qualify. See
+[content feedback](docs/content-feedback-implementation.md).
+
 ### Product direction amendment — approved 2026-10-03
 
 Kody is a game-first coding platform. The project owner explicitly approved this

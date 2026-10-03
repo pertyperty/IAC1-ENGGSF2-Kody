@@ -103,7 +103,7 @@ class AccountDeletion
         $enrollments = DB::table('course_enrollments')->where('user_id', $user->id)->select('id');
         DB::table('course_module_progress')->whereIn('enrollment_id', $enrollments)->delete();
         DB::table('course_enrollments')->where('user_id', $user->id)->delete();
-        foreach (['learning_activity_days', 'learning_level_completions', 'learning_progress', 'email_verifications', 'verification_deliveries', 'account_recoveries'] as $table) {
+        foreach (['content_accesses', 'content_reactions', 'learning_activity_days', 'learning_level_completions', 'learning_progress', 'email_verifications', 'verification_deliveries', 'account_recoveries'] as $table) {
             DB::table($table)->where('user_id', $user->id)->delete();
         }
         DB::table('notifications')->where('notifiable_id', $user->id)->delete();

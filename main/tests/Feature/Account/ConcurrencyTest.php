@@ -13,6 +13,7 @@ use App\Services\Administration\ModeratorAppointments;
 use App\Services\Challenges\ChallengePublishing;
 use App\Services\Content\CoursePublishing;
 use App\Services\Content\ModulePublishing;
+use App\Services\Engagement\ContentFeedback;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
@@ -20,6 +21,25 @@ use Illuminate\Support\Facades\Storage;
 use Symfony\Component\Process\Process;
 
 uses(DatabaseMigrations::class);
+
+test('B10 simultaneous reactions serialize duplicate retries competing choices and independent users', function (string $case) {
+    $item = moduleFixture(true);
+    $first = moduleAccount(Role::Learner);
+    $second = $case === 'independent' ? moduleAccount(Role::Learner) : $first;
+    $service = app(ContentFeedback::class);
+    foreach ([$first, $second] as $user) {
+        $service->read($user, 'module-test-session', 'module', $item->id, true);
+    }
+    $results = simultaneousAccountRequests('content-react', ['actor_ids' => [$first->id, $second->id], 'module_id' => $item->id,
+        'version' => 0, 'reactions' => ['Like', $case === 'competing' ? 'Helpful' : 'Like']],
+        fn () => $item->newQuery()->whereKey($item->id)->lockForUpdate()->first());
+    sort($results);
+    expect($results)->toBe($case === 'competing' ? ['duplicate', 'saved'] : ['saved', 'saved']);
+    expect(DB::table('content_reactions')->count())->toBe($case === 'independent' ? 2 : 1);
+    expect(DB::table('content_reactions')->where('record_version', '!=', 1)->count())->toBe(0);
+    $state = $service->read($first, 'module-test-session', 'module', $item->id);
+    expect(array_sum($state['counts']))->toBe($case === 'independent' ? 2 : 1);
+})->with(['duplicate', 'competing', 'independent']);
 
 test('G12 G13 simultaneous FAQ confirmations commit one content version and audit', function (string $action) {
     $entry = faqFixture();
