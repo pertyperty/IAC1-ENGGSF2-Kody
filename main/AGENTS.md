@@ -121,6 +121,11 @@ authored modules/courses/challenges; creator deletion awaits retention/removal
 rules. The owner approved waiting for Queued/Evaluating submissions to finish
 before deletion removes submission data. See [the deletion plan](docs/account-deletion-plan.md).
 
+For A09/G05 Contributor applications, the owner approved 500-character application
+messages and reviewer feedback with matching storage, resolving the dictionary's
+varchar(255)/500-character conflict. Eligibility thresholds remain unresolved; see
+[the Contributor application plan](docs/contributor-application-plan.md).
+
 You are working on **Kody: Gamified Programming Learning Platform and Course Management System (K:GPLPCMS)**.
 
 This repository is a real Laravel application intended for deployment. Treat every production-bound change as maintainable software, not as tutorial, demo, or throwaway coursework.

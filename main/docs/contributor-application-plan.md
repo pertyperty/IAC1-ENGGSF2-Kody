@@ -14,13 +14,16 @@ apply, with distinct server-validated module completions and passed challenges;
 repeated revisions/weekly plays must not inflate eligibility. No eligibility
 writer is implemented until this decision is approved.
 
-The same dictionary declares request_message and moderator_feedback as
-varchar(255), while their domain rules permit 500 characters. Asked the owner
-whether matching 500-character columns and validation should resolve this.
+## Approved text constraints
+
+The owner approved 500-character limits for request_message and moderator_feedback,
+with matching database columns and validation. This resolves the dictionary's
+varchar(255) versus maximum-500-character conflict. Eligibility remains pending;
+this approval does not resolve the completion thresholds.
 
 ## Proposed implementation prompt
 
-After the owner resolves these conflicts, inspect existing creator applications,
+After the owner resolves eligibility, inspect existing creator applications,
 private credential storage, notification delivery, session locks and audit
 boundaries. Implement verified Active Learner admission with server-computed
 eligibility, optional portfolio URL, private validated supporting credentials
