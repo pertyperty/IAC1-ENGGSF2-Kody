@@ -35,8 +35,8 @@ learner audit references; it preserves all stored history.
 
 Commands below run from the Laravel directory (`main/` in this repository).
 
-Requirements: Composer 2; PHP 8.4.1+ for the locked runtime and test dependencies
-(application declaration remains PHP ^8.3); Node 22.12+ with npm; PostgreSQL 17
+Requirements: Composer 2; PHP 8.4.1+ (within PHP 8.x) for application, development
+and tests; Node 22.12+ with npm; PostgreSQL 17
 (CI's baseline). Enable PHP ctype, curl, dom, fileinfo, filter, intl, mbstring,
 openssl, PDO/pdo_pgsql, tokenizer, xml and zip. Use `composer check-platform-reqs`
 to verify the actual lock file. Do not downgrade dependencies to suit old XAMPP.

@@ -182,9 +182,8 @@ The supplied SRS 4.2 states 99.9% uptime; no alternate numeric target was found
 in the reviewed foundation sections. Do not assert a conflict or compliance
 without source evidence and measurement.
 
-Technology mismatch: composer.json declares PHP ^8.3, but locked Symfony 8.1
-runtime packages and PHPUnit 13 require PHP >=8.4.1. Dependencies are preserved;
-development, CI and deployment instructions require 8.4.1+. Align the declared
-minimum in a separate dependency-baseline decision if PHP 8.3 support is required.
-The exact locked versions and proposed options are recorded in the
-[pending runtime decision](runtime-baseline-decision.md).
+The owner approved PHP 8.4.1+ on 2026-10-04. The root requirement is `^8.4.1`,
+matching the minimum required by locked Symfony 8.1 and PHPUnit 13 packages.
+Application, development, test and deployment documentation share this minimum;
+CI uses PHP 8.4. Existing dependency versions are preserved. See the
+[approved runtime decision](runtime-baseline-decision.md).

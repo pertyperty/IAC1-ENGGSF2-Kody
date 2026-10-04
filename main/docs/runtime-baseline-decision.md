@@ -1,7 +1,8 @@
-# Pending PHP runtime baseline decision
+# Approved PHP runtime baseline decision
 
-The repository's declared application minimum is PHP `^8.3` in composer.json and
-the verified technology baseline in AGENTS.md. The locked packages currently are:
+On 2026-10-04, the owner approved PHP 8.4.1+ in chat. Application, development,
+tests and production PHP-FPM now require `^8.4.1` (PHP 8.4.1 or newer within PHP
+8.x), superseding the previous `^8.3` baseline. Locked versions are preserved:
 
 | Package | Locked version | PHP requirement |
 | --- | --- | --- |
@@ -10,19 +11,24 @@ the verified technology baseline in AGENTS.md. The locked packages currently are
 | Pest | v5.2.1 | ^8.4 |
 | PHPUnit | 13.3.4 | >=8.4.1 |
 
-Source: installed composer.lock, checked locally on 2026-10-03. README and CI
-already use PHP 8.4, and local verification uses PHP 8.4.26. PHP 8.3 cannot install
-the current locked runtime/test dependencies, regardless of the root declaration.
-The mismatch was previously recorded in architecture.md; it remains unresolved.
+Source: composer.lock, checked locally on 2026-10-04. PHP 8.3 cannot install
+these locked runtime/test dependencies. Updating the root requirement and lock
+metadata resolves that mismatch without upgrading or downgrading packages.
 
-Recommended: adopt PHP 8.4.1+ as the supported application/development/test baseline,
-update the root requirement to `^8.4.1`, align AGENTS.md and setup/deployment docs,
-and preserve the tested dependency versions. This changes the stated minimum;
-the owner should confirm that team and deployment runtimes can follow it.
+AGENTS.md, README and architecture guidance reflect the approved minimum. CI
+already selects PHP 8.4; local verification uses PHP 8.4.26. Teams must use a
+compatible runtime for Composer, Artisan, web serving and queue workers.
+Composer platform checks must pass without ignoring platform requirements.
 
-Alternative: require actual PHP 8.3 support and reassess compatible locked packages
-and test tooling. Pest 5 cannot remain in a PHP 8.3 test environment. This requires
-a separate dependency change, compatibility review, audits and full regression.
+This decision does not change a deployed runtime or certify every future PHP
+release. Validate runtime upgrades before deployment. There are no schema,
+authorization or business-rule changes.
 
-No dependency downgrade, minimum-version change or production runtime change is
-made while the decision is pending. The Google setup deferral remains separate.
+Provider setup deferrals, including Google OAuth and Judge0, remain separate.
+
+Verification on PHP 8.4.26: strict Composer validation, locked platform checks,
+install dry-run and dependency audit passed (no reported vulnerability advisories).
+All 137 locked package records are unchanged; only the content hash and root PHP
+platform constraint changed. Health and password-hashing regression checks passed
+(5 tests, 23 assertions), as did Pint and the whitespace check. Remote CI and
+production runtime validation remain separate from these local checks.

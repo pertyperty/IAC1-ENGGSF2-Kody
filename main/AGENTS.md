@@ -243,7 +243,8 @@ Known inconsistencies may exist in the source documents, including availability 
 
 The current repository uses:
 
-- PHP `^8.3`
+- PHP `^8.4.1` (owner-approved on 2026-10-04; see
+  [runtime baseline decision](docs/runtime-baseline-decision.md))
 - Laravel Framework `^13.17`
 - Laravel Boost `^2.2`
 - Pest `^5.2`
