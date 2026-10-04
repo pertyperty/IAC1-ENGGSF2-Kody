@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\HealthController;
+use App\Http\Controllers\Transactions\PaymentController;
 use App\Http\Middleware\EnsureActiveAccountSession;
 use App\Http\Middleware\GoogleCallbackPrivacy;
 use Illuminate\Foundation\Application;
@@ -16,6 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         then: function (): void {
             // Probes must not depend on database-backed sessions or CSRF state.
+            Route::post('/webhooks/xendit', [PaymentController::class, 'webhook'])->middleware(ThrottleRequests::class.':600,1')->name('xendit.webhook');
             Route::get('/up', [HealthController::class, 'live'])->name('health.live');
             Route::get('/ready', [HealthController::class, 'ready'])->name('health.ready');
         },
@@ -29,7 +31,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->trimStrings(except: ['test_cases.*.input', 'test_cases.*.expected_output', 'source_code']);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        $exceptions->dontFlash(['verification_token', 'recovery_token', 'source_code', 'code', 'state', 'access_token', 'id_token', 'client_secret', 'code_verifier']);
+        $exceptions->dontFlash(['verification_token', 'recovery_token', 'source_code', 'code', 'state', 'access_token', 'id_token', 'client_secret', 'code_verifier', 'mobile', 'street', 'city', 'province', 'postal_code', 'account_holder_name']);
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );

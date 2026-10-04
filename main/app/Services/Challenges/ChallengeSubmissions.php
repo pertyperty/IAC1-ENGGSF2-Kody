@@ -13,6 +13,8 @@ use App\Services\Account\CurrentAccountSession;
 use App\Services\Administration\AuditRecorder;
 use App\Services\Challenges\Judge0\ProviderReadiness;
 use App\Services\Gamification\WeeklyEvents;
+use App\Services\Operations\BudgetAdmission;
+use App\Services\Transactions\ContentAccess;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Queue;
@@ -70,6 +72,10 @@ class ChallengeSubmissions
             $cases = $revision->testCases()->get(['id', 'revision_id']);
             if ($cases->isEmpty()) {
                 throw ValidationException::withMessages(['challenge' => 'This quest is unavailable. No attempt was used.']);
+            }
+            app(BudgetAdmission::class)->assert('challenge');
+            if ($event === null) {
+                app(ContentAccess::class)->assertAccessible($user, 'challenge', $current, $revision);
             }
             app(CurrentAccountSession::class)->assert($user, $sessionId);
             $participationId = $participation?->id ?? DB::table('challenge_participations')->insertGetId([

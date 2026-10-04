@@ -1,5 +1,10 @@
 # Weekly coding events — E02, C03/C04/B07
 
+> Later amendment (2026-10-04): the owner delegated economy, XP/rank/reward,
+> reviewed paid access and creator-retention decisions. See [current policies](economy-and-launch-decisions.md)
+> and [implementation](economy-implementation.md). Earlier first-release deferrals below
+> are historical; live providers/staging and numeric ratings remain deferred.
+
 ## Approved scope and decisions
 
 Gamification owns weekly configuration and lifecycle; Challenge Management owns

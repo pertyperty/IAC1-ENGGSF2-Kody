@@ -8,6 +8,7 @@ use App\Jobs\Account\EraseAccountFile;
 use App\Models\AccountFileErasure;
 use App\Models\User;
 use App\Services\Administration\AuditRecorder;
+use App\Services\Transactions\WalletLedger;
 use App\Support\AccountPasswords;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
@@ -48,7 +49,16 @@ class AccountDeletion
                     throw ValidationException::withMessages(['current_password' => 'Confirm deletion and enter your current password.']);
                 }
                 if ($this->hasAuthoredContent($user)) {
-                    throw ValidationException::withMessages(['account' => 'Deletion for accounts with authored content is unavailable until retention rules are defined.']);
+                    app(CreatorErasure::class)->consume($user, in_array($data['retention_consent'] ?? null, [true, 1, '1', 'yes', 'on', 'true'], true));
+                }
+                app(WalletLedger::class)->lock();
+                if ($this->hasUnsettledFinances($user)) {
+                    throw ValidationException::withMessages(['account' => 'Settle your wallet, creator earnings and open financial requests before deleting.']);
+                }
+                foreach ([['learning_modules', 'module_revisions', 'module_id'], ['learning_courses', 'course_revisions', 'course_id'], ['coding_challenges', 'coding_challenge_revisions', 'challenge_id']] as [$table, $revisions, $foreign]) {
+                    if (DB::table($revisions)->whereIn($foreign, DB::table($table)->where('created_by', $user->id)->select('id'))->where('review_status', 'Pending')->exists()) {
+                        throw ValidationException::withMessages(['account' => 'Finish pending content review decisions before deleting.']);
+                    }
                 }
                 DB::table('challenge_participations')->where('user_id', $user->id)->lockForUpdate()->chunkById(200, function ($rows): void {
                     if (DB::table('challenge_submissions')->whereIn('participation_id', $rows->pluck('id'))->whereNull('completed_at')->exists()) {
@@ -70,6 +80,21 @@ class AccountDeletion
             Log::error('Account deletion write failed.', ['sqlstate' => $exception->getCode()]);
             throw new RuntimeException('Your account could not be deleted. Please try again.');
         }
+    }
+
+    public function hasUnsettledFinances(User $user): bool
+    {
+        if (app(WalletLedger::class)->snapshot($user->id)['balance'] > 0
+            || DB::table('publisher_earnings')->where('user_id', $user->id)->where('status', 'Available')->where(fn ($q) => $q->whereColumn('amount_minor', '>', 'claimed_minor')->orWhereColumn('kb_milli', '>', 'claimed_kb_milli'))->exists()) {
+            return true;
+        }
+        foreach (['payment_purchases', 'payout_requests', 'refund_requests'] as $table) {
+            if (DB::table($table)->where('user_id', $user->id)->whereNotIn('state', ['Succeeded', 'Failed', 'Rejected', 'Refunded', 'Reversed'])->exists()) {
+                return true;
+            }
+        }
+
+        return DB::table('financial_remedy_cases')->where('user_id', $user->id)->whereIn('state', ['Open', 'Review'])->exists();
     }
 
     private function removePrivateData(User $user): void
@@ -103,10 +128,14 @@ class AccountDeletion
         $enrollments = DB::table('course_enrollments')->where('user_id', $user->id)->select('id');
         DB::table('course_module_progress')->whereIn('enrollment_id', $enrollments)->delete();
         DB::table('course_enrollments')->where('user_id', $user->id)->delete();
-        foreach (['google_auth_attempts', 'google_identities', 'content_accesses', 'content_reactions', 'learning_activity_days', 'learning_level_completions', 'learning_progress', 'email_verifications', 'verification_deliveries', 'account_recoveries'] as $table) {
+        foreach (['xp_awards', 'xp_totals', 'google_auth_attempts', 'google_identities', 'content_accesses', 'content_reactions', 'learning_activity_days', 'learning_level_completions', 'learning_progress', 'email_verifications', 'verification_deliveries', 'account_recoveries'] as $table) {
             DB::table($table)->where('user_id', $user->id)->delete();
         }
         DB::table('notifications')->where('notifiable_id', $user->id)->delete();
+        DB::table('content_entitlements')->where('user_id', $user->id)->whereIn('source', ['Free', 'Legacy'])->delete();
+        DB::table('financial_remedy_cases')->where('user_id', $user->id)->update(['message' => '[Removed after account deletion]', 'review_notes' => null]);
+        DB::table('refund_requests')->where('user_id', $user->id)->update(['reason' => '[Removed after account deletion]', 'review_notes' => null]);
+        DB::table('creator_erasure_reviews')->where('user_id', $user->id)->update(['review_notes' => null]);
     }
 
     private function queueFile(User $user, string $disk, string $path): void

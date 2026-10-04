@@ -31,7 +31,7 @@ test('guest module access redirects to sign-in with registration available', fun
     $this->get(route('login'))->assertOk()->assertSee(route('register'));
 })->with(['sequences', 'loops', 'conditions']);
 
-test('authenticated module games use the correct template instance and remain practice only', function (string $slug) {
+test('authenticated module games use the correct template and explain first-clear XP without KodeBit rewards', function (string $slug) {
     $user = User::factory()->create();
     foreach (array_slice(['sequences', 'loops', 'conditions'], 0, array_search($slug, ['sequences', 'loops', 'conditions'])) as $previous) {
         DB::table('learning_level_completions')->insert(['id' => (string) Str::uuid(), 'user_id' => $user->id, 'level' => $previous, 'template_version' => 1, 'completed_at' => now()]);
@@ -39,7 +39,7 @@ test('authenticated module games use the correct template instance and remain pr
     $this->post(route('login.store'), ['email' => $user->email, 'password' => 'password']);
     $this->withCookie(config('session.cookie'), session()->getId());
     $this->get(route('learning.show', $slug))->assertOk()->assertSee(config('learning.instances.'.$slug.'.title'))
-        ->assertSee('data-coding-game', false)->assertSee('data-practice-quiz', false)->assertSee('doesn’t award KodeBits')->assertHeader('Cache-Control', 'no-store, private');
+        ->assertSee('data-coding-game', false)->assertSee('data-practice-quiz', false)->assertSee('20 XP')->assertSee('awards no KodeBits')->assertHeader('Cache-Control', 'no-store, private');
     $this->get(route('learning.show', 'unknown'))->assertNotFound();
 })->with(['sequences', 'loops', 'conditions']);
 

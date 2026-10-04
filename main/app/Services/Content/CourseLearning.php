@@ -3,6 +3,7 @@
 namespace App\Services\Content;
 
 use App\Models\CourseEnrollment;
+use App\Models\CourseRevision;
 use App\Models\CourseRevisionModule;
 use App\Models\LearningCourse;
 use App\Models\LearningModule;
@@ -10,34 +11,43 @@ use App\Models\User;
 use App\Services\Account\CurrentAccountSession;
 use App\Services\Administration\AuditRecorder;
 use App\Services\Gamification\LearningProgression;
+use App\Services\Transactions\ContentAccess;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
 
 class CourseLearning
 {
-    public function enroll(User $actor, string $sessionId, int $courseId, int $revisionId): CourseEnrollment
+    public function enroll(User $actor, string $sessionId, int $courseId, int $revisionId, bool $confirmed = false): CourseEnrollment
     {
-        return DB::transaction(function () use ($actor, $sessionId, $courseId, $revisionId): CourseEnrollment {
+        return DB::transaction(function () use ($actor, $sessionId, $courseId, $revisionId, $confirmed): CourseEnrollment {
             $user = $this->account($actor, $sessionId);
             $course = LearningCourse::whereKey($courseId)->lockForUpdate()->firstOrFail();
             abort_if($course->isWithdrawn(), 404);
             $existing = CourseEnrollment::where('user_id', $user->id)->where('course_id', $course->id)->first();
             if ($existing !== null && in_array($course->status, ['Published', 'Archived'], true)) {
+                if ($this->hasAccess($user, $course, $existing->revision)) {
+                    return $existing;
+                }
+                abort_unless($course->status === 'Published', 404);
+                abort_unless($existing->course_revision_id === $revisionId, 409);
+                $this->availableLessons($existing->revision);
+                $this->confirmPrice($existing->revision, $course, $confirmed);
+                app(ContentAccess::class)->admit($user, 'course', $course, $existing->revision);
+
                 return $existing;
             }
             abort_unless($course->status === 'Published' && $course->published_revision_id === $revisionId, 409, 'This course changed. Reload before enrolling.');
             $revision = $course->publishedRevision;
             abort_unless($revision?->review_status === 'Approved', 404);
-            $slots = $revision->modules()->with('revision')->get();
-            $modules = LearningModule::whereIn('id', $slots->pluck('module_id'))->orderBy('id')->lockForUpdate()->get()->keyBy('id');
-            if ($slots->isEmpty() || $slots->contains(fn ($slot) => $modules->get($slot->module_id)?->status !== 'Published' || $modules->get($slot->module_id)?->isWithdrawn() || $slot->revision->review_status !== 'Approved')) {
-                throw ValidationException::withMessages(['course' => 'An adventure in this course is unavailable. Try another journey.']);
-            }
+            $this->availableLessons($revision);
+            $this->confirmPrice($revision, $course, $confirmed);
+            $effectivePrice = app(ContentAccess::class)->price($revision, $course->created_by);
+            app(ContentAccess::class)->admit($user, 'course', $course, $revision);
             $enrollment = CourseEnrollment::create(['user_id' => $user->id, 'course_id' => $course->id,
                 'course_revision_id' => $revision->id, 'enrolled_at' => now(), 'sequential' => $revision->sequential]);
             app(AuditRecorder::class)->record($user->id, $user->id, 'course.enrolled', 'course_enrollment', (string) $enrollment->id,
-                ['course_id' => $course->id, 'revision_id' => $revision->id, 'access' => 'free']);
+                ['course_id' => $course->id, 'revision_id' => $revision->id, 'access' => $effectivePrice > 0 ? 'paid' : 'free']);
 
             return $enrollment;
         });
@@ -59,7 +69,11 @@ class CourseLearning
             $unlocked = $revision->modules->mapWithKeys(fn ($slot) => [$slot->id => ! $enrollment?->sequential
                 || $revision->modules->where('position', '<', $slot->position)->every(fn ($previous) => $progress->get($previous->id)?->completed_at !== null)]);
 
-            return compact('course', 'enrollment', 'revision', 'progress', 'unlocked');
+            $accessible = $enrollment !== null && $this->hasAccess($user, $course, $revision);
+            $price = app(ContentAccess::class)->price($revision, $course->created_by);
+            $requirements = app(ContentAccess::class)->requirements($user, $revision);
+
+            return compact('course', 'enrollment', 'revision', 'progress', 'unlocked', 'accessible', 'price', 'requirements');
         });
     }
 
@@ -121,6 +135,7 @@ class CourseLearning
         abort_unless(in_array($course->status, ['Published', 'Archived'], true), 404);
         $enrollment = CourseEnrollment::where('user_id', $user->id)->where('course_id', $course->id)->first();
         abort_unless($enrollment !== null, 403, 'Join this course to open its adventures.');
+        abort_unless($this->hasAccess($user, $course, $enrollment->revision), 403, 'Unlock this course to continue.');
         $slot = CourseRevisionModule::where('course_revision_id', $enrollment->course_revision_id)->with('revision')->findOrFail($slotId);
         $module = LearningModule::whereKey($slot->module_id)->lockForUpdate()->firstOrFail();
         abort_unless($module->status === 'Published' && ! $module->isWithdrawn() && $slot->revision->review_status === 'Approved' && $enrollment->revision->review_status === 'Approved', 404);
@@ -142,6 +157,37 @@ class CourseLearning
         } else {
             DB::table('course_module_progress')->insert(['enrollment_id' => $enrollment->id, 'assignment_id' => $slot->id,
                 'course_revision_id' => $enrollment->course_revision_id, 'first_accessed_at' => now(), 'last_accessed_at' => now()]);
+        }
+    }
+
+    private function availableLessons(CourseRevision $revision): void
+    {
+        $slots = $revision->modules()->with('revision')->get();
+        $modules = LearningModule::whereIn('id', $slots->pluck('module_id'))->orderBy('id')->lockForUpdate()->get()->keyBy('id');
+        if ($slots->isEmpty() || $slots->contains(fn ($slot) => $modules->get($slot->module_id)?->status !== 'Published' || $modules->get($slot->module_id)?->isWithdrawn() || $slot->revision->review_status !== 'Approved')) {
+            throw ValidationException::withMessages(['course' => 'An adventure in this course is unavailable. Try another journey.']);
+        }
+    }
+
+    private function hasAccess(User $user, LearningCourse $course, CourseRevision $revision): bool
+    {
+        $access = app(ContentAccess::class);
+        $row = DB::table('content_entitlements')->where('user_id', $user->id)->where('content_type', 'course')->where('content_id', $course->id)->first();
+        if ($row === null && $revision->price_kb === 0) {
+            // Existing free enrollments retain admission, including pre-amendment gates.
+            DB::table('content_entitlements')->insert(['user_id' => $user->id, 'content_type' => 'course', 'content_id' => $course->id,
+                'revision_id' => $revision->id, 'source' => 'Legacy', 'created_at' => now(), 'updated_at' => now()]);
+
+            return true;
+        }
+
+        return $access->has($user->id, 'course', $course->id);
+    }
+
+    private function confirmPrice(CourseRevision $revision, LearningCourse $course, bool $confirmed): void
+    {
+        if (! $confirmed && app(ContentAccess::class)->price($revision, $course->created_by) > 0) {
+            throw ValidationException::withMessages(['confirmed' => 'Confirm the reviewed KodeBit price before joining.']);
         }
     }
 }

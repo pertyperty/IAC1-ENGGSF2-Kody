@@ -1,7 +1,9 @@
 @extends('layouts.learning')
 @section('title', 'Review a coding quest — Kody')
 @section('content')
-<section class="review-page page-width"><a class="quiet-link" href="{{ route('challenge-reviews.index') }}">← Challenge reviews</a><h1>{{ $revision->title }}</h1><p class="step-pill">Revision {{ $revision->number }} · {{ $revision->review_status }}</p>
+<section class="review-page page-width">
+@include('transactions.review-access')
+<a class="quiet-link" href="{{ route('challenge-reviews.index') }}">← Challenge reviews</a><h1>{{ $revision->title }}</h1><p class="step-pill">Revision {{ $revision->number }} · {{ $revision->review_status }}</p>
 @if(session('status'))<p class="lesson-note" role="status">{{ session('status') }}</p>@endif
 @if($errors->any())<div class="studio-errors" role="alert">@foreach($errors->all() as $error)<p>{{ $error }}</p>@endforeach</div>@endif
 @include('challenges.problem')

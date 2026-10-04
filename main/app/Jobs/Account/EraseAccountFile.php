@@ -3,11 +3,11 @@
 namespace App\Jobs\Account;
 
 use App\Models\AccountFileErasure;
+use App\Services\Account\PrivateObjectErasure;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 use RuntimeException;
 use Throwable;
 
@@ -40,9 +40,7 @@ class EraseAccountFile implements ShouldQueue
                     || config('filesystems.disks.'.$erasure->disk.'.visibility') === 'public') {
                     throw new RuntimeException('Invalid private erasure target.');
                 }
-                if (! Storage::disk($erasure->disk)->delete($path)) {
-                    throw new RuntimeException('Private object erasure failed.');
-                }
+                app(PrivateObjectErasure::class)->erase($erasure->disk, $path);
                 $erasure->update(['path' => null, 'completed_at' => now(), 'failed_at' => null, 'attempts' => $erasure->attempts + 1]);
 
                 return false;

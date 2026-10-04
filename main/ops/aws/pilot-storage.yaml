@@ -1,0 +1,121 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Kody pilot private PostgreSQL and versioned credential storage; review only, never auto-deployed.
+Parameters:
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+  PrivateSubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: At least two private subnets in different availability zones.
+  ApplicationSecurityGroupId:
+    Type: AWS::EC2::SecurityGroup::Id
+    Description: Existing application host group; only this group can reach PostgreSQL.
+  DatabaseClass:
+    Type: String
+    Default: db.t4g.micro
+    AllowedValues: [db.t4g.micro, db.t4g.small]
+  DatabaseIdentifier:
+    Type: String
+    Default: kody-pilot
+    MinLength: 5
+    MaxLength: 63
+    AllowedPattern: '[a-z][a-z0-9]*(-[a-z0-9]+)*'
+Resources:
+  DatabaseSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Private Kody PostgreSQL from application hosts only
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 5432
+          ToPort: 5432
+          SourceSecurityGroupId: !Ref ApplicationSecurityGroupId
+  DatabaseSubnets:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: Kody private database subnets
+      SubnetIds: !Ref PrivateSubnetIds
+  Database:
+    Type: AWS::RDS::DBInstance
+    DependsOn: DatabaseLogRetention
+    DeletionPolicy: Snapshot
+    UpdateReplacePolicy: Snapshot
+    Properties:
+      Engine: postgres
+      DBInstanceIdentifier: !Ref DatabaseIdentifier
+      DBInstanceClass: !Ref DatabaseClass
+      AllocatedStorage: '20'
+      MaxAllocatedStorage: 40
+      StorageType: gp3
+      StorageEncrypted: true
+      PubliclyAccessible: false
+      MultiAZ: false
+      DBName: kody
+      MasterUsername: kody_operator
+      ManageMasterUserPassword: true
+      BackupRetentionPeriod: 35
+      PreferredBackupWindow: '16:30-17:00'
+      PreferredMaintenanceWindow: 'sun:17:30-sun:18:00'
+      CopyTagsToSnapshot: true
+      DeletionProtection: true
+      AutoMinorVersionUpgrade: true
+      DBSubnetGroupName: !Ref DatabaseSubnets
+      VPCSecurityGroups: [!Ref DatabaseSecurityGroup]
+      EnableCloudwatchLogsExports: [postgresql]
+      Tags:
+        - Key: Application
+          Value: Kody
+  Credentials:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      VersioningConfiguration:
+        Status: Enabled
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        IgnorePublicAcls: true
+        BlockPublicPolicy: true
+        RestrictPublicBuckets: true
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced
+      LifecycleConfiguration:
+        Rules:
+          - Id: noncurrent-privacy-retention
+            Status: Enabled
+            NoncurrentVersionExpiration:
+              NoncurrentDays: 30
+            AbortIncompleteMultipartUpload:
+              DaysAfterInitiation: 1
+  DatabaseLogRetention:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Retain
+    Properties:
+      LogGroupName: !Sub '/aws/rds/instance/${DatabaseIdentifier}/postgresql'
+      RetentionInDays: 30
+  CredentialsPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref Credentials
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Deny
+            Principal: '*'
+            Action: s3:*
+            Resource: [!GetAtt Credentials.Arn, !Sub '${Credentials.Arn}/*']
+            Condition:
+              Bool:
+                aws:SecureTransport: 'false'
+Outputs:
+  DatabaseEndpoint:
+    Value: !GetAtt Database.Endpoint.Address
+  CredentialsBucket:
+    Value: !Ref Credentials
+  DatabaseMasterSecretArn:
+    Value: !GetAtt Database.MasterUserSecret.SecretArn

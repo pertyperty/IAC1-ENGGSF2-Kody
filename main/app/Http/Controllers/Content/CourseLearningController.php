@@ -23,8 +23,8 @@ class CourseLearningController extends Controller
     public function catalog(Request $request): Response
     {
         $query = $request->validate(['q' => ['nullable', 'string', 'max:80']])['q'] ?? '';
-        $courses = CourseRevision::select(['id', 'course_id', 'title', 'description', 'category', 'difficulty', 'estimated_duration'])
-            ->where('review_status', 'Approved')->whereHas('course', fn ($builder) => $builder->where('status', 'Published')->whereNull('staff_withdrawn_at')->whereColumn('published_revision_id', 'course_revisions.id'))
+        $courses = CourseRevision::select(['id', 'course_id', 'title', 'description', 'category', 'difficulty', 'estimated_duration', 'price_kb', 'minimum_xp'])
+            ->with('course.creator:id,account_status')->where('review_status', 'Approved')->whereHas('course', fn ($builder) => $builder->where('status', 'Published')->whereNull('staff_withdrawn_at')->whereColumn('published_revision_id', 'course_revisions.id'))
             ->when(trim($query) !== '', fn ($builder) => $builder->where(fn ($search) => $search->where('title', 'ilike', '%'.addcslashes(trim($query), '%_\\').'%')->orWhere('description', 'ilike', '%'.addcslashes(trim($query), '%_\\').'%')->orWhere('category', 'ilike', '%'.addcslashes(trim($query), '%_\\').'%')))
             ->orderByDesc('id')->paginate(12)->withQueryString();
 
@@ -49,7 +49,7 @@ class CourseLearningController extends Controller
 
     public function enroll(EnrollCourseRequest $request, LearningCourse $course, CourseLearning $learning): RedirectResponse
     {
-        $learning->enroll($request->user(), $request->session()->getId(), $course->id, (int) $request->validated('revision_id'));
+        $learning->enroll($request->user(), $request->session()->getId(), $course->id, (int) $request->validated('revision_id'), $request->boolean('confirmed'));
 
         return redirect()->route('course-learning.show', $course)->with('status', 'You have joined this journey. Pick an adventure to begin!');
     }

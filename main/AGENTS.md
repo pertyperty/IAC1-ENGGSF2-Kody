@@ -2,6 +2,14 @@
 
 ## Mission
 
+On 2026-10-04 the owner explicitly delegated recommendations and implementation
+of the remaining economy, reward, creator-deletion and launch policies. See
+[the adopted decisions](docs/economy-and-launch-decisions.md); they supersede
+earlier business-rule deferrals below. Live providers/staging remain deferred.
+Financial state must use the Transaction-owned ledger and verified callbacks;
+XP never comes from browser practice, payment or reading. Retain the SRS F04
+Instructor-cash / Contributor-KodeBit distinction and existing attempt limits.
+
 The owner approved optional sequential creator course paths on 2026-10-04.
 New enrollments snapshot the approved path policy; existing enrollments keep open
 access. Assessment-free course lessons require an authorized opening and explicit

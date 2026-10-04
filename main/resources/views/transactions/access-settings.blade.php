@@ -1,0 +1,7 @@
+<section><h2>Access and pricing</h2>
+<p class="field-hint">Prices and requirements are reviewed with this saved revision. Existing learners keep their access; course access covers every included lesson.</p>
+<label for="price_kb">KodeBit price · 0 for free</label><input type="number" id="price_kb" name="price_kb" min="0" max="{{ config('economy.price_bands.'.$accessKind)[1] }}" value="{{ old('price_kb', $revision?->price_kb ?? 0) }}">
+<label for="minimum_xp">Minimum achievement rank</label><select id="minimum_xp" name="minimum_xp">@foreach(config('economy.ranks') as $xp => $rank)<option value="{{ $xp }}" @selected((string)old('minimum_xp', $revision?->minimum_xp ?? 0) === (string)$xp)>{{ $rank }} · {{ number_format($xp) }} XP</option>@endforeach</select>
+<input type="hidden" name="prerequisite_modules[]" value="">
+<label for="prerequisite_modules">Required modules · choose up to five</label><select id="prerequisite_modules" name="prerequisite_modules[]" multiple size="4">@foreach($accessModules as $option)@continue($accessKind === 'module' && $option->id === ($module?->id ?? null))<option value="{{ $option->id }}" @selected(in_array($option->id, old('prerequisite_modules', $revision?->prerequisite_modules ?? [])))>{{ $option->publishedRevision->title }}</option>@endforeach</select>
+<p class="field-hint">Only validated assessment completions qualify. Reading alone earns no XP or prerequisite credit.</p></section>

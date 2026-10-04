@@ -89,7 +89,7 @@ test('Delete Account blocks every kind of authored content and keeps its identit
     };
     $user = User::find($content->created_by);
     moduleSignIn($this, $user);
-    $this->get(route('account.delete'))->assertOk()->assertSee('content retention rules')->assertDontSee('name="confirmation_phrase"', false);
+    $this->get(route('account.delete'))->assertOk()->assertSee('Staff must inspect every retained revision')->assertDontSee('name="confirmation_phrase"', false);
     $this->post(route('account.delete.store'), deletionData($user))->assertSessionHasErrors('account');
     expect($user->fresh()->account_status)->toBe(AccountStatus::Active)->and($content->fresh())->not->toBeNull();
 })->with(['module', 'course', 'challenge']);

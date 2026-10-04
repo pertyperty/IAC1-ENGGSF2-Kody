@@ -8,6 +8,7 @@ use App\Models\LearningModule;
 use App\Models\User;
 use App\Services\Account\CurrentAccountSession;
 use App\Services\Content\CourseLearning;
+use App\Services\Transactions\ContentAccess;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -87,11 +88,21 @@ class ContentFeedback
         if ($kind === 'course') {
             $outline = app(CourseLearning::class)->outline($user, $sessionId, $id);
 
-            return [$target, $outline['enrollment'] !== null];
+            return [$target, $outline['enrollment'] !== null && $outline['accessible']];
         }
         abort_unless($target->status === 'Published' && $target->publishedRevision?->review_status === 'Approved', 404);
 
-        return [$target, true];
+        $access = app(ContentAccess::class);
+        $entitled = $access->has($user->id, $kind, $id)
+            || ($access->price($target->publishedRevision, $target->created_by) === 0 && $access->requirements($user, $target->publishedRevision)['eligible']);
+        if (! $entitled && $kind === 'module') {
+            $entitled = DB::table('course_module_progress as progress')->join('course_enrollments as enrollment', 'enrollment.id', '=', 'progress.enrollment_id')
+                ->join('course_revision_modules as assignment', 'assignment.id', '=', 'progress.assignment_id')
+                ->join('content_entitlements as access', fn ($join) => $join->on('access.user_id', '=', 'enrollment.user_id')->on('access.content_id', '=', 'enrollment.course_id')->where('access.content_type', 'course')->whereNull('access.revoked_at'))
+                ->where('enrollment.user_id', $user->id)->where('assignment.module_id', $id)->whereNotNull('progress.first_accessed_at')->exists();
+        }
+
+        return [$target, $entitled];
     }
 
     private function proof(User $user, string $kind, int $id): bool

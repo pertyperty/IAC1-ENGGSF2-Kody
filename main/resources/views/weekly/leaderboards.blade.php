@@ -1,0 +1,5 @@
+@extends('layouts.learning')
+@section('title', 'Learning leaderboards — Kody')
+@section('content')
+<section class="review-page page-width"><p class="overline">A LITTLE PROGRESS, EVERY DAY</p><h1>Climb by learning.</h1><p>Only server-validated first-time achievements earn XP. Equal XP shares the same position; ranks never change your account role.</p><div class="review-list">@forelse($players as $player)<div class="lesson-note"><b>#{{ $player->position }} · {{ $player->username ?? 'Kody player' }}</b><p>{{ number_format($player->xp) }} XP</p></div>@empty<p>Your first validated win is the beginning of the climb.</p>@endforelse</div>{{ $players->links() }}<h2>Published weekly results</h2><div class="review-list">@forelse($events as $event)<a href="{{ route('weekly-results.show', $event->id) }}"><b>Week of {{ \Carbon\CarbonImmutable::parse($event->starts_at)->setTimezone('Asia/Manila')->format('M j, Y') }}</b><span>Verified scores, shared ranks and confirmed rewards →</span></a>@empty<p>Results appear after each week closes, evaluations finish and staff confirms publication.</p>@endforelse</div></section>
+@endsection

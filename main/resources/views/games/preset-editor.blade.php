@@ -2,7 +2,7 @@
 @section('title', 'Shape a game preset — Kody')
 @section('content')
 <section class="review-page page-width"><a class="quiet-link" href="{{ route('game-presets.index') }}">← Preset workshop</a><h1>{{ $preset ? 'Shape the next version.' : 'Plant a new idea.' }}</h1>
-<p>Garden trails share Kody’s movement and objective rules. Practice quizzes support up to ten questions with two to six choices each. Creator lessons use the existing verified Active participant access rules. Wins qualify existing learning activity; XP and KodeBit rewards are deferred.</p>
+<p>Garden trails share Kody’s movement and objective rules. Practice quizzes support up to ten questions with two to six choices each. Creator lessons use the existing verified Active participant access rules. Validated module wins qualify for daily activity and the platform’s first-completion XP. Presets cannot set extra XP or KodeBit prizes.</p>
 @if(session('status'))<p class="lesson-note" role="status">{{ session('status') }}</p>@endif
 @if($errors->any())<div class="form-errors" role="alert">@foreach($errors->all() as $error)<p>{{ $error }}</p>@endforeach</div>@endif
 @if($preset)<p class="step-pill">{{ $preset->status }} · {{ $uses }} saved module revision references</p>@endif
@@ -24,7 +24,7 @@
 @include('games.quiz-editor')
 </div>
 @include('games.scenario-editor', ['scenarioInstance' => $instance, 'scenarioName' => 'game_scenario'])
-<label for="reward_mode">Reward mode</label><select id="reward_mode" name="reward_mode"><option value="Deferred">Deferred — no XP or KodeBit grants</option></select>
+<label for="reward_mode">Reward mode</label><select id="reward_mode" name="reward_mode"><option value="Deferred">No extra preset rewards — platform XP applies</option></select>
 <button class="button button-play">{{ $preset ? 'Save new version' : 'Create preset' }}</button></fieldset></form>
 @if($preset?->status === 'Active')<h2>Retire this preset</h2><p>Inactivation removes it from new module drafts. Existing assessments, references and results stay intact.</p><form class="account-form" method="POST" action="{{ route('game-presets.inactivate', $preset) }}">@csrf<input type="hidden" name="record_version" value="{{ $preset->record_version }}"><label><input type="checkbox" name="confirmed" value="1" required> Confirm inactivation</label><button class="button button-dark">Make preset inactive</button></form>@endif
 @if($instance)<section class="studio-preview"><h2>Try the saved version</h2><p>Preview wins are local practice.</p>@if($instance['template'] !== 'choice-quiz')@include('learning.activity', ['game' => $instance, 'module' => null, 'completionUrl' => null, 'trial' => false])@else@include('learning.quiz', ['quiz' => $instance, 'module' => null, 'completionUrl' => null])@endif</section>@endif

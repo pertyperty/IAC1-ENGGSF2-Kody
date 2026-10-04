@@ -2,13 +2,22 @@
 
 namespace App\Http\Requests\Challenges;
 
+use App\Http\Requests\Content\NormalizesAccessSettings;
 use App\Models\CodingChallenge;
+use App\Services\Publishing\AccessSettings;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
 
 class SaveChallengeRequest extends FormRequest
 {
+    use NormalizesAccessSettings;
+
+    protected function prepareForValidation(): void
+    {
+        $this->normalizeAccessSettings();
+    }
+
     public function authorize(): bool
     {
         $challenge = $this->route('challenge');
@@ -34,7 +43,7 @@ class SaveChallengeRequest extends FormRequest
             'test_cases.*' => ['required', 'array:input,expected_output,hidden'],
             'test_cases.*.input' => ['present', 'nullable', 'string', 'max:'.$limits['max_case_characters'], 'not_regex:/\x00/'],
             'test_cases.*.expected_output' => ['present', 'nullable', 'string', 'max:'.$limits['max_case_characters'], 'not_regex:/\x00/'],
-            'test_cases.*.hidden' => ['required', 'boolean']];
+            'test_cases.*.hidden' => ['required', 'boolean']] + app(AccessSettings::class)->rules('challenge');
     }
 
     public function withValidator(Validator $validator): void

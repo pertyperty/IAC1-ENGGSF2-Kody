@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Services\Transactions\Xendit\Readiness;
 use Illuminate\Console\Command;
 
 class SetupStatus extends Command
@@ -24,6 +25,9 @@ class SetupStatus extends Command
             ['Private credentials', config('account.credentials.disk'), 'Verify private storage, staff-only downloads and backup restore'],
             ['Queue', config('queue.default'), 'Verify supervised worker, restart and failed-job alerts in staging'],
             ['Scheduler', 'Registered in Laravel', 'Verify minute trigger and task execution in staging'],
+            ['Xendit economy', app(Readiness::class)->available() ? 'Configuration gate satisfied' : 'Disabled / activation gate incomplete', 'Sandbox callback/retrieval, contract fees, named responders, budget and staging evidence required'],
+            ['Recovery targets', 'RPO 15m / RTO 4h; backup 35 days', 'Verify RDS PITR, private S3 version erasure, encrypted key recovery and monthly isolated restore'],
+            ['Pilot budget', 'PHP12,000 / month', config('operations.budget_enforced') ? 'Current-month operator report controls new admissions' : 'Enable budget enforcement before live payment activation'],
             ['Production baseline', config('app.debug') || ! $this->https(config('app.url')) ? 'Needs HTTPS URL / debug disabled' : 'URL and debug settings present', 'Verify TLS, secure cookies and PostgreSQL CA validation'],
         ];
         $this->table(['Component', 'Local configuration', 'Next verification'], $rows);

@@ -1,0 +1,9 @@
+@extends('layouts.learning')
+@section('title', 'Review retained creator material — Kody')
+@section('content')
+<section class="review-page page-width"><a class="quiet-link" href="{{ route('creator-erasure.index') }}">← Privacy review queue</a><h1>Inspect every retained version.</h1><p>Creator #{{ $row->user_id }} · {{ $row->state }} · Inventory {{ $row->fingerprint }}</p><p>@foreach(['module','course','challenge'] as $tab)<a class="button button-dark button-small" href="{{ route('creator-erasure.show', [$row->id, 'kind' => $tab]) }}">{{ ucfirst($tab) }} versions</a> @endforeach</p>
+@if($errors->any())<p class="studio-errors" role="alert">{{ $errors->first() }}</p>@endif
+@foreach($revisions as $revision)<details class="lesson-note"><summary>{{ $revision->title }} · Version {{ $revision->number }} · {{ $revision->review_status }}</summary><pre class="creator-inventory-text">{{ json_encode($revision->toArray(), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR) }}</pre></details>@endforeach{{ $revisions->links() }}
+@if($row->state === 'Pending')<form class="studio-form" method="post" action="{{ route('creator-erasure.review', $row->id) }}">@csrf<label>Decision<select name="decision"><option value="Rejected">Return for privacy cleanup</option><option value="Approved">Approve unchanged inventory</option></select></label><label>Inspection notes<textarea name="review_notes" required maxlength="500"></textarea></label><label class="checkbox-label"><input type="checkbox" name="privacy_reviewed" value="1"> I manually inspected every page in all three version lists, including attachments/referenced material and hidden tests, and found no retained personal data requiring removal.</label>@include('transactions.password-confirmation')<button class="button button-play">Record privacy decision</button></form>@endif
+</section>
+@endsection

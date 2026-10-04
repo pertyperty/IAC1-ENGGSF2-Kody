@@ -5,7 +5,7 @@
 @elseif($ready)<form class="studio-form" method="POST" action="{{ $attemptAction }}">@csrf
 <input type="hidden" name="revision_id" value="{{ $revision->id }}"><input type="hidden" name="language" value="{{ $revision->language }}"><input type="hidden" name="confirmation_id" value="{{ $confirmationId }}">
 <label for="source-code">Your {{ config('challenges.languages')[$revision->language] }} solution</label><textarea id="source-code" class="challenge-source" name="source_code" rows="16" spellcheck="false" required aria-describedby="attempt-help"></textarea>
-<p id="attempt-help">Free participation. Up to 64 KiB of code. Confirming uses one attempt; evaluation continues if you leave this page.</p>
+<p id="attempt-help">Access unlocked. Up to 64 KiB of code. Confirming uses one attempt; evaluation continues if you leave this page.</p>
 <label class="checkbox-row"><input type="checkbox" name="confirmed" value="1" required> I confirm this solution for evaluation.</label><button class="button button-play" type="submit">Submit my solution →</button></form>
 @else<p class="lesson-note">Explore the problem and plan your approach. Code evaluation is not available yet. No attempt will be used.</p><a class="button button-play" href="{{ route('dashboard') }}">Keep playing while you wait →</a>@endif
 @if($attempts->isNotEmpty())<h2>Your attempts</h2><ul>@foreach($attempts as $attempt)<li><a href="{{ route('challenge-attempts.show', $attempt->id) }}">Attempt {{ $attempt->attempt }} · {{ $attempt->status }}</a></li>@endforeach</ul>@endif
