@@ -196,3 +196,13 @@
 .studio-form input[type=checkbox] { display: inline-block; width: auto; margin-right: .5rem; accent-color: #355a25; }
 .studio-form .challenge-source, pre.challenge-case { font-family: ui-monospace, monospace; white-space: pre-wrap; overflow-wrap: anywhere; tab-size: 4; }
 .weekly-card { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; margin: 28px 0; padding: 28px; background: #f4e6ff; border: 1px solid #dbc4f2; border-radius: 22px; }.weekly-card h2 { margin: 8px 0; font-size: 28px; }.weekly-card p { line-height: 1.6; }
+[data-garden-designer] { margin-top: 24px; padding: 20px; border: 1px solid var(--line, #dbe4dc); border-radius: 20px; background: #f4f9f4; }
+.designer-tools { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+.designer-tools button { border: 1px solid #bed1c3; border-radius: 12px; padding: 10px 14px; background: white; cursor: pointer; }
+.designer-tools button[aria-pressed="true"] { background: #173e2c; color: white; }
+.designer-tools button:disabled { opacity: .45; cursor: default; }
+.designer-board { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; max-width: 360px; margin: 18px 0; }
+.designer-board button { min-width: 0; min-height: 44px; aspect-ratio: 1; border: 2px solid #c6dfce; border-radius: 12px; color: #234c35; background: #dceee0; font-size: 24px; font-weight: 800; cursor: pointer; }
+.designer-board button.designer-path { background: #ffefcf; border-color: #dcc799; }
+.designer-board button:focus-visible, .designer-tools button:focus-visible { outline: 3px solid #564bd8; outline-offset: 3px; }
+[data-designer-preview-host] .game-card { margin-top: 20px; }

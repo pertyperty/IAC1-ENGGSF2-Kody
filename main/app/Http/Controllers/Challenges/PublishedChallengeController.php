@@ -7,6 +7,7 @@ use App\Models\ChallengeSubmission;
 use App\Models\CodingChallenge;
 use App\Models\CodingChallengeRevision;
 use App\Services\Challenges\Judge0\ProviderReadiness;
+use App\Services\Engagement\ContentFeedback;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
@@ -32,7 +33,7 @@ class PublishedChallengeController extends Controller
         return response()->view('challenges.catalog', compact('challenges', 'query', 'filters'));
     }
 
-    public function show(Request $request, CodingChallenge $challenge): Response
+    public function show(Request $request, CodingChallenge $challenge, ContentFeedback $feedbackService): Response
     {
         abort_unless($challenge->status === 'Published' && ! $challenge->isWithdrawn(), 404);
         $revision = CodingChallengeRevision::whereKey($challenge->published_revision_id)->where('challenge_id', $challenge->id)->where('review_status', 'Approved')
@@ -43,7 +44,8 @@ class PublishedChallengeController extends Controller
         $attempts = $participation === null ? collect() : ChallengeSubmission::where('participation_id', $participation->id)->orderByDesc('attempt')->get(['id', 'attempt', 'status']);
         $ready = Gate::allows('create', ChallengeSubmission::class) && app(ProviderReadiness::class)->profile($revision) !== null;
         $confirmationId = (string) Str::uuid();
+        $feedback = $feedbackService->read($request->user(), $request->session()->getId(), 'challenge', $challenge->id, true);
 
-        return response()->view('challenges.published', compact('revision', 'samples', 'challenge', 'participation', 'attempts', 'ready', 'confirmationId'))->header('Cache-Control', 'no-store, private');
+        return response()->view('challenges.published', compact('revision', 'samples', 'challenge', 'participation', 'attempts', 'ready', 'confirmationId', 'feedback'))->header('Cache-Control', 'no-store, private');
     }
 }

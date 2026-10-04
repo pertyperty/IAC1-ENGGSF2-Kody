@@ -2,6 +2,33 @@
 
 ## Mission
 
+The owner approved the first Google identity slice for existing verified Active
+accounts: explicit linking after confirming the current Kody password, followed
+by sign-in through the linked provider subject. Never automatically link by email
+or create Google-only accounts; new registration remains A01/A02. All five roles
+retain the existing account-status, lockout and single-session rules. Linking and
+unlinking are sensitive account changes and revoke sessions. See
+[Google authentication](docs/google-authentication-implementation.md).
+The owner subsequently deferred Google OAuth configuration/live verification.
+Keep it disabled and track setup in the [deferred register](docs/deferred-features.md);
+continue independent development without requesting those credentials again.
+
+The owner approved B10 one replaceable Like/Helpful/Favorite reaction per user
+and content, with removal; numeric ratings are deferred. The owner delegated the
+prior-access policy to platform judgment: verified Active Learners, Contributors
+and Instructors need current access and a server-recorded authorized opening or
+validated completion. Course reactions also require enrollment. Catalog browsing,
+creator/staff previews and browser assertions do not qualify. See
+[content feedback](docs/content-feedback-implementation.md).
+
+For D04/D09/C07, the owner approved preserving all retained dependencies, even
+after they become inactive. Learner history, pinned course revisions, weekly
+events, feedback and moderation history block permanent deletion; offer archival
+when eligible instead. Only dependency-free owned content may be permanently
+deleted after explicit confirmation and a locked dependency recheck. Ordinary
+authoring audits remain durable references. See
+[content deletion](docs/content-deletion-implementation.md).
+
 ### Product direction amendment — approved 2026-10-03
 
 Kody is a game-first coding platform. The project owner explicitly approved this
@@ -216,7 +243,8 @@ Known inconsistencies may exist in the source documents, including availability 
 
 The current repository uses:
 
-- PHP `^8.3`
+- PHP `^8.4.1` (owner-approved on 2026-10-04; see
+  [runtime baseline decision](docs/runtime-baseline-decision.md))
 - Laravel Framework `^13.17`
 - Laravel Boost `^2.2`
 - Pest `^5.2`

@@ -47,15 +47,7 @@ class LoginAccount
                 return $status;
             }
             if ($user->active_session_hash !== null && $user->active_session_expires_at?->isFuture()) {
-                $session->regenerate(true);
-                $session->put('login_confirmation', [
-                    'user_id' => $user->id,
-                    'password_digest' => hash('sha256', $user->password),
-                    'session_hash' => $user->active_session_hash,
-                    'expires_at' => now()->addMinutes(5)->timestamp,
-                ]);
-
-                return LoginOutcome::Conflict;
+                return $this->conflict($user, $session);
             }
             if (Hash::needsRehash($user->password)) {
                 $user->password = $password;
@@ -81,6 +73,12 @@ class LoginAccount
             if ($user->login_locked_until?->isFuture()) {
                 return LoginOutcome::Locked;
             }
+            if (isset($confirmation['google_identity_id'])) {
+                $identity = DB::table('google_identities')->where('id', $confirmation['google_identity_id'])->where('user_id', $user->id)->lockForUpdate()->first();
+                if ($identity === null || $identity->subject_hash === null || $identity->record_version !== $confirmation['google_identity_version']) {
+                    return LoginOutcome::Invalid;
+                }
+            }
             $status = $this->eligibility($user);
 
             return $status ?? $this->authenticate($user, $session);
@@ -99,6 +97,46 @@ class LoginAccount
         Auth::logout();
         $session->invalidate();
         $session->regenerateToken();
+    }
+
+    public function fromGoogle(string $subjectHash, Session $session): LoginOutcome
+    {
+        $session->forget('login_confirmation');
+
+        return $this->transaction($session, function () use ($subjectHash, $session): LoginOutcome {
+            $candidate = DB::table('google_identities')->where('subject_hash', $subjectHash)->first();
+            if ($candidate === null) {
+                return LoginOutcome::Invalid;
+            }
+            // All account mutations lock the user before its linked identity.
+            $user = User::whereKey($candidate->user_id)->lockForUpdate()->first();
+            $identity = DB::table('google_identities')->where('id', $candidate->id)->where('subject_hash', $subjectHash)->lockForUpdate()->first();
+            if ($user === null || $identity === null || $identity->user_id !== $user->id) {
+                return LoginOutcome::Invalid;
+            }
+            if ($user->login_locked_until?->isFuture()) {
+                return LoginOutcome::Locked;
+            }
+            if (($status = $this->eligibility($user)) !== null) {
+                return $status;
+            }
+            if ($user->active_session_hash !== null && $user->active_session_expires_at?->isFuture()) {
+                return $this->conflict($user, $session, ['google_identity_id' => $identity->id, 'google_identity_version' => $identity->record_version]);
+            }
+
+            return $this->authenticate($user, $session);
+        });
+    }
+
+    private function conflict(User $user, Session $session, array $proof = []): LoginOutcome
+    {
+        $session->regenerate(true);
+        $session->put('login_confirmation', $proof + [
+            'user_id' => $user->id, 'password_digest' => hash('sha256', $user->password),
+            'session_hash' => $user->active_session_hash, 'expires_at' => now()->addMinutes(5)->timestamp,
+        ]);
+
+        return LoginOutcome::Conflict;
     }
 
     private function eligibility(User $user): ?LoginOutcome

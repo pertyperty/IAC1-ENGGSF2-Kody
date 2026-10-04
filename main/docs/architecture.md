@@ -1,5 +1,12 @@
 # Foundation conventions
 
+[Google authentication](google-authentication-implementation.md) is Account-owned.
+A dedicated Socialite adapter translates server-verified provider identity into
+a namespaced subject digest. Explicit password-confirmed linking, database-owned
+callback consumption and fresh account locks protect identity ownership; sign-in
+reuses the existing lockout/status/session rules. No other module handles OAuth
+tokens, and provider email never grants an account or role.
+
 The [creator studio](creator-studio-implementation.md) adds Content-owned versioned
 module publishing, Administration-authorized review and audit, noncritical
 in-app notification delivery, and server-validated assessments feeding existing
@@ -175,7 +182,8 @@ The supplied SRS 4.2 states 99.9% uptime; no alternate numeric target was found
 in the reviewed foundation sections. Do not assert a conflict or compliance
 without source evidence and measurement.
 
-Technology mismatch: composer.json declares PHP ^8.3, but locked Symfony 8.1
-runtime packages and PHPUnit 13 require PHP >=8.4.1. Dependencies are preserved;
-development, CI and deployment instructions require 8.4.1+. Align the declared
-minimum in a separate dependency-baseline decision if PHP 8.3 support is required.
+The owner approved PHP 8.4.1+ on 2026-10-04. The root requirement is `^8.4.1`,
+matching the minimum required by locked Symfony 8.1 and PHPUnit 13 packages.
+Application, development, test and deployment documentation share this minimum;
+CI uses PHP 8.4. Existing dependency versions are preserved. See the
+[approved runtime decision](runtime-baseline-decision.md).

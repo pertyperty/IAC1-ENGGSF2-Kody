@@ -6,17 +6,20 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Learning\CompleteGameRequest;
 use App\Http\Requests\Learning\CompleteQuizRequest;
 use App\Models\LearningModule;
+use App\Services\Engagement\ContentFeedback;
 use App\Services\Gamification\LearningProgression;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class PublishedModuleController extends Controller
 {
-    public function show(LearningModule $module): Response
+    public function show(Request $request, LearningModule $module, ContentFeedback $feedback): Response
     {
         abort_unless($module->status === 'Published' && ! $module->isWithdrawn() && $module->publishedRevision?->review_status === 'Approved', 404);
 
-        return response()->view('content.published', ['module' => $module, 'revision' => $module->publishedRevision])->header('Cache-Control', 'no-store, private');
+        return response()->view('content.published', ['module' => $module, 'revision' => $module->publishedRevision,
+            'feedback' => $feedback->read($request->user(), $request->session()->getId(), 'module', $module->id, true)])->header('Cache-Control', 'no-store, private');
     }
 
     public function game(CompleteGameRequest $request, LearningModule $module, int $revision, LearningProgression $progression): JsonResponse

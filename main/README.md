@@ -6,12 +6,37 @@ layered over playable experiences. See the approved
 modular monolith; business use cases are implemented incrementally.
 Read `AGENTS.md` and [architecture conventions](docs/architecture.md) first.
 
+The [creator garden designer](docs/garden-designer-implementation.md) lets
+Instructors paint paths, move objectives and add crystals, then play a preview
+before saving. The server rejects unsolvable layouts; published revisions remain
+unchanged until review. Google OAuth live setup is now explicitly deferred in the
+[deferred-feature register](docs/deferred-features.md).
+
+[Google sign-in](docs/google-authentication-implementation.md) supports explicitly
+linked existing verified accounts, with password-confirmed linking/unlinking,
+PKCE, single-use callback records and existing account/session restrictions.
+Deploy its additive migration. It is disabled by default until private OAuth
+configuration and a live verification round trip are completed. Email matching
+never links accounts or creates new users.
+
+[Content feedback](docs/content-feedback-implementation.md) lets verified Active
+Learners, Contributors and Instructors choose one Like, Helpful or Favorite after
+opening available content. Enrolled courses also accept feedback; choices can be
+replaced or removed without interrupting game practice. Numeric ratings and
+rewards remain deferred. Deploy the additive feedback migration and rebuild assets.
+
+[Creator deletion](docs/content-deletion-implementation.md) removes dependency-free
+owned modules, courses and challenges after explicit confirmation. Retained
+learner/course/weekly/feedback/moderation history blocks permanent deletion and
+preserves the existing archival option. An additive migration indexes retained
+learner audit references; it preserves all stored history.
+
 ## Development setup
 
 Commands below run from the Laravel directory (`main/` in this repository).
 
-Requirements: Composer 2; PHP 8.4.1+ for the locked runtime and test dependencies
-(application declaration remains PHP ^8.3); Node 22.12+ with npm; PostgreSQL 17
+Requirements: Composer 2; PHP 8.4.1+ (within PHP 8.x) for application, development
+and tests; Node 22.12+ with npm; PostgreSQL 17
 (CI's baseline). Enable PHP ctype, curl, dom, fileinfo, filter, intl, mbstring,
 openssl, PDO/pdo_pgsql, tokenizer, xml and zip. Use `composer check-platform-reqs`
 to verify the actual lock file. Do not downgrade dependencies to suit old XAMPP.

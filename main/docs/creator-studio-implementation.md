@@ -16,6 +16,10 @@ activity and audit history remain.
 
 ## Delivered scope
 
+The subsequent [content deletion milestone](content-deletion-implementation.md)
+adds D04 permanent removal only without retained dependencies; existing course
+pins, learner history and governance records remain protected through archival.
+
 - D01: Instructor studio at `/create`, owned drafts with title (150 characters),
   description, plain text/code lesson, Article/Interactive/Video formats and
   optional assessments. Interactive requires an assessment. Video uses an HTTPS
@@ -103,3 +107,9 @@ Private media upload/storage, deletion, creator module placement in the ladder,
 graded quizzes, rewards, paid access and notification preferences remain separate
 features. Module deletion must protect learner activity and course/challenge
 references. Courses do not yet grant learner enrollment/access or issue rewards.
+## Visual world authoring follow-up
+
+The [garden designer](garden-designer-implementation.md) extends D01/D02 with
+creator-owned path/start/goal/crystal placeholders and a playable preview. Existing
+version-1 movement rules, reviewed immutable snapshots and authoritative learner
+completion remain in place. No new database migration or permission is required.

@@ -1,5 +1,11 @@
 # Play hub, templates and progression
 
+The [creator garden designer](garden-designer-implementation.md) now allows custom
+path/start/goal/crystal placeholders within the existing version-1 interpreter.
+Live creator previews do not save progress; reviewed revisions remain the sole
+source of authoritative learner objectives. Google setup remains deferred in the
+[feature register](deferred-features.md).
+
 Implements the owner's 2026-10-03 game-first amendment, supporting the direction
 of B01/B02/B05 and E01/E05/E06 without claiming their full original scope.
 The public landing game is a real command-grid exercise. Learning has its own

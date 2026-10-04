@@ -10,6 +10,7 @@ use App\Models\CourseEnrollment;
 use App\Models\CourseRevision;
 use App\Models\LearningCourse;
 use App\Services\Content\CourseLearning;
+use App\Services\Engagement\ContentFeedback;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -37,9 +38,12 @@ class CourseLearningController extends Controller
         return response()->view('learning.my-courses', compact('enrollments'))->header('Cache-Control', 'no-store, private');
     }
 
-    public function show(Request $request, LearningCourse $course, CourseLearning $learning): Response
+    public function show(Request $request, LearningCourse $course, CourseLearning $learning, ContentFeedback $feedback): Response
     {
-        return response()->view('learning.course', $learning->outline($request->user(), $request->session()->getId(), $course->id))->header('Cache-Control', 'no-store, private');
+        $data = $learning->outline($request->user(), $request->session()->getId(), $course->id);
+        $data['feedback'] = $feedback->read($request->user(), $request->session()->getId(), 'course', $course->id, true);
+
+        return response()->view('learning.course', $data)->header('Cache-Control', 'no-store, private');
     }
 
     public function enroll(EnrollCourseRequest $request, LearningCourse $course, CourseLearning $learning): RedirectResponse
@@ -49,9 +53,12 @@ class CourseLearningController extends Controller
         return redirect()->route('course-learning.show', $course)->with('status', 'You have joined this journey. Pick an adventure to begin!');
     }
 
-    public function lesson(Request $request, LearningCourse $course, int $slot, CourseLearning $learning): Response
+    public function lesson(Request $request, LearningCourse $course, int $slot, CourseLearning $learning, ContentFeedback $feedback): Response
     {
-        return response()->view('learning.course-lesson', $learning->lesson($request->user(), $request->session()->getId(), $course->id, $slot))->header('Cache-Control', 'no-store, private');
+        $data = $learning->lesson($request->user(), $request->session()->getId(), $course->id, $slot);
+        $data['feedback'] = $feedback->read($request->user(), $request->session()->getId(), 'module', $data['slot']->module_id);
+
+        return response()->view('learning.course-lesson', $data)->header('Cache-Control', 'no-store, private');
     }
 
     public function game(CompleteGameRequest $request, LearningCourse $course, int $slot, CourseLearning $learning): JsonResponse

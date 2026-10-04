@@ -39,5 +39,7 @@
 @if($revision?->review_status === 'Draft' && $challenge?->status !== 'Archived')<form method="post" action="{{ route('challenges.submit', $challenge) }}" class="studio-actions">@csrf<input type="hidden" name="record_version" value="{{ $challenge->record_version }}"><button class="button button-dark">Submit saved challenge for review →</button></form>@endif
 @can('archive', $challenge)<p><a class="quiet-link" href="{{ route('challenges.archive-confirmation', $challenge) }}">Archive this challenge</a></p>@endcan
 @if($challenge?->status === 'Archived')<p class="lesson-note">This challenge is archived. Its revisions and review history are preserved.</p>@endif
-<p class="field-hint">You can author and review quests now. Challenge submissions are coming soon.</p></section>
+<p class="field-hint">You can author and review quests now. Challenge submissions are coming soon.</p>@if($challenge)@can('delete', $challenge)<p><a class="quiet-link" href="{{ route('content-deletion.show', ['challenge', $challenge->id]) }}">Delete this challenge →</a></p>@endcan
+@endif
+</section>
 @endsection

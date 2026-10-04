@@ -17,6 +17,7 @@ use App\Services\Account\AccountDeletion;
 use App\Services\Account\AccountRecoveryService;
 use App\Services\Account\ContributorApplications;
 use App\Services\Account\EmailVerificationService;
+use App\Services\Account\GoogleAuthentication;
 use App\Services\Account\InstructorApplications;
 use App\Services\Account\ProfileEditing;
 use App\Services\Administration\AccountEnforcement;
@@ -24,11 +25,14 @@ use App\Services\Administration\ContentModeration;
 use App\Services\Administration\FaqManagement;
 use App\Services\Administration\ModeratorAppointments;
 use App\Services\Administration\SupportProfileCorrections;
+use App\Services\Challenges\ChallengeDeletion;
 use App\Services\Challenges\ChallengePublishing;
 use App\Services\Challenges\ChallengeSubmissions;
+use App\Services\Content\ContentDeletion;
 use App\Services\Content\CourseLearning;
 use App\Services\Content\CoursePublishing;
 use App\Services\Content\ModulePublishing;
+use App\Services\Engagement\ContentFeedback;
 use App\Services\Games\GamePresets;
 use App\Services\Gamification\LearningProgression;
 use App\Services\Gamification\WeeklyEvents;
@@ -36,6 +40,8 @@ use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
@@ -57,6 +63,55 @@ try {
     $session->start();
 
     $result = match ($argv[1]) {
+        'google-claim' => (function () use ($input, $session): string {
+            $session->setId($input['session_id']);
+            $session->put('google_attempt_id', $input['attempt_id']);
+            $request = Request::create('/auth/google/callback', 'GET', ['state' => $input['state']]);
+            $request->setLaravelSession($session);
+            try {
+                app(GoogleAuthentication::class)->claim($request);
+
+                return 'claimed';
+            } catch (RuntimeException) {
+                return 'invalid';
+            }
+        })(),
+        'google-login' => strtolower(app(LoginAccount::class)->fromGoogle($input['subject_hash'], $session)->name),
+        'google-link' => (function () use ($input, $session, $argv): string {
+            $user = User::findOrFail($input['user_ids'][(int) $argv[3] - 1]);
+            $session->setId($input['session_id']);
+            $request = Request::create('/auth/google/callback');
+            $request->setLaravelSession($session);
+            $request->setUserResolver(fn () => $user);
+            try {
+                app(GoogleAuthentication::class)->link($request,
+                    (object) ['user_id' => $user->id, 'profile_version' => 1, 'identity_version' => 0], $input['subject_hash']);
+
+                return 'linked';
+            } catch (RuntimeException) {
+                return 'rejected';
+            }
+        })(),
+        'content-delete' => (function () use ($input, $argv): string {
+            $index = (int) $argv[3] - 1;
+            $actor = User::findOrFail($input['actor_ids'][$index]);
+            if ($input['actions'][$index] === 'open') {
+                app(ContentFeedback::class)->read($actor, 'module-test-session', 'module', $input['content_id'], true);
+
+                return 'opened';
+            }
+            $service = app($input['kind'] === 'challenge' ? ChallengeDeletion::class : ContentDeletion::class);
+            $service->delete($actor, 'module-test-session', $input['kind'], $input['content_id'], $input['version'], true);
+
+            return 'deleted';
+        })(),
+        'content-react' => (function () use ($input, $argv): string {
+            $index = (int) $argv[3] - 1;
+            app(ContentFeedback::class)->change(User::findOrFail($input['actor_ids'][$index]), 'module-test-session',
+                'module', $input['module_id'], $input['version'], $input['reactions'][$index]);
+
+            return 'saved';
+        })(),
         'faq-change' => (function () use ($input, $argv): string {
             $actor = User::findOrFail($input['actor_ids'][(int) $argv[3] - 1]);
             $entry = FaqEntry::findOrFail($input['entry_id']);
@@ -223,6 +278,13 @@ try {
     echo $result."\n";
 } catch (ValidationException) {
     echo "duplicate\n";
+} catch (ModelNotFoundException) {
+    if ($argv[1] === 'content-delete') {
+        echo "missing\n";
+    } else {
+        echo "error\n";
+        exit(1);
+    }
 } catch (Throwable) {
     // Test diagnostics must never print input tokens, credentials or provider details.
     echo "error\n";

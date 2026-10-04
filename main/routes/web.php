@@ -5,6 +5,7 @@ use App\Http\Controllers\Account\AccountDeletionController;
 use App\Http\Controllers\Account\ContributorApplicationController;
 use App\Http\Controllers\Account\ContributorReviewController;
 use App\Http\Controllers\Account\EmailVerificationController;
+use App\Http\Controllers\Account\GoogleAuthenticationController;
 use App\Http\Controllers\Account\InstructorApplicationController;
 use App\Http\Controllers\Account\InstructorReviewController;
 use App\Http\Controllers\Account\LoginController;
@@ -22,17 +23,20 @@ use App\Http\Controllers\Challenges\ChallengeStudioController;
 use App\Http\Controllers\Challenges\ChallengeSubmissionController;
 use App\Http\Controllers\Challenges\PublishedChallengeController;
 use App\Http\Controllers\Challenges\WeeklyChallengeController;
+use App\Http\Controllers\Content\ContentDeletionController;
 use App\Http\Controllers\Content\CourseLearningController;
 use App\Http\Controllers\Content\CourseReviewController;
 use App\Http\Controllers\Content\CourseStudioController;
 use App\Http\Controllers\Content\ModuleReviewController;
 use App\Http\Controllers\Content\ModuleStudioController;
 use App\Http\Controllers\Content\PublishedModuleController;
+use App\Http\Controllers\Engagement\ContentReactionController;
 use App\Http\Controllers\Gamification\WeeklyEventStudioController;
 use App\Http\Controllers\HelpController;
 use App\Http\Controllers\LearningController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PlayController;
+use App\Http\Middleware\GoogleCallbackPrivacy;
 use Illuminate\Support\Facades\Route;
 
 Route::pattern('course', '[0-9]+');
@@ -131,6 +135,10 @@ Route::middleware(['auth', 'account.session'])->prefix('manage/accounts')->name(
 Route::get('/account/contributor-application', [ContributorApplicationController::class, 'create'])->middleware(['auth', 'account.session'])->name('contributor-application.create');
 Route::get('/manage/reports', SystemReportController::class)->middleware(['auth', 'account.session', 'throttle:10,1,system-reports:'])->name('system-reports');
 Route::get('/help', [HelpController::class, 'index'])->middleware('throttle:30,1,help:')->name('help.index');
+Route::post('/feedback/{kind}/{content}', [ContentReactionController::class, 'store'])->whereIn('kind', ['module', 'course', 'challenge'])->whereNumber('content')
+    ->middleware(['auth', 'account.session', 'throttle:20,1,content-feedback:'])->name('content-reactions.store');
+Route::get('/create/content/{kind}/{content}/delete', [ContentDeletionController::class, 'show'])->whereIn('kind', ['module', 'course', 'challenge'])->whereNumber('content')->middleware(['auth', 'account.session'])->name('content-deletion.show');
+Route::post('/create/content/{kind}/{content}/delete', [ContentDeletionController::class, 'store'])->whereIn('kind', ['module', 'course', 'challenge'])->whereNumber('content')->middleware(['auth', 'account.session', 'throttle:5,1,content-delete:'])->name('content-deletion.store');
 Route::get('/help/{entry}', [HelpController::class, 'show'])->whereNumber('entry')->middleware('throttle:30,1,help:')->name('help.show');
 Route::middleware(['auth', 'account.session'])->prefix('manage/faqs')->name('faq-management.')->group(function (): void {
     Route::get('/', [FaqController::class, 'index'])->name('index');
@@ -169,6 +177,13 @@ Route::get('/account/creator-application', [InstructorApplicationController::cla
 Route::post('/account/creator-application', [InstructorApplicationController::class, 'store'])->middleware(['auth', 'account.session', 'throttle:5,1,creator-apply:'])->name('instructor-application.store');
 Route::patch('/account', [ProfileEditingController::class, 'update'])->middleware(['auth', 'account.session', 'throttle:10,1,profile-edit:'])->name('account.update');
 Route::post('/logout', [LoginController::class, 'destroy'])->middleware('auth')->name('logout');
+Route::post('/auth/google', [GoogleAuthenticationController::class, 'start'])->middleware(['guest', 'throttle:10,1,google-login:'])->name('google.start');
+Route::get('/auth/google/callback', [GoogleAuthenticationController::class, 'callback'])->middleware([GoogleCallbackPrivacy::class, 'throttle:20,1,google-callback:'])->name('google.callback');
+Route::middleware(['auth', 'account.session'])->group(function (): void {
+    Route::get('/account/google', [GoogleAuthenticationController::class, 'show'])->name('account.google');
+    Route::post('/account/google/link', [GoogleAuthenticationController::class, 'link'])->middleware('throttle:5,1,google-link:')->name('google.link');
+    Route::post('/account/google/unlink', [GoogleAuthenticationController::class, 'unlink'])->middleware('throttle:5,1,google-unlink:')->name('google.unlink');
+});
 Route::middleware(['auth', 'account.session'])->prefix('manage/instructors')->name('instructor-reviews.')->group(function (): void {
     Route::get('/', [InstructorReviewController::class, 'index'])->name('index');
     Route::get('/{application}', [InstructorReviewController::class, 'show'])->name('show');

@@ -5,6 +5,7 @@
     <h1>Your profile</h1>
     <p class="intro">Your account information. Your email is masked for privacy.</p>
     <p class="secondary-link"><a href="{{ route('account.edit') }}">Edit your player profile</a></p>
+    <p class="secondary-link"><a href="{{ route('account.google') }}">Manage Google sign-in</a></p>
     @if(in_array(auth()->user()->account_role, [\App\Enums\Role::Learner, \App\Enums\Role::Contributor], true))<p class="secondary-link"><a href="{{ route('instructor-application.create') }}">Become a learning creator</a></p>@endif
     <dl class="profile-details">
         <dt>Username</dt><dd>{{ $profile['username'] ?? 'Not yet provided' }}</dd>

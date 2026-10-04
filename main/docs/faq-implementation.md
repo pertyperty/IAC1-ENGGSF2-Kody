@@ -77,9 +77,9 @@ Remote CI, production deployment and browser visual checks remain unverified.
 
 ## Next implementation prompt
 
-B10's Rate Content flow describes a toggled Like reaction, but its business rules
-describe one overwritten rating per content and an undefined numeric scale. The
-dictionary permits Like/Helpful/Favorite. Resolve the reaction-versus-rating
-contract and proof of prior access before storing feedback. Do not invent a rating
-scale or turn browser claims into access proof. Retain monetization, reward formulas
-and live Judge0 activation in the deferred-feature register.
+B10 has since been resolved by the owner: one replaceable Like/Helpful/Favorite
+reaction with removal; numeric ratings deferred. The delegated eligibility choice
+requires current access and a trusted opening/completion, plus course enrollment.
+See [content feedback](content-feedback-implementation.md) for implementation and
+the next content-deletion decision. Retain monetization, reward formulas and live
+Judge0 activation in the deferred-feature register.

@@ -1,6 +1,7 @@
 @extends('layouts.learning')
 @section('title', 'Creator studio — Kody')
 @section('content')
+@if(session('status'))<p class="lesson-note page-width" role="status">{{ session('status') }}</p>@endif
 <section class="review-page page-width">
     <p class="overline">MAKE SOMEONE’S NEXT AHA MOMENT</p><h1>Your creator studio.</h1>
     <p>Turn an idea into a little adventure. Add a lesson, choose a game or quiz, and send it for review.</p>

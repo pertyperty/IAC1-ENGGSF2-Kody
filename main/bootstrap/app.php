@@ -2,10 +2,12 @@
 
 use App\Http\Controllers\HealthController;
 use App\Http\Middleware\EnsureActiveAccountSession;
+use App\Http\Middleware\GoogleCallbackPrivacy;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Middleware\ThrottleRequests;
 use Illuminate\Support\Facades\Route;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -20,13 +22,14 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias(['account.session' => EnsureActiveAccountSession::class]);
+        $middleware->prependToPriorityList(ThrottleRequests::class, GoogleCallbackPrivacy::class);
         $middleware->redirectGuestsTo(fn () => route('login'));
         $middleware->redirectUsersTo(fn () => route('dashboard'));
         // Test-case whitespace is part of the expected program behavior.
         $middleware->trimStrings(except: ['test_cases.*.input', 'test_cases.*.expected_output', 'source_code']);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        $exceptions->dontFlash(['verification_token', 'recovery_token', 'source_code']);
+        $exceptions->dontFlash(['verification_token', 'recovery_token', 'source_code', 'code', 'state', 'access_token', 'id_token', 'client_secret', 'code_verifier']);
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );

@@ -13,13 +13,87 @@ use App\Services\Administration\ModeratorAppointments;
 use App\Services\Challenges\ChallengePublishing;
 use App\Services\Content\CoursePublishing;
 use App\Services\Content\ModulePublishing;
+use App\Services\Engagement\ContentFeedback;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Symfony\Component\Process\Process;
 
 uses(DatabaseMigrations::class);
+
+test('A03 Google simultaneous callback claims permit only one provider exchange', function () {
+    $sessionId = Str::random(40);
+    $attemptId = (string) Str::uuid();
+    DB::table('google_auth_attempts')->insert(['id' => $attemptId, 'session_hash' => hash('sha256', $sessionId),
+        'state_hash' => hash('sha256', 'test-state'), 'intent' => 'login', 'created_at' => now(), 'expires_at' => now()->addMinutes(5)]);
+    $results = simultaneousAccountRequests('google-claim', ['session_id' => $sessionId, 'attempt_id' => $attemptId, 'state' => 'test-state'],
+        fn () => DB::table('google_auth_attempts')->where('id', $attemptId)->lockForUpdate()->first());
+    sort($results);
+    expect($results)->toBe(['claimed', 'invalid'])->and(DB::table('google_auth_attempts')->value('consumed_at'))->not->toBeNull();
+});
+
+test('A03 Google concurrent sign-ins authenticate one session and prompt the other', function () {
+    $user = User::factory()->create();
+    $hash = googleIdentity($user);
+    $results = simultaneousAccountRequests('google-login', ['subject_hash' => $hash], fn () => User::whereKey($user->id)->lockForUpdate()->first());
+    sort($results);
+    expect($results)->toBe(['authenticated', 'conflict']);
+});
+
+test('A06 Google concurrent links preserve unique ownership and one audit', function () {
+    $sessionId = Str::random(40);
+    $users = User::factory()->count(2)->create(['active_session_hash' => hash('sha256', $sessionId), 'active_session_expires_at' => now()->addHour()]);
+    $results = simultaneousAccountRequests('google-link', ['session_id' => $sessionId, 'user_ids' => $users->pluck('id')->all(), 'subject_hash' => hash('sha256', 'shared-google-subject')],
+        fn () => DB::statement('LOCK TABLE google_identities IN SHARE MODE'));
+    sort($results);
+    expect($results)->toBe(['linked', 'rejected'])->and(DB::table('google_identities')->count())->toBe(1)
+        ->and(DB::table('audit_events')->where('event', 'account.google-linked')->count())->toBe(1);
+});
+
+test('D04 D09 C07 simultaneous deletion commits one purge and audit', function (string $kind) {
+    $content = moderationFixture($kind);
+    $results = simultaneousAccountRequests('content-delete', ['actor_ids' => [$content->created_by, $content->created_by],
+        'actions' => ['delete', 'delete'], 'kind' => $kind, 'content_id' => $content->id, 'version' => $content->record_version],
+        fn () => $content->newQuery()->whereKey($content->id)->lockForUpdate()->first());
+    sort($results);
+    expect($results)->toBe(['deleted', 'missing'])->and($content->fresh())->toBeNull();
+    expect(DB::table('audit_events')->where('event', $kind.'.deleted')->count())->toBe(1);
+})->with(['module', 'course', 'challenge']);
+
+test('D04 a simultaneous opening and deletion preserve either the learner reference or complete deletion', function () {
+    $content = moduleFixture(true);
+    $learner = moduleAccount(Role::Learner);
+    $results = simultaneousAccountRequests('content-delete', ['actor_ids' => [$content->created_by, $learner->id],
+        'actions' => ['delete', 'open'], 'kind' => 'module', 'content_id' => $content->id, 'version' => $content->record_version],
+        fn () => $content->newQuery()->whereKey($content->id)->lockForUpdate()->first());
+    sort($results);
+    if ($content->fresh() === null) {
+        expect($results)->toBe(['deleted', 'missing'])->and(DB::table('content_accesses')->where('module_id', $content->id)->count())->toBe(0);
+    } else {
+        expect($results)->toBe(['duplicate', 'opened'])->and(DB::table('content_accesses')->where('module_id', $content->id)->count())->toBe(1);
+    }
+});
+
+test('B10 simultaneous reactions serialize duplicate retries competing choices and independent users', function (string $case) {
+    $item = moduleFixture(true);
+    $first = moduleAccount(Role::Learner);
+    $second = $case === 'independent' ? moduleAccount(Role::Learner) : $first;
+    $service = app(ContentFeedback::class);
+    foreach ([$first, $second] as $user) {
+        $service->read($user, 'module-test-session', 'module', $item->id, true);
+    }
+    $results = simultaneousAccountRequests('content-react', ['actor_ids' => [$first->id, $second->id], 'module_id' => $item->id,
+        'version' => 0, 'reactions' => ['Like', $case === 'competing' ? 'Helpful' : 'Like']],
+        fn () => $item->newQuery()->whereKey($item->id)->lockForUpdate()->first());
+    sort($results);
+    expect($results)->toBe($case === 'competing' ? ['duplicate', 'saved'] : ['saved', 'saved']);
+    expect(DB::table('content_reactions')->count())->toBe($case === 'independent' ? 2 : 1);
+    expect(DB::table('content_reactions')->where('record_version', '!=', 1)->count())->toBe(0);
+    $state = $service->read($first, 'module-test-session', 'module', $item->id);
+    expect(array_sum($state['counts']))->toBe($case === 'independent' ? 2 : 1);
+})->with(['duplicate', 'competing', 'independent']);
 
 test('G12 G13 simultaneous FAQ confirmations commit one content version and audit', function (string $action) {
     $entry = faqFixture();
