@@ -76,6 +76,13 @@
             <div class="studio-actions"><button class="button button-play" type="submit">Save draft</button><a class="quiet-link" href="{{ route('studio.index') }}">Cancel</a></div>
         </fieldset>
     </form>
+    <section class="studio-preview" data-quiz-preview hidden aria-label="Unsaved quiz preview">
+        <h2>Try your current quiz</h2>
+        <p class="field-hint" data-quiz-preview-status role="status">Preview wins stay here.</p>
+        <button type="button" class="button button-dark" data-quiz-preview-button>Preview my quiz →</button>
+        <div data-quiz-preview-host></div>
+        <template>@include('learning.quiz', ['quiz' => ['template' => 'choice-quiz', 'version' => 1, 'title' => '', 'question' => '', 'explanation' => '', 'options' => [['id' => 'a', 'label' => ''], ['id' => 'b', 'label' => '']], 'answer' => 'a'], 'module' => null])</template>
+    </section>
     @if($revision?->review_status === 'Draft' && $module?->status !== 'Archived')<form method="post" action="{{ route('studio.submit', $module) }}" class="studio-actions">@csrf<input type="hidden" name="record_version" value="{{ $module->record_version }}"><button class="button button-dark" type="submit">Submit saved draft for review →</button></form>@endif
     @if($module?->status === 'Published')<p><a class="quiet-link" href="{{ route('studio.archive-confirmation', $module) }}">Archive this adventure</a></p>@endif
     @if($revision)<section class="studio-preview"><h2>Try your saved adventure</h2><p class="field-hint">This preview uses your last saved draft. Preview wins stay here.</p>@include('content.lesson', ['module' => null, 'preview' => true])</section>@endif

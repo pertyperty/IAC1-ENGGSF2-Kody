@@ -1,46 +1,17 @@
 # Kody
 
-Game-first coding platform with learning modules, creator content and monetization
-layered over playable experiences. See the approved
-[product amendment](docs/game-first-product-direction.md). This is a Laravel
-modular monolith; business use cases are implemented incrementally.
+Game-first coding platform with creator-authored lessons, customizable games and
+reviewed courses. Laravel modular monolith with PostgreSQL as the canonical database.
+
 Read `AGENTS.md` and [architecture conventions](docs/architecture.md) first.
+The [implementation map](docs/implementation-status.md) is the master index for
+feature scope, traceability and remaining improvements. It links the detailed
+records without duplicating their approved decisions. Owner-deferred features
+remain in the [deferred register](docs/deferred-features.md).
 
-The [creator garden designer](docs/garden-designer-implementation.md) lets
-Instructors paint paths, move objectives and add crystals, then play a preview
-before saving. The server rejects unsolvable layouts; published revisions remain
-unchanged until review. Google OAuth live setup is now explicitly deferred in the
-[deferred-feature register](docs/deferred-features.md).
-
-[Google sign-in](docs/google-authentication-implementation.md) supports explicitly
-linked existing verified accounts, with password-confirmed linking/unlinking,
-PKCE, single-use callback records and existing account/session restrictions.
-Deploy its additive migration. It is disabled by default until private OAuth
-configuration and a live verification round trip are completed. Email matching
-never links accounts or creates new users.
-
-[Content feedback](docs/content-feedback-implementation.md) lets verified Active
-Learners, Contributors and Instructors choose one Like, Helpful or Favorite after
-opening available content. Enrolled courses also accept feedback; choices can be
-replaced or removed without interrupting game practice. Numeric ratings and
-rewards remain deferred. Deploy the additive feedback migration and rebuild assets.
-
-[Creator deletion](docs/content-deletion-implementation.md) removes dependency-free
-owned modules, courses and challenges after explicit confirmation. Retained
-learner/course/weekly/feedback/moderation history blocks permanent deletion and
-preserves the existing archival option. An additive migration indexes retained
-learner audit references; it preserves all stored history.
-
-Four additional creator-configurable games are available in the Playground:
-Pixel Studio, Number Machine, Sort Lab and Terminal Quest. The terminal uses a
-virtual filesystem; full language execution still requires Judge0 setup. See
-[template contracts, authoring and deployment](docs/arcade-templates-implementation.md).
-The [Learning catalog](docs/module-discovery-implementation.md) filters published
-lessons by game or quiz type; each playground trial links to matching lessons.
-The [guided creator and learner journey](docs/creator-learner-journey.md) adds
-eight editable lesson starters and a saved-progress Continue playing action.
-See [deployment operations](docs/deployment-operations.md) for local worker,
-scheduler, private storage and restore evidence, plus remaining staging checks.
+The shared interface uses blue/grey light and dark themes, a remembered header
+toggle and responsive controls. Creators can preview unsaved games and quizzes;
+previews do not record learner progress. See [interface implementation](docs/interface-implementation.md).
 
 ## Development setup
 
@@ -139,7 +110,7 @@ UTC is canonical. Database queues dispatch after commit by default; test queues 
 Account verification persists its database job inside the account transaction.
 The base seeder creates no accounts or production credentials.
 
-## Account registration milestone
+## Account configuration
 
 `/register` implements A01 registration and pending Instructor applications;
 `/email/verify` implements A02 single-use activation and limited resends.
@@ -149,8 +120,8 @@ Do not use a log mailer for verification tokens. Credentials use the private
 local disk by default; preserve its storage across release switches.
 
 See [account implementation and traceability](docs/account-implementation-plan.md)
-for approved requirement decisions, migration preflight, token protection,
-concurrency coverage and remaining recovery/approval/provider scope.
+for approved requirements decisions, migration preflight, token protection and
+concurrency coverage. Other account scopes are indexed in the implementation map.
 
 `/login` implements A03 email/password login with durable progressive lockouts,
 consent before replacing an active session, and POST logout. The protected
@@ -167,90 +138,8 @@ password login. The additive migrations do not rewrite existing passwords.
 
 ## Production preparation
 
-Approved Instructors can build adventures in `/create`, attach configurable games
-or quizzes and submit drafts. Moderator/Admin review at `/manage/modules` controls
-publication and replacements. Learning shows approved revisions; verified wins
-qualify the Manila daily streak. Creators receive reviews at `/updates` and can
-archive published adventures. See [creator studio scope and verification](docs/creator-studio-implementation.md).
-
-The studio also supports `/create/courses`: versioned course drafts, ordered reuse
-of owned approved adventures, saved previews and course review at `/manage/courses`.
-See [course composition scope](docs/course-composition-implementation.md).
-Learners can browse `/learn/courses`, explicitly join free courses and resume
-their pinned lessons in `/learn/courses/mine`. Verified game/quiz wins save
-assessment progress and share the daily streak. Owners can archive courses;
-existing enrollees retain access while new enrollment stops. Paid enrollment is
-unavailable. See [course learning scope](docs/course-learning-implementation.md).
-
-Contributors and Instructors can author coding quests in `/create/challenges`,
-with versioned problems, execution settings and sample/hidden tests. Moderator/Admin
-review at `/manage/challenges` controls publication and replacements; owners can
-archive published quests. `/challenges` exposes approved metadata and authenticated
-sample previews. Confirmed free attempts now pin the approved revision, enforce
-three lifetime attempts and queue private evaluation. Execution stays unavailable
-until configured Judge0 compiler IDs and limits pass `php artisan kody:judge0-check`.
-See [submission setup and scope](docs/challenge-submission-implementation.md) and
-[challenge studio scope](docs/challenge-studio-implementation.md).
-
-The Play hub now presents weekly quests with their own three-attempt budgets.
-Moderators configure approved, revision-pinned events at `/manage/weekly-events`;
-the Laravel scheduler activates the Sunday-to-Sunday Manila cycle and selects an
-approved quest when no manual selection exists. Private history lives at `/weekly`.
-Judge0 setup and all XP/rank/KodeBit rewards remain deferred. See
-[weekly event scope](docs/weekly-challenge-plan.md).
-
-All five roles can edit their own profile at `/account/edit`. Email/password
-changes require the current password and end sessions; changed email requires
-verification again. Learners and Contributors can apply to become creators and
-resubmit after rejection, with private credentials and prior decisions preserved.
-See [A06 scope and verification](docs/profile-editing-implementation.md).
-Paid purchases and other postponed scope are tracked in the
-[deferred-feature register](docs/deferred-features.md).
-Learners, Contributors and Instructors can archive their own accounts with
-password confirmation, retaining data and returning through A04 recovery.
-See [A07 archival scope](docs/account-archival-implementation.md).
-Participant accounts without authored modules, courses or challenges can request
-permanent deletion at `/account/delete`, using password and explicit confirmation.
-Active evaluations must finish first; Archived users reactivate through A04 first.
-Deletion removes private learning/submission records and revokes sessions. Private
-credential files use encrypted, retryable cleanup records. Keep database workers
-and the scheduler running; `php artisan kody:account-erasures-retry` requeues
-unfinished cleanup without duplicating pending jobs. See
-[deletion scope and operational limits](docs/account-deletion-plan.md).
-Learners can apply for Contributor access at `/account/contributor-application`
-after 30 days, 25 distinct validated module completions and 50 distinct passed
-coding challenges. Moderator/Admin review at `/manage/contributors` controls
-elevation. Rejected applications retain history; only one Pending role application
-is allowed at a time. Supporting files stay private and notices use database jobs.
-See [A09/G05 scope](docs/contributor-application-plan.md).
-Moderators and Administrators can browse account status and enforcement history
-at `/manage/accounts`. Confirmed suspension immediately revokes sessions;
-reinstatement requires a new login. The approved hierarchy protects self/Admin
-targets, and committed coding evaluations continue. See
-[G01/G03/G04 scope](docs/account-governance-implementation.md).
-Administrators can also appoint verified Active participant accounts as Moderators
-and remove them to their recorded prior role. Confirmation requires the current
-Administrator password, revokes target sessions and records audit/notification
-history. Self/Admin targets and legacy Moderators with unknown prior roles remain
-protected. See [G02 role scope](docs/moderator-appointments-implementation.md).
-Administrators can correct username and first/last name for eligible accounts
-when the user requests help, with password confirmation, audit, session revocation
-and a queued notice. See [G02 support scope](docs/support-profile-corrections-implementation.md).
-Administrators can view read-only account, content, validated learning and coding
-attempt totals at `/manage/reports`, with retained date filters and consistent
-PostgreSQL snapshots. Financial/reward reporting remains unavailable. See
-[G07 scope and count definitions](docs/system-reports-implementation.md).
-Moderators/Administrators can withdraw and restore Published/Archived content at
-`/manage/content`. Staff withdrawal blocks enrolled learners too, preserving
-content, progress and committed evaluations. Creator edits cannot lift the block.
-See [G06 scope and rollback safeguards](docs/content-withdrawal-implementation.md).
-Administrators manage reusable game/quiz defaults at `/manage/game-presets`.
-Module assessments pin immutable preset versions; updates and inactivation retain
-existing play. Rewards stay Deferred. See
-[preset workshop scope](docs/game-presets-implementation.md).
-Public Help at `/help` provides categorized, searchable answers. Verified Active
-Administrators publish, update and delete entries at `/manage/faqs`, with audited
-version checks. See [FAQ scope and verification](docs/faq-implementation.md).
+See [deployment operations](docs/deployment-operations.md) for rehearsal evidence,
+worker configuration and remaining staging checks.
 
 The target is Linux EC2, Nginx/PHP-FPM with PHP 8.4.1+, RDS PostgreSQL and S3 where required.
 Set `APP_ENV=production`, `APP_DEBUG=false`, a stable managed `APP_KEY`, HTTPS

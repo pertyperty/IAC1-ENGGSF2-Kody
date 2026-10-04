@@ -2,6 +2,12 @@
 
 ## Mission
 
+Start with the [implementation map](docs/implementation-status.md) for current
+scope and authoritative feature records. Shared browser themes and interaction
+conventions are documented in [interface implementation](docs/interface-implementation.md).
+Use semantic blue/grey light/dark tokens; keep typed game colors meaningful and
+preview-only wins separate from server-validated progress.
+
 The [guided journey](docs/creator-learner-journey.md) supplies editable lesson
 examples and continued play derived from persisted progress. Examples never
 auto-save or publish. See [operations preparation](docs/deployment-operations.md)

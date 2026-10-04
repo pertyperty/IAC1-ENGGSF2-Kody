@@ -27,17 +27,27 @@ export function mountQuiz(root) {
     let quiz;
     try { quiz = validateQuiz(JSON.parse(root.dataset.practiceQuiz)); }
     catch { feedback.textContent = 'This quiz is unavailable. Try another adventure.'; root.querySelector('button').disabled = true; return; }
+    let busy = false;
     root.querySelector('form').addEventListener('submit', async (event) => {
         event.preventDefault();
+        if (busy) return;
         const answer = root.querySelector('input:checked')?.value;
         const result = checkPracticeAnswer(quiz, answer);
         feedback.textContent = result.message;
         root.classList.toggle('quiz-correct', result.correct);
         if (result.correct) {
-            const button = root.querySelector('button'); button.disabled = true;
-            const saved = await saveCompletion(root, { answer });
-            feedback.textContent = `${result.message} ${saved}`;
-            button.disabled = false;
+            busy = true;
+            const controls = root.querySelectorAll('button, input');
+            controls.forEach((control) => { control.disabled = true; });
+            root.setAttribute('aria-busy', 'true');
+            try {
+                const saved = await saveCompletion(root, { answer });
+                feedback.textContent = `${result.message} ${saved}`;
+            } finally {
+                busy = false;
+                controls.forEach((control) => { control.disabled = false; });
+                root.setAttribute('aria-busy', 'false');
+            }
         }
     });
 }

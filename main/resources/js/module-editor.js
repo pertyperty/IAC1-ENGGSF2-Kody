@@ -1,5 +1,6 @@
 import { mountGardenDesigner } from './games/garden-designer.js';
 import { mountScenarioEditor } from './games/scenario-editor.js';
+import { mountQuizDesigner } from './games/quiz-designer.js';
 
 export function mountModuleEditor(root) {
     const kind = root.querySelector('[name="assessment_kind"]');
@@ -7,6 +8,7 @@ export function mountModuleEditor(root) {
     const preset = root.querySelector('[name="game_preset"]');
     const presets = JSON.parse(root.dataset.gamePresets);
     mountGardenDesigner(root, presets);
+    mountQuizDesigner(root);
     mountScenarioEditor(root, '[name="game_preset"]', { title: 'game_title', instructions: 'game_instructions', hint: 'game_hint', learningIdea: 'game_learning_idea' });
     let previousPreset = preset.value;
     preset.addEventListener('change', () => {
@@ -23,6 +25,10 @@ export function mountModuleEditor(root) {
         root.querySelector('[data-quiz-fields]').hidden = kind.value !== 'quiz';
         root.querySelector('[data-preset-fields]').hidden = kind.value !== 'preset';
         root.querySelector('[data-video-fields]').hidden = type.value !== 'Video';
+        for (const selector of ['[data-quiz-fields]', '[data-preset-fields]', '[data-video-fields]']) {
+            const section = root.querySelector(selector);
+            section.querySelectorAll('input, textarea, select').forEach((field) => { field.disabled = section.hidden; });
+        }
         root.querySelectorAll('[data-game-fields] input, [data-game-fields] textarea, [data-game-fields] select').forEach((field) => {
             field.disabled = kind.value !== 'game' || ['[data-garden-designer]', '[data-scenario-editor]', '[data-scenario-panel]']
                 .some((selector) => field.closest(selector)?.hidden);

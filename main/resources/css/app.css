@@ -1,5 +1,7 @@
 @import 'tailwindcss';
 @import './play.css';
+@import './interface.css';
+@import './theme.css';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
@@ -8,74 +10,3 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
-
-.account-page { margin: 0; background: #f6f7f2; color: #203328; font-family: var(--font-sans); min-height: 100vh; }
-.account-header { max-width: 1100px; margin: auto; padding: 28px 24px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: #617467; }
-.brand { font-size: 30px; font-weight: 800; letter-spacing: -1px; color: #203328; text-decoration: none; }
-.brand span { color: #688e3e; }
-.account-shell { max-width: 550px; margin: 22px auto 60px; padding: 36px; border: 1px solid #dce3d5; border-radius: 20px; background: white; box-shadow: 0 12px 48px #20332808; }
-.eyebrow { color: #6e874c; font-size: 11px; letter-spacing: 2px; font-weight: 700; margin-bottom: 14px; }
-.account-shell h1 { font-size: 34px; line-height: 1.15; letter-spacing: -1px; font-weight: 700; margin: 0 0 16px; }
-.intro { color: #617467; line-height: 1.6; margin-bottom: 28px; }
-.account-form { display: grid; gap: 18px; }
-.report-table { width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 14px; }
-.moderation-details pre { white-space: pre-wrap; overflow-wrap: anywhere; }
-.faq-answer { white-space: pre-wrap; overflow-wrap: anywhere; }
-.content-reactions { margin-top: 32px; padding: 24px; border: 1px solid #dce3d5; border-radius: 18px; background: #f6f7f2; }
-.content-reactions h2 { font-weight: 650; font-size: 20px; }
-.content-reactions p { margin-block: 10px; color: #617467; font-size: 14px; }
-.reaction-choices { display: flex; flex-wrap: wrap; gap: 10px; }
-.reaction-choices button[aria-pressed="true"] { background: #597f31; }
-.reaction-choices button:disabled { opacity: .6; cursor: default; }
-.report-table caption { text-align: left; font-weight: 700; margin-bottom: 12px; }
-.report-table th, .report-table td { padding: 12px 8px; border-bottom: 1px solid #dce3d5; text-align: left; overflow-wrap: anywhere; }
-.report-table tbody th { font-weight: 400; }
-.report-table td, .report-table thead th:last-child { text-align: right; font-variant-numeric: tabular-nums; }
-.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.account-form label { display: grid; gap: 7px; font-size: 13px; font-weight: 600; }
-.account-form input, .account-form select { width: 100%; padding: 11px 12px; border: 1px solid #cdd9ca; border-radius: 8px; background: #fbfcfa; color: #203328; font-size: 15px; box-sizing: border-box; }
-.account-form input:focus, .account-form select:focus { outline: 2px solid #96b572; outline-offset: 2px; }
-.account-form small, .form-note { color: #617467; font-size: 11px; font-weight: 400; line-height: 1.6; }
-.account-form fieldset { border: 1px solid #dce3d5; border-radius: 10px; padding: 18px; }
-.account-form fieldset label { margin-top: 16px; }
-.account-form fieldset p { color: #617467; font-size: 12px; line-height: 1.6; }
-.primary-button { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; background: #274d34; color: white; border: 0; border-radius: 9px; cursor: pointer; text-decoration: none; font-weight: 600; font-size: 14px; }
-.primary-button:hover { background: #356443; }
-.secondary-link { margin-top: 24px; font-size: 12px; color: #365f40; }
-.secondary-link a { text-decoration: underline; text-underline-offset: 3px; }
-.notice { border: 1px solid #c4d8ae; background: #edf5e4; padding: 14px; border-radius: 10px; font-size: 13px; line-height: 1.6; }
-.form-errors { background: #fff1ee; color: #912e22; padding: 14px; border-radius: 10px; margin-bottom: 20px; font-size: 13px; }
-.form-errors ul { padding-left: 20px; list-style: disc; }
-.account-footer { text-align: center; color: #617467; font-size: 11px; padding: 24px; }
-.profile-details { display: grid; grid-template-columns: 110px 1fr; gap: 16px; font-size: 14px; }
-.profile-details dt { color: #617467; }
-.profile-details dd { margin: 0; overflow-wrap: anywhere; }
-@media (max-width: 600px) { .account-shell { margin: 10px 16px 30px; padding: 25px; } .account-header { padding: 20px; } .account-header > span { display: none; } .form-row { grid-template-columns: 1fr; } .account-shell h1 { font-size: 30px; } }
-/* Shared template playground: text labels accompany color and visual state. */
-.arcade-tabs { display:flex; flex-wrap:wrap; gap:.7rem; margin:1.5rem 0; }
-.arcade-tabs .button { width:auto; flex:0 1 auto; font-size:.9rem; justify-content:center; padding:.8rem 1rem; }
-.arcade-world { display:flex; flex-wrap:wrap; gap:1.5rem; align-items:center; padding:1.5rem; border-radius:1rem; background:#f2f3ec; margin:1rem 0; }
-.arcade-controls { display:flex; flex-wrap:wrap; gap:.75rem; align-items:end; margin:1rem 0; }
-.arcade-controls label { display:grid; gap:.4rem; }
-.arcade-controls input,.arcade-controls select { padding:.65rem; border:1px solid #80877b; border-radius:.6rem; max-width:100%; background:white; color:#25352c; }
-.arcade-code-label { display:grid; gap:.5rem; font-weight:700; }
-.arcade-code-label textarea { width:100%; box-sizing:border-box; padding:1rem; border:1px solid #80877b; border-radius:.7rem; font-family:monospace; background:#fff; color:#25352c; }
-.arcade-output { white-space:pre-wrap; overflow-wrap:anywhere; background:#24362e; color:#f3fff3; padding:1rem; border-radius:.7rem; min-height:5rem; }
-.pixel-grid { display:grid; grid-template-columns:repeat(3,3.7rem); gap:.35rem; }
-.pixel-tile { display:grid; place-items:center; height:3.7rem; border:1px solid #667669; border-radius:.5rem; color:#24362e; font-size:.8rem; }
-.pixel-blank { background:#fff; } .pixel-mint { background:#aee8c2; } .pixel-peach { background:#ffcaa8; } .pixel-lavender { background:#d7c6f4; }
-.number-display { font-size:2rem; font-weight:800; padding:1rem; background:#b7e7cc; border-radius:1rem; }
-.sort-tile { white-space:pre-line; text-align:center; padding:1rem; background:#d7c6f4; border-radius:.8rem; font-weight:700; }
-.terminal-game .arcade-code-label textarea { background:#24362e; color:#f3fff3; }
-.arcade-game { max-width:960px; margin:1.5rem auto; }
-@media(max-width:500px) { .arcade-world { padding:.75rem; } .arcade-controls label { width:100%; } .arcade-tabs .button { width:100%; } }
-.continue-card { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 24px; padding: 24px; margin-bottom: 28px; border: 1px solid #c9dfb9; border-radius: 20px; background: #edf6e4; }
-.continue-card h2 { margin-top: 0; }
-.starter-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 16px; }
-.starter-card { display: block; padding: 20px; border: 1px solid #d4deca; border-radius: 16px; background: #f5f8f0; color: #33462c; text-decoration: none; }
-.starter-card:hover { background: #e7f1dc; }
-.starter-card h3 { margin: 0 0 10px; }
-.starter-card span { font-weight: 600; }
-.creator-steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 16px; padding: 0; list-style: none; margin: 28px 0; }
-.creator-steps li { border-left: 3px solid #a7c88c; padding: 12px 16px; }
-.creator-steps span { display: block; margin-top: 8px; line-height: 1.5; }

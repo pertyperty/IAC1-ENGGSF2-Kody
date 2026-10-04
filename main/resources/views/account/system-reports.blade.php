@@ -1,5 +1,6 @@
 @extends('layouts.account')
 @section('title', 'System reports — Kody')
+@section('shell-class', 'account-shell-wide')
 @section('content')
 <h1>System reports</h1><p>Read-only totals from stored Kody records. Dates use Asia/Manila, including both selected calendar days.</p>
 @if($errors->any())<div class="form-errors" role="alert">@foreach($errors->all() as $error)<p>{{ $error }}</p>@endforeach</div>@endif

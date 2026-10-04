@@ -1,5 +1,6 @@
 @extends('layouts.account')
 @section('title', 'Account governance — Kody')
+@section('shell-class', 'account-shell-wide')
 @section('content')
 <h1>Keep the community safe</h1><p>Browse current roles and account status, then open an account to review enforcement history.</p>
 <form class="account-form" method="GET" action="{{ route('account-governance.index') }}">

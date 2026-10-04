@@ -11,8 +11,10 @@ versioned assessment defaults. It neither creates a record nor grants publicatio
 Current validation, owner/session checks, immutable approved revisions and staff
 review remain required. Blank drafts are still supported; existing drafts and
 validation-restored input are not replaced by examples. The editor explains teach,
-preview and save/review steps. Garden/scenario previews and saved quiz previews
-remain local practice without completion endpoints.
+preview and save/review steps. Garden/scenario previews, unsaved quiz previews
+and saved quiz previews remain local practice without completion endpoints.
+The [shared interface update](interface-implementation.md) adds the unsaved quiz
+preview and ensures its feedback does not imply saved streak qualification.
 
 The hub derives the next uncompleted unlocked starter level and today's activity
 from the existing database snapshot. A quiz win qualifies daily practice without
