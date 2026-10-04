@@ -35,6 +35,8 @@ Four additional creator-configurable games are available in the Playground:
 Pixel Studio, Number Machine, Sort Lab and Terminal Quest. The terminal uses a
 virtual filesystem; full language execution still requires Judge0 setup. See
 [template contracts, authoring and deployment](docs/arcade-templates-implementation.md).
+The [Learning catalog](docs/module-discovery-implementation.md) filters published
+lessons by game or quiz type; each playground trial links to matching lessons.
 
 ## Development setup
 

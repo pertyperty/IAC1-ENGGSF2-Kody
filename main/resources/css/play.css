@@ -110,6 +110,7 @@
 .catalog-search { max-width: 650px; margin: 0 0 35px; }
 .catalog-search label { display: block; color: #738167; font-size: 11px; margin-bottom: 8px; }
 .catalog-search > div { display: flex; gap: 12px; }
+.catalog-search > label:not(:first-child) { margin-top: 16px; }
 .catalog-search input { width: 100%; min-width: 0; background: #fff; border: 1px solid #d4deca; border-radius: 10px; padding: 12px; font-size: 13px; color: #33462c; }
 .module-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 23px; }
 .module-card { background: #fff; border: 1px solid #dce4d4; border-radius: 18px; overflow: hidden; transition: transform .2s, box-shadow .2s; }

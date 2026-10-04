@@ -1,5 +1,8 @@
 # Play hub, templates and progression
 
+The [module discovery update](module-discovery-implementation.md) connects public
+playground trials to published lessons through assessment-template catalog filters.
+
 The [creator garden designer](garden-designer-implementation.md) now allows custom
 path/start/goal/crystal placeholders within the existing version-1 interpreter.
 Live creator previews do not save progress; reviewed revisions remain the sole
