@@ -6,6 +6,12 @@ import { mountChallengeStatus } from './challenge-status.js';
 import { mountContentReactions } from './content-reactions.js';
 import { mountGarden } from './games/command-garden.js';
 import { mountQuiz } from './games/choice-quiz.js';
+import { mountArcade } from './games/arcade-games.js';
+import { mountTheme } from './theme.js';
+import { mountAccountLinks } from './account-links.js';
+
+mountTheme(document, window);
+mountAccountLinks(document, window);
 
 document.querySelectorAll('[data-module-editor]').forEach(mountModuleEditor);
 document.querySelectorAll('[data-preset-editor]').forEach(mountPresetEditor);
@@ -16,6 +22,7 @@ document.querySelectorAll('[data-content-reactions]').forEach((root) => mountCon
 
 document.querySelectorAll('[data-coding-game]').forEach(mountGarden);
 document.querySelectorAll('[data-practice-quiz]').forEach(mountQuiz);
+document.querySelectorAll('[data-arcade-game]').forEach(mountArcade);
 
 const accountType = document.querySelector('#account-type');
 const instructorFields = document.querySelector('#instructor-fields');
@@ -32,29 +39,6 @@ if (accountType && instructorFields) {
 
     accountType.addEventListener('change', updateInstructorFields);
     updateInstructorFields();
-}
-
-const verificationForm = document.querySelector('#verify-link-form');
-const verificationInput = document.querySelector('#verification-token');
-if (verificationForm && verificationInput && window.location.hash) {
-    const token = new URLSearchParams(window.location.hash.slice(1)).get('token');
-    // Fragments are never sent to web servers; remove the secret from browser history.
-    window.history.replaceState(null, '', window.location.pathname);
-    if (token && /^[a-f0-9]{64}$/.test(token)) {
-        verificationInput.value = token;
-        verificationForm.submit();
-    }
-}
-
-const recoveryForm = document.querySelector('#recovery-token-form');
-const recoveryToken = document.querySelector('#recovery-token');
-if (recoveryForm && recoveryToken && window.location.hash) {
-    const token = new URLSearchParams(window.location.hash.slice(1)).get('recovery');
-    window.history.replaceState(null, '', window.location.pathname);
-    if (token && /^[a-f0-9]{64}$/.test(token)) {
-        recoveryToken.value = token;
-        recoveryForm.submit();
-    }
 }
 
 const cooldown = document.querySelector('[data-recovery-cooldown]');

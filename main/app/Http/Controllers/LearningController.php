@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\BrowseModulesRequest;
 use App\Models\ModuleRevision;
 use App\Services\Gamification\LearningProgression;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Validation\Rule;
 
 class LearningController extends Controller
 {
@@ -14,16 +16,28 @@ class LearningController extends Controller
         return response()->view('welcome', ['game' => config('learning.instances.sequences')]);
     }
 
-    public function catalog(Request $request): Response
+    public function arcade(Request $request): Response
     {
-        $query = $request->validate(['q' => ['nullable', 'string', 'max:80']])['q'] ?? '';
-        $modules = collect(config('learning.modules'))->filter(fn (array $module) => str_contains(mb_strtolower(implode(' ', $module)), mb_strtolower(trim($query))))->all();
+        $selected = $request->validate(['game' => ['sometimes', 'string', Rule::in(array_keys(config('arcade')))]])['game'] ?? 'pixel-studio';
+
+        return response()->view('learning.arcade', ['selected' => $selected, 'game' => config('arcade')[$selected]]);
+    }
+
+    public function catalog(BrowseModulesRequest $request): Response
+    {
+        $query = $request->validated('q') ?? '';
+        $template = $request->validated('template') ?? '';
+        $templates = $request->templates();
+        $modules = collect(config('learning.modules'))
+            ->filter(fn (array $module) => str_contains(mb_strtolower(implode(' ', $module)), mb_strtolower(trim($query))))
+            ->filter(fn (array $module, string $slug) => $template === '' || config('learning.instances.'.$slug.'.template') === $template || config('learning.quizzes.'.$slug.'.template') === $template)->all();
 
         $published = ModuleRevision::where('review_status', 'Approved')->whereHas('module', fn ($builder) => $builder->where('status', 'Published')->whereNull('staff_withdrawn_at')->whereColumn('published_revision_id', 'module_revisions.id'))
             ->when(trim($query) !== '', fn ($builder) => $builder->where(fn ($search) => $search->where('title', 'ilike', '%'.addcslashes(trim($query), '%_\\').'%')->orWhere('description', 'ilike', '%'.addcslashes(trim($query), '%_\\').'%')))
+            ->when($template !== '', fn ($builder) => $builder->where('assessment->template', $template))
             ->orderByDesc('id')->paginate(12)->withQueryString();
 
-        return response()->view('learning.catalog', compact('modules', 'query', 'published'));
+        return response()->view('learning.catalog', compact('modules', 'query', 'published', 'template', 'templates'));
     }
 
     public function show(Request $request, string $module, LearningProgression $progression): Response

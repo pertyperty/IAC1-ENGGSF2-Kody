@@ -7,8 +7,9 @@ use App\Models\ModuleRevision;
 use App\Models\User;
 use App\Services\Account\CurrentAccountSession;
 use App\Services\Administration\AuditRecorder;
+use App\Services\Games\GameAssessment;
 use App\Services\Games\GamePresets;
-use App\Services\Games\GardenLayout;
+use App\Services\Games\QuizAuthoring;
 use App\Services\Notifications\InAppNotifications;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -119,9 +120,9 @@ class ModulePublishing
     {
         return match ($data['assessment_kind']) {
             'preset' => array_replace(app(GamePresets::class)->snapshot((int) $data['managed_preset']), ['title' => $data['preset_title']]),
-            'game' => array_replace(app(GardenLayout::class)->instance($data), ['preset' => $data['game_preset'],
+            'game' => array_replace(app(GameAssessment::class)->instance($data), ['preset' => $data['game_preset'],
                 'title' => $data['game_title'], 'instructions' => $data['game_instructions'], 'hint' => $data['game_hint'], 'learningIdea' => $data['game_learning_idea']]),
-            'quiz' => ['template' => 'choice-quiz', 'version' => 1, 'title' => $data['quiz_title'], 'question' => $data['quiz_question'],
+            'quiz' => isset($data['quiz_questions']) ? app(QuizAuthoring::class)->instance($data['quiz_title'], $data['quiz_questions']) : ['template' => 'choice-quiz', 'version' => 1, 'title' => $data['quiz_title'], 'question' => $data['quiz_question'],
                 'options' => [['id' => 'a', 'label' => $data['quiz_a']], ['id' => 'b', 'label' => $data['quiz_b']]],
                 'answer' => $data['quiz_answer'], 'explanation' => $data['quiz_explanation']],
             default => null,

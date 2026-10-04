@@ -11,7 +11,7 @@ class ContributorEligibility
 {
     public function snapshot(User $user): array
     {
-        // Both writers persist only server-validated wins. Union by module identity,
+        // Reading completion advances courses but is not a server-validated win. Union by module identity,
         // so course reuse, revisions and daily replay cannot inflate the threshold.
         $standalone = DB::table('learning_activity_days')->where('user_id', $user->id)
             ->whereRaw("level ~ '^module-[1-9][0-9]*$'")->selectRaw('substring(level from 8) AS module_id');
@@ -19,6 +19,7 @@ class ContributorEligibility
             ->join('course_enrollments as enrollment', 'enrollment.id', '=', 'progress.enrollment_id')
             ->join('course_revision_modules as assignment', 'assignment.id', '=', 'progress.assignment_id')
             ->where('enrollment.user_id', $user->id)->whereNotNull('progress.completed_at')
+            ->whereRaw("progress.validated_input->>'kind' IS DISTINCT FROM 'reading'")
             ->selectRaw('CAST(assignment.module_id AS text) AS module_id');
         $modules = DB::query()->fromSub($standalone->union($courses), 'completions')->count();
         $challenges = DB::table('challenge_submissions as submission')

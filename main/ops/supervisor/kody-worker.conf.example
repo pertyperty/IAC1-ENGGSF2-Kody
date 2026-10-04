@@ -1,0 +1,16 @@
+; Review paths, service user and log rotation for the target Linux host before installing.
+[program:kody-worker]
+directory=/var/www/kody/current
+command=/usr/bin/php /var/www/kody/current/artisan queue:work database --queue=default --sleep=3 --tries=3 --timeout=60 --max-time=3600
+user=www-data
+numprocs=1
+autostart=true
+autorestart=true
+startsecs=5
+stopasgroup=true
+killasgroup=true
+stopwaitsecs=120
+redirect_stderr=true
+stdout_logfile=/var/www/kody/shared/storage/logs/worker.log
+stdout_logfile_maxbytes=10MB
+stdout_logfile_backups=5

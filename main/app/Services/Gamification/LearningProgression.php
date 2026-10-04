@@ -6,7 +6,8 @@ use App\Models\LearningModule;
 use App\Models\ModuleRevision;
 use App\Models\User;
 use App\Services\Account\CurrentAccountSession;
-use App\Services\Games\CommandGarden;
+use App\Services\Games\GameAssessment;
+use App\Services\Games\QuizAuthoring;
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\DB;
@@ -30,7 +31,10 @@ class LearningProgression
             $previousComplete = $previousComplete && $isComplete;
         }
 
+        $next = collect($levels)->filter(fn (array $level) => $level['unlocked'] && ! $level['completed'])->keys()->first();
+
         return ['current_streak' => $current, 'longest_streak' => $progress?->longest_streak ?? 0,
+            'next_level' => $next, 'active_today' => $progress?->last_activity_date === $today->toDateString(),
             'last_activity_date' => $progress?->last_activity_date, 'levels' => $levels,
             'completed_count' => count(array_intersect(array_keys($levels), $completed))];
     }
@@ -46,8 +50,8 @@ class LearningProgression
             }
             $instance = $kind === 'game' ? config('learning.instances')[$level] : config('learning.quizzes')[$level];
             $valid = $kind === 'game'
-                ? app(CommandGarden::class)->succeeds($instance, $input['program'], $input['repeat'] ?? false, $input['conditional'] ?? false)
-                : $input['answer'] === $instance['answer'];
+                ? app(GameAssessment::class)->succeeds($instance, $input)
+                : app(QuizAuthoring::class)->succeeds($instance, $input);
             if (! $valid) {
                 throw ValidationException::withMessages(['completion' => 'That attempt did not complete the objective. Try again.']);
             }
@@ -86,10 +90,10 @@ class LearningProgression
             $revision = ModuleRevision::where('module_id', $moduleId)->findOrFail($revisionId);
             $instance = $revision->assessment;
             abort_unless(in_array($kind, ['game', 'quiz'], true) && $revision->review_status === 'Approved' && $instance !== null
-                && $instance['template'] === ($kind === 'game' ? 'command-garden' : 'choice-quiz'), 404);
+                && ($kind === 'game' ? app(GameAssessment::class)->supports($instance) : $instance['template'] === 'choice-quiz'), 404);
             $valid = $kind === 'game'
-                ? app(CommandGarden::class)->succeeds($instance, $input['program'], $input['repeat'] ?? false, $input['conditional'] ?? false)
-                : $input['answer'] === $instance['answer'];
+                ? app(GameAssessment::class)->succeeds($instance, $input)
+                : app(QuizAuthoring::class)->succeeds($instance, $input);
             if (! $valid) {
                 throw ValidationException::withMessages(['completion' => 'That attempt did not complete the objective. Try again.']);
             }

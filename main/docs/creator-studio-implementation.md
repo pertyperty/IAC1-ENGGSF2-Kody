@@ -29,8 +29,8 @@ pins, learner history and governance records remain protected through archival.
   cannot be changed. Feedback appears in the studio; rejection allows a new draft.
 - G06 publication subset: Moderator/Admin queue, playable saved preview,
   approve/reject with required rejection feedback, version checks and audit.
-  Approval atomically selects the exact current revision for Learning. Flagging,
-  reports, removal, challenge/course moderation are future work.
+  Approval atomically selects the exact current revision for Learning. Later
+  staff withdrawal, reporting and course/challenge review slices extend governance.
 - D03: owning Instructor confirms archive, with current version and fresh
   session checks. Archived adventures are read-only in the owner's studio;
   their pending revisions leave the review queue. No restore transition is added.
@@ -40,8 +40,10 @@ pins, learner history and governance records remain protected through archival.
   financial/role email and user notification preferences are separate work.
 - Game-first amendment: creators configure title, instructions, hint and learning
   feedback on one of three approved garden trails; mechanics/objectives are
-  snapshotted as typed version-1 data. Quizzes configure two choices, the correct
-  choice and explanation. Creator uploads never become executable code or HTML.
+  snapshotted as typed version-1 data. The later
+  [completion milestone](platform-completion-implementation.md) expands quizzes
+  to 1–10 questions and 2–6 choices with immutable answer/feedback snapshots.
+  Creator uploads never become executable code or HTML.
 - Learning lists only current approved Published metadata, with literal-text
   search and pagination. Guests must sign in for lessons. Published game/quiz wins
   are replayed/checked on the server against the exact published revision and
@@ -103,10 +105,10 @@ previews, reviews and noncritical updates are now implemented in the subsequent
 approved extending publication review to courses. Follow that document's next
 prompt for enrollment/access and the remaining archive policy decisions.
 
-Private media upload/storage, deletion, creator module placement in the ladder,
-graded quizzes, rewards, paid access and notification preferences remain separate
-features. Module deletion must protect learner activity and course/challenge
-references. Courses do not yet grant learner enrollment/access or issue rewards.
+Private media upload/storage, graded academic quizzes, rewards, paid access and
+notification preferences remain separate scopes. Protected content deletion,
+free course enrollment and optional sequential creator paths are implemented
+in subsequent slices collected in [the implementation map](implementation-status.md).
 ## Visual world authoring follow-up
 
 The [garden designer](garden-designer-implementation.md) extends D01/D02 with

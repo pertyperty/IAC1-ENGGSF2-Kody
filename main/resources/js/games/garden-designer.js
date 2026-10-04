@@ -31,18 +31,21 @@ export function mountGardenDesigner(form, presets) {
     const root = form.querySelector('[data-garden-designer]');
     const input = root.querySelector('[name="game_layout"]');
     const preset = form.querySelector('[name="game_preset"]');
+    const firstPreset = presets[preset.value] ? preset.value : 'sequences';
+    const toggle = () => { root.hidden = !presets[preset.value]; input.disabled = root.hidden; };
+    toggle();
     const status = root.querySelector('[data-designer-status]');
     const host = root.querySelector('[data-designer-preview-host]');
     const board = root.querySelector('[data-designer-board]');
     let layout;
     let tool = 'path';
     let valid = true;
-    const instance = () => ({ ...presets[preset.value], ...layout });
+    const instance = () => ({ ...(presets[preset.value] ?? presets.sequences), ...layout });
     try {
-        layout = input.value ? JSON.parse(input.value) : gardenLayout(presets[preset.value]);
+        layout = input.value ? JSON.parse(input.value) : gardenLayout(presets[firstPreset]);
         validateInstance(instance());
     } catch {
-        layout = gardenLayout(presets[preset.value]);
+        layout = gardenLayout(presets[firstPreset]);
         valid = false;
         status.textContent = 'The submitted layout could not be loaded. Choose Reset trail to start over.';
     }
@@ -97,8 +100,10 @@ export function mountGardenDesigner(form, presets) {
         layout = gardenLayout(presets[preset.value]);
         save();
     });
-    let previous = preset.value;
+    let previous = firstPreset;
     preset.addEventListener('change', () => {
+        toggle();
+        if (!presets[preset.value]) return;
         if (JSON.stringify(layout) === JSON.stringify(gardenLayout(presets[previous]))) layout = gardenLayout(presets[preset.value]);
         if (preset.value !== 'conditions') layout.crystals = [];
         if (tool === 'crystal' && preset.value !== 'conditions') tool = 'path';
