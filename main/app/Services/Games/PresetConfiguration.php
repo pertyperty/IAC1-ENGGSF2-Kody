@@ -10,8 +10,9 @@ class PresetConfiguration
     public function rules(): array
     {
         return ['name' => ['required', 'string', 'max:100'], 'record_version' => ['required', 'integer', 'min:1'],
-            'basis' => ['required', Rule::in(['sequences', 'loops', 'conditions', 'quiz'])],
+            'basis' => ['required', Rule::in(array_merge(['sequences', 'loops', 'conditions', 'quiz'], array_keys(config('arcade'))))],
             'title' => ['required', 'string', 'max:100'],
+            'game_scenario' => ['nullable', 'string', 'max:4000'],
             'instructions' => ['required_unless:basis,quiz', 'nullable', 'string', 'max:1000'],
             'hint' => ['required_unless:basis,quiz', 'nullable', 'string', 'max:1000'],
             'learning_idea' => ['required_unless:basis,quiz', 'nullable', 'string', 'max:1000'],
@@ -45,7 +46,7 @@ class PresetConfiguration
                 'answer' => $data['answer'], 'explanation' => $data['explanation']];
         }
 
-        return array_replace(config('learning.instances')[$data['basis']], ['basis' => $data['basis'],
+        return array_replace(isset(config('arcade')[$data['basis']]) ? app(ArcadeGames::class)->instance($data['basis'], $data['game_scenario'] ?? null) : config('learning.instances')[$data['basis']], ['basis' => $data['basis'],
             'title' => $data['title'], 'instructions' => $data['instructions'], 'hint' => $data['hint'], 'learningIdea' => $data['learning_idea']]);
     }
 }

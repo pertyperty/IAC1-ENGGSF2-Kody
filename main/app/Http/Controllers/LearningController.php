@@ -6,12 +6,20 @@ use App\Models\ModuleRevision;
 use App\Services\Gamification\LearningProgression;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Validation\Rule;
 
 class LearningController extends Controller
 {
     public function home(): Response
     {
         return response()->view('welcome', ['game' => config('learning.instances.sequences')]);
+    }
+
+    public function arcade(Request $request): Response
+    {
+        $selected = $request->validate(['game' => ['sometimes', 'string', Rule::in(array_keys(config('arcade')))]])['game'] ?? 'pixel-studio';
+
+        return response()->view('learning.arcade', ['selected' => $selected, 'game' => config('arcade')[$selected]]);
     }
 
     public function catalog(Request $request): Response

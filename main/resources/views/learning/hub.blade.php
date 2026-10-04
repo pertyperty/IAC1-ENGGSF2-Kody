@@ -13,4 +13,5 @@
         <p class="catalog-note">These wins save your level progress and daily activity. XP, ranks and KodeBits remain separate and are not awarded by these practice templates.</p>
         <form method="post" action="{{ route('logout') }}">@csrf<button type="submit" class="quiet-link hub-logout">Sign out</button></form>
     </section>
+    <section class="page-width"><h2>Try another kind of puzzle.</h2><p>Explore four practice templates, including a command-line mission.</p><a class="button button-dark" href="{{ route('arcade') }}">Open the playground →</a></section>
 @endsection

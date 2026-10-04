@@ -6,7 +6,7 @@ use App\Models\LearningModule;
 use App\Models\ModuleRevision;
 use App\Models\User;
 use App\Services\Account\CurrentAccountSession;
-use App\Services\Games\CommandGarden;
+use App\Services\Games\GameAssessment;
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\DB;
@@ -46,7 +46,7 @@ class LearningProgression
             }
             $instance = $kind === 'game' ? config('learning.instances')[$level] : config('learning.quizzes')[$level];
             $valid = $kind === 'game'
-                ? app(CommandGarden::class)->succeeds($instance, $input['program'], $input['repeat'] ?? false, $input['conditional'] ?? false)
+                ? app(GameAssessment::class)->succeeds($instance, $input)
                 : $input['answer'] === $instance['answer'];
             if (! $valid) {
                 throw ValidationException::withMessages(['completion' => 'That attempt did not complete the objective. Try again.']);
@@ -86,9 +86,9 @@ class LearningProgression
             $revision = ModuleRevision::where('module_id', $moduleId)->findOrFail($revisionId);
             $instance = $revision->assessment;
             abort_unless(in_array($kind, ['game', 'quiz'], true) && $revision->review_status === 'Approved' && $instance !== null
-                && $instance['template'] === ($kind === 'game' ? 'command-garden' : 'choice-quiz'), 404);
+                && ($kind === 'game' ? app(GameAssessment::class)->supports($instance) : $instance['template'] === 'choice-quiz'), 404);
             $valid = $kind === 'game'
-                ? app(CommandGarden::class)->succeeds($instance, $input['program'], $input['repeat'] ?? false, $input['conditional'] ?? false)
+                ? app(GameAssessment::class)->succeeds($instance, $input)
                 : $input['answer'] === $instance['answer'];
             if (! $valid) {
                 throw ValidationException::withMessages(['completion' => 'That attempt did not complete the objective. Try again.']);

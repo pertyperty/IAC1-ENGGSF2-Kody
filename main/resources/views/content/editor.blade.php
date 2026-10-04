@@ -13,7 +13,7 @@
     @if($revision)<p class="step-pill">Revision {{ $revision->number }} · {{ $revision->review_status }} · {{ $module->status }}</p>@if($revision->review_notes)<p class="lesson-note">Reviewer feedback: {{ $revision->review_notes }}</p>@endif @endif
     @php
         $assessment = $revision?->assessment;
-        $kind = $assessment === null ? 'none' : ($assessment['template'] === 'command-garden' ? 'game' : 'quiz');
+        $kind = $assessment === null ? 'none' : ($assessment['template'] === 'choice-quiz' ? 'quiz' : 'game');
         $fields = ['title' => $revision?->title, 'description' => $revision?->description, 'content' => $revision?->content,
             'video_url' => $revision?->video_url, 'game_title' => $kind === 'game' ? $assessment['title'] : 'My Logic Garden',
             'game_instructions' => $kind === 'game' ? $assessment['instructions'] : config('learning.instances.sequences.instructions'),
@@ -33,20 +33,21 @@
             <label for="type">Lesson format</label><select id="type" name="type">@foreach(['Article','Interactive','Video'] as $type)<option @selected(old('type', $revision?->type ?? 'Interactive') === $type)>{{ $type }}</option>@endforeach</select>
             <label for="content">Teach the idea</label><p class="field-hint">Write your explanation and code examples as plain text. Your learners will see exactly what you write.</p><textarea id="content" name="content" rows="10" maxlength="50000" required>{{ old('content', $fields['content']) }}</textarea>
             <div data-video-fields><label for="video_url">Video link</label><p class="field-hint">For video lessons, add an HTTPS link to your video. It opens in a new tab.</p><input id="video_url" type="url" name="video_url" value="{{ old('video_url', $fields['video_url']) }}" maxlength="2000"></div>
-            <label for="assessment_kind">Make it playable</label><select id="assessment_kind" name="assessment_kind">@foreach(['game' => 'Garden game', 'quiz' => 'Quick quiz', 'preset' => 'Workshop preset', 'none' => 'Lesson only (Article or Video)'] as $value => $label)<option value="{{ $value }}" @selected(old('assessment_kind', $revision?->game_preset_revision_id ? 'preset' : ($revision ? $kind : 'game')) === $value)>{{ $label }}</option>@endforeach</select>
+            <label for="assessment_kind">Make it playable</label><select id="assessment_kind" name="assessment_kind">@foreach(['game' => 'Coding game', 'quiz' => 'Quick quiz', 'preset' => 'Workshop preset', 'none' => 'Lesson only (Article or Video)'] as $value => $label)<option value="{{ $value }}" @selected(old('assessment_kind', $revision?->game_preset_revision_id ? 'preset' : ($revision ? $kind : 'game')) === $value)>{{ $label }}</option>@endforeach</select>
             <div data-preset-fields><h2>Start from a workshop preset</h2><p class="field-hint">Choose saved game or quiz prompts and give the activity a title. Your lesson keeps this version when the preset changes.</p>
                 @if($revision?->game_preset_revision_id)<p class="lesson-note">Saved preset revision #{{ $revision->game_preset_revision_id }}. To save a new draft, choose a current available version below.</p>@endif
-                <label for="managed_preset">Available preset</label><select id="managed_preset" name="managed_preset"><option value="">Choose a preset</option>@foreach($presets as $preset)<option value="{{ $preset->current_revision_id }}" @selected((string) old('managed_preset', $revision?->game_preset_revision_id) === (string) $preset->current_revision_id)>{{ $preset->name }} · v{{ $preset->currentRevision->number }} · {{ $preset->currentRevision->instance['template'] === 'command-garden' ? 'Garden game' : 'Quick quiz' }}</option>@endforeach</select>
+                <label for="managed_preset">Available preset</label><select id="managed_preset" name="managed_preset"><option value="">Choose a preset</option>@foreach($presets as $preset)<option value="{{ $preset->current_revision_id }}" @selected((string) old('managed_preset', $revision?->game_preset_revision_id) === (string) $preset->current_revision_id)>{{ $preset->name }} · v{{ $preset->currentRevision->number }} · {{ $preset->currentRevision->instance['template'] === 'choice-quiz' ? 'Quick quiz' : 'Coding game' }}</option>@endforeach</select>
                 @if($presets->count() === 100)<p class="field-hint">Showing the first 100 available presets.</p>@endif
                 <label for="preset_title">Activity title</label><input id="preset_title" name="preset_title" maxlength="100" value="{{ old('preset_title', $assessment['title'] ?? 'My adventure') }}">
             </div>
-            <div data-game-fields><h2>Your garden game</h2><p class="field-hint">Choose a coding idea, build its world, then make the prompts your own.</p>
-                <label for="game_preset">Trail</label><select id="game_preset" name="game_preset">@foreach(config('learning.modules') as $slug => $preset)<option value="{{ $slug }}" @selected(old('game_preset', $assessment['preset'] ?? 'sequences') === $slug)>{{ $preset['concept'] }}</option>@endforeach</select>
+            <div data-game-fields><h2>Your coding game</h2><p class="field-hint">Choose a coding idea, build its world, then make the prompts your own.</p>
+                <label for="game_preset">Game template</label><select id="game_preset" name="game_preset">@foreach((config('learning.instances') + config('arcade')) as $slug => $preset)<option value="{{ $slug }}" @selected(old('game_preset', $assessment['preset'] ?? $assessment['basis'] ?? 'sequences') === $slug)>{{ $preset['title'] }} · {{ $preset['concept'] }}</option>@endforeach</select>
                 @foreach(['game_title' => ['Game title',100], 'game_instructions' => ['Instructions',1000], 'game_hint' => ['Hint',1000], 'game_learning_idea' => ['What they learned',1000]] as $name => [$label,$limit])<label for="{{ $name }}">{{ $label }}</label><textarea id="{{ $name }}" name="{{ $name }}" rows="2" maxlength="{{ $limit }}">{{ old($name, $fields[$name]) }}</textarea>@endforeach
                 @php
-                    $initialGarden = $kind === 'game' ? $assessment : config('learning.instances.sequences');
+                    $initialGarden = $kind === 'game' && $assessment['template'] === 'command-garden' ? $assessment : config('learning.instances.sequences');
                     $initialLayout = array_intersect_key($initialGarden, array_flip(['start', 'goal', 'path', 'crystals']));
                 @endphp
+                @include('games.scenario-editor', ['scenarioInstance' => $assessment, 'scenarioName' => 'game_scenario'])
                 <section class="garden-designer" data-garden-designer aria-label="Garden level designer">
                     <h3>Build a little world</h3><p>Choose a tool, then tap a tile. K marks the start; the flag is your goal. Keyboard: move between tiles with arrows, then press Enter or Space.</p>
                     <input type="hidden" name="game_layout" value="{{ old('game_layout', json_encode($initialLayout, JSON_THROW_ON_ERROR)) }}">

@@ -2,8 +2,8 @@
     @if($revision->type === 'Video')<p><a class="quiet-link" href="{{ $revision->video_url }}" target="_blank" rel="noopener noreferrer">Watch the lesson video ↗</a></p>@endif
 </div>
 @if($revision->assessment)
-    @if($revision->assessment['template'] === 'command-garden')
-        @include('learning.game', ['game' => $revision->assessment, 'module' => null, 'completionUrl' => ($preview ?? false) ? null : ($assessmentCompletionUrl ?? route('modules.game', [$module, $revision->id])), 'trial' => false])
+    @if($revision->assessment['template'] !== 'choice-quiz')
+        @include('learning.activity', ['game' => $revision->assessment, 'module' => null, 'completionUrl' => ($preview ?? false) ? null : ($assessmentCompletionUrl ?? route('modules.game', [$module, $revision->id])), 'trial' => false])
     @else
         @include('learning.quiz', ['quiz' => $revision->assessment, 'module' => null, 'completionUrl' => ($preview ?? false) ? null : ($assessmentCompletionUrl ?? route('modules.quiz', [$module, $revision->id]))])
     @endif

@@ -31,6 +31,11 @@ learner/course/weekly/feedback/moderation history blocks permanent deletion and
 preserves the existing archival option. An additive migration indexes retained
 learner audit references; it preserves all stored history.
 
+Four additional creator-configurable games are available in the Playground:
+Pixel Studio, Number Machine, Sort Lab and Terminal Quest. The terminal uses a
+virtual filesystem; full language execution still requires Judge0 setup. See
+[template contracts, authoring and deployment](docs/arcade-templates-implementation.md).
+
 ## Development setup
 
 Commands below run from the Laravel directory (`main/` in this repository).

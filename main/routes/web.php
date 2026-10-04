@@ -44,6 +44,7 @@ Route::pattern('challenge', '[0-9]+');
 Route::pattern('weeklyEvent', '[0-9]+');
 
 Route::get('/', [LearningController::class, 'home'])->name('home');
+Route::get('/playground', [LearningController::class, 'arcade'])->name('arcade');
 Route::get('/learn', [LearningController::class, 'catalog'])->name('learning.catalog');
 Route::get('/learn/courses', [CourseLearningController::class, 'catalog'])->name('course-learning.catalog');
 Route::get('/challenges', [PublishedChallengeController::class, 'catalog'])->name('challenges.catalog');

@@ -6,6 +6,7 @@ import { mountChallengeStatus } from './challenge-status.js';
 import { mountContentReactions } from './content-reactions.js';
 import { mountGarden } from './games/command-garden.js';
 import { mountQuiz } from './games/choice-quiz.js';
+import { mountArcade } from './games/arcade-games.js';
 
 document.querySelectorAll('[data-module-editor]').forEach(mountModuleEditor);
 document.querySelectorAll('[data-preset-editor]').forEach(mountPresetEditor);
@@ -16,6 +17,7 @@ document.querySelectorAll('[data-content-reactions]').forEach((root) => mountCon
 
 document.querySelectorAll('[data-coding-game]').forEach(mountGarden);
 document.querySelectorAll('[data-practice-quiz]').forEach(mountQuiz);
+document.querySelectorAll('[data-arcade-game]').forEach(mountArcade);
 
 const accountType = document.querySelector('#account-type');
 const instructorFields = document.querySelector('#instructor-fields');

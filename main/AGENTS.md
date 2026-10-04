@@ -215,6 +215,13 @@ Do not claim a requirement is complete merely because a page renders or a happy 
 
 ## 1. Sources of Truth
 
+The owner requested more than three additional customizable games and a CLI on
+2026-10-04. Pixel Studio, Number Machine, Sort Lab and Terminal Quest use typed
+version-1 creator scenarios, immutable review/preset snapshots and server replay.
+The terminal is a virtual filesystem simulator, not a host shell; full language
+execution stays with Judge0. Guest trials/previews remain local practice. See
+[arcade implementation](docs/arcade-templates-implementation.md).
+
 Kody is governed by:
 
 - **Kody SRS v1.4** for required system behavior, use cases, actors, business rules, data constraints, and non-functional targets.
