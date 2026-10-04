@@ -46,7 +46,7 @@ class CoursePublishing
             }
             $revision = CourseRevision::create(['course_id' => $current->id, 'number' => $number, 'title' => $data['title'],
                 'description' => $data['description'], 'category' => $data['category'], 'difficulty' => $data['difficulty'],
-                'estimated_duration' => $data['estimated_duration']]);
+                'estimated_duration' => $data['estimated_duration'], 'sequential' => (bool) ($data['sequential'] ?? false)]);
             $modules = LearningModule::whereIn('id', $data['module_ids'])->with('publishedRevision')->orderBy('id')->lockForUpdate()->get()->keyBy('id');
             foreach ($data['module_ids'] as $position => $id) {
                 $module = $modules->get($id);

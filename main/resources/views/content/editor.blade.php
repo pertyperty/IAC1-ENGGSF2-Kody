@@ -22,8 +22,8 @@
             'game_hint' => $kind === 'game' ? $assessment['hint'] : config('learning.instances.sequences.hint'),
             'game_learning_idea' => $kind === 'game' ? $assessment['learningIdea'] : config('learning.instances.sequences.learningIdea'),
             'quiz_title' => $kind === 'quiz' ? $assessment['title'] : 'A quick idea check',
-            'quiz_question' => $kind === 'quiz' ? $assessment['question'] : '', 'quiz_a' => $kind === 'quiz' ? $assessment['options'][0]['label'] : '',
-            'quiz_b' => $kind === 'quiz' ? $assessment['options'][1]['label'] : '', 'quiz_explanation' => $kind === 'quiz' ? $assessment['explanation'] : ''];
+            'quiz_question' => $kind === 'quiz' ? ($assessment['question'] ?? '') : '', 'quiz_a' => $kind === 'quiz' ? ($assessment['options'][0]['label'] ?? '') : '',
+            'quiz_b' => $kind === 'quiz' ? ($assessment['options'][1]['label'] ?? '') : '', 'quiz_explanation' => $kind === 'quiz' ? ($assessment['explanation'] ?? '') : ''];
         $fields = array_replace($fields, $starter ?? []);
     @endphp
     <form class="studio-form" method="post" action="{{ $module ? route('studio.update', $module) : route('studio.store') }}" data-module-editor data-game-presets="{{ json_encode(config('learning.instances'), JSON_THROW_ON_ERROR) }}">
@@ -69,9 +69,12 @@
                     <noscript><p>Enable JavaScript to paint and try your world. Saving keeps the current layout.</p></noscript>
                 </section>
             </div>
-            <div data-quiz-fields><h2>Your quick quiz</h2><p class="field-hint">Two clear choices, one useful idea. This is a practice quiz with feedback.</p>
-                @foreach(['quiz_title' => ['Quiz title',100], 'quiz_question' => ['Question',500], 'quiz_a' => ['Choice A',300], 'quiz_b' => ['Choice B',300], 'quiz_explanation' => ['Feedback and explanation',1000]] as $name => [$label,$limit])<label for="{{ $name }}">{{ $label }}</label><textarea id="{{ $name }}" name="{{ $name }}" rows="2" maxlength="{{ $limit }}">{{ old($name, $fields[$name]) }}</textarea>@endforeach
-                <label for="quiz_answer">Correct choice</label><select id="quiz_answer" name="quiz_answer"><option value="a" @selected(old('quiz_answer', $assessment['answer'] ?? $starter['quiz_answer'] ?? 'a') === 'a')>Choice A</option><option value="b" @selected(old('quiz_answer', $assessment['answer'] ?? $starter['quiz_answer'] ?? 'a') === 'b')>Choice B</option></select>
+            <div data-quiz-fields><h2>Your practice quiz</h2>
+                <label for="quiz_title">Quiz title</label><input id="quiz_title" name="quiz_title" maxlength="100" value="{{ old('quiz_title', $fields['quiz_title']) }}">
+                @php
+                    $quizQuestions = old('quiz_questions', $starter['quiz_questions'] ?? ($kind === 'quiz' ? app(\App\Services\Games\QuizAuthoring::class)->questions($assessment) : [['id' => 'q1', 'question' => old('quiz_question', $fields['quiz_question']), 'options' => [['id' => 'a', 'label' => old('quiz_a', $fields['quiz_a'])], ['id' => 'b', 'label' => old('quiz_b', $fields['quiz_b'])]], 'answer' => old('quiz_answer', $starter['quiz_answer'] ?? 'a'), 'explanation' => old('quiz_explanation', $fields['quiz_explanation'])]]));
+                @endphp
+                @include('games.quiz-editor')
             </div>
             <div class="studio-actions"><button class="button button-play" type="submit">Save draft</button><a class="quiet-link" href="{{ route('studio.index') }}">Cancel</a></div>
         </fieldset>

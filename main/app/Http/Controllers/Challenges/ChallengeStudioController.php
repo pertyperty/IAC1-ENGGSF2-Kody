@@ -10,6 +10,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\Rule;
 
 class ChallengeStudioController extends Controller
 {
@@ -21,11 +22,16 @@ class ChallengeStudioController extends Controller
         return response()->view('challenges.studio', compact('challenges'))->header('Cache-Control', 'no-store, private');
     }
 
-    public function create(): Response
+    public function create(Request $request): Response
     {
         Gate::authorize('create', CodingChallenge::class);
 
-        return response()->view('challenges.editor', ['challenge' => null, 'revision' => null])->header('Cache-Control', 'no-store, private');
+        $data = $request->validate(['example' => ['nullable', 'string', Rule::in(array_keys(config('challenge-examples')))],
+            'language' => ['nullable', 'string', Rule::in(array_keys(config('challenges.languages')))]]);
+        $starter = empty($data['example']) ? [] : config('challenge-examples.'.$data['example'])
+            + ['language' => $data['language'] ?? 'python', 'difficulty' => 'Easy', 'cpu_time_ms' => 1000, 'memory_kib' => 262144];
+
+        return response()->view('challenges.editor', ['challenge' => null, 'revision' => null, 'starter' => $starter])->header('Cache-Control', 'no-store, private');
     }
 
     public function store(SaveChallengeRequest $request, ChallengePublishing $publishing): RedirectResponse

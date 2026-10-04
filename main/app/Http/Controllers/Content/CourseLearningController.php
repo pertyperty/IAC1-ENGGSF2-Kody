@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Content\EnrollCourseRequest;
 use App\Http\Requests\Learning\CompleteGameRequest;
 use App\Http\Requests\Learning\CompleteQuizRequest;
+use App\Http\Requests\Learning\MarkLessonReadRequest;
 use App\Models\CourseEnrollment;
 use App\Models\CourseRevision;
 use App\Models\LearningCourse;
@@ -64,6 +65,13 @@ class CourseLearningController extends Controller
     public function game(CompleteGameRequest $request, LearningCourse $course, int $slot, CourseLearning $learning): JsonResponse
     {
         return response()->json($learning->complete($request->user(), $request->session()->getId(), $course->id, $slot, 'game', $request->validated()))->header('Cache-Control', 'no-store');
+    }
+
+    public function markRead(MarkLessonReadRequest $request, LearningCourse $course, int $slot, CourseLearning $learning): RedirectResponse
+    {
+        $learning->markRead($request->user(), $request->session()->getId(), $course->id, $slot);
+
+        return redirect()->route('course-learning.show', $course)->with('status', 'Lesson marked as read. Your course progress is saved.');
     }
 
     public function quiz(CompleteQuizRequest $request, LearningCourse $course, int $slot, CourseLearning $learning): JsonResponse

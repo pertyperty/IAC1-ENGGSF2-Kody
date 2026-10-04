@@ -7,7 +7,13 @@ class CreatorExamples
     public function fields(string $slug): array
     {
         $lesson = config('creator-examples')[$slug];
-        if ($slug === 'choice-quiz') {
+        if (($lesson['assessment_kind'] ?? null) === 'none') {
+            return $lesson + ['type' => 'Article'];
+        }
+        if (($lesson['template'] ?? $slug) === 'choice-quiz') {
+            if (isset($lesson['quiz_questions'])) {
+                return $lesson + ['type' => 'Interactive', 'assessment_kind' => 'quiz', 'quiz_title' => $lesson['title']];
+            }
             $quiz = config('learning.quizzes.sequences');
 
             return $lesson + ['type' => 'Interactive', 'assessment_kind' => 'quiz',

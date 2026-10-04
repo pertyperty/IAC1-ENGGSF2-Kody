@@ -103,3 +103,15 @@ backups, private object restoration, centralized monitoring/alert drills and
 approved recovery targets still need a provisioned staging environment. Track
 that work in the [deferred register](deferred-features.md); do not deploy based on
 these local checks alone.
+
+### Completion follow-up
+
+The completion pass ran all 33 migrations on a new isolated PostgreSQL database,
+including quiz version-2 preset constraints and the optional course-path policy.
+An older application release cannot safely read newly authored multi-question
+quizzes or preserve sequential/reading semantics. Use a compatible release for
+application rollback; migration guards refuse retained incompatible state.
+See [completion evidence](platform-completion-implementation.md#verification)
+and [later integration setup](integration-setup.md). The earlier local worker,
+backup and scheduler drill remains local evidence; this follow-up does not
+claim a new managed-cloud rehearsal.

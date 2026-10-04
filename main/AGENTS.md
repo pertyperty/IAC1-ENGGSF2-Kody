@@ -2,6 +2,24 @@
 
 ## Mission
 
+The owner approved optional sequential creator course paths on 2026-10-04.
+New enrollments snapshot the approved path policy; existing enrollments keep open
+access. Assessment-free course lessons require an authorized opening and explicit
+Mark as read action. Reading advances course progress only: never daily streaks,
+XP, starter levels or Contributor assessment eligibility. See
+[completion implementation](docs/platform-completion-implementation.md).
+Practice quizzes now support 1–10 questions with 2–6 choices; version 1 remains
+single-question compatible, and version 2 requires every answer to be correct.
+Preserve immutable published/preset instances and server validation.
+
+The owner supplied provisional PHP purchase packages, a proposed 65/35 net split,
+competition-rank ties and a 4% reward cap for sustainability analysis. These are
+planning inputs, not finalized financial rules. Do not activate purchases, rewards,
+earnings or payouts from them. See [the analysis](docs/sustainability-analysis.md).
+Live Google, Judge0, SendGrid and staging setup remains explicitly deferred;
+[the setup guide](docs/integration-setup.md) prepares later configuration.
+`kody:setup-status` must remain secret-free, read-only and free of provider calls.
+
 Start with the [implementation map](docs/implementation-status.md) for current
 scope and authoritative feature records. Shared browser themes and interaction
 conventions are documented in [interface implementation](docs/interface-implementation.md).

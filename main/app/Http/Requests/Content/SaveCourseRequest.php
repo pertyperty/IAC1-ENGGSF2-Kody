@@ -18,6 +18,7 @@ class SaveCourseRequest extends FormRequest
             'description' => ['required', 'string', 'max:5000'], 'category' => ['required', 'string', 'max:50'],
             'difficulty' => ['required', Rule::in(['Beginner', 'Intermediate', 'Advanced'])],
             'estimated_duration' => ['required', 'integer', 'min:1', 'max:10000'],
+            'sequential' => ['sometimes', 'boolean'],
             'module_ids' => ['present', 'array', 'list', 'max:100'], 'module_ids.*' => ['required', 'integer', 'min:1', 'distinct']];
     }
 

@@ -1,5 +1,10 @@
 # Course learning and archiving — B01/B03/B04/D08
 
+The subsequent [completion milestone](platform-completion-implementation.md)
+adds owner-approved optional sequential paths, explicit reading completion and
+consolidated dashboards. Existing enrollments remain open; reading grants no
+streak or Contributor eligibility credit.
+
 ## Approved decisions
 
 The owner approved these amendments in chat on 2026-10-03:

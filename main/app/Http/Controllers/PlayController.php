@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Learning\CompleteGameRequest;
 use App\Http\Requests\Learning\CompleteQuizRequest;
 use App\Models\WeeklyEvent;
+use App\Services\Engagement\PlatformDashboard;
 use App\Services\Gamification\LearningProgression;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -12,9 +13,10 @@ use Illuminate\Http\Response;
 
 class PlayController extends Controller
 {
-    public function hub(Request $request, LearningProgression $progression): Response
+    public function hub(Request $request, LearningProgression $progression, PlatformDashboard $dashboard): Response
     {
         return response()->view('learning.hub', ['progress' => $progression->snapshot($request->user()->id),
+            'dashboard' => $dashboard->snapshot($request->user()),
             'weekly' => WeeklyEvent::open()->with('revision:id,title,language,difficulty')->first()])->header('Cache-Control', 'no-store, private');
     }
 
