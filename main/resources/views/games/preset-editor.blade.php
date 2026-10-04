@@ -2,7 +2,7 @@
 @section('title', 'Shape a game preset — Kody')
 @section('content')
 <section class="review-page page-width"><a class="quiet-link" href="{{ route('game-presets.index') }}">← Preset workshop</a><h1>{{ $preset ? 'Shape the next version.' : 'Plant a new idea.' }}</h1>
-<p>Garden trails share Kody’s movement and objective rules. Practice quizzes have two choices and one correct answer. Creator lessons use the existing verified Active participant access rules. Wins qualify existing learning activity; XP and KodeBit rewards are deferred.</p>
+<p>Garden trails share Kody’s movement and objective rules. Practice quizzes support up to ten questions with two to six choices each. Creator lessons use the existing verified Active participant access rules. Wins qualify existing learning activity; XP and KodeBit rewards are deferred.</p>
 @if(session('status'))<p class="lesson-note" role="status">{{ session('status') }}</p>@endif
 @if($errors->any())<div class="form-errors" role="alert">@foreach($errors->all() as $error)<p>{{ $error }}</p>@endforeach</div>@endif
 @if($preset)<p class="step-pill">{{ $preset->status }} · {{ $uses }} saved module revision references</p>@endif
@@ -15,12 +15,13 @@
 <form class="studio-form" data-preset-editor method="POST" action="{{ $preset ? route('game-presets.update', $preset) : route('game-presets.store') }}">@csrf @if($preset)@method('PUT')@endif
 <input type="hidden" name="record_version" value="{{ $preset?->record_version ?? 1 }}">
 <fieldset @disabled($preset?->status === 'Inactive')><legend>Reusable prompts</legend>
-<label for="basis">Game rules</label><select id="basis" name="basis">@foreach(['sequences' => 'Sequences garden', 'loops' => 'Loop garden (repeat twice)', 'conditions' => 'Crystal garden (conditional collection)', 'quiz' => 'Two-choice practice quiz'] + array_map(fn($game) => $game['title'], config('arcade')) as $value => $label)<option value="{{ $value }}" @selected(old('basis', $preset ? $basis : 'sequences') === $value)>{{ $label }}</option>@endforeach</select>
+<label for="basis">Game rules</label><select id="basis" name="basis">@foreach(['sequences' => 'Sequences garden', 'loops' => 'Loop garden (repeat twice)', 'conditions' => 'Crystal garden (conditional collection)', 'quiz' => 'Practice quiz'] + array_map(fn($game) => $game['title'], config('arcade')) as $value => $label)<option value="{{ $value }}" @selected(old('basis', $preset ? $basis : 'sequences') === $value)>{{ $label }}</option>@endforeach</select>
 <p class="field-hint">Fill the game prompts and scenario, or the question, choices and explanation for a quiz. All prompts are plain text.</p>
 @foreach(['name' => ['Preset name',100], 'title' => ['Activity title',100]] as $name => [$label,$limit])<label for="{{ $name }}">{{ $label }}</label><input id="{{ $name }}" name="{{ $name }}" maxlength="{{ $limit }}" value="{{ old($name, $defaults[$name]) }}" required>@endforeach
 <div data-garden-prompts>@foreach(['instructions' => ['Game instructions',1000], 'hint' => ['Game hint',1000], 'learning_idea' => ['Game learning feedback',1000]] as $name => [$label,$limit])<label for="{{ $name }}">{{ $label }}</label><textarea id="{{ $name }}" name="{{ $name }}" rows="2" maxlength="{{ $limit }}">{{ old($name, $defaults[$name]) }}</textarea>@endforeach</div>
-<div data-quiz-prompts>@foreach(['question' => ['Quiz question',500], 'choice_a' => ['Quiz choice A',300], 'choice_b' => ['Quiz choice B',300], 'explanation' => ['Quiz explanation',1000]] as $name => [$label,$limit])<label for="{{ $name }}">{{ $label }}</label><textarea id="{{ $name }}" name="{{ $name }}" rows="2" maxlength="{{ $limit }}">{{ old($name, $defaults[$name]) }}</textarea>@endforeach
-<label for="answer">Correct quiz choice</label><select id="answer" name="answer"><option value="a" @selected(old('answer', $instance['answer'] ?? 'a') === 'a')>Choice A</option><option value="b" @selected(old('answer', $instance['answer'] ?? 'a') === 'b')>Choice B</option></select>
+<div data-quiz-prompts>
+@php($quizQuestions = old('quiz_questions', ($instance['template'] ?? null) === 'choice-quiz' ? app(\App\Services\Games\QuizAuthoring::class)->questions($instance) : [['id' => 'q1', 'question' => '', 'options' => [['id' => 'a', 'label' => ''], ['id' => 'b', 'label' => '']], 'answer' => '', 'explanation' => '']]))
+@include('games.quiz-editor')
 </div>
 @include('games.scenario-editor', ['scenarioInstance' => $instance, 'scenarioName' => 'game_scenario'])
 <label for="reward_mode">Reward mode</label><select id="reward_mode" name="reward_mode"><option value="Deferred">Deferred — no XP or KodeBit grants</option></select>

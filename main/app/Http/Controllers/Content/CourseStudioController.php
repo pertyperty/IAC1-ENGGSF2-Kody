@@ -13,6 +13,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\Rule;
 
 class CourseStudioController extends Controller
 {
@@ -27,8 +28,10 @@ class CourseStudioController extends Controller
     public function create(Request $request): Response
     {
         Gate::authorize('create', LearningCourse::class);
+        $slug = $request->validate(['curriculum' => ['nullable', 'string', Rule::in(array_keys(config('curriculum')))]])['curriculum'] ?? null;
 
-        return response()->view('content.course-editor', ['course' => null, 'revision' => null, 'modules' => $this->availableModules([], $request)])->header('Cache-Control', 'no-store, private');
+        return response()->view('content.course-editor', ['course' => null, 'revision' => null, 'modules' => $this->availableModules([], $request),
+            'starter' => $slug === null ? null : config('curriculum.'.$slug)])->header('Cache-Control', 'no-store, private');
     }
 
     public function store(SaveCourseRequest $request, CoursePublishing $publishing): RedirectResponse

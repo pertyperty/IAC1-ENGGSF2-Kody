@@ -37,6 +37,18 @@ return [
 
     'mailers' => [
 
+        'sendgrid' => [
+            'transport' => 'smtp',
+            'scheme' => 'smtp',
+            'host' => 'smtp.sendgrid.net',
+            'port' => 587,
+            'username' => 'apikey',
+            'password' => env('SENDGRID_API_KEY'),
+            'timeout' => 10,
+            'require_tls' => true,
+            'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url((string) env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
+        ],
+
         'smtp' => [
             'transport' => 'smtp',
             'scheme' => env('MAIL_SCHEME'),

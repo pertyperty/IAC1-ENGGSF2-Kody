@@ -4,6 +4,11 @@ Start here for current scope, detailed evidence and the next useful improvements
 This index consolidates the feature summaries previously repeated in README.
 It does not replace approved requirements, decisions or the implementation records.
 Last reviewed: 2026-10-04.
+The [completion roadmap](platform-completion-roadmap.md) tracks the latest owner
+request; [its implementation record](platform-completion-implementation.md) covers
+expanded quizzes, longer course paths, dashboards and curriculum preparation.
+[Sustainability analysis](sustainability-analysis.md) records provisional business
+values and pilot costs separately from approved financial behavior.
 
 ## How to read the documentation
 
@@ -27,9 +32,9 @@ Last reviewed: 2026-10-04.
 | Personal accounts / A06–A07 | All-role self editing; password-confirmed sensitive changes; participant archival. Deletion covers accounts without authored content after active evaluations finish. | [Editing](profile-editing-implementation.md), [archival](account-archival-implementation.md), [deletion](account-deletion-plan.md) |
 | Role applications / A09–A10, G05 | Private credential history, one Pending role application, rejection/resubmission and staff review; Contributor eligibility uses distinct validated achievements. | [Instructor review](creator-review-implementation.md), [Contributor application](contributor-application-plan.md) |
 | Game-first journey / B01–B02, B05, partial E01/E05/E06 | Landing trial, saved hub, three starter levels and Manila daily streaks. Game clearance unlocks the next level; quiz wins qualify daily activity. Browser trials/previews never grant progress. | [Play](play-implementation.md), [guided journeys](creator-learner-journey.md) |
-| Customizable assessments / D01–D02, G08–G10 | Garden, Pixel Studio, Number Machine, Sort Lab, virtual Terminal Quest and practice quizzes; typed creator data, server replay and immutable preset snapshots. Eight lesson starters. | [Arcade](arcade-templates-implementation.md), [garden designer](garden-designer-implementation.md), [presets](game-presets-implementation.md) |
+| Customizable assessments / D01–D02, G08–G10 | Garden, Pixel Studio, Number Machine, Sort Lab, virtual Terminal Quest and practice quizzes; typed creator data, server replay and immutable preset snapshots. Twelve lesson starters, two curriculum plans, 1-10-question quizzes and 2-6 choices with immutable snapshots. | [Arcade](arcade-templates-implementation.md), [garden designer](garden-designer-implementation.md), [presets](game-presets-implementation.md) |
 | Module and course authoring / D01–D09 | Owned drafts, moderated new/replacement publication, revision-pinned course composition, creator archival and protected deletion. Retained dependencies block deletion. | [Studio](creator-studio-implementation.md), [courses](course-composition-implementation.md), [deletion](content-deletion-implementation.md) |
-| Learning / B03–B04 | Authenticated module discovery and assessment filters; free course enrollment, pinned lessons, saved validated assessment progress and continued journeys. Archived courses retain existing enrollment access; archived modules remain unavailable. | [Discovery](module-discovery-implementation.md), [course learning](course-learning-implementation.md) |
+| Learning / B03–B04 | Authenticated module discovery and assessment filters; free course enrollment, pinned lessons, saved assessment/reading progress, optional sequential paths and consolidated dashboards. Reading grants no streak or Contributor credit. Archived courses retain existing enrollment access; archived modules remain unavailable. | [Discovery](module-discovery-implementation.md), [course learning](course-learning-implementation.md) |
 | Coding quests / C01–C07, B07 | Reviewed challenge authoring, hidden tests, revision-pinned durable submissions and concurrency-safe three-attempt limits. Judge0 adapter and fake-provider tests exist; live execution is disabled. | [Challenge studio](challenge-studio-implementation.md), [submissions](challenge-submission-implementation.md) |
 | Weekly play / partial E02–E04 | Manila Sunday windows, future scheduling, immutable started events, separate three-attempt budgets and private verified-result history. Live execution depends on deferred Judge0 setup. | [Weekly events](weekly-challenge-plan.md) |
 | Reactions / B10 | One replaceable/removable Like, Helpful or Favorite after server-recorded authorized use and current access; courses additionally require enrollment. | [Feedback](content-feedback-implementation.md) |
@@ -60,26 +65,21 @@ provider-fake verification is not live delivery/execution evidence.
 7. Narrow staff reports and uneven mobile controls: shared wrapping, wide staff
    shells, readable inputs and minimum control sizes address these layout flaws.
 
-## Further non-deferred improvement candidates
+## Remaining verification and business decisions
 
-- Creator quiz authoring currently has two choices; the runtime accepts 2–6.
-  A variable-length editor should preserve existing snapshot answers, support
-  accessible reordering/removal and remain consistent with presets and review.
-- Additional browser coverage should exercise long translations/content,
-  keyboard-only authoring and assessment error/retry paths across actual Safari,
-  Firefox and mobile devices. This review uses one Chromium browser surface.
-- Measure representative catalog/lesson queries, frontend load and worker latency
-  with populated staging data before claiming SRS performance/accessibility targets.
-- Built-in progression currently has three starter levels. Extending persistent
-  ladders to creator-authored material needs an explicit progression contract;
-  it must preserve the approved separation from XP/ranks.
-
-These are review findings, not newly approved business rules or additional owner
-deferrals. Deferred payments/rewards/provider setup and production infrastructure
-stay in their existing register.
-
-Latest local verification: 968 PostgreSQL tests / 7,022 assertions, 528 cached
-regressions / 4,007 assertions and 40 frontend tests passed. See the
-[interface evidence](interface-implementation.md#local-evidence--2026-10-04)
+- Variable-length quiz authoring, multi-question server completion, sequential
+  creator paths, reading completion and dashboards are implemented in
+  [the completion milestone](platform-completion-implementation.md).
+- Exercise long content, keyboard authoring and error/retry paths across actual
+  Safari, Firefox and mobile devices. Local checks use one Chromium surface.
+- Measure staging catalog, dashboard, lesson and worker load against SRS targets.
+- Publish customized launch curriculum through designated creators and staff;
+  editable plans are not automatically published course records.
+- Finalize provisional financial values, cap/tie/rounding/funding contracts and
+  creator-deletion retention; see the deferred register and sustainability analysis.
+Latest local verification: 1,012 PostgreSQL tests / 7,422 assertions, 574 cached
+regressions / 4,419 assertions and 44 frontend tests passed. The cached pass
+includes the subsequent rollback-guard and staff-review regressions. See the
+[completion evidence](platform-completion-implementation.md#verification)
 for browser observations and their limits. These local results do not substitute
 for remote CI or production staging checks.

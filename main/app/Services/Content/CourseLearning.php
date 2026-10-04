@@ -35,7 +35,7 @@ class CourseLearning
                 throw ValidationException::withMessages(['course' => 'An adventure in this course is unavailable. Try another journey.']);
             }
             $enrollment = CourseEnrollment::create(['user_id' => $user->id, 'course_id' => $course->id,
-                'course_revision_id' => $revision->id, 'enrolled_at' => now()]);
+                'course_revision_id' => $revision->id, 'enrolled_at' => now(), 'sequential' => $revision->sequential]);
             app(AuditRecorder::class)->record($user->id, $user->id, 'course.enrolled', 'course_enrollment', (string) $enrollment->id,
                 ['course_id' => $course->id, 'revision_id' => $revision->id, 'access' => 'free']);
 
@@ -56,7 +56,10 @@ class CourseLearning
             $revision->load('modules.revision', 'modules.module');
             $progress = $enrollment === null ? collect() : DB::table('course_module_progress')->where('enrollment_id', $enrollment->id)->get()->keyBy('assignment_id');
 
-            return compact('course', 'enrollment', 'revision', 'progress');
+            $unlocked = $revision->modules->mapWithKeys(fn ($slot) => [$slot->id => ! $enrollment?->sequential
+                || $revision->modules->where('position', '<', $slot->position)->every(fn ($previous) => $progress->get($previous->id)?->completed_at !== null)]);
+
+            return compact('course', 'enrollment', 'revision', 'progress', 'unlocked');
         });
     }
 
@@ -87,6 +90,21 @@ class CourseLearning
         });
     }
 
+    public function markRead(User $actor, string $sessionId, int $courseId, int $slotId): void
+    {
+        DB::transaction(function () use ($actor, $sessionId, $courseId, $slotId): void {
+            $user = $this->account($actor, $sessionId);
+            [, $enrollment, $slot] = $this->entitlement($user, $courseId, $slotId);
+            abort_unless($slot->revision->assessment === null, 409, 'Complete the assessment to clear this adventure.');
+            $query = DB::table('course_module_progress')->where('enrollment_id', $enrollment->id)->where('assignment_id', $slot->id);
+            abort_unless($query->exists(), 409, 'Open this lesson before marking it as read.');
+            if ($query->whereNull('completed_at')->update(['completed_at' => now(), 'validated_input' => json_encode(['kind' => 'reading'], JSON_THROW_ON_ERROR)])) {
+                app(AuditRecorder::class)->record($user->id, $user->id, 'course.lesson_read', 'course_enrollment', (string) $enrollment->id,
+                    ['assignment_id' => $slot->id, 'revision_id' => $slot->module_revision_id]);
+            }
+        });
+    }
+
     private function account(User $actor, string $sessionId): User
     {
         $user = User::whereKey($actor->id)->lockForUpdate()->firstOrFail();
@@ -106,6 +124,12 @@ class CourseLearning
         $slot = CourseRevisionModule::where('course_revision_id', $enrollment->course_revision_id)->with('revision')->findOrFail($slotId);
         $module = LearningModule::whereKey($slot->module_id)->lockForUpdate()->firstOrFail();
         abort_unless($module->status === 'Published' && ! $module->isWithdrawn() && $slot->revision->review_status === 'Approved' && $enrollment->revision->review_status === 'Approved', 404);
+        if ($enrollment->sequential) {
+            $unfinished = CourseRevisionModule::where('course_revision_id', $enrollment->course_revision_id)->where('position', '<', $slot->position)
+                ->whereNotExists(fn ($query) => $query->selectRaw('1')->from('course_module_progress')
+                    ->whereColumn('assignment_id', 'course_revision_modules.id')->where('enrollment_id', $enrollment->id)->whereNotNull('completed_at'))->exists();
+            abort_if($unfinished, 403, 'Complete the previous adventures to unlock this lesson.');
+        }
 
         return [$course, $enrollment, $slot];
     }

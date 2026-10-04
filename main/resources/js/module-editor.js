@@ -1,6 +1,7 @@
 import { mountGardenDesigner } from './games/garden-designer.js';
 import { mountScenarioEditor } from './games/scenario-editor.js';
 import { mountQuizDesigner } from './games/quiz-designer.js';
+import { mountQuizEditor } from './games/quiz-editor.js';
 
 export function mountModuleEditor(root) {
     const kind = root.querySelector('[name="assessment_kind"]');
@@ -8,6 +9,7 @@ export function mountModuleEditor(root) {
     const preset = root.querySelector('[name="game_preset"]');
     const presets = JSON.parse(root.dataset.gamePresets);
     mountGardenDesigner(root, presets);
+    mountQuizEditor(root.querySelector('[data-quiz-editor]'));
     mountQuizDesigner(root);
     mountScenarioEditor(root, '[name="game_preset"]', { title: 'game_title', instructions: 'game_instructions', hint: 'game_hint', learningIdea: 'game_learning_idea' });
     let previousPreset = preset.value;

@@ -84,3 +84,13 @@ the prepaint script silently. No dependency or infrastructure changes are needed
 
 Real-device/Safari/Firefox checks, a complete accessibility audit and populated
 staging performance measurements remain follow-up verification work.
+
+### Completion follow-up
+
+The shared quiz editor now supports 1–10 questions and 2–6 choices with accessible
+add/remove/reorder controls and stable correct-answer identifiers. The dashboard
+adds bounded progress/activity panels, uses two columns on wider screens and one
+on phones, and keeps the primary Continue playing action compact. See
+[the completion record](platform-completion-implementation.md#verification) for
+the newer tests and browser scenarios; the counts above describe the earlier
+interface pass, not the latest repository total.

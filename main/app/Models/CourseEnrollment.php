@@ -13,7 +13,7 @@ class CourseEnrollment extends Model
 
     protected function casts(): array
     {
-        return ['enrolled_at' => 'immutable_datetime'];
+        return ['enrolled_at' => 'immutable_datetime', 'sequential' => 'boolean'];
     }
 
     public function course(): BelongsTo

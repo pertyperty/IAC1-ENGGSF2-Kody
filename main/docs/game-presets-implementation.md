@@ -16,8 +16,10 @@ the existing Manila streak writer. Presets never grant access independently.
 ## Configuration and creator experience
 
 Verified Active Administrators create presets with a unique 100-character name,
-activity title and one of the three existing garden trail rule sets or a two-choice
-practice quiz. Gardens configure instructions, hints and learning feedback;
+activity title and an approved game or practice quiz. The later
+[completion milestone](platform-completion-implementation.md) supports 1–10 quiz
+questions with 2–6 choices, retaining version-1 single-question compatibility.
+Gardens configure instructions, hints and learning feedback;
 geometry, objectives, movement, loop repeat and conditional collection are the
 existing runtime's rules. Quizzes configure question, distinct choices, correct
 answer and explanation. Text bounds match the existing template contract.

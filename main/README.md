@@ -13,6 +13,12 @@ The shared interface uses blue/grey light and dark themes, a remembered header
 toggle and responsive controls. Creators can preview unsaved games and quizzes;
 previews do not record learner progress. See [interface implementation](docs/interface-implementation.md).
 
+
+Creators can use beginner curriculum plans, 1-10-question quizzes and sequential
+course paths. Learner dashboards consolidate saved progress and updates. See the
+[completion record](docs/platform-completion-implementation.md). Later private
+provider configuration is covered by [integration setup](docs/integration-setup.md);
+`php artisan kody:setup-status` performs sanitized checks without network calls.
 ## Development setup
 
 Commands below run from the Laravel directory (`main/` in this repository).

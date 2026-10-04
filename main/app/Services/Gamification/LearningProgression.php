@@ -7,6 +7,7 @@ use App\Models\ModuleRevision;
 use App\Models\User;
 use App\Services\Account\CurrentAccountSession;
 use App\Services\Games\GameAssessment;
+use App\Services\Games\QuizAuthoring;
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\DB;
@@ -50,7 +51,7 @@ class LearningProgression
             $instance = $kind === 'game' ? config('learning.instances')[$level] : config('learning.quizzes')[$level];
             $valid = $kind === 'game'
                 ? app(GameAssessment::class)->succeeds($instance, $input)
-                : $input['answer'] === $instance['answer'];
+                : app(QuizAuthoring::class)->succeeds($instance, $input);
             if (! $valid) {
                 throw ValidationException::withMessages(['completion' => 'That attempt did not complete the objective. Try again.']);
             }
@@ -92,7 +93,7 @@ class LearningProgression
                 && ($kind === 'game' ? app(GameAssessment::class)->supports($instance) : $instance['template'] === 'choice-quiz'), 404);
             $valid = $kind === 'game'
                 ? app(GameAssessment::class)->succeeds($instance, $input)
-                : $input['answer'] === $instance['answer'];
+                : app(QuizAuthoring::class)->succeeds($instance, $input);
             if (! $valid) {
                 throw ValidationException::withMessages(['completion' => 'That attempt did not complete the objective. Try again.']);
             }
