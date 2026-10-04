@@ -62,7 +62,7 @@
                     </div>
                     <p class="field-hint">Sequences and conditions allow 12 instructions. Loops repeat a pattern of up to 3 instructions twice. Conditions can collect up to 4 crystals; the starting tile cannot hold one.</p>
                     <div class="designer-board" data-designer-board role="group" aria-label="Editable garden, five columns and four rows"></div>
-                    <div class="studio-actions"><button type="button" class="button button-dark" data-designer-preview>Try this level</button><button type="button" class="game-reset" data-designer-reset>Reset trail</button></div>
+<div class="studio-actions"><button type="button" class="button button-dark" data-designer-preview>Try this level</button><button type="button" class="game-reset" data-designer-reset>Reset trail</button></div>
                     <p class="field-hint" data-designer-status role="status">Your saved world stays intact until you paint a tile or reset it. Published levels change only after review.</p>
                     <div data-designer-preview-host></div>
                     <template>@include('learning.game', ['game' => config('learning.instances.sequences'), 'module' => null, 'designerShell' => true])</template>
@@ -76,6 +76,7 @@
                 @endphp
                 @include('games.quiz-editor')
             </div>
+            @include('transactions.access-settings', ['accessKind' => 'module'])
             <div class="studio-actions"><button class="button button-play" type="submit">Save draft</button><a class="quiet-link" href="{{ route('studio.index') }}">Cancel</a></div>
         </fieldset>
     </form>

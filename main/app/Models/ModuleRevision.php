@@ -11,7 +11,7 @@ class ModuleRevision extends Model
 
     protected function casts(): array
     {
-        return ['assessment' => 'array', 'number' => 'integer', 'reviewed_at' => 'immutable_datetime'];
+        return ['price_kb' => 'integer', 'minimum_xp' => 'integer', 'prerequisite_modules' => 'array', 'assessment' => 'array', 'number' => 'integer', 'reviewed_at' => 'immutable_datetime'];
     }
 
     public function module(): BelongsTo

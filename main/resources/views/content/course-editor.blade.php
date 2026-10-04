@@ -31,7 +31,8 @@
                 <template data-course-slot-template><div class="course-slot"><label>Adventure <span data-slot-number></span><select name="module_ids[]"><option value="">Choose an adventure</option>@foreach($modules as $adventure)<option value="{{ $adventure->id }}">{{ $adventure->publishedRevision->title }} · v{{ $adventure->publishedRevision->number }} · {{ $adventure->status }}</option>@endforeach</select></label><button type="button" class="game-reset" data-remove-slot>Remove</button></div></template>
                 <button class="button button-dark button-small" type="button" data-add-slot>Add an adventure +</button>
             </section>
-            <div class="studio-actions"><button class="button button-play">Save course draft</button><a class="quiet-link" href="{{ route('courses.index') }}">Cancel</a></div>
+            @include('transactions.access-settings', ['accessKind' => 'course'])
+<div class="studio-actions"><button class="button button-play">Save course draft</button><a class="quiet-link" href="{{ route('courses.index') }}">Cancel</a></div>
         </fieldset>
     </form>
     @if($revision?->review_status === 'Draft' && $course?->status !== 'Archived')<form method="post" action="{{ route('courses.submit', $course) }}" class="studio-actions">@csrf<input type="hidden" name="record_version" value="{{ $course->record_version }}"><button class="button button-dark">Submit saved course for review →</button></form>@endif

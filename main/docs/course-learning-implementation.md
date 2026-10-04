@@ -1,5 +1,10 @@
 # Course learning and archiving — B01/B03/B04/D08
 
+> Later amendment (2026-10-04): the owner delegated economy, XP/rank/reward,
+> reviewed paid access and creator-retention decisions. See [current policies](economy-and-launch-decisions.md)
+> and [implementation](economy-implementation.md). Earlier first-release deferrals below
+> are historical; live providers/staging and numeric ratings remain deferred.
+
 The subsequent [completion milestone](platform-completion-implementation.md)
 adds owner-approved optional sequential paths, explicit reading completion and
 consolidated dashboards. Existing enrollments remain open; reading grants no

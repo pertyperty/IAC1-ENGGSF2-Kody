@@ -36,6 +36,8 @@ use App\Services\Engagement\ContentFeedback;
 use App\Services\Games\GamePresets;
 use App\Services\Gamification\LearningProgression;
 use App\Services\Gamification\WeeklyEvents;
+use App\Services\Transactions\ContentAccess;
+use App\Services\Transactions\PublisherSettlements;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -63,6 +65,21 @@ try {
     $session->start();
 
     $result = match ($argv[1]) {
+        'economy-unlock' => (function () use ($input, $argv): string {
+            $index = (int) $argv[3] - 1;
+            app(ContentAccess::class)->unlock(User::findOrFail($input['actor_id']), 'module-test-session', 'module', $input['content_ids'][$index], $input['revision_ids'][$index]);
+
+            return 'unlocked';
+        })(),
+        'economy-payout' => (function () use ($input): string {
+            config(['xendit' => $input['xendit'], 'app.url' => 'https://kody.example.test', 'operations.staging_verified' => true,
+                'operations.budget_enforced' => true, 'operations.operations_owner' => 'Test operator', 'operations.backup_responder' => 'Test responder']);
+            $data = $input['data'];
+            $data['confirmation_id'] = (string) Str::uuid();
+            app(PublisherSettlements::class)->request(User::findOrFail($input['actor_id']), 'module-test-session', $data);
+
+            return 'reserved';
+        })(),
         'google-claim' => (function () use ($input, $session): string {
             $session->setId($input['session_id']);
             $session->put('google_attempt_id', $input['attempt_id']);

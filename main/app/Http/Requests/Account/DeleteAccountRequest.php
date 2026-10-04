@@ -17,6 +17,6 @@ class DeleteAccountRequest extends FormRequest
     {
         return ['profile_version' => ['required', 'integer', 'min:1'], 'current_password' => ['required', 'string', 'max:1024'],
             'confirmation_phrase' => ['required', 'string', Rule::in(['DELETE MY ACCOUNT'])], 'confirmed' => ['required', 'accepted'],
-            'user_id' => ['prohibited'], 'account_status' => ['prohibited']];
+            'retention_consent' => ['sometimes', 'accepted'], 'user_id' => ['prohibited'], 'account_status' => ['prohibited']];
     }
 }

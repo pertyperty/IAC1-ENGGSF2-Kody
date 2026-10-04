@@ -9,6 +9,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 
 class AccountDeletionController extends Controller
@@ -19,7 +20,10 @@ class AccountDeletionController extends Controller
         $version = $request->user()->profile_version;
         $authored = $accounts->hasAuthoredContent($request->user());
 
-        return response()->view('account.delete', compact('version', 'authored'))->header('Cache-Control', 'no-store, private');
+        $privacyReview = DB::table('creator_erasure_reviews')->where('user_id', $request->user()->id)->orderByDesc('created_at')->first();
+        $unsettled = $accounts->hasUnsettledFinances($request->user());
+
+        return response()->view('account.delete', compact('version', 'authored', 'privacyReview', 'unsettled'))->header('Cache-Control', 'no-store, private');
     }
 
     public function store(DeleteAccountRequest $request, AccountDeletion $accounts): RedirectResponse

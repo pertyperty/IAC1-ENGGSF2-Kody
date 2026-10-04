@@ -12,7 +12,7 @@ class CourseRevision extends Model
 
     protected function casts(): array
     {
-        return ['number' => 'integer', 'estimated_duration' => 'integer', 'reviewed_at' => 'immutable_datetime', 'sequential' => 'boolean'];
+        return ['price_kb' => 'integer', 'minimum_xp' => 'integer', 'prerequisite_modules' => 'array', 'number' => 'integer', 'estimated_duration' => 'integer', 'reviewed_at' => 'immutable_datetime', 'sequential' => 'boolean'];
     }
 
     public function course(): BelongsTo

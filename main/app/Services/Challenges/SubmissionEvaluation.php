@@ -8,6 +8,8 @@ use App\Models\ChallengeTestCase;
 use App\Models\CodingChallengeRevision;
 use App\Services\Challenges\Judge0\Judge0Client;
 use App\Services\Challenges\Judge0\ProviderUnavailable;
+use App\Services\Gamification\Achievements;
+use App\Services\Gamification\WeeklyResults;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -120,5 +122,7 @@ class SubmissionEvaluation
             }]);
         DB::table('challenge_participations')->where('id', $submission->participation_id)->where('active_submission_id', $submission->id)
             ->update(['active_submission_id' => null, 'updated_at' => now()]);
+        app(Achievements::class)->challenge($submission);
+        app(WeeklyResults::class)->capture($submission);
     }
 }

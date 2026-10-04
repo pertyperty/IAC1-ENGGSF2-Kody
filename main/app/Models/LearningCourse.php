@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasCreator;
 use App\Models\Concerns\HasStaffWithdrawal;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -9,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class LearningCourse extends Model
 {
+    use HasCreator;
     use HasStaffWithdrawal;
 
     protected $guarded = ['id', 'staff_withdrawn_at'];

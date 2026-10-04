@@ -52,7 +52,7 @@ class WeeklyEvents
             app(CurrentAccountSession::class)->assert($user, $sessionId);
             $attributes = ['challenge_id' => $challenge->id, 'revision_id' => $revision->id, 'configured_by' => $user->id,
                 'rules' => $data['rules'], 'starts_at' => $start->utc(), 'ends_at' => $start->addWeek()->utc(),
-                'status' => $start->isFuture() ? 'Scheduled' : 'Active', 'reward_mode' => 'Deferred',
+                'status' => $start->isFuture() ? 'Scheduled' : 'Active', 'reward_mode' => 'Capped', 'economy_policy_version' => config('economy.policy_version'),
                 'record_version' => ($event?->record_version ?? 0) + 1];
             if ($event === null) {
                 $event = WeeklyEvent::create($attributes);
@@ -104,7 +104,7 @@ class WeeklyEvents
                 return;
             }
             $event = WeeklyEvent::create(['challenge_id' => $challenge->id, 'revision_id' => $revision->id,
-                'starts_at' => $start, 'ends_at' => $start->addWeek(), 'rules' => $revision->rules, 'status' => 'Active']);
+                'starts_at' => $start, 'ends_at' => $start->addWeek(), 'rules' => $revision->rules, 'status' => 'Active', 'reward_mode' => 'Capped', 'economy_policy_version' => config('economy.policy_version')]);
             $this->audit($event, 'weekly.auto-selected');
         });
     }
@@ -143,6 +143,6 @@ class WeeklyEvents
     {
         app(AuditRecorder::class)->record($actorId, $actorId, $name, 'weekly_event', (string) $event->id,
             ['challenge_id' => $event->challenge_id, 'revision_id' => $event->revision_id, 'version' => $event->record_version,
-                'starts_at' => $event->starts_at->toIso8601String(), 'ends_at' => $event->ends_at->toIso8601String(), 'reward_mode' => 'Deferred']);
+                'starts_at' => $event->starts_at->toIso8601String(), 'ends_at' => $event->ends_at->toIso8601String(), 'reward_mode' => $event->reward_mode, 'economy_policy_version' => $event->economy_policy_version]);
     }
 }

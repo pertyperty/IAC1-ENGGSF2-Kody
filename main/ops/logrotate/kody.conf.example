@@ -1,0 +1,10 @@
+# Review service user and paths on the target Linux host. Do not install automatically.
+/var/www/kody/shared/storage/logs/scheduler.log {
+    daily
+    rotate 30
+    compress
+    missingok
+    notifempty
+    copytruncate
+    su www-data www-data
+}

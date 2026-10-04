@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Services\Account\CurrentAccountSession;
 use App\Services\Administration\AuditRecorder;
 use App\Services\Notifications\InAppNotifications;
+use App\Services\Publishing\AccessSettings;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -42,7 +43,7 @@ class ChallengePublishing
             $revision = CodingChallengeRevision::create(['challenge_id' => $current->id, 'number' => $number,
                 'title' => $data['title'], 'description' => $data['description'], 'language' => $data['language'],
                 'difficulty' => $data['difficulty'], 'rules' => $data['rules'], 'input_format' => $data['input_format'],
-                'output_format' => $data['output_format'], 'cpu_time_ms' => $data['cpu_time_ms'], 'memory_kib' => $data['memory_kib']]);
+                'output_format' => $data['output_format'], 'cpu_time_ms' => $data['cpu_time_ms'], 'memory_kib' => $data['memory_kib']] + app(AccessSettings::class)->attributes($user, 'challenge', $data, $current->id));
             foreach ($data['test_cases'] as $index => $case) {
                 ChallengeTestCase::create(['revision_id' => $revision->id, 'position' => $index + 1,
                     'input' => $case['input'] ?? '', 'expected_output' => $case['expected_output'] ?? '', 'hidden' => (bool) $case['hidden']]);
@@ -88,6 +89,8 @@ class ChallengePublishing
             }
             if ($decision === 'Approved') {
                 Gate::forUser($users->get($current->created_by))->authorize('create', CodingChallenge::class);
+                app(AccessSettings::class)->attributes($users->get($current->created_by), 'challenge',
+                    $revision->only(['price_kb', 'minimum_xp', 'prerequisite_modules']), $current->id);
                 if (! $revision->testCases()->exists()) {
                     throw ValidationException::withMessages(['challenge' => 'This challenge has no test cases.']);
                 }
