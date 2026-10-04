@@ -8,7 +8,7 @@
         <div class="program-track" data-game-program aria-label="Your program"><span>Add an arrow to start your program</span></div>
         <div class="game-toolbar"><button class="button button-play" type="button" data-game-run>Run my code <span aria-hidden="true">▶︎</span></button><button type="button" class="game-reset" data-game-reset>Start over</button><button type="button" class="game-reset" data-game-hint>Hint</button></div>
         <p class="game-feedback" data-game-feedback role="status" aria-live="polite">Small steps count. You can try as many times as you like.</p>
-        <div class="game-success" data-game-success hidden><p><b>You made that happen! ✦</b><span>{{ $game['learningIdea'] }}</span></p><a href="{{ route('learning.catalog') }}" class="quiet-link">Explore your next adventure →</a></div>
+        <div class="game-success" data-game-success hidden><p><b>You made that happen! ✦</b><span>{{ $game['learningIdea'] }}</span></p>@if(isset($module))<a href="{{ route('dashboard') }}" class="quiet-link">Continue playing →</a>@elseif($trial ?? false)@auth<a href="{{ route('dashboard') }}" class="quiet-link">Continue your saved trail →</a>@else<p>This trial stays here. Create an account to start saving your wins.</p><a href="{{ route('register') }}" class="quiet-link">Start your saved adventure →</a><a href="{{ route('login') }}" class="quiet-link">Already joined? Sign in →</a>@endauth@else<a href="{{ route('learning.catalog') }}" class="quiet-link">Explore your next adventure →</a>@endif</div>
         <noscript><p class="game-feedback">Turn on JavaScript to play. You can still browse modules and create an account.</p></noscript>
     </div>
 </section>

@@ -2,6 +2,12 @@
 
 ## Mission
 
+The [guided journey](docs/creator-learner-journey.md) supplies editable lesson
+examples and continued play derived from persisted progress. Examples never
+auto-save or publish. See [operations preparation](docs/deployment-operations.md)
+for local rehearsal evidence; cloud supervision, monitoring and managed backup
+restoration still require staging verification before a production release.
+
 The owner approved the first Google identity slice for existing verified Active
 accounts: explicit linking after confirming the current Kody password, followed
 by sign-in through the linked provider subject. Never automatically link by email

@@ -6,12 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Content\SaveModuleRequest;
 use App\Models\GamePreset;
 use App\Models\LearningModule;
+use App\Services\Content\CreatorExamples;
 use App\Services\Content\ModulePublishing;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\Rule;
 
 class ModuleStudioController extends Controller
 {
@@ -23,11 +25,14 @@ class ModuleStudioController extends Controller
         return response()->view('content.studio', compact('modules'))->header('Cache-Control', 'no-store, private');
     }
 
-    public function create(): Response
+    public function create(Request $request, CreatorExamples $examples): Response
     {
         Gate::authorize('create', LearningModule::class);
 
-        return response()->view('content.editor', ['module' => null, 'revision' => null, 'presets' => $this->presets()])->header('Cache-Control', 'no-store, private');
+        $slug = $request->validate(['example' => ['nullable', 'string', Rule::in(array_keys(config('creator-examples')))]])['example'] ?? null;
+
+        return response()->view('content.editor', ['module' => null, 'revision' => null, 'presets' => $this->presets(),
+            'starter' => $slug === null ? [] : $examples->fields($slug)])->header('Cache-Control', 'no-store, private');
     }
 
     public function store(SaveModuleRequest $request, ModulePublishing $publishing): RedirectResponse

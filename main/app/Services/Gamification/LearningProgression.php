@@ -30,7 +30,10 @@ class LearningProgression
             $previousComplete = $previousComplete && $isComplete;
         }
 
+        $next = collect($levels)->filter(fn (array $level) => $level['unlocked'] && ! $level['completed'])->keys()->first();
+
         return ['current_streak' => $current, 'longest_streak' => $progress?->longest_streak ?? 0,
+            'next_level' => $next, 'active_today' => $progress?->last_activity_date === $today->toDateString(),
             'last_activity_date' => $progress?->last_activity_date, 'levels' => $levels,
             'completed_count' => count(array_intersect(array_keys($levels), $completed))];
     }

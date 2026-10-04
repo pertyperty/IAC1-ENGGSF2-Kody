@@ -4,6 +4,11 @@
 .learning-page button, .learning-page input { font: inherit; }
 .learning-page button { cursor: pointer; }
 .learning-page :focus-visible { outline: 3px solid #55774b; outline-offset: 4px; }
+@media (max-width: 760px) {
+    .learning-page .site-header { flex-wrap: wrap; }
+    .learning-page .site-header nav { order: 3; width: 100%; flex-wrap: wrap; }
+    .learning-page .nav-actions { flex-wrap: wrap; justify-content: flex-end; min-width: 0; }
+}
 .page-width { max-width: 1240px; padding: 0 36px; margin: auto; }
 .site-header { max-width: 1312px; min-height: 102px; margin: auto; padding: 24px 36px; display: flex; gap: 35px; align-items: center; justify-content: space-between; }
 .play-brand { display: inline-flex; align-items: center; gap: 9px; font-size: 32px; font-weight: 800; letter-spacing: -1.5px; color: #24322e; }
@@ -58,7 +63,7 @@
 .step-pill { font-size: 8px; background: #f0f2eb; color: #698058; font-weight: 650; padding: 6px 8px; border-radius: 5px; margin-top: 2px; }
 .game-instructions p { margin: 0; font-size: 11px; color: #71806a; line-height: 1.65; }
 .command-buttons { display: flex; gap: 8px; margin-bottom: 13px; }
-.command-buttons button { border: 1px solid #d7dfcf; background: #f7f9f1; color: #49603e; border-radius: 8px; width: 42px; height: 34px; box-shadow: 0 2px 0 #dce3d3; font-size: 19px; }
+.command-buttons button { border: 1px solid #d7dfcf; background: #f7f9f1; color: #49603e; border-radius: 8px; width: 44px; min-width: 44px; height: 44px; box-shadow: 0 2px 0 #dce3d3; font-size: 19px; }
 .command-buttons button:hover { background: #edf4df; }
 .command-buttons .undo-command { width: auto; margin-left: auto; font-size: 10px; padding: 0 12px; box-shadow: none; }
 .program-track { min-height: 41px; border: 1px dashed #d5dfca; border-radius: 8px; padding: 7px 9px; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; color: #8a9782; font-size: 10px; }
@@ -66,7 +71,7 @@
 .program-step.executing { background: #badf8b; outline: 2px solid #7b9d59; }
 .game-toolbar { display: flex; gap: 18px; align-items: center; margin-top: 14px; }
 .button-play { background: #c2e891; color: #355324; box-shadow: 0 3px 0 #95b86c; font-size: 11px; padding: 10px 15px; border-radius: 8px; flex: 1; justify-content: space-between; }
-.game-reset { font-size: 10px; border: 0; background: none; padding: 8px 0; color: #78856f; }
+.game-reset { font-size: 12px; border: 0; background: none; padding: 8px; min-height: 44px; min-width: 44px; color: #526348; }
 .game-feedback { color: #7d8a73; font-size: 10px; line-height: 1.6; margin: 14px 0 0; min-height: 32px; }
 .game-option { display: flex; align-items: center; gap: 8px; font-size: 11px; margin: 12px 0; color: #566d47; }
 .game-success { background: #f1f8e9; border-radius: 10px; padding: 13px; margin-top: 9px; }

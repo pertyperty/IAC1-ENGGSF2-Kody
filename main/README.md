@@ -37,6 +37,10 @@ virtual filesystem; full language execution still requires Judge0 setup. See
 [template contracts, authoring and deployment](docs/arcade-templates-implementation.md).
 The [Learning catalog](docs/module-discovery-implementation.md) filters published
 lessons by game or quiz type; each playground trial links to matching lessons.
+The [guided creator and learner journey](docs/creator-learner-journey.md) adds
+eight editable lesson starters and a saved-progress Continue playing action.
+See [deployment operations](docs/deployment-operations.md) for local worker,
+scheduler, private storage and restore evidence, plus remaining staging checks.
 
 ## Development setup
 

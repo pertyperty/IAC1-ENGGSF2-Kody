@@ -7,6 +7,7 @@
             <p class="hero-description">Learn to code by making things happen. Solve tiny puzzles, explore new worlds, and turn <em>what if?</em> into <em>look what I can do.</em></p>
             <div class="hero-actions"><a class="button button-dark" href="#try-it">Try your first game <span aria-hidden="true">→</span></a><a class="quiet-link" href="{{ route('learning.catalog') }}">Explore learning ↗︎</a></div>
             <p class="hero-note"><span aria-hidden="true">✦</span> No experience. No download. Just curiosity.</p>
+            @auth<p><a class="quiet-link" href="{{ route('dashboard') }}">Continue your saved adventure →</a></p>@endauth
             <div class="concept-strip"><span>Build a sequence</span><span>Find a pattern</span><span>Make a choice</span></div>
         </div>
         <div class="hero-game" id="try-it">@include('learning.game', ['trial' => true])<p class="game-caption"><span aria-hidden="true">↖︎</span> This isn’t a screenshot. Give it a go!</p></div>
