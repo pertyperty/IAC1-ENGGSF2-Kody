@@ -172,3 +172,12 @@ and verify no older version or marker survives. Never aim the drill at live data
 The economy follow-up applied all 40 migrations to a new isolated local PostgreSQL
 database and obtained zero mismatches from the empty-ledger check. This verifies
 clean-schema installation, not an upgrade of live financial data or managed recovery.
+
+### Populated acceptance rehearsal — 2026-10-05
+
+`npm run test:restore` repeats an isolated 40-to-41 migration upgrade with
+creator/course/learner/XP/ledger/hidden-case/encrypted-delivery history, followed
+by a matching-client custom-format restore. All 75 table counts/digests and
+ledger/decryption checks passed locally. The guarded script is reusable in CI;
+[the evidence record](acceptance-verification.md) distinguishes it from managed
+RDS/S3/key recovery and the older pre-economy upgrade.

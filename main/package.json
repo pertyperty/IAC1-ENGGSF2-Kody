@@ -4,10 +4,14 @@
     "type": "module",
     "scripts": {
         "test:games": "node --test tests/Frontend/*.test.mjs",
+        "test:browser": "node tests/Browser/run.mjs",
+        "test:restore": "node tests/Browser/run.mjs --rehearse",
         "build": "vite build",
         "dev": "vite"
     },
     "devDependencies": {
+        "@axe-core/playwright": "4.13.0",
+        "@playwright/test": "1.63.0",
         "@tailwindcss/vite": "^4.0.0",
         "concurrently": "^10.0.3",
         "laravel-vite-plugin": "^3.1",

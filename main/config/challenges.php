@@ -3,6 +3,10 @@
 return [
     // Approved Version 1 scope; provider compiler IDs are configured separately.
     'languages' => ['python' => 'Python', 'java' => 'Java', 'cpp' => 'C++'],
+    'categories' => ['foundations' => 'Programming basics', 'numbers' => 'Numbers and arithmetic',
+        'collections' => 'Lists and collections', 'strings' => 'Text and strings'],
+    'tags' => ['variables' => 'Variables', 'conditions' => 'Conditions', 'loops' => 'Loops',
+        'functions' => 'Functions', 'arrays' => 'Arrays', 'strings' => 'Strings'],
     // Authoring safeguards, not a claim about the future provider's supported limits.
     'authoring' => ['max_test_cases' => 20, 'max_case_characters' => 16384,
         'min_cpu_time_ms' => 100, 'max_cpu_time_ms' => 5000,

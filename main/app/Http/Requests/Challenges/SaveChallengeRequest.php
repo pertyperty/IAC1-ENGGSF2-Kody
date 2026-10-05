@@ -4,6 +4,7 @@ namespace App\Http\Requests\Challenges;
 
 use App\Http\Requests\Content\NormalizesAccessSettings;
 use App\Models\CodingChallenge;
+use App\Services\Challenges\ChallengeMetadata;
 use App\Services\Publishing\AccessSettings;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -16,6 +17,8 @@ class SaveChallengeRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $this->normalizeAccessSettings();
+        $this->merge(['category' => $this->input('category', 'foundations'),
+            'tags' => $this->input('tags', [])]);
     }
 
     public function authorize(): bool
@@ -43,7 +46,7 @@ class SaveChallengeRequest extends FormRequest
             'test_cases.*' => ['required', 'array:input,expected_output,hidden'],
             'test_cases.*.input' => ['present', 'nullable', 'string', 'max:'.$limits['max_case_characters'], 'not_regex:/\x00/'],
             'test_cases.*.expected_output' => ['present', 'nullable', 'string', 'max:'.$limits['max_case_characters'], 'not_regex:/\x00/'],
-            'test_cases.*.hidden' => ['required', 'boolean']] + app(AccessSettings::class)->rules('challenge');
+            'test_cases.*.hidden' => ['required', 'boolean']] + app(AccessSettings::class)->rules('challenge') + app(ChallengeMetadata::class)->rules();
     }
 
     public function withValidator(Validator $validator): void

@@ -15,7 +15,7 @@ is the master documentation entry point. Original SRS/SDD artifacts remain intac
 | Refunds and remedies | Whole untouched original purchase within 14 days; unused access within seven days; locked usage recheck, staff review, durable reversal records and provider-confirmed fiat refund. Exceptional cases have an audited investigation/decision queue; resolving a case does not fabricate a financial outcome. |
 | B09/E01, E03–E06 | Idempotent authoritative XP and separate achievement ranks; authenticated leaderboards; best verified weekly score, competition ties, immutable staff publication and whole-KB rewards constrained by prior purchased-token spending and matured platform cash. Existing Deferred weekly events stay Deferred. |
 | Account erasure | Existing tombstone/erasure outbox plus creator retention consent, all-revision staff inspection, unchanged inventory hash and settlement checks. Shared material remains, free for future admissions. Optional separately confirmed balance relinquishment handles voluntarily surrendered balances and dust. |
-| G07/G13 / operations | Administrator-only dated accounting/XP/reward aggregates, financial liabilities/cash history, attested owner funding and paid-expense entries; versioned monthly cost reports, once-per-threshold notices, automatic admission pause, secret-free launch/config checks and read-only ledger reconciliation. |
+| G07 / operations | Administrator-only dated accounting/XP/reward aggregates, financial liabilities/cash history, attested owner funding and paid-expense entries; versioned monthly cost reports, once-per-threshold notices, automatic admission pause, secret-free launch/config checks and read-only ledger reconciliation. |
 
 ## Persistence and atomicity
 

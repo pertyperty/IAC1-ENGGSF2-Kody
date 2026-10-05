@@ -22,13 +22,17 @@ class PublishedChallengeController extends Controller
     {
         $filters = $request->validate(['q' => ['nullable', 'string', 'max:80'],
             'language' => ['nullable', Rule::in(array_keys(config('challenges.languages')))],
+            'category' => ['nullable', Rule::in(array_keys(config('challenges.categories')))],
+            'tag' => ['nullable', Rule::in(array_keys(config('challenges.tags')))],
             'difficulty' => ['nullable', Rule::in(['Easy', 'Medium', 'Hard'])]]);
         $query = $filters['q'] ?? '';
-        $challenges = CodingChallengeRevision::select(['id', 'challenge_id', 'title', 'language', 'difficulty', 'price_kb', 'minimum_xp'])->with('challenge.creator:id,account_status')
+        $challenges = CodingChallengeRevision::select(['id', 'challenge_id', 'title', 'language', 'difficulty', 'category', 'tags', 'price_kb', 'minimum_xp'])->with('challenge.creator:id,account_status')
             ->where('review_status', 'Approved')->whereHas('challenge', fn ($builder) => $builder->where('status', 'Published')->whereNull('staff_withdrawn_at')->whereColumn('published_revision_id', 'coding_challenge_revisions.id'))
             ->when(trim($query) !== '', fn ($builder) => $builder->where('title', 'ilike', '%'.addcslashes(trim($query), '%_\\').'%'))
             ->when($filters['language'] ?? null, fn ($builder, $language) => $builder->where('language', $language))
             ->when($filters['difficulty'] ?? null, fn ($builder, $difficulty) => $builder->where('difficulty', $difficulty))
+            ->when($filters['category'] ?? null, fn ($builder, $category) => $builder->where('category', $category))
+            ->when($filters['tag'] ?? null, fn ($builder, $tag) => $builder->whereJsonContains('tags', $tag))
             ->orderByDesc('id')->paginate(12)->withQueryString();
 
         return response()->view('challenges.catalog', compact('challenges', 'query', 'filters'));
@@ -43,7 +47,7 @@ class PublishedChallengeController extends Controller
             return response()->view('transactions.access-preview', $access + ['kind' => 'challenge'])->header('Cache-Control', 'no-store, private');
         }
         $revision = CodingChallengeRevision::whereKey($challenge->published_revision_id)->where('challenge_id', $challenge->id)->where('review_status', 'Approved')
-            ->firstOrFail(['id', 'title', 'description', 'language', 'difficulty', 'rules', 'input_format', 'output_format', 'cpu_time_ms', 'memory_kib']);
+            ->firstOrFail(['id', 'title', 'description', 'language', 'difficulty', 'category', 'tags', 'rules', 'input_format', 'output_format', 'cpu_time_ms', 'memory_kib']);
         // Hidden tests are excluded by SQL and never loaded into the learner view.
         $samples = $revision->testCases()->where('hidden', false)->get(['position', 'input', 'expected_output']);
         $participation = DB::table('challenge_participations')->where('user_id', $request->user()->id)->where('challenge_id', $challenge->id)->whereNull('weekly_event_id')->first();
