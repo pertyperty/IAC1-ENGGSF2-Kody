@@ -19,3 +19,13 @@ complete after a single rendered page. Detailed records remain linked from the
 The later explicit owner delegation authorizes the documented recommended business
 choices. It does not authorize live provider activation or deployment. The
 [deferred register](deferred-features.md) owns remaining setup and verification.
+
+## Acceptance follow-up — 2026-10-05
+
+The [master audit](requirements-acceptance-audit.md) maps all original use cases
+and NFR evidence. Reviewed challenge category/tag discovery is implemented; quiz
+XP copy and 320px ladder overflow are corrected. Four isolated browser journeys,
+axe checks and populated upgrade/restore rehearsal are repeatable locally and in
+CI. [The launch curriculum pack](launch-curriculum-review.md) provides publication
+checks. Terms content/version remains a real owner-content gap; private providers,
+managed staging and actual devices retain their explicit deferral.

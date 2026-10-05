@@ -86,6 +86,8 @@ button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
 .button { min-height: 44px; }
 .primary-button:disabled, .button:disabled { transform: none; box-shadow: none; opacity: .6; cursor: wait; }
 .review-page, .module-play, .hero-copy, .hero-game, .module-play-grid > *, .form-row > *, .studio-form { min-width: 0; }
+.journey-section > *, .creator-section > * { min-width: 0; }
+.ladder-node { flex: 1 1 0; min-width: 0; max-width: 92px; }
 .site-header nav a, .nav-login { display: inline-flex; align-items: center; min-height: 44px; transition: color .18s; }
 .site-header nav a:hover, .nav-login:hover { color: var(--accent-text); }
 .brand-mark { color: var(--accent-text); }

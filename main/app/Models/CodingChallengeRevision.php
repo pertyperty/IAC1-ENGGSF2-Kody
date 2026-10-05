@@ -12,7 +12,7 @@ class CodingChallengeRevision extends Model
 
     protected function casts(): array
     {
-        return ['price_kb' => 'integer', 'minimum_xp' => 'integer', 'prerequisite_modules' => 'array', 'number' => 'integer', 'cpu_time_ms' => 'integer', 'memory_kib' => 'integer', 'reviewed_at' => 'immutable_datetime'];
+        return ['tags' => 'array', 'price_kb' => 'integer', 'minimum_xp' => 'integer', 'prerequisite_modules' => 'array', 'number' => 'integer', 'cpu_time_ms' => 'integer', 'memory_kib' => 'integer', 'reviewed_at' => 'immutable_datetime'];
     }
 
     public function challenge(): BelongsTo

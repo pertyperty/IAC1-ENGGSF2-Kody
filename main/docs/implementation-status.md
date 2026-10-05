@@ -3,7 +3,11 @@
 Start here for current scope, detailed evidence and the next useful improvements.
 This index consolidates the feature summaries previously repeated in README.
 It does not replace approved requirements, decisions or the implementation records.
-Last reviewed: 2026-10-04.
+Last reviewed: 2026-10-05.
+The [requirements acceptance audit](requirements-acceptance-audit.md) is the master
+61-use-case/NFR checklist. [Repeatable acceptance verification](acceptance-verification.md)
+owns browser/upgrade/restore evidence; [launch curriculum review](launch-curriculum-review.md)
+owns the editorial publication queue.
 The [completion roadmap](platform-completion-roadmap.md) tracks the latest owner
 request; [its implementation record](platform-completion-implementation.md) covers
 expanded quizzes, longer course paths, dashboards and curriculum preparation.
@@ -36,11 +40,11 @@ records code/evidence; [sustainability](sustainability-analysis.md) remains a se
 | Customizable assessments / D01–D02, G08–G10 | Garden, Pixel Studio, Number Machine, Sort Lab, virtual Terminal Quest and practice quizzes; typed creator data, server replay and immutable preset snapshots. Twelve lesson starters, two curriculum plans, 1-10-question quizzes and 2-6 choices with immutable snapshots. | [Arcade](arcade-templates-implementation.md), [garden designer](garden-designer-implementation.md), [presets](game-presets-implementation.md) |
 | Module and course authoring / D01–D09 | Owned drafts, moderated new/replacement publication, revision-pinned course composition, creator archival and protected deletion. Retained dependencies block deletion. | [Studio](creator-studio-implementation.md), [courses](course-composition-implementation.md), [deletion](content-deletion-implementation.md) |
 | Learning / B03–B04 | Authenticated module discovery and assessment filters; reviewed free/paid course enrollment, pinned lessons, saved assessment/reading progress, optional sequential paths and consolidated dashboards. Reading grants no streak or Contributor credit. Archived courses retain existing enrollment access; archived modules remain unavailable. | [Discovery](module-discovery-implementation.md), [course learning](course-learning-implementation.md) |
-| Coding quests / C01–C07, B07 | Reviewed challenge authoring, hidden tests, revision-pinned durable submissions and concurrency-safe three-attempt limits. Judge0 adapter and fake-provider tests exist; live execution is disabled. | [Challenge studio](challenge-studio-implementation.md), [submissions](challenge-submission-implementation.md) |
+| Coding quests / C01–C07, B07 | Reviewed topic/concept discovery, challenge authoring, hidden tests, revision-pinned durable submissions and concurrency-safe three-attempt limits. Judge0 adapter and fake-provider tests exist; live execution is disabled. | [Challenge studio](challenge-studio-implementation.md), [submissions](challenge-submission-implementation.md) |
 | Weekly play / E02–E06 | Manila Sunday windows, future scheduling, immutable started events, separate three-attempt budgets and private verified-result history, best-score ties, immutable staff publication and cash/spend-capped KB rewards. Live execution depends on deferred Judge0 setup. | [Weekly events](weekly-challenge-plan.md) |
 | Reactions / B10 | One replaceable/removable Like, Helpful or Favorite after server-recorded authorized use and current access; courses additionally require enrollment. | [Feedback](content-feedback-implementation.md) |
 | Staff governance / G01–G06 | Protected account search/enforcement, Moderator appointments/removal, support corrections, content withdrawal/restoration, session revocation and durable audit/notice records. | [Accounts](account-governance-implementation.md), [appointments](moderator-appointments-implementation.md), [support corrections](support-profile-corrections-implementation.md), [withdrawal](content-withdrawal-implementation.md) |
-| Reports / G07/G13 | Read-only account/content/learning/submission and dated accounting/XP/reward aggregates, plus separate Administrator-only cash/financial-liability summaries and private histories. | [Report definitions](system-reports-implementation.md) |
+| Reports / G07 | Read-only account/content/learning/submission and dated accounting/XP/reward aggregates, plus separate Administrator-only cash/financial-liability summaries and private histories. | [Report definitions](system-reports-implementation.md) |
 | Help / B11, G11–G13 | Public Active FAQ search/categories and Administrator authoring with version checks/audit. | [Help](faq-implementation.md) |
 | Google identity / A03/A06 integration slice | Password-confirmed explicit linking of existing accounts; no email auto-linking/new Google accounts. Implemented but disabled pending owner-deferred live setup. | [Google identity](google-authentication-implementation.md) |
 | Economy / F01–F05, B03/B07 | Disabled GCash top-ups, exact FIFO ledger, reviewed pricing/gates, atomic access/earnings, mature claims/payout reservations, refunds and audited reconciliation. | [Economy implementation](economy-implementation.md) |
@@ -73,8 +77,12 @@ provider-fake verification is not live delivery/execution evidence.
 - Variable-length quiz authoring, multi-question server completion, sequential
   creator paths, reading completion and dashboards are implemented in
   [the completion milestone](platform-completion-implementation.md).
-- Exercise long content, keyboard authoring and error/retry paths across actual
+- Four isolated Chromium browser workflows now exercise real registration, play,
+  creator/staff publication, mobile arcade assessments, themes and axe checks. Exercise
+  long content, keyboard authoring and error/retry paths across actual
   Safari, Firefox and mobile devices. Local checks use one Chromium surface.
+- Supply reviewed Terms content/version, then add recorded server-enforced
+  registration acceptance; this is an actual A01 gap, not an owner-deferred feature.
 - Measure staging catalog, dashboard, lesson and worker load against SRS targets.
 - Publish customized launch curriculum through designated creators and staff;
   editable plans are not automatically published course records.

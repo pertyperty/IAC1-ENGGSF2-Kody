@@ -43,7 +43,7 @@ class ChallengePublishing
             $revision = CodingChallengeRevision::create(['challenge_id' => $current->id, 'number' => $number,
                 'title' => $data['title'], 'description' => $data['description'], 'language' => $data['language'],
                 'difficulty' => $data['difficulty'], 'rules' => $data['rules'], 'input_format' => $data['input_format'],
-                'output_format' => $data['output_format'], 'cpu_time_ms' => $data['cpu_time_ms'], 'memory_kib' => $data['memory_kib']] + app(AccessSettings::class)->attributes($user, 'challenge', $data, $current->id));
+                'output_format' => $data['output_format'], 'cpu_time_ms' => $data['cpu_time_ms'], 'memory_kib' => $data['memory_kib']] + app(AccessSettings::class)->attributes($user, 'challenge', $data, $current->id) + app(ChallengeMetadata::class)->attributes($data));
             foreach ($data['test_cases'] as $index => $case) {
                 ChallengeTestCase::create(['revision_id' => $revision->id, 'position' => $index + 1,
                     'input' => $case['input'] ?? '', 'expected_output' => $case['expected_output'] ?? '', 'hidden' => (bool) $case['hidden']]);

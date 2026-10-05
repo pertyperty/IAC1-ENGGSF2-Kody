@@ -94,3 +94,10 @@ on phones, and keeps the primary Continue playing action compact. See
 [the completion record](platform-completion-implementation.md#verification) for
 the newer tests and browser scenarios; the counts above describe the earlier
 interface pass, not the latest repository total.
+
+### Acceptance follow-up — 2026-10-05
+
+The isolated browser suite exposed and fixed 320px landing ladder overflow.
+Grid children now shrink within their tracks and ladder nodes flex to available
+space. Both themes pass the exercised keyboard/axe/overflow checks; original
+quiz feedback now reflects eligible XP. See [repeatable evidence](acceptance-verification.md).

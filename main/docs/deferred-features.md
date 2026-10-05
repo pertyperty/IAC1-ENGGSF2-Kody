@@ -15,7 +15,7 @@ these private keys again.
 | Google identity live setup — A03/A06 | Explicit password-confirmed linking, subject-based sign-in and unlinking for existing verified Active accounts; disabled. | Private client/exact HTTPS callback, consent and live authentication/session/error verification. No email auto-linking or Google-only accounts. |
 | SendGrid live setup | TLS-required SMTP, durable account/financial notices and uncertain-delivery review. | Private key, authenticated sender/domain, real inbox/delivery/failure and supervised worker checks. Array transport is testing only. |
 | Numeric ratings — B10 | Approved replaceable/removable Like/Helpful/Favorite reaction. | Approved scale, eligibility and aggregation if numeric ratings are later wanted. |
-| Actual device and SRS capacity/availability evidence | Local Chromium/viewport and bounded-query regressions; explicit pilot sizing assumptions. | Safari/Firefox/devices, staged load against unchanged SRS targets, measured feedback/latency/availability and recovery. |
+| Actual device and SRS capacity/availability evidence | Isolated Chromium journeys/axe/viewport checks, bounded queries and populated local restore; explicit pilot sizing assumptions. | Safari/Firefox/devices, staged load against unchanged SRS targets, measured feedback/latency/availability and recovery. |
 
 Setup: [integration guide](integration-setup.md). Policy:
 [decisions](economy-and-launch-decisions.md). Verification:
