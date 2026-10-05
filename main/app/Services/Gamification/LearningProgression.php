@@ -2,15 +2,18 @@
 
 namespace App\Services\Gamification;
 
+use App\Models\LearningCourse;
 use App\Models\LearningModule;
 use App\Models\ModuleRevision;
 use App\Models\User;
 use App\Services\Account\CurrentAccountSession;
 use App\Services\Games\GameAssessment;
 use App\Services\Games\QuizAuthoring;
+use App\Services\Transactions\ContentAccess;
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
@@ -62,6 +65,7 @@ class LearningProgression
                 ]);
             }
             $this->saveActivity($user, $state, $level, $kind, $instance, $input);
+            app(Achievements::class)->award($user->id, 'starter:'.$level.':'.$kind, config('economy.xp.starter'));
 
             return ['message' => $kind === 'game' ? 'Level cleared and saved. Your streak is up to date.' : 'Quiz win saved. Your streak is up to date.', 'progress' => $this->snapshot($user->id)];
         });
@@ -72,8 +76,11 @@ class LearningProgression
         return DB::transaction(function () use ($actor, $sessionId, $moduleId, $revisionId, $kind, $input): array {
             $user = User::whereKey($actor->id)->lockForUpdate()->firstOrFail();
             app(CurrentAccountSession::class)->assert($user, $sessionId);
+            Gate::forUser($user)->authorize('viewLearning', LearningCourse::class);
             $module = LearningModule::whereKey($moduleId)->lockForUpdate()->firstOrFail();
             abort_unless($module->status === 'Published' && ! $module->isWithdrawn() && $module->published_revision_id === $revisionId, 409, 'This adventure changed. Reload before trying again.');
+
+            app(ContentAccess::class)->assertAccessible($user, 'module', $module, $module->publishedRevision);
 
             return $this->recordApprovedModule($user, $sessionId, $moduleId, $revisionId, $kind, $input);
         });
@@ -85,6 +92,7 @@ class LearningProgression
         return DB::transaction(function () use ($actor, $sessionId, $moduleId, $revisionId, $kind, $input): array {
             $user = User::whereKey($actor->id)->lockForUpdate()->firstOrFail();
             app(CurrentAccountSession::class)->assert($user, $sessionId);
+            Gate::forUser($user)->authorize('viewLearning', LearningCourse::class);
             $module = LearningModule::whereKey($moduleId)->lockForUpdate()->firstOrFail();
             abort_unless($module->status === 'Published' && ! $module->isWithdrawn(), 404);
             $revision = ModuleRevision::where('module_id', $moduleId)->findOrFail($revisionId);
@@ -98,6 +106,7 @@ class LearningProgression
                 throw ValidationException::withMessages(['completion' => 'That attempt did not complete the objective. Try again.']);
             }
             $this->saveActivity($user, $this->snapshot($user->id), 'module-'.$moduleId, $kind, $instance, $input + ['revision_id' => $revisionId]);
+            app(Achievements::class)->award($user->id, 'module:'.$moduleId, config('economy.xp.module'));
 
             return ['message' => 'Adventure win saved. Your streak is up to date.', 'progress' => $this->snapshot($user->id)];
         });

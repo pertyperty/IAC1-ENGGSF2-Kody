@@ -32,6 +32,8 @@ class SystemReports
                 'accounts' => $this->accounts($start, $end),
                 'content' => $this->content($start, $end),
                 'learning' => $this->learning($start, $end),
+                'economy' => $this->economy($start, $end),
+                'rewards' => $this->rewards($start, $end),
                 'execution' => $this->groups('challenge_submissions', 'submitted_at', 'status',
                     ['Queued', 'Evaluating', 'Passed', 'Failed', 'Unavailable'], 'Attempts submitted', $start, $end),
                 default => throw new LogicException('Unsupported system report.'),
@@ -72,6 +74,28 @@ class SystemReports
         $counts = $this->window($table, $time, $start, $end)->select($group)->selectRaw('COUNT(*) AS total')->groupBy($group)->pluck('total', $group);
 
         return array_map(fn (string $value): array => ['metric' => $label.' · '.$value, 'count' => (int) ($counts[$value] ?? 0)], $values);
+    }
+
+    private function economy(CarbonImmutable $start, CarbonImmutable $end): array
+    {
+        $operations = $this->window('wallet_operations', 'created_at', $start, $end);
+
+        return [
+            ['metric' => 'Purchased wallet credits · KB', 'count' => (int) (clone $operations)->where('kind', 'Purchase')->sum('kodebits')],
+            ['metric' => 'Paid content debits · KB', 'count' => -(int) (clone $operations)->where('kind', 'Access')->sum('kodebits')],
+            ['metric' => 'Purchased wallet backing · PHP centavos', 'count' => (int) (clone $operations)->where('kind', 'Purchase')->sum('value_minor')],
+            ['metric' => 'Net platform cash postings · PHP centavos', 'count' => (int) $this->window('platform_cash_entries', 'created_at', $start, $end)->sum('amount_minor')],
+        ];
+    }
+
+    private function rewards(CarbonImmutable $start, CarbonImmutable $end): array
+    {
+        return [
+            ['metric' => 'Validated XP grants · XP', 'count' => (int) $this->window('xp_awards', 'created_at', $start, $end)->sum('xp')],
+            ['metric' => 'Unique XP grants · records', 'count' => $this->window('xp_awards', 'created_at', $start, $end)->count()],
+            ['metric' => 'Funded weekly prizes · KB', 'count' => (int) $this->window('wallet_operations', 'created_at', $start, $end)->where('kind', 'Reward')->sum('kodebits')],
+            ['metric' => 'Published weekly result sets · events', 'count' => $this->window('weekly_result_sets', 'published_at', $start, $end)->where('status', 'Published')->count()],
+        ];
     }
 
     private function window(string $table, string $time, CarbonImmutable $start, CarbonImmutable $end): Builder

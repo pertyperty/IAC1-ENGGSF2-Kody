@@ -132,7 +132,8 @@ concurrency coverage. Other account scopes are indexed in the implementation map
 `/login` implements A03 email/password login with durable progressive lockouts,
 consent before replacing an active session, and POST logout. The protected
 `/dashboard` provides the play hub, saved streak/ladder state and a link to enrolled
-course journeys; full B01 dashboard scope remains incomplete. Protected routes must use
+course journeys and bounded owned activity/progress panels. See the implementation
+map for current B01 scope. Protected routes must use
 both `auth` and `account.session`, and sensitive actions must recheck state
 transactionally. See [login traceability](docs/login-implementation.md).
 
@@ -154,7 +155,8 @@ Secure cookies default to true in staging/production. Use RDS
 `DB_SSLMODE=verify-full` and `DB_SSLROOTCERT` pointing to the current AWS CA bundle.
 `DB_CONNECT_TIMEOUT` bounds connection establishment; it is not a query deadline.
 Use managed secrets and least-privilege service/deployment identities. The S3
-driver package and provider integrations must be added/tested when needed.
+driver package is installed; managed storage and provider behavior still require
+staging verification.
 
 Supervise the worker with systemd/Supervisor under the application user, from the
 active release, using the worker command above and automatic restart. Its 60s
@@ -177,3 +179,13 @@ Monitor HTTP, queues, database and scheduled work; configure encrypted backups
 at least every 24h per SRS 4.2 and test restoration before a production release.
 AWS deployment, TLS/encryption, backup restoration and availability targets
 have not been provisioned or verified by this foundation task.
+
+## Browser and recovery acceptance
+
+After building assets, install Chromium with `npx playwright install chromium`.
+Use `npm run test:browser` for isolated real UI journeys and `npm run test:restore`
+for a populated upgrade/custom-format recovery drill. Both require a local
+PostgreSQL role with CREATE DATABASE and privately supplied connection variables.
+They create/drop only their own random testing databases. See
+[setup and evidence](docs/acceptance-verification.md) and the
+[master requirements checklist](docs/requirements-acceptance-audit.md).

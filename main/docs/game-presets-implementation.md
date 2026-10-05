@@ -1,5 +1,10 @@
 # Administrator game preset workshop — G08–G10
 
+> Later amendment (2026-10-04): the owner delegated economy, XP/rank/reward,
+> reviewed paid access and creator-retention decisions. See [current policies](economy-and-launch-decisions.md)
+> and [implementation](economy-implementation.md). Earlier first-release deferrals below
+> are historical; live providers/staging and numeric ratings remain deferred.
+
 ## Approved scope
 
 The owner approved the first preset release using existing server-validated

@@ -1,5 +1,10 @@
 # Challenge submissions and evaluation — C03/C04/B07
 
+> Later amendment (2026-10-04): the owner delegated economy, XP/rank/reward,
+> reviewed paid access and creator-retention decisions. See [current policies](economy-and-launch-decisions.md)
+> and [implementation](economy-implementation.md). Earlier first-release deferrals below
+> are historical; live providers/staging and numeric ratings remain deferred.
+
 ## Approved requirements decisions
 
 The owner approved these amendments on 2026-10-03, resolving C03 forwarding each

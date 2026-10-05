@@ -2,6 +2,14 @@
 
 ## Mission
 
+On 2026-10-04 the owner explicitly delegated recommendations and implementation
+of the remaining economy, reward, creator-deletion and launch policies. See
+[the adopted decisions](docs/economy-and-launch-decisions.md); they supersede
+earlier business-rule deferrals below. Live providers/staging remain deferred.
+Financial state must use the Transaction-owned ledger and verified callbacks;
+XP never comes from browser practice, payment or reading. Retain the SRS F04
+Instructor-cash / Contributor-KodeBit distinction and existing attempt limits.
+
 The owner approved optional sequential creator course paths on 2026-10-04.
 New enrollments snapshot the approved path policy; existing enrollments keep open
 access. Assessment-free course lessons require an authorized opening and explicit
@@ -1309,3 +1317,14 @@ Prefer:
 The target is not merely to make Kody work under XAMPP.
 
 The target is to **develop locally with a reproducible engineering workflow, continuously verify every production-bound change, and deploy the same Laravel application safely to its approved cloud architecture without redesigning it at deployment time.**
+
+## Acceptance verification follow-up — 2026-10-05
+
+[The acceptance audit](docs/requirements-acceptance-audit.md) maps the 61 SRS use
+cases and remaining NFR/content gaps; G07 owns reports and G13 owns FAQ deletion.
+[Repeatable verification](docs/acceptance-verification.md) owns isolated browser
+and populated upgrade/restore checks. Never expose fixtures as HTTP endpoints or
+run them against development/production databases. Topics/tags belong to immutable
+challenge revisions; keep review isolation and hidden-case exclusion. Approved
+Terms content/version is still missing; do not invent legal agreements or claim
+registration acceptance exists. Live setup remains deferred.

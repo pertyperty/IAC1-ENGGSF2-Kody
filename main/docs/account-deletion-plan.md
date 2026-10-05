@@ -1,5 +1,10 @@
 # Account deletion/anonymization — SRS A10 Delete Account
 
+> Later amendment (2026-10-04): the owner delegated economy, XP/rank/reward,
+> reviewed paid access and creator-retention decisions. See [current policies](economy-and-launch-decisions.md)
+> and [implementation](economy-implementation.md). Earlier first-release deferrals below
+> are historical; live providers/staging and numeric ratings remain deferred.
+
 The SRS uses A10 for both Delete Account and Instructor verification. This record
 identifies deletion by its name; it does not conflate the two workflows.
 

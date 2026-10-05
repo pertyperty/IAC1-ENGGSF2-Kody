@@ -7,6 +7,7 @@
     <p class="secondary-link"><a href="{{ route('account.edit') }}">Edit your player profile</a></p>
     <p class="secondary-link"><a href="{{ route('account.google') }}">Manage Google sign-in</a></p>
     @if(in_array(auth()->user()->account_role, [\App\Enums\Role::Learner, \App\Enums\Role::Contributor], true))<p class="secondary-link"><a href="{{ route('instructor-application.create') }}">Become a learning creator</a></p>@endif
+    <p class="secondary-link"><a href="{{ route('wallet.index') }}">Your KodeBits and earnings</a></p>
     <dl class="profile-details">
         <dt>Username</dt><dd>{{ $profile['username'] ?? 'Not yet provided' }}</dd>
         <dt>First name</dt><dd>{{ $profile['first_name'] ?? 'Not yet provided' }}</dd>
@@ -24,6 +25,8 @@
     @can('viewOwn', \App\Models\ContributorApplication::class)<p class="secondary-link"><a href="{{ route('contributor-application.create') }}">Contributor application and history</a></p>@endcan
     @can('viewAny', \App\Models\ContributorApplication::class)<p class="secondary-link"><a href="{{ route('contributor-reviews.index') }}">Review Contributor applications</a></p>@endcan
     @can('viewAny', \App\Models\User::class)<p class="secondary-link"><a href="{{ route('account-governance.index') }}">Community account governance</a></p>@endcan
+    @if(in_array(auth()->user()->account_role, [\App\Enums\Role::Moderator, \App\Enums\Role::Administrator], true))<p class="secondary-link"><a href="{{ route('creator-erasure.index') }}">Review creator privacy inventories</a></p>@endif
+    @if(auth()->user()->account_role === \App\Enums\Role::Administrator)<p class="secondary-link"><a href="{{ route('finance.index') }}">Finance and reconciliation</a> · <a href="{{ route('system-reports') }}">System reports</a></p>@endif
     @can('archive', auth()->user())<p class="secondary-link"><a href="{{ route('account.archive') }}">Take a break: archive your account</a></p>@endcan
     @can('delete', auth()->user())<p class="secondary-link"><a href="{{ route('account.delete') }}">Permanently delete your account</a></p>@endcan
     <p class="secondary-link"><a href="{{ route('dashboard') }}">Back to your account home</a></p>

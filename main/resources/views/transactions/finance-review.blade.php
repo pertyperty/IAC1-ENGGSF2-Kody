@@ -1,0 +1,9 @@
+@extends('layouts.learning')
+@section('title', 'Review '.$kind.' — Kody')
+@section('content')
+<section class="review-page page-width"><a class="quiet-link" href="{{ route('finance.index') }}">← Financial review</a><h1>Review {{ $kind }}</h1><p>{{ $row->id }} · Account #{{ $row->user_id }} · {{ $row->state }}</p>
+@if($errors->any())<p class="studio-errors" role="alert">{{ $errors->first() }}</p>@endif
+@if($recipient)<dl class="profile-details"><dt>Recipient</dt><dd>{{ $recipient['given_name'] }} {{ $recipient['surname'] }}</dd><dt>GCash holder</dt><dd>{{ $recipient['account_details']['account_holder_name'] }}</dd><dt>Account</dt><dd>{{ $recipient['account_details']['account_number'] }}</dd><dt>Address</dt><dd>{{ implode(', ', $recipient['address']) }}</dd><dt>Gross requested</dt><dd>PHP {{ \App\Support\ExactMoney::decimal($row->gross_minor) }}</dd><dt>Fee</dt><dd>PHP {{ \App\Support\ExactMoney::decimal($row->fee_minor) }}</dd></dl>@else<p>{{ $row->kind }} request · {{ $row->target_id }}</p><p>{{ $row->reason }}</p>@endif
+@if($row->state === 'PendingReview')<form class="studio-form" method="post" action="{{ route('finance.review', [$kind, $row->id]) }}">@csrf<label>Decision<select name="decision"><option value="Rejected">Return with a reason</option><option value="Approved">Approve</option></select></label><label>Review notes<textarea name="review_notes" required maxlength="500"></textarea></label>@if($recipient)<label class="checkbox-label"><input type="checkbox" name="recipient_verified" value="1"> I verified the recipient's identity and ownership of this GCash account.</label>@endif @include('transactions.password-confirmation')<button class="button button-play">Save reviewed decision</button></form>@else<p class="lesson-note">This request has been decided or needs provider reconciliation. Its reserved funds remain protected.</p>@endif
+</section>
+@endsection

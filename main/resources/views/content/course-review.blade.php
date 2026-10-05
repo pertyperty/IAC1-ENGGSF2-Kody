@@ -1,7 +1,9 @@
 @extends('layouts.learning')
 @section('title', 'Review a course — Kody')
 @section('content')
-<section class="review-page page-width"><a class="quiet-link" href="{{ route('course-reviews.index') }}">← Course review queue</a><h1>{{ $revision->title }}</h1><p>{{ $revision->description }}</p><p>{{ $revision->category }} · {{ $revision->difficulty }} · {{ $revision->estimated_duration }} hours · {{ $revision->review_status }}</p>
+<section class="review-page page-width">
+@include('transactions.review-access')
+<a class="quiet-link" href="{{ route('course-reviews.index') }}">← Course review queue</a><h1>{{ $revision->title }}</h1><p>{{ $revision->description }}</p><p>{{ $revision->category }} · {{ $revision->difficulty }} · {{ $revision->estimated_duration }} hours · {{ $revision->review_status }}</p>
     @if(session('status'))<p class="lesson-note" role="status">{{ session('status') }}</p>@endif
     @if($errors->any())<div class="studio-errors" role="alert">@foreach($errors->all() as $error)<p>{{ $error }}</p>@endforeach</div>@endif
     <p class="lesson-note">{{ $revision->sequential ? 'Sequential path: new learners complete each adventure before opening the next.' : 'Open path: new learners can explore adventures in any order.' }} Existing enrollments keep their original access policy.</p>

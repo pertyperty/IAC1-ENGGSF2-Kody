@@ -8,6 +8,7 @@ use App\Http\Requests\Learning\CompleteQuizRequest;
 use App\Models\LearningModule;
 use App\Services\Engagement\ContentFeedback;
 use App\Services\Gamification\LearningProgression;
+use App\Services\Transactions\ContentAccess;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -16,9 +17,12 @@ class PublishedModuleController extends Controller
 {
     public function show(Request $request, LearningModule $module, ContentFeedback $feedback): Response
     {
-        abort_unless($module->status === 'Published' && ! $module->isWithdrawn() && $module->publishedRevision?->review_status === 'Approved', 404);
+        $access = app(ContentAccess::class)->open($request->user(), $request->session()->getId(), 'module', $module->id);
+        if (! $access['accessible']) {
+            return response()->view('transactions.access-preview', $access + ['kind' => 'module'])->header('Cache-Control', 'no-store, private');
+        }
 
-        return response()->view('content.published', ['module' => $module, 'revision' => $module->publishedRevision,
+        return response()->view('content.published', ['module' => $access['participant'] ? $access['target'] : null, 'revision' => $access['revision'], 'participant' => $access['participant'],
             'feedback' => $feedback->read($request->user(), $request->session()->getId(), 'module', $module->id, true)])->header('Cache-Control', 'no-store, private');
     }
 

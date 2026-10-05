@@ -4,6 +4,8 @@ use App\Enums\AccountStatus;
 use App\Enums\Role;
 use App\Models\User;
 use App\Services\Administration\SystemReports;
+use App\Services\Gamification\Achievements;
+use App\Services\Transactions\WalletLedger;
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\QueryException;
@@ -27,6 +29,27 @@ function reportCounts(array $report): array
 {
     return array_column($report['rows'], 'count', 'metric');
 }
+
+test('G13 accounting and reward reports use exact posted units and Manila boundaries without private references', function () {
+    $this->travelTo(CarbonImmutable::parse('2026-10-03 00:00:00', 'UTC'));
+    $admin = moduleAccount(Role::Administrator);
+    $learner = moduleAccount(Role::Learner);
+    economyCredit($learner, 100, 10000);
+    app(Achievements::class)->award($learner->id, 'private-test-reference', 20);
+    $this->travelTo(CarbonImmutable::parse('2026-10-03 16:00:00', 'UTC'));
+    DB::transaction(fn () => app(WalletLedger::class)->credit($learner->id, 'outside-window', 'Purchase', 50, 5000));
+    app(Achievements::class)->award($learner->id, 'outside-window', 40);
+    $admin->forceFill(['active_session_expires_at' => now()->addHour()])->save();
+    $economy = app(SystemReports::class)->generate($admin, 'module-test-session', reportFilters('economy'));
+    expect(reportCounts($economy)['Purchased wallet credits · KB'])->toBe(100)
+        ->and(reportCounts($economy)['Purchased wallet backing · PHP centavos'])->toBe(10000);
+    $rewards = app(SystemReports::class)->generate($admin, 'module-test-session', reportFilters('rewards'));
+    expect(reportCounts($rewards)['Validated XP grants · XP'])->toBe(20)
+        ->and(reportCounts($rewards)['Unique XP grants · records'])->toBe(1);
+    expect(json_encode([$economy['rows'], $rewards['rows']]))->not->toContain($learner->email, 'private-test-reference', 'outside-window');
+    moduleSignIn($this, $admin);
+    $this->get(route('system-reports', reportFilters('economy')))->assertOk()->assertSee('PHP centavos')->assertHeader('Cache-Control', 'no-store, private');
+});
 
 test('G07 reports exclude participant and Moderator actors and require a current verified Active Admin', function (Role $role) {
     $actor = moduleAccount($role);
@@ -53,7 +76,7 @@ test('G07 reports apply Manila inclusive calendar dates and current account stat
     User::factory()->create(['created_at' => '2026-10-02 15:59:59']);
     moduleSignIn($this, $admin);
     $response = $this->get(route('system-reports', reportFilters()))->assertOk()->assertHeader('Cache-Control', 'no-store, private')
-        ->assertDontSee('privateaccount')->assertDontSee('private@example.test')->assertSee('current state')->assertSee('unavailable');
+        ->assertDontSee('privateaccount')->assertDontSee('private@example.test')->assertSee('current state')->assertSee('Finance');
     $counts = reportCounts($response->viewData('report'));
     expect($counts['Registered accounts by current status · Active'])->toBe(1)
         ->and($counts['Registered accounts by current status · Suspended'])->toBe(1)

@@ -1,9 +1,10 @@
 # Kody sustainability analysis — pilot planning draft
 
 Prepared 2026-10-04 for fewer than 100 registered users. The owner supplied the
-packages, proposed 65/35 net-revenue split and 4% reward cap as **provisional**
-research inputs, not finalized financial rules. No purchases, earnings, payouts
-or reward issuance are enabled by this document. See the
+packages, proposed split and cap initially as provisional research inputs. The
+later explicit delegation adopts [the recommended policies](economy-and-launch-decisions.md):
+65/35 on consumed lot backing and 4% of prior-month purchased KB spent. Code is
+implemented; this analysis never activates real purchases, payouts or providers. See the
 [deferred register](deferred-features.md) and [completion roadmap](platform-completion-roadmap.md).
 
 ## Workload and costing assumptions
@@ -53,9 +54,11 @@ Sources: [EC2 pricing](https://aws.amazon.com/ec2/pricing/on-demand/),
 | Judge0 CE | RapidAPI Basic pay-per-use; 3,000–9,000 executions | $5.10–15.30 |
 | SendGrid Email API | Essentials entry tier after trial | $19.95 |
 | Monitoring/transfer/snapshots | Small CloudWatch/log/transfer contingency | $5–10 |
-| **Base estimate** | Before tax, domain, support and staff time | **$82.70–126.90** |
-| **Budget with 20% contingency** | Account for uncertainty and small overages | **$99.24–152.28** |
-| **Illustrative PHP budget** | At ₱58/USD | **₱5,756–8,833/month** |
+| Infrastructure/service subtotal | Before gateway, tax, domain and staff time | $82.70–126.90 |
+| Low-volume Xendit minimum allowance | $50 minimum plus illustrative 12% fee VAT; verify contract | $56.00 |
+| **Pilot cash-outflow estimate** | Infrastructure/services plus low-volume gateway allowance | **$138.70–182.90** |
+| **Budget with 20% contingency** | Other taxes/domain/usage can still add cost | **$166.44–219.48** |
+| **Illustrative PHP budget** | At ₱58/USD | **₱9,654–12,730/month** |
 
 AWS charges $0.005/hour for public IPv4; one continuously allocated address is
 $3.65 at 730 hours. Use private RDS and avoid adding public addresses unnecessarily.
@@ -83,7 +86,7 @@ No subscription or infrastructure is purchased by this recommendation. User
 count alone cannot guarantee capacity; record latency, DB memory, queue age,
 provider usage and monthly spend during the pilot before expanding.
 
-## Draft KodeBit packages
+## Adopted pilot KodeBit packages
 
 | Package | PHP price | KodeBits | Gross PHP per KB | KB above a nominal 1 KB/₱1 |
 | --- | ---: | ---: | ---: | ---: |
@@ -124,7 +127,8 @@ illustration, the maximum platform contribution per package is shown above.
 Unspent KB, promotional KB, mixed package rates, refund fees, tax and payout fees
 need explicit allocation rules. Do not value every spent KB at ₱1: the package
 rates differ. A defensible candidate is purchase-lot cost allocation, but it is
-not adopted here without an approved spending/rounding/reversal contract.
+now adopted in the policy amendment: FIFO net backing, exact centavos, last-lot
+remainders, provenance-preserving refunds and 14-day maturity.
 
 For a ₱6,000 monthly operating-cost example, break-even requires at least:
 
@@ -139,32 +143,52 @@ creator payout overhead. With 100 users and only 50 buying a ₱300 package once
 the modeled contribution is ₱4,900, below ₱6,000. At the estimated upper pilot
 budget, approximately 91 fully spent ₱300 purchases would be needed before
 those other costs. Fewer than 100 users can support a technical pilot, but this
-draft does **not** establish commercial sustainability.
+model does **not** establish commercial sustainability. The ₱6,000 example is
+below the revised gateway-inclusive planning range and is not the launch budget.
 
-## Reward cap and ties
+## Current gateway minimum and pilot decision
 
-The owner proposes reward emission at no more than 4% of token circulation.
-This needs a defined measurement period and denominator. “Current outstanding
-wallet balances,” “paid KB issued during the month” and “paid KB spent during
-the month” produce different limits. An outstanding-balance denominator can
-grow with prior rewards and shrink with spending; it is not a revenue yield.
-The cap alone supplies no actual XP, rank thresholds or reward allocations.
+Xendit's September 2026 fee policy sets a USD50 monthly minimum after the first
+transacting month, billed as the difference when eligible accrued fees are lower.
+Method/payout fees can survive refunds/reversals; processing applies per initiated
+attempt. Verify the merchant contract and reports. Budget `max(eligible fees, $50)`,
+not both full eligible fees and another $50. [Official fee policy](https://docs.xendit.co/v1/docs/transaction-fees).
+The table uses an illustrative 12% fee-VAT allowance, subject to actual contracting
+entity/tax treatment; [Xendit VAT guidance](https://docs.xendit.co/docs/value-added-tax-vat).
 
-For illustration only, 50 purchases of the 330 KB package issue 16,500 KB; 4% of
-that issuance is 660 KB. At the illustrative net value per purchased KB,
-₱280/330, this has up to ₱560 of net spending value. A 65% creator allocation
-would add ₱364 of potential creator liability despite no extra purchase receipt.
-Specify how rewarded KB fund creators and which account bears that expense.
+The upper modeled allowance exceeds the adopted ₱12,000 ceiling. Keep the free
+platform available, obtain the exact Singapore/provider quotes and reduce costs
+or explicitly revise the ceiling before live admission. No subscription is bought.
+Successful top-up method/processing fees already reduce token-lot backing: only
+minimum adjustments, failed-attempt fees and other unallocated invoices are extra
+platform expenses in the contribution model. Do not count the same fee twice.
 
-The supplied tie rule uses competition ranks: two first-place finishers occupy
-ranks 1 and 2, split the sum of those rewards equally, and the next finisher is
-rank 3. This is recorded as the intended policy. Fractional KB, remainder
-allocation, ties crossing the paid-rank boundary, cap reservation under
-concurrency and reversals remain decisions before issuing financial rewards.
-XP formulas, rank thresholds and the definition of a tied score also remain
-unspecified. No automated reward is inferred from this analysis.
+At a ₱12,000 operating-cost example, the earlier ₱98 contribution from a fully
+spent ₱300 package needs at least 123 packages/month before rewards, taxes and
+payout overhead. Reserving 13 pesos per 330 purchased KB spent (illustrative whole
+KB 4% cap) leaves ₱85, needing 142 packages. The actual cap uses the previous
+month's purchased spending and applies once at publication; this is a conservative
+steady-state illustration, not a forecast or a promise to issue every possible KB.
+With fewer than 100 users, the pilot likely needs owner funding. Free users do
+not supply revenue and unspent prepaid balances are liabilities, not margin.
 
-## Research claims and decisions still needed
+## Adopted reward cap and ties
+
+The cap denominator is prior Manila-calendar-month purchased KB spent, net of
+reversed access. Reward/creator-origin KB never enlarge it. This is more stable
+than a recursively growing outstanding-balance denominator. Every issued reward
+KB receives ₱1 of backing from matured platform cash; no cash means no KB prize.
+Replays earn no repeated XP, purchases buy no rank, and historical rewards are
+not fabricated. See [formulas and thresholds](economy-and-launch-decisions.md).
+
+The owner's competition-rank rule is implemented: tied finishers pool the prizes
+for occupied ranks, including a tie across the paid cutoff, divide equally into
+whole KB and leave dust unissued. Best passed-case score determines ties; time or
+spend does not. Only full passes receive KB. A second cash limit prevents the 4%
+cap from becoming an unfunded creator liability. It is a chosen policy, not proof
+of economic sustainability.
+
+## Unverified research claims and activation evidence
 
 The owner supplied comparisons to Roblox, Duolingo, Udemy and retail loyalty
 programs, plus Alstyne et al. (2016), Gandomi & Marshall (2015) and Udemy (2023).
@@ -173,9 +197,10 @@ Those references were not supplied as complete bibliographic sources and are
 sustainable for Kody. Verify exact titles/pages and comparable fee definitions
 before using them in an academic or investor-facing document.
 
-Before implementation, finalize packages, currency/tax treatment, premium
-content prices/access, KB cost allocation, bonus/reward funding and cap period,
-rounding/refunds, creator earnings recognition, payout eligibility/minimum/fees,
-and XP/rank formulas. Before activation, verify provider contracts privately,
-forecast actual usage, obtain the regional AWS quote, run staging/load/restore
-tests and set spend alerts. Live integration setup remains owner-deferred.
+The delegated amendment finalizes the implementable pilot policies. Before live
+activation, verify merchant contracts, tax/receipt obligations and actual fees;
+forecast usage, obtain regional quotes, run staging/load/restore tests, designate
+responders and demonstrate spend alerts. The under-100-user configuration does
+not certify the unchanged 500-concurrent-user or 99.9% SRS requirements. Live
+integration setup remains owner-deferred. Monitor contribution, liabilities,
+redemption behavior and actual cost before expanding or promising sustainability.

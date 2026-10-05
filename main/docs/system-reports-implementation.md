@@ -1,5 +1,10 @@
 # G07 read-only system reports
 
+> Later amendment (2026-10-04): the owner delegated economy, XP/rank/reward,
+> reviewed paid access and creator-retention decisions. See [current policies](economy-and-launch-decisions.md)
+> and [implementation](economy-implementation.md). Earlier first-release deferrals below
+> are historical; live providers/staging and numeric ratings remain deferred.
+
 ## Requirement and scope
 
 G07 permits Administrators to select report types and filters, view validated,
@@ -84,3 +89,15 @@ committed evaluations. See [withdrawal scope](content-withdrawal-implementation.
 The owner approved the first-release Deferred preset reward mode; see
 [G08–G10 scope](game-presets-implementation.md). Retain owner-deferred purchases,
 rewards and live Judge0 activation in the deferred-feature register.
+
+## Delegated economy extension — 2026-10-04
+
+Administrator reports now include exact posted wallet KB/backing/platform cash
+and validated XP/funded weekly-prize aggregates. The same bounded Manila date
+filters and PostgreSQL repeatable-read, read-only snapshot apply. Report labels
+state their units (PHP centavos, KB, XP or record counts); posted accounting is
+not gross receipts, tax reporting or provider-bank reconciliation. No payer,
+recipient, submission source or raw reference appears in aggregate rows. Private
+Finance remains the separate review/history surface. Tests exercise boundary
+dates, authorization, exact units and privacy. See
+[economy verification](economy-implementation.md).

@@ -79,10 +79,18 @@ abstract class OwnedContentDeletion
     {
         $column = $kind.'_id';
         $checks = [
+            'Retained access grants' => DB::table('content_entitlements')->where('content_type', $kind)->where('content_id', $content->id)->exists(),
+            'Retained financial history' => DB::table('content_purchases')->where('content_type', $kind)->where('content_id', $content->id)->exists(),
             'Staff moderation history' => $content->isWithdrawn() || DB::table('content_moderation_actions')->where($column, $content->id)->exists(),
             'Learner openings' => DB::table('content_accesses')->where($column, $content->id)->exists(),
             'Learner feedback history' => DB::table('content_reactions')->where($column, $content->id)->exists(),
         ] + $this->specificDependencies($kind, $content);
+        if ($kind === 'module') {
+            foreach (['module_revisions', 'course_revisions', 'coding_challenge_revisions'] as $table) {
+                $checks['Retained prerequisite references'] = ($checks['Retained prerequisite references'] ?? false)
+                    || DB::table($table)->whereJsonContains('prerequisite_modules', $content->id)->exists();
+            }
+        }
 
         return array_keys(array_filter($checks));
     }

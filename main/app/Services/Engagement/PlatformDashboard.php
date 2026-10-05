@@ -7,6 +7,7 @@ use App\Models\CourseEnrollment;
 use App\Models\LearningCourse;
 use App\Models\LearningModule;
 use App\Models\User;
+use App\Services\Gamification\Achievements;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 
@@ -19,7 +20,7 @@ class PlatformDashboard
         $activity = collect();
         $quests = collect();
         if ($gate->allows('viewLearning', LearningCourse::class)) {
-            $courses = CourseEnrollment::where('user_id', $user->id)->with('course', 'revision')
+            $courses = CourseEnrollment::where('user_id', $user->id)->whereNotExists(fn ($q) => $q->selectRaw('1')->from('content_entitlements')->whereColumn('content_id', 'course_enrollments.course_id')->whereColumn('user_id', 'course_enrollments.user_id')->where('content_type', 'course')->whereNotNull('revoked_at'))->with('course', 'revision')
                 ->select('course_enrollments.*')
                 ->selectSub(DB::table('course_revision_modules')->selectRaw('count(*)')
                     ->whereColumn('course_revision_id', 'course_enrollments.course_revision_id'), 'total_lessons')
@@ -34,6 +35,7 @@ class PlatformDashboard
                 ->join('module_revisions as revision', 'revision.id', '=', 'slot.module_revision_id')
                 ->where('enrollment.user_id', $user->id)->whereIn('course.status', ['Published', 'Archived'])->whereNull('course.staff_withdrawn_at')
                 ->where('module.status', 'Published')->whereNull('module.staff_withdrawn_at')
+                ->whereNotExists(fn ($q) => $q->selectRaw('1')->from('content_entitlements')->whereColumn('content_id', 'enrollment.course_id')->whereColumn('user_id', 'enrollment.user_id')->where('content_type', 'course')->whereNotNull('revoked_at'))
                 ->orderByDesc('progress.last_accessed_at')->orderByDesc('progress.id')->limit(6)
                 ->get(['course.id as course_id', 'slot.id as slot_id', 'revision.title', 'progress.completed_at', 'progress.last_accessed_at']);
             $quests = DB::table('challenge_submissions as submission')
@@ -63,6 +65,11 @@ class PlatformDashboard
         $unread = $user->unreadNotifications()->count();
         $updates = $user->notifications()->orderByDesc('created_at')->orderByDesc('id')->limit(3)->get();
 
-        return compact('courses', 'activity', 'quests', 'creator', 'unread', 'updates');
+        $financial = DB::table('users')->leftJoin('xp_totals', 'xp_totals.user_id', '=', 'users.id')->leftJoin('wallet_accounts', 'wallet_accounts.user_id', '=', 'users.id')
+            ->where('users.id', $user->id)->first(['xp_totals.xp', 'wallet_accounts.balance', 'wallet_accounts.reserved']);
+        $achievements = app(Achievements::class)->fromXp((int) ($financial->xp ?? 0));
+        $wallet = ['balance' => (int) ($financial->balance ?? 0), 'reserved' => (int) ($financial->reserved ?? 0), 'available' => (int) ($financial->balance ?? 0) - (int) ($financial->reserved ?? 0)];
+
+        return compact('achievements', 'wallet', 'courses', 'activity', 'quests', 'creator', 'unread', 'updates');
     }
 }

@@ -43,7 +43,7 @@ beforeEach(function () {
     Http::preventStrayRequests();
 });
 
-test('E02 Moderators configure future pinned weekly quests with UTC windows and no rewards', function () {
+test('E02 Moderators configure future pinned weekly quests with UTC windows and server-owned capped rewards', function () {
     $challenge = challengeFixture(true, overrides: ['test_cases' => [['input' => 'weekly-private-input', 'expected_output' => 'weekly-private-output', 'hidden' => true]]]);
     moduleSignIn($this, User::factory()->create(['account_role' => Role::Moderator]));
     $this->get(route('weekly-studio.index'))->assertOk()->assertSee('A fresh quest')->assertDontSee('weekly-private-input')->assertDontSee('weekly-private-output')->assertHeader('Cache-Control', 'no-store, private');
@@ -51,7 +51,7 @@ test('E02 Moderators configure future pinned weekly quests with UTC windows and 
     $event = WeeklyEvent::sole();
     expect($event->starts_at->utc()->format('Y-m-d H:i:s'))->toBe('2026-10-10 16:00:00')
         ->and($event->ends_at->utc()->format('Y-m-d H:i:s'))->toBe('2026-10-17 16:00:00')
-        ->and($event->status)->toBe('Scheduled')->and($event->reward_mode)->toBe('Deferred')->and($event->revision_id)->toBe($challenge->published_revision_id);
+        ->and($event->status)->toBe('Scheduled')->and($event->reward_mode)->toBe('Capped')->and($event->economy_policy_version)->toBe(1)->and($event->revision_id)->toBe($challenge->published_revision_id);
     expect(DB::table('audit_events')->where('event', 'weekly.configured')->count())->toBe(1);
 });
 
@@ -232,7 +232,7 @@ test('disabled Judge0 still allows weekly configuration and previews without con
     $event = weeklyFixture();
     moduleSignIn($this, User::factory()->create());
     $this->get(route('dashboard'))->assertOk()->assertSee('THIS WEEK')->assertSee('Picnic sums');
-    $this->get(route('weekly-events.show', $event))->assertOk()->assertSee('Code evaluation is not available yet')->assertSee('not awarded');
+    $this->get(route('weekly-events.show', $event))->assertOk()->assertSee('Code evaluation is not available yet')->assertSee('25 bonus XP')->assertSee('monthly reward budget');
     $this->postJson(route('weekly-events.attempt', $event), attemptData(CodingChallenge::find($event->challenge_id)))->assertUnprocessable();
     $this->assertDatabaseCount('challenge_participations', 0);
     Http::assertNothingSent();
@@ -260,7 +260,7 @@ test('weekly mutation routes enforce CSRF and canonical event identifiers', func
     $this->get('/weekly/invalid-id')->assertNotFound();
 });
 
-test('weekly PostgreSQL checks protect Sunday windows deferred rewards and context binding', function () {
+test('weekly PostgreSQL checks protect Sunday windows approved reward modes and context binding', function () {
     readyJudge();
     $event = weeklyFixture();
     $submission = submitAttempt(CodingChallenge::find($event->challenge_id), moduleAccount(Role::Learner));

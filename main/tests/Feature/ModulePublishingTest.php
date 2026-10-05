@@ -128,7 +128,7 @@ test('G06 reviewers approve the exact pending revision and cannot review twice',
     expect($module->fresh()->status)->toBe('Published')->and($module->fresh()->publishedRevision->review_status)->toBe('Approved');
     $this->assertDatabaseCount('audit_events', 3);
     $this->get(route('learning.catalog', ['q' => 'PICNIC']))->assertOk()->assertSee('Robot picnic');
-    $this->get(route('modules.show', $module))->assertOk()->assertSee('data-completion-url', false);
+    $this->get(route('modules.show', $module))->assertOk()->assertSee('Staff preview')->assertDontSee('data-completion-url', false);
 })->with([Role::Moderator, Role::Administrator]);
 
 test('G06 author learner and contributor cannot review modules', function (Role $role) {

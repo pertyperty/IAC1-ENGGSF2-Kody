@@ -11,6 +11,7 @@ use App\Services\Games\GameAssessment;
 use App\Services\Games\GamePresets;
 use App\Services\Games\QuizAuthoring;
 use App\Services\Notifications\InAppNotifications;
+use App\Services\Publishing\AccessSettings;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
@@ -41,7 +42,7 @@ class ModulePublishing
                 'title' => $data['title'], 'description' => $data['description'], 'content' => $data['content'],
                 'type' => $data['type'], 'video_url' => $data['type'] === 'Video' ? $data['video_url'] : null,
                 'assessment' => $this->assessment($data),
-                'game_preset_revision_id' => $data['assessment_kind'] === 'preset' ? (int) $data['managed_preset'] : null]);
+                'game_preset_revision_id' => $data['assessment_kind'] === 'preset' ? (int) $data['managed_preset'] : null] + app(AccessSettings::class)->attributes($user, 'module', $data, $current->id));
             $this->audit($user, $current, 'module.saved', ['revision' => $number]);
 
             return $current;
@@ -84,6 +85,10 @@ class ModulePublishing
             }
             if ($decision === 'Approved' && ! Gate::forUser($users->get($current->created_by))->allows('create', LearningModule::class)) {
                 throw ValidationException::withMessages(['module' => 'The author must retain verified Active Instructor access before publication.']);
+            }
+            if ($decision === 'Approved') {
+                app(AccessSettings::class)->attributes($users->get($current->created_by), 'module',
+                    $revision->only(['price_kb', 'minimum_xp', 'prerequisite_modules']), $current->id);
             }
             $revision->update(['review_status' => $decision, 'reviewed_by' => $user->id, 'reviewed_at' => now(), 'review_notes' => $notes]);
             $changes = ['record_version' => $current->record_version + 1];

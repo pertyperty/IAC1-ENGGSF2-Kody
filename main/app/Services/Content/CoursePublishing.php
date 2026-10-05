@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Services\Account\CurrentAccountSession;
 use App\Services\Administration\AuditRecorder;
 use App\Services\Notifications\InAppNotifications;
+use App\Services\Publishing\AccessSettings;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -46,7 +47,7 @@ class CoursePublishing
             }
             $revision = CourseRevision::create(['course_id' => $current->id, 'number' => $number, 'title' => $data['title'],
                 'description' => $data['description'], 'category' => $data['category'], 'difficulty' => $data['difficulty'],
-                'estimated_duration' => $data['estimated_duration'], 'sequential' => (bool) ($data['sequential'] ?? false)]);
+                'estimated_duration' => $data['estimated_duration'], 'sequential' => (bool) ($data['sequential'] ?? false)] + app(AccessSettings::class)->attributes($user, 'course', $data, $current->id));
             $modules = LearningModule::whereIn('id', $data['module_ids'])->with('publishedRevision')->orderBy('id')->lockForUpdate()->get()->keyBy('id');
             foreach ($data['module_ids'] as $position => $id) {
                 $module = $modules->get($id);
@@ -99,6 +100,8 @@ class CoursePublishing
             }
             if ($decision === 'Approved') {
                 Gate::forUser($users->get($current->created_by))->authorize('create', LearningCourse::class);
+                app(AccessSettings::class)->attributes($users->get($current->created_by), 'course',
+                    $revision->only(['price_kb', 'minimum_xp', 'prerequisite_modules']), $current->id);
                 $this->availableModules($revision, $current->created_by);
                 $current->update(['title' => $revision->title, 'category' => $revision->category,
                     'published_revision_id' => $revision->id, 'status' => 'Published']);

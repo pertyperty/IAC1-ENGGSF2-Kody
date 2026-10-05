@@ -13,6 +13,6 @@ class EnrollCourseRequest extends FormRequest
 
     public function rules(): array
     {
-        return ['revision_id' => ['required', 'integer', 'min:1']];
+        return ['revision_id' => ['required', 'integer', 'min:1'], 'confirmed' => ['sometimes', 'accepted']];
     }
 }

@@ -75,5 +75,38 @@ dashboard, course and worker load against the SRS before accepting capacity.
 The local pilot suggests small EC2/RDS/S3 resources, not proven SRS availability.
 Record the regional quote, operational ownership and backup/recovery values before
 provisioning. Do not run test seeders or `migrate:fresh` on shared/live data.
-Keep payments/rewards off: provisional package/pricing/earnings/cap rules are not
-an approved financial contract. No Xendit webhook or purchase is enabled by setup.
+The [delegated business policies](economy-and-launch-decisions.md) are now adopted;
+real-money activation remains separately gated. No setup command enables payments.
+
+## Xendit economy setup — deferred live verification
+
+Use the merchant's approved GCash Payments API and Payouts v3 products. Store
+`XENDIT_SECRET_KEY`, `XENDIT_CALLBACK_TOKEN` and `XENDIT_BUSINESS_ID` privately.
+Keep `XENDIT_ENABLED=false` until evidence exists. Configure HTTPS
+`POST /webhooks/xendit` in the provider dashboard, with callback authentication,
+for payment capture/failure/expiry, payout success/failure/rejection/reversal and
+refund success/failure. Browser wallet returns cannot prove payment.
+
+Record verified all-in contract values, including tax/processing charges:
+`XENDIT_PAYMENT_FEE_BASIS_POINTS`, `XENDIT_PAYMENT_FEE_FIXED_MINOR`,
+`XENDIT_PAYOUT_FEE_MINOR`, `XENDIT_REFUND_FEE_MINOR`; there are no guessed defaults.
+Set `XENDIT_CONTRACT_VERIFIED=true` only after review. Verify real GCash redirect
+hosts against the strict adapter allowlist; never accept arbitrary URLs. Compare
+success/failure/reversal amounts, retained fees, monthly minimums and refund fee
+reporting with merchant statements.
+
+Use isolated sandbox accounts for top-up/duplicate callback, return without
+callback, wrong amount/currency/merchant, creator sale, holding/reservation,
+payout success/failure/reversal, untouched-purchase and unused-access refunds,
+and lost-response reconciliation. Payments/refunds use numeric major units;
+Payouts v3 uses integer centavos. Never resend an uncertain payment/refund POST.
+
+Configure `KODY_OPERATIONS_OWNER`, `KODY_BACKUP_RESPONDER` and
+`KODY_BUDGET_ENFORCED=true`; record a current estimate through Administrator finance.
+Only after the operational runbook passes may the operator attest
+`KODY_STAGING_VERIFIED=true`. Run `kody:launch-check` and `kody:ledger-check`, rebuild
+config cache and restart workers listening to `payments,notifications,default`.
+Actual monthly minimums/failed-attempt charges are separately recorded operating
+expenses. Application receipts are not tax invoices. Flags are attestations,
+not independent proof. No sandbox account, email, cloud resource or real payment
+is created by this development run.

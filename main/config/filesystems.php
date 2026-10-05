@@ -56,7 +56,11 @@ return [
             'url' => env('AWS_URL'),
             'endpoint' => env('AWS_ENDPOINT'),
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
-            'throw' => false,
+            'http' => ['connect_timeout' => 5, 'timeout' => 15],
+            'retries' => 2,
+            'visibility' => 'private',
+            'options' => ['ACL' => 'bucket-owner-full-control', 'ServerSideEncryption' => 'AES256'],
+            'throw' => true,
             'report' => false,
         ],
 

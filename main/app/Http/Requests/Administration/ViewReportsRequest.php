@@ -25,7 +25,7 @@ class ViewReportsRequest extends FormRequest
 
     public function rules(): array
     {
-        return ['type' => ['required', Rule::in(['accounts', 'content', 'learning', 'execution'])],
+        return ['type' => ['required', Rule::in(['accounts', 'content', 'learning', 'execution', 'economy', 'rewards'])],
             'from' => ['required', 'date_format:Y-m-d'], 'to' => ['required', 'date_format:Y-m-d', 'after_or_equal:from']];
     }
 

@@ -1,4 +1,4 @@
-<div class="lesson-note">@if($preview ?? false)<h2>{{ $revision->title }}</h2>@else<h1>{{ $revision->title }}</h1>@endif<p>{{ $revision->description }}</p><div class="lesson-text">{{ $revision->content }}</div>
+<div class="lesson-note">@unless($headingShown ?? false)@if($preview ?? false)<h2>{{ $revision->title }}</h2>@else<h1>{{ $revision->title }}</h1>@endif @endunless<p>{{ $revision->description }}</p><div class="lesson-text">{{ $revision->content }}</div>
     @if($revision->type === 'Video')<p><a class="quiet-link" href="{{ $revision->video_url }}" target="_blank" rel="noopener noreferrer">Watch the lesson video ↗</a></p>@endif
 </div>
 @if($revision->assessment)

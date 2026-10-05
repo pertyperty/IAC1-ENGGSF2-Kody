@@ -72,6 +72,13 @@ button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
 .account-shell a:not(.primary-button):hover { text-decoration: underline; }
 .secondary-link a, .studio-actions .quiet-link, .hub-logout { display: inline-flex; align-items: center; min-height: 44px; }
 .account-form textarea { width: 100%; min-height: 100px; padding: 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface-soft); color: var(--text); resize: vertical; }
+.content-price { color: var(--accent); font-weight: 700; font-size: 13px; }
+.review-page details.lesson-note { margin-block: 16px; }
+.review-page details > summary { cursor: pointer; min-height: 44px; padding-block: 10px; font-weight: 600; }
+.review-page details[open] > summary { margin-bottom: 12px; }
+.review-page p, .review-page pre { overflow-wrap: anywhere; }
+.review-page pre { max-width: 100%; white-space: pre-wrap; }
+.button-danger { background: var(--surface); color: var(--text); border-color: var(--border); }
 .account-form input[type="checkbox"], .account-form input[type="radio"] { width: auto; }
 .account-form input:not([type="checkbox"], [type="radio"]), .account-form select, .account-form textarea, .catalog-search input, .catalog-search select, .studio-form input:not([type="hidden"], [type="checkbox"], [type="radio"]), .studio-form textarea, .studio-form select { font-size: 16px; min-height: 44px; }
 .account-form label:has(input[type="checkbox"]), .account-form label:has(input[type="radio"]) { display: flex; align-items: flex-start; min-height: 44px; line-height: 1.6; }
@@ -79,6 +86,8 @@ button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
 .button { min-height: 44px; }
 .primary-button:disabled, .button:disabled { transform: none; box-shadow: none; opacity: .6; cursor: wait; }
 .review-page, .module-play, .hero-copy, .hero-game, .module-play-grid > *, .form-row > *, .studio-form { min-width: 0; }
+.journey-section > *, .creator-section > * { min-width: 0; }
+.ladder-node { flex: 1 1 0; min-width: 0; max-width: 92px; }
 .site-header nav a, .nav-login { display: inline-flex; align-items: center; min-height: 44px; transition: color .18s; }
 .site-header nav a:hover, .nav-login:hover { color: var(--accent-text); }
 .brand-mark { color: var(--accent-text); }

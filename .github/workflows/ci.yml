@@ -97,12 +97,34 @@ jobs:
           php artisan config:cache
           php artisan route:cache
           php artisan view:cache
-          php artisan test --filter='HealthTest|LoginTest|SessionConflictTest|DatabaseSessionsTest|PasswordHashingTest|RecoveryTest|ProfileTest|LearningTest|LearningProgressionTest|InstructorReviewTest|ModulePublishingTest|CoursePublishingTest|GamePresetsTest|ContentModerationTest|FaqTest|ContentFeedbackTest|ContentDeletionTest|GoogleAuthenticationTest|GardenDesignerTest|ArcadeGamesTest|ModuleDiscoveryTest|CreatorJourneyTest|InterfaceTest|QuizAuthoringTest|CourseLearningPathTest|PlatformDashboardTest|CurriculumTest|SetupStatusTest|CourseLearningTest'
+          php artisan test --filter='HealthTest|LoginTest|SessionConflictTest|DatabaseSessionsTest|PasswordHashingTest|RecoveryTest|ProfileTest|LearningTest|LearningProgressionTest|InstructorReviewTest|ModulePublishingTest|ChallengePublishingTest|ChallengeDiscoveryTest|BrowserIsolationTest|CoursePublishingTest|GamePresetsTest|ContentModerationTest|FaqTest|ContentFeedbackTest|ContentDeletionTest|GoogleAuthenticationTest|GardenDesignerTest|ArcadeGamesTest|ModuleDiscoveryTest|CreatorJourneyTest|InterfaceTest|QuizAuthoringTest|CourseLearningPathTest|PlatformDashboardTest|CurriculumTest|SetupStatusTest|CourseLearningTest|Economy|WeeklyResultsTest|PrivateObjectErasureTest|LaunchReadinessTest|SystemReportsTest'
           php artisan route:list --path=up
           php artisan route:list --path=ready
           php artisan route:clear
           php artisan config:clear
           php artisan view:clear
+      - name: Install isolated Chromium test runtime
+        run: npx playwright install --with-deps chromium
+      - name: Browser journeys and accessibility regressions
+        run: npm run test:browser
+      - name: Install matching PostgreSQL recovery client
+        run: |
+          sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
+          sudo apt-get install --yes postgresql-client-17
+      - name: Representative upgrade and restore rehearsal
+        env:
+          KODY_TEST_PG_BIN: /usr/lib/postgresql/17/bin
+        run: npm run test:restore
+      - name: Upload synthetic browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-${{ github.sha }}
+          path: |
+            main/storage/app/browser-report/
+            main/storage/app/browser-results/
+          if-no-files-found: ignore
+          retention-days: 7
       - name: Record verified Git revision
         run: printf '%s\n' "$GITHUB_SHA" > public/build/revision.txt
       - name: Upload frontend build with revision

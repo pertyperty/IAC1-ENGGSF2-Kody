@@ -5,6 +5,12 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
+test('validated quiz copy reflects adopted XP while unsaved previews promise no persisted progress', function () {
+    signInForLearning($this);
+    $this->get(route('learning.show', 'sequences'))->assertOk()->assertSee('eligible first-completion XP')
+        ->assertSee('This quiz awards no KodeBits.')->assertDontSee('No grades, XP or KodeBits.');
+});
+
 test('shared account and learning pages provide a keyboard bypass and accessible theme control', function (string $route) {
     $this->get(route($route))->assertOk()->assertSee('href="#main-content"', false)
         ->assertSee('id="main-content"', false)->assertSee('aria-label="Dark mode"', false)

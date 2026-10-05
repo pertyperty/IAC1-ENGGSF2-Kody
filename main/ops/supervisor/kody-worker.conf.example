@@ -1,7 +1,7 @@
 ; Review paths, service user and log rotation for the target Linux host before installing.
 [program:kody-worker]
 directory=/var/www/kody/current
-command=/usr/bin/php /var/www/kody/current/artisan queue:work database --queue=default --sleep=3 --tries=3 --timeout=60 --max-time=3600
+command=/usr/bin/php /var/www/kody/current/artisan queue:work database --queue=payments,notifications,default --sleep=3 --tries=3 --timeout=60 --max-time=3600
 user=www-data
 numprocs=1
 autostart=true

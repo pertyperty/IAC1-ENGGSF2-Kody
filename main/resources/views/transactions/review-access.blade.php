@@ -1,0 +1,1 @@
+<aside class="lesson-note"><b>Reviewed access</b><p>{{ $revision->price_kb ? $revision->price_kb.' KodeBits' : 'Free' }} · Minimum {{ $revision->minimum_xp }} XP · Required module IDs: {{ implode(', ', $revision->prerequisite_modules) ?: 'none' }} · Creator settlement: {{ $revision->creator_settlement }}</p></aside>
