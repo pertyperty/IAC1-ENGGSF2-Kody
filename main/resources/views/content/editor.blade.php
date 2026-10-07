@@ -8,7 +8,7 @@
 
     <a class="quiet-link" href="{{ route('studio.index') }}">← Your studio</a><h1>{{ $module ? 'Shape your adventure.' : 'Start with a spark.' }}</h1>
     <p>Teach a small idea with a lesson and a playful activity. Save a draft, try it out, then submit it for review.</p>
-    <nav class="editor-jumps" aria-label="Adventure setup"><a href="#lesson-edit"><span>01</span> Lesson</a><a href="#assessment-edit"><span>02</span> Activity</a><a href="#access-settings"><span>03</span> Access</a><a href="#draft-save"><span>04</span> Save & review</a></nav>
+    <ol class="creator-steps" aria-label="Publishing steps"><li><b>1. Teach one idea</b><span>Give learners a short explanation and something to try.</span></li><li><b>2. Play your assessment</b><span>Customize the prompts and objective. Check the preview and hint.</span></li><li><b>3. Save, then send for review</b><span>Saving creates a draft. Staff approval makes it available to learners.</span></li></ol>
     @if(!empty($starter))<p class="lesson-note">Your example is ready to customize. It has not been saved or published yet.</p>@endif
     @if(session('status'))<p role="status" class="lesson-note">{{ session('status') }}</p>@endif
     @if($errors->any())<div role="alert" class="studio-errors"><b>Please check your adventure.</b><ul>@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
@@ -31,13 +31,11 @@
         <input type="hidden" name="record_version" value="{{ $module?->record_version ?? 1 }}">
         <fieldset @disabled($revision?->review_status === 'Pending' || $module?->status === 'Archived')>
             <legend>Your lesson</legend>
-            <h2 id="lesson-edit">1. Teach one small idea</h2>
             <label for="title">Adventure title</label><input id="title" name="title" value="{{ old('title', $fields['title']) }}" maxlength="150" required>
             <label for="description">A little invitation</label><textarea id="description" name="description" rows="3" maxlength="5000" required>{{ old('description', $fields['description']) }}</textarea>
             <label for="type">Lesson format</label><select id="type" name="type">@foreach(['Article','Interactive','Video'] as $type)<option @selected(old('type', $revision?->type ?? $starter['type'] ?? 'Interactive') === $type)>{{ $type }}</option>@endforeach</select>
             <label for="content">Teach the idea</label><p class="field-hint">Write your explanation and code examples as plain text. Your learners will see exactly what you write.</p><textarea id="content" name="content" rows="10" maxlength="50000" required>{{ old('content', $fields['content']) }}</textarea>
             <div data-video-fields><label for="video_url">Video link</label><p class="field-hint">For video lessons, add an HTTPS link to your video. It opens in a new tab.</p><input id="video_url" type="url" name="video_url" value="{{ old('video_url', $fields['video_url']) }}" maxlength="2000"></div>
-            <h2 id="assessment-edit">2. Give the idea a playground</h2><p class="field-hint">Choose a template, make its scenario yours, then try the preview. Previewing never saves learner progress.</p>
             <label for="assessment_kind">Make it playable</label><select id="assessment_kind" name="assessment_kind">@foreach(['game' => 'Coding game', 'quiz' => 'Quick quiz', 'preset' => 'Workshop preset', 'none' => 'Lesson only (Article or Video)'] as $value => $label)<option value="{{ $value }}" @selected(old('assessment_kind', $revision?->game_preset_revision_id ? 'preset' : ($revision ? $kind : ($starter['assessment_kind'] ?? 'game'))) === $value)>{{ $label }}</option>@endforeach</select>
             <div data-preset-fields><h2>Start from a workshop preset</h2><p class="field-hint">Choose saved game or quiz prompts and give the activity a title. Your lesson keeps this version when the preset changes.</p>
                 @if($revision?->game_preset_revision_id)<p class="lesson-note">Saved preset revision #{{ $revision->game_preset_revision_id }}. To save a new draft, choose a current available version below.</p>@endif
@@ -79,7 +77,7 @@
                 @include('games.quiz-editor')
             </div>
             @include('transactions.access-settings', ['accessKind' => 'module'])
-            <div class="studio-actions" id="draft-save"><button class="button button-play" type="submit">Save draft</button><a class="quiet-link" href="{{ route('studio.index') }}">Cancel</a></div>
+            <div class="studio-actions"><button class="button button-play" type="submit">Save draft</button><a class="quiet-link" href="{{ route('studio.index') }}">Cancel</a></div>
         </fieldset>
     </form>
     <section class="studio-preview" data-quiz-preview hidden aria-label="Unsaved quiz preview">
