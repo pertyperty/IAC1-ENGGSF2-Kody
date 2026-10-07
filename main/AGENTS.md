@@ -10,12 +10,6 @@ including Moderator-only weekly scheduling and Administrator-only finance tools.
 
 ## Mission
 
-The owner's next interface polish request adds flatter surfaces, pinned local
-fonts, original SVG branding/game art and accessible sticky/revealing navigation.
-See [navigation and visual polish](docs/navigation-and-visual-polish.md).
-Preserve touch/keyboard reveal, focus and open-menu guards, bounded rail scrolling,
-reduced motion and the existing typed/server-validated game boundaries.
-
 The owner requested a broader role/UI/game interaction redesign on 2026-10-07.
 See [interactive workspaces](docs/interactive-workspaces.md). Both layouts share
 policy-filtered navigation; `workspace.css` and `game-play.css` own their component

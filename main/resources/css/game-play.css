@@ -39,8 +39,8 @@
 :root[data-theme="dark"] .garden-game .world-label { color: #d6e9d9; }
 .world-mission { font-weight: 700; font-size: 12px; }
 .world-mission > span { font-size: 20px; margin-right: 4px; }
-.garden-game .game-board { width: 100%; max-width: 470px; gap: 8px; padding: 12px; background: #c3d5b6; border: 1px solid #b6c8ab; border-radius: 20px; box-shadow: none; }
-:root[data-theme="dark"] .garden-game .game-board { background: #2a493b; border-color: #42634e; box-shadow: none; }
+.garden-game .game-board { width: 100%; max-width: 470px; gap: 8px; padding: 12px; background: #c3d5b6; border: 1px solid #b6c8ab; border-radius: 20px; box-shadow: 0 6px 0 #a9c095; }
+:root[data-theme="dark"] .garden-game .game-board { background: #2a493b; border-color: #42634e; box-shadow: 0 6px 0 #173226; }
 .garden-game .garden-tile { aspect-ratio: 1; height: auto; min-height: 0; border-radius: 12px; }
 .garden-game .grass-tile { background: #b8d098; color: #61783d; }
 .garden-game .path-tile { background: #fff4db; box-shadow: 0 4px 0 #c8b98e; border: 1px solid #ffffff80; }

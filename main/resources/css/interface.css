@@ -1,5 +1,5 @@
 .account-page { margin: 0; background: var(--page); color: var(--text); font-family: var(--font-sans); min-height: 100vh; }
-.account-shell { max-width: 550px; margin: 22px auto 60px; padding: 36px; border: 1px solid var(--border); border-radius: 20px; background: var(--surface); box-shadow: none; }
+.account-shell { max-width: 550px; margin: 22px auto 60px; padding: 36px; border: 1px solid var(--border); border-radius: 20px; background: var(--surface); box-shadow: 0 12px 48px var(--shadow); }
 .eyebrow { color: var(--muted); font-size: 11px; letter-spacing: 2px; font-weight: 700; margin-bottom: 14px; }
 .account-shell h1 { font-size: 34px; line-height: 1.15; letter-spacing: -1px; font-weight: 700; margin: 0 0 16px; }
 .intro { color: var(--muted); line-height: 1.6; margin-bottom: 28px; }

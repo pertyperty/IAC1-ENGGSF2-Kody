@@ -1,8 +1,5 @@
-<div class="app-header-shell" data-scroll-navigation>
-<span class="header-hover-edge" aria-hidden="true"></span>
-<button type="button" class="navigation-reveal" data-navigation-reveal hidden>Show navigation <span aria-hidden="true">⌄</span></button>
 <header class="app-header">
-    <a href="{{ route('home') }}" class="play-brand" aria-label="Kody home"><img class="brand-mark" src="{{ asset('images/kody-mark.svg') }}" width="36" height="36" alt="">kody<span class="brand-dot">.</span></a>
+    <a href="{{ route('home') }}" class="play-brand" aria-label="Kody home"><span class="brand-mark" aria-hidden="true">k</span>kody<span class="brand-dot">.</span></a>
     <nav class="app-primary-nav" aria-label="Main navigation">
         <a href="{{ auth()->check() ? route('dashboard') : route('home') }}" @if(request()->routeIs('home', 'dashboard', 'learning.show', 'arcade')) aria-current="page" @endif>Play</a>
         <a href="{{ route('learning.catalog') }}" @if(request()->routeIs('learning.catalog', 'course-learning.*', 'challenges.catalog', 'challenges.show', 'modules.*')) aria-current="page" @endif>Learn</a>
@@ -31,4 +28,3 @@
         @include('layouts.theme-toggle')
     </div>
 </header>
-</div>

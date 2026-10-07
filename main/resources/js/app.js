@@ -11,13 +11,11 @@ import { mountTheme } from './theme.js';
 import { mountAccountLinks } from './account-links.js';
 import { mountPasswordFields } from './password-fields.js';
 import { mountWorkspaceMenus } from './workspace-menus.js';
-import { mountScrollNavigation } from './scroll-navigation.js';
 
 mountTheme(document, window);
 mountAccountLinks(document, window);
 mountPasswordFields(document);
 mountWorkspaceMenus(document);
-mountScrollNavigation(document, window);
 
 document.querySelectorAll('[data-module-editor]').forEach(mountModuleEditor);
 document.querySelectorAll('[data-preset-editor]').forEach(mountPresetEditor);

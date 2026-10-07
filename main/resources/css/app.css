@@ -4,7 +4,6 @@
 @import './theme.css';
 @import './workspace.css';
 @import './game-play.css';
-@import './design-system.css';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
