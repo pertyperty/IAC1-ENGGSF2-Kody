@@ -1,5 +1,13 @@
 # Kody Engineering Agent Guidelines
 
+The owner requested all five verified Active local role accounts in seeders on
+2026-10-07. `LocalRoleAccountsSeeder` is a removable development fixture with
+local/testing and loopback PostgreSQL guards; default seeds call it only locally.
+Generate private passwords, preserve existing identities/status/history on reruns,
+and never promote conflicting accounts or create Unverified fixtures. See
+[local role setup](docs/local-administrator-setup.md#reproducible-local-role-accounts).
+It is not production bootstrap or a substitute for public role application rules.
+
 The owner requested local Administrator provisioning on 2026-10-07. Use the
 audited `kody:admin-create-local` command described in
 [local setup](docs/local-administrator-setup.md). It requires local/testing and
