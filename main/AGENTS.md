@@ -1,5 +1,13 @@
 # Kody Engineering Agent Guidelines
 
+The owner requested all five verified Active local role accounts in seeders on
+2026-10-07. `LocalRoleAccountsSeeder` is a removable development fixture with
+local/testing and loopback PostgreSQL guards; default seeds call it only locally.
+Generate private passwords, preserve existing identities/status/history on reruns,
+and never promote conflicting accounts or create Unverified fixtures. See
+[local role setup](docs/local-administrator-setup.md#reproducible-local-role-accounts).
+It is not production bootstrap or a substitute for public role application rules.
+
 The owner requested local Administrator provisioning on 2026-10-07. Use the
 audited `kody:admin-create-local` command described in
 [local setup](docs/local-administrator-setup.md). It requires local/testing and
@@ -9,6 +17,19 @@ public role-elevation path. Staff workspace cards must retain existing policies,
 including Moderator-only weekly scheduling and Administrator-only finance tools.
 
 ## Mission
+
+The owner's next interface polish request adds flatter surfaces, pinned local
+fonts, original SVG branding/game art and accessible sticky/revealing navigation.
+See [navigation and visual polish](docs/navigation-and-visual-polish.md).
+Preserve touch/keyboard reveal, focus and open-menu guards, bounded rail scrolling,
+reduced motion and the existing typed/server-validated game boundaries.
+
+The owner requested a broader role/UI/game interaction redesign on 2026-10-07.
+See [interactive workspaces](docs/interactive-workspaces.md). Both layouts share
+policy-filtered navigation; `workspace.css` and `game-play.css` own their component
+surfaces. Direct painting/swapping and program editing are local previews until
+the existing server validates a confirmed Run. Preserve typed creator data,
+immutable assessments, focused keyboard shortcuts and reduced-motion behavior.
 
 On 2026-10-04 the owner explicitly delegated recommendations and implementation
 of the remaining economy, reward, creator-deletion and launch policies. See

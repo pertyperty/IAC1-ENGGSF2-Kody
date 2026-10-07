@@ -1,4 +1,4 @@
-<section><h2>Access and pricing</h2>
+<section id="access-settings"><h2>Access and pricing</h2>
 <p class="field-hint">Prices and requirements are reviewed with this saved revision. Existing learners keep their access; course access covers every included lesson.</p>
 <label for="price_kb">KodeBit price · 0 for free</label><input type="number" id="price_kb" name="price_kb" min="0" max="{{ config('economy.price_bands.'.$accessKind)[1] }}" value="{{ old('price_kb', $revision?->price_kb ?? 0) }}">
 <label for="minimum_xp">Minimum achievement rank</label><select id="minimum_xp" name="minimum_xp">@foreach(config('economy.ranks') as $xp => $rank)<option value="{{ $xp }}" @selected((string)old('minimum_xp', $revision?->minimum_xp ?? 0) === (string)$xp)>{{ $rank }} · {{ number_format($xp) }} XP</option>@endforeach</select>

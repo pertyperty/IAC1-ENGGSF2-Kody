@@ -147,3 +147,65 @@ the runner's actual dependency and checks rejection of all four line terminators
 after a comment token without executing any shell string. See
 [the upstream advisory](https://github.com/advisories/GHSA-pqg4-j6r4-53mv).
 Keep the override until a reviewed upstream release includes the fix.
+
+### Interactive role workspaces — 2026-10-07
+
+The broader owner-requested follow-up replaces the earlier header rows with shared
+application chrome, desktop role navigation and compact native menus on smaller
+screens. See [interactive workspaces](interactive-workspaces.md) for the current
+design, original-asset provenance, role boundaries and complete interaction record.
+Creator libraries prioritize owned drafts, starter examples expand on demand, and
+long adventure/quest editors have labelled section links. Publication queues share
+clear navigation. Existing account, report and staff views inherit the same surfaces.
+
+Starter lessons lead with the game. Command Garden has selectable/reorderable
+program tiles, focused keyboard controls, execution highlights, visited trails and
+crystal counters. Its accessible map retains path coordinates after every render.
+Pixel Studio supports direct painting; Sort Lab supports tile selection/swapping;
+Number Machine previews value changes; Terminal Quest shows its virtual files and
+supports command history. All activities retain editable instruction text and
+existing server validation. Direct edits and previews make no completion request.
+
+Local verification: **173 focused PostgreSQL tests / 1,459 assertions**, **45
+frontend tests**, and **11 isolated Chromium workflows** passed. Browser checks
+cover all five roles, 1440/1280px desktop and 390/320px layouts, both themes,
+keyboard focus, axe and horizontal overflow checks. Direct game controls are
+tested through real server completion routes; a simulated 503 saves nothing,
+restores controls and allows a safe successful retry. Reading, review/publication,
+quiz and enrollment journeys remain covered. The latest browser pass took 2.6
+minutes on the local Windows runtime. Build, Pint, whitespace and full Composer/npm
+audits passed. Cached regressions and the full suite also run in CI.
+The local cached configuration/routes/views pass also succeeded: **713 PostgreSQL
+tests / 5,325 assertions**. Temporary testing caches were cleared afterward.
+
+No migration, dependency addition, new permission or live provider is introduced.
+This is local Chromium evidence, not real-device, staging performance or complete
+WCAG certification. Earlier dated verification counts remain historical records.
+
+### Navigation and visual polish — 2026-10-07
+
+The next owner-requested refinement adds flatter shared surfaces, tighter grids,
+stable color/border hover feedback and tactile buttons. Sticky desktop/mobile
+workspace menus accompany a top bar that hides on downward scrolling and returns
+by upward scrolling, top-edge hover, keyboard focus or a labelled reveal button.
+Open menus and focused controls guard against accidental hiding. Skip links and
+anchor targets account for sticky layers; short-screen menus scroll independently.
+See [the implementation and asset record](navigation-and-visual-polish.md).
+
+Original SVG logo/favicon, explorer, flag, crystal and landing illustrations
+replace the earlier text/CSS placeholders. Space Grotesk headings accompany
+Instrument Sans body/control text with explicit pinned weights. Seven unmodified
+WOFF2 files, their checksums and both OFL notices are included; builds now use
+local fonts without provider calls or additional packages.
+
+Local verification passed **65 focused PostgreSQL tests / 520 assertions**, **45
+frontend tests**, and **13 isolated Chromium workflows**. Checks cover all five
+roles, both themes, 1440/1280px desktops, 390/320px layouts, short touch viewports,
+scroll direction, hover, keyboard reveal and focus, sticky menus, axe, overflow,
+registration, creator review/publication and real server-validated game saves.
+The complete browser pass took 3.0 minutes; later source refinements also run
+through CI against the pushed revision. Pint, Vite build and whitespace checks
+passed. Font/provider traffic is unnecessary during the build.
+
+No migration, role-policy change or live provider activation is included.
+Chromium evidence remains distinct from staging, real-device and full WCAG claims.

@@ -53,3 +53,61 @@ environments/hosts, duplicate identity preservation, exclusive credential-file
 creation, password validation and audit rollback. The shared workspace continues
 to use existing policies; Administrators do not acquire the Moderator-only E02
 weekly scheduling permission.
+
+## Reproducible local role accounts
+
+The owner also requested verified Active accounts for every role and their inclusion
+in seeders on 2026-10-07. This is a local development fixture amendment, not a change
+to A01/A02 registration or A09/A10/G02 role elevation. No schema or public route changes.
+
+With `APP_ENV=local` and loopback PostgreSQL, run:
+
+```sh
+php artisan db:seed
+```
+
+`DatabaseSeeder` calls `LocalRoleAccountsSeeder` only in the local environment.
+For an explicit isolated testing invocation:
+
+```sh
+php artisan db:seed --class=LocalRoleAccountsSeeder --env=testing
+```
+
+| Role | Email | Username |
+| --- | --- | --- |
+| Learner | learner@kody.local | kody_learner |
+| Contributor | contributor@kody.local | kody_contributor |
+| Instructor | instructor@kody.local | kody_instructor |
+| Moderator | moderator@kody.local | kody_moderator |
+| Administrator | admin2@kody.local | kody_admin_two |
+
+Each missing account receives a unique generated 30-character password, Laravel
+hashing, Active status and a trusted local verification timestamp. No Unverified
+fixtures are created. New credentials go into an exclusively created, ignored
+`storage/app/private/local-role-credentials-<uuid>.txt` file; console output shows
+only its path. Files from earlier manual provisioning remain usable and unchanged.
+Restrict Windows ACLs to the owner on shared machines; POSIX files use mode 0600.
+Existing accounts are never reset, reactivated, verified or promoted on reruns;
+email/username/role collisions fail and roll back the whole batch. A removed fixture
+can be recreated with a fresh password in a new file. The original
+`admin@kody.local` account is outside this seeder and remains unchanged.
+
+The explicit role seeder also refuses production/staging, non-PostgreSQL connections
+and non-loopback database hosts, even with `--force`. Default production/staging
+seeding creates no fixture accounts. The owner plans to remove these fixtures
+before deployment: remove this seeder and its `DatabaseSeeder` call together, and
+exclude local databases and private credential files from deployment artifacts.
+Do not copy a development database into production. Removing seed code does not
+remove accounts already present in a database.
+
+All new users and secret-free `local_role_account_created` audits commit together;
+storage/audit errors roll back the batch and clean up only its newly created file.
+Unique database constraints protect competing invocations; a racing collision can
+be retried. After an interrupted process, inspect database and private-file state
+before rerunning. Fixtures grant no content, progress, financial credits or fabricated
+role-application history. Directly provisioned Moderators retain an unknown prior
+role and the existing removal safeguard. Normal server authorization still applies.
+
+`LocalRoleAccountsSeederTest` covers all five roles, private generated credentials,
+hashing, idempotency, nonlocal defaults, explicit deployment/remote refusal, identity
+conflicts and transactional rollback on audit/storage failure.
