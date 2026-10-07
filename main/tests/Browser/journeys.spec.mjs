@@ -28,6 +28,10 @@ async function audit(page) {
             .slice(0, 15).map(element => `${element.tagName}.${element.className}`) }));
     expect(overflow.scroll, JSON.stringify(overflow)).toBeLessThanOrEqual(overflow.width + 1);
 }
+async function accountLink(page, name) {
+    await page.locator('.account-menu > summary').click();
+    await page.getByRole('navigation', { name: 'Account navigation', exact: true }).getByRole('link', { name, exact: true }).click();
+}
 async function solveGarden(page, saved = true) {
     const game = page.locator('[data-coding-game]');
     for (const direction of ['right', 'right', 'up', 'right', 'right']) await game.getByRole('button', { name: `Add ${direction}`, exact: true }).click();
@@ -55,16 +59,16 @@ test('staff workspace, account filters and password controls stay accessible in 
             const toggle = page.getByRole('button', { name: 'Dark mode', exact: true });
             if ((await toggle.getAttribute('aria-pressed') === 'true') !== dark) await toggle.click();
             await audit(page);
-            await page.getByRole('link', { name: 'Workspace', exact: true }).click();
+            await accountLink(page, 'Workspace');
             await expect(page.getByRole('heading', { name: 'Keep the community safe' })).toBeVisible();
             await page.getByLabel('Username', { exact: true }).fill('no_such_player');
             await page.getByRole('button', { name: 'Apply filters', exact: true }).click();
             await expect(page.getByRole('heading', { name: 'No accounts found' })).toBeVisible();
             await page.getByRole('link', { name: 'Clear filters', exact: true }).click();
             await audit(page);
-            await page.getByRole('link', { name: 'My account', exact: true }).click();
+            await accountLink(page, 'My account');
             await audit(page);
-            await page.getByRole('link', { name: 'Dashboard', exact: true }).click();
+            await accountLink(page, 'Dashboard');
         }
     }
     await page.setViewportSize({ width: 1280, height: 900 });
@@ -181,6 +185,7 @@ test('B05: four creator arcade assessments and a multi-question quiz save valida
         'sort-lab': 'swap 1 2\nswap 2 3', 'terminal-quest': 'ls\ncat hello.txt\ncp hello.txt release.txt\ncat release.txt' };
     for (const [slug, program] of Object.entries(programs)) {
         await page.goto(`/learn/modules/${manifest.modules[slug]}`);
+        await page.locator('.arcade-source > summary').click();
         await page.getByLabel('Your program', { exact: true }).fill(program);
         await audit(page);
         await page.getByRole('button', { name: 'Run program' }).click();
@@ -200,4 +205,98 @@ test('B05: four creator arcade assessments and a multi-question quiz save valida
     await expect(page.locator('[data-quiz-feedback]')).toContainText('saved');
     await audit(page);
     expect(JSON.parse(fixture('snapshot', 'arcadelearner@browser.example.test'))).toMatchObject({ xp: 200, xp_awards: 5, streak: 1 });
+});
+
+for (const [role, destination, link] of [
+    ['learner', '/learn', 'Learning catalog'], ['contributor', '/create/challenges', 'Quest studio'],
+    ['instructor', '/create', 'Module studio'], ['moderator', '/manage/modules', 'Publication reviews'],
+    ['administrator', '/manage/accounts', 'Community'],
+]) {
+    test(`${role} workspace has focused navigation and usable desktop/mobile surfaces in both themes`, async ({ page }) => {
+        await login(page, `nav${role}`);
+        for (const width of [1440, 320]) {
+            await page.setViewportSize({ width, height: 1000 });
+            const nav = page.getByRole('navigation', { name: width === 1440 ? 'Your workspace' : 'Mobile workspace', exact: true });
+            if (width === 320) await page.locator('.mobile-workspace > summary').click();
+            await expect(nav.getByRole('link', { name: 'Module studio', exact: true })).toHaveCount(role === 'instructor' ? 1 : 0);
+            await expect(nav.getByRole('link', { name: 'Quest studio', exact: true })).toHaveCount(['instructor', 'contributor'].includes(role) ? 1 : 0);
+            await expect(nav.getByRole('link', { name: 'Weekly planning', exact: true })).toHaveCount(role === 'moderator' ? 1 : 0);
+            await expect(nav.getByRole('link', { name: 'Accounting', exact: true })).toHaveCount(role === 'administrator' ? 1 : 0);
+            await nav.getByRole('link', { name: link, exact: true }).click();
+            await expect(page).toHaveURL(new RegExp(`${destination}$`));
+            for (const dark of [false, true]) {
+                const toggle = page.getByRole('button', { name: 'Dark mode', exact: true });
+                if ((await toggle.getAttribute('aria-pressed') === 'true') !== dark) await toggle.click();
+                await audit(page);
+            }
+            if (width === 1440) await page.screenshot({ path: `storage/app/browser-results/${role}-workspace.png` });
+            await page.locator('.account-menu > summary').click();
+            await expect(page.getByRole('navigation', { name: 'Account navigation' })).toBeVisible();
+            await page.keyboard.press('Escape');
+            await expect(page.locator('.account-menu')).not.toHaveAttribute('open', '');
+            await expect(page.locator('.account-menu > summary')).toBeFocused();
+        }
+    });
+}
+
+test('interactive games edit and preview locally; confirmed runs save through the existing server rules', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.setViewportSize({ width: 1440, height: 1000 });
+    await login(page, 'interactive');
+    await page.goto('/learn/sequences');
+    const garden = page.locator('[data-coding-game]');
+    await expect(garden.locator('[data-game-board]')).toHaveAttribute('aria-label', /Path tiles/);
+    await expect(garden.locator('[data-game-board]')).toHaveAttribute('aria-label', /Path tiles/);
+    let saves = 0;
+    const completion = await garden.getAttribute('data-completion-url');
+    page.on('request', request => { if (request.method() === 'POST' && request.url() === completion) saves++; });
+    await garden.focus();
+    for (const key of ['ArrowRight', 'ArrowUp', 'ArrowRight', 'ArrowRight', 'ArrowRight']) await page.keyboard.press(key);
+    await garden.getByRole('button', { name: 'Step 2: up', exact: true }).focus();
+    await page.keyboard.press('Alt+ArrowRight');
+    await expect(garden.getByRole('button', { name: 'Step 3: up', exact: true })).toBeFocused();
+    await garden.getByRole('button', { name: 'Add left', exact: true }).click();
+    await garden.getByRole('button', { name: 'Step 6: left', exact: true }).focus();
+    await page.keyboard.press('Delete');
+    expect(saves).toBe(0);
+    expect(JSON.parse(fixture('snapshot', 'interactive@browser.example.test'))).toMatchObject({ xp: 0, levels: 0 });
+    await page.route(completion, route => route.fulfill({ status: 503, contentType: 'application/json', body: '{}' }), { times: 1 });
+    await garden.getByRole('button', { name: 'Run my code', exact: true }).click();
+    await expect(garden.locator('[data-game-feedback]')).toContainText('wasn’t saved');
+    await expect(garden.getByRole('button', { name: 'Add right', exact: true })).toBeEnabled();
+    expect(JSON.parse(fixture('snapshot', 'interactive@browser.example.test'))).toMatchObject({ xp: 0 });
+    await garden.getByRole('button', { name: 'Run my code', exact: true }).click();
+    await expect(garden.locator('[data-game-feedback]')).toContainText('saved');
+    expect(saves).toBe(2);
+    expect(JSON.parse(fixture('snapshot', 'interactive@browser.example.test'))).toMatchObject({ xp: 20, levels: 1 });
+    await audit(page);
+    await page.screenshot({ path: 'storage/app/browser-results/interactive-garden.png' });
+    await page.setViewportSize({ width: 320, height: 1000 });
+    await page.goto(`/learn/modules/${manifest.modules['pixel-studio']}`);
+    await page.getByRole('button', { name: 'Paint column 1, row 1; currently blank', exact: true }).click();
+    await page.getByRole('button', { name: 'Paint with peach', exact: true }).click();
+    await page.getByRole('button', { name: 'Paint column 2, row 2; currently blank', exact: true }).click();
+    await expect(page.locator('[data-arcade-preview-status]')).toContainText('Preview only');
+    expect(JSON.parse(fixture('snapshot', 'interactive@browser.example.test'))).toMatchObject({ xp: 20 });
+    await audit(page);
+    await page.getByRole('button', { name: 'Run program' }).click();
+    await expect(page.locator('[data-arcade-output]')).toContainText('saved');
+    expect(JSON.parse(fixture('snapshot', 'interactive@browser.example.test'))).toMatchObject({ xp: 60 });
+    await page.goto(`/learn/modules/${manifest.modules['sort-lab']}`);
+    for (const position of [1, 2, 2, 3]) await page.getByRole('button', { name: new RegExp(`^Select position ${position},`) }).click();
+    await page.getByRole('button', { name: 'Run program' }).click();
+    await expect(page.locator('[data-arcade-output]')).toContainText('saved');
+    await audit(page);
+    expect(JSON.parse(fixture('snapshot', 'interactive@browser.example.test'))).toMatchObject({ xp: 100 });
+    await page.goto(`/learn/modules/${manifest.modules['terminal-quest']}`);
+    const prompt = page.getByLabel('kody@workspace $', { exact: true });
+    for (const command of ['ls', 'cp hello.txt release.txt', 'cat release.txt']) {
+        await prompt.fill(command); await prompt.press('Enter');
+        await expect(prompt).toBeEnabled();
+    }
+    await expect(page.locator('[data-arcade-output]')).toContainText('saved');
+    await prompt.press('ArrowUp'); await expect(prompt).toHaveValue('cat release.txt');
+    await prompt.press('ArrowDown'); await expect(prompt).toHaveValue('');
+    await audit(page);
+    expect(JSON.parse(fixture('snapshot', 'interactive@browser.example.test'))).toMatchObject({ xp: 140, xp_awards: 4 });
 });

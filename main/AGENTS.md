@@ -10,6 +10,13 @@ including Moderator-only weekly scheduling and Administrator-only finance tools.
 
 ## Mission
 
+The owner requested a broader role/UI/game interaction redesign on 2026-10-07.
+See [interactive workspaces](docs/interactive-workspaces.md). Both layouts share
+policy-filtered navigation; `workspace.css` and `game-play.css` own their component
+surfaces. Direct painting/swapping and program editing are local previews until
+the existing server validates a confirmed Run. Preserve typed creator data,
+immutable assessments, focused keyboard shortcuts and reduced-motion behavior.
+
 On 2026-10-04 the owner explicitly delegated recommendations and implementation
 of the remaining economy, reward, creator-deletion and launch policies. See
 [the adopted decisions](docs/economy-and-launch-decisions.md); they supersede
