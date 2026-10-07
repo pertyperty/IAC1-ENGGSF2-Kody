@@ -11,21 +11,17 @@
 </head>
 <body class="account-page">
     <a class="skip-link" href="#main-content">Skip to content</a>
-    <header class="account-header"><a href="{{ url('/') }}" class="brand">Kody<span>.</span></a>
-        <nav aria-label="Account navigation">
-            <a href="{{ auth()->check() ? route('dashboard') : route('home') }}">{{ auth()->check() ? 'Dashboard' : 'Play' }}</a>
-            @auth<a href="{{ route('account.show') }}" @if(request()->routeIs('account.show', 'account.edit')) aria-current="page" @endif>My account</a>@endauth
-            @can('viewAny', \App\Models\User::class)<a href="{{ route('account-governance.index') }}" @if(request()->routeIs('account-governance.*')) aria-current="page" @endif>Workspace</a>@endcan
-            <a href="{{ route('help.index') }}">Help</a>
-        </nav>
-        @include('layouts.theme-toggle')
-    </header>
+    @include('layouts.app-header')
+    <div class="app-frame {{ auth()->check() ? 'has-workspace' : '' }}">
+    @auth<aside class="app-rail"><div class="rail-identity"><span class="rail-emblem" aria-hidden="true">k</span><div><b>Make a little progress.</b><span>{{ auth()->user()->account_role->name }}</span></div></div>@include('layouts.workspace-nav')</aside>
+    <details class="mobile-workspace"><summary>Explore your workspace <span aria-hidden="true">⌄</span></summary>@include('layouts.workspace-nav', ['mobile' => true])</details>@endauth
     <main id="main-content" tabindex="-1" class="account-shell @yield('shell-class')">
         @if (session('status'))
             <p class="notice" role="status">{{ session('status') }}</p>
         @endif
         @yield('content')
     </main>
+    </div>
     <footer class="account-footer">Your next programming milestone starts here.</footer>
 </body>
 </html>
