@@ -3,7 +3,7 @@
 .app-header { position: relative; display: flex; align-items: center; gap: 20px; min-height: 72px; padding: 12px 28px; border-bottom: 1px solid var(--border); background: var(--surface); pointer-events: auto; }
 .navigation-hidden .app-header { transform: translateY(-100%); }
 .header-hover-edge { position: absolute; top: 0; left: 0; right: 0; height: 12px; pointer-events: auto; }
-.navigation-reveal { position: absolute; left: 50%; top: 0; transform: translateX(-50%); min-height: 44px; padding: 7px 14px; border: 1px solid var(--border); border-top: 0; border-radius: 0 0 10px 10px; background: var(--surface); color: var(--accent-text); font-size: 12px; font-weight: 600; pointer-events: auto; cursor: pointer; }
+.navigation-reveal { position: absolute; z-index: 1; left: 50%; top: 0; transform: translateX(-50%); min-height: 44px; padding: 7px 14px; border: 1px solid var(--border); border-top: 0; border-radius: 0 0 10px 10px; background: var(--surface); color: var(--accent-text); font-size: 12px; font-weight: 600; pointer-events: auto; cursor: pointer; }
 .navigation-reveal:hover { background: var(--accent-soft); }
 .app-header .play-brand { font-size: 28px; text-decoration: none; }
 .app-primary-nav { display: flex; gap: 6px; margin-left: 32px; }

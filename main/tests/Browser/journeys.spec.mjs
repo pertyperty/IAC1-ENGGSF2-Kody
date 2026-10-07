@@ -59,6 +59,10 @@ test('navigation hides on downward scroll and returns by upward scroll, hover an
     await page.mouse.wheel(0, 150);
     await expect(shell).toHaveClass(/navigation-hidden/);
     await page.getByRole('button', { name: 'Show navigation' }).focus();
+    expect(await page.getByRole('button', { name: 'Show navigation' }).evaluate(element => {
+        const box = element.getBoundingClientRect();
+        return element.contains(document.elementFromPoint(box.x + box.width / 2, box.y + box.height / 2));
+    })).toBe(true);
     await page.keyboard.press('Enter');
     await expect(shell).not.toHaveClass(/navigation-hidden/);
     await expect(header.getByRole('link', { name: 'Kody home' })).toBeFocused();
