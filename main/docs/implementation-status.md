@@ -37,6 +37,9 @@ records code/evidence; [sustainability](sustainability-analysis.md) remains a se
 The 2026-10-07 follow-up adds [audited local Administrator provisioning](local-administrator-setup.md)
 and [account/staff interface polish](interface-implementation.md#account-and-staff-polish--2026-10-07).
 The private credential file is local-only and excluded from release artifacts.
+The owner-requested [local role seeder](local-administrator-setup.md#reproducible-local-role-accounts)
+recreates missing verified Active fixtures for all five roles without resetting
+existing accounts; default seeding provisions them only in local mode.
 
 | Area / use cases | Current implementation | Detailed records |
 | --- | --- | --- |
