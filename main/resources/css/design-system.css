@@ -1,0 +1,97 @@
+/* Shared typography, flat surfaces and controls. Scenario colors remain meaningful. */
+:root { --font-display: 'Space Grotesk', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif; }
+body { font-size: 15px; line-height: 1.6; }
+html { scroll-padding-top: calc(var(--header-height, 128px) + 60px); }
+.skip-link { z-index: 60; }
+body :is(h1, h2, h3, h4) { font-family: var(--font-display); font-weight: 600; line-height: 1.2; text-wrap: balance; }
+body :is(h1, h2) { letter-spacing: -.035em; }
+.play-brand { font-family: var(--font-display); font-weight: 700; letter-spacing: -1.5px; }
+.app-header .brand-mark { display: block; width: 36px; height: 36px; padding: 0; margin: 0; background: none; border-radius: 0; transform: none; }
+.app-header :is(.app-primary-nav a, .header-login), .workspace-nav a { letter-spacing: -.01em; }
+.page-width { max-width: 1400px; padding-inline: 32px; }
+.has-workspace .page-width { padding-inline: 28px; }
+.play-hub, .review-page, .module-play { padding-top: 28px; padding-bottom: 48px; }
+.studio-heading, .play-stage-heading { margin-bottom: 20px; }
+.overline, .rail-label { letter-spacing: .09em; }
+.section-heading :is(h1, h2), .studio-heading h1 { margin-bottom: 10px; }
+.hero { gap: 36px; padding-block: 36px; }
+.hero h1 { font-size: clamp(36px, 4vw, 56px); line-height: 1.12; }
+.hero-description { line-height: 1.7; margin-bottom: 24px; }
+.hero-note { margin-block: 20px; }
+.hero .concept-strip { gap: 8px; }
+.hero .concept-strip span { font-size: 12px; border-radius: 6px; }
+.journey-section, .creator-section { gap: 36px; padding-block: 36px; }
+.landing-art { display: block; width: 100%; height: auto; border-radius: 14px; }
+.creator-art { padding: 0; height: auto; min-height: 0; background: none; }
+.creator-art img { display: block; width: 100%; height: auto; }
+.arcade-discovery { align-items: center; }
+.arcade-discovery > div { min-width: 0; }
+.button, .primary-button, .button-play { font-family: var(--font-sans); font-weight: 700; letter-spacing: .005em; line-height: 1.3; gap: 10px; padding: 12px 18px; border: 1px solid var(--accent-hover); border-bottom-width: 3px; border-radius: 9px; box-shadow: none; transition: background .15s, border-color .15s, color .15s; }
+.button-small { padding: 10px 14px; }
+.button-danger { border-color: var(--error-text); }
+.button:not(:disabled):active, .primary-button:not(:disabled):active { border-bottom-color: var(--accent-hover); transform: none; }
+.button:hover, .primary-button:hover, .button-play:hover { transform: none; box-shadow: none; }
+.button:disabled, .primary-button:disabled { opacity: .55; }
+.button:not(:disabled):hover, .primary-button:not(:disabled):hover { background: var(--accent-hover); color: var(--on-accent); }
+.button-danger:not(:disabled):hover { background: var(--error-text); }
+.theme-toggle, .account-menu > summary, .studio-wayfinding a { border-radius: 8px; }
+.account-shell, .dashboard-panel, .staff-workspace, .starter-library, .studio-preview, .garden-designer, .catalog-filter-panel, .game-card, .arcade-game, .continue-card, .module-card, .ladder-card, .practice-quiz { border-radius: 14px; box-shadow: none; }
+.has-workspace .account-shell { padding: 28px; }
+.account-shell-wide { max-width: 1200px; }
+.dashboard-grid, .creator-dashboard-grid { gap: 14px; }
+.progress-stats { gap: 12px; margin-block: 24px 16px; }
+.progress-stats > div { padding: 18px; border-radius: 12px; }
+.continue-card { background: var(--accent-soft); padding: 22px; }
+.workspace-grid > a, .review-list > a, .starter-card, .account-result { border-radius: 10px; box-shadow: none; transition: border-color .15s, background .15s; }
+.workspace-grid > a:hover, .review-list > a:hover, .starter-card:hover, .account-result:hover { transform: none; box-shadow: none; border-color: var(--accent-line); background: var(--accent-soft); }
+.studio-wayfinding { gap: 8px; margin-bottom: 20px; }
+.editor-jumps { border-radius: 10px; padding: 6px; }
+.module-grid { gap: 16px; }
+.module-card:hover { transform: none; box-shadow: none; border-color: var(--accent-line); }
+.module-card:hover .module-link { color: var(--accent-text); }
+.module-copy { padding: 20px; }
+.module-copy p { font-size: 14px; line-height: 1.65; }
+.module-link { font-size: 13px; }
+.review-list > a { padding: 16px 18px; margin-block: 8px; }
+.studio-form > fieldset { border-radius: 12px; }
+.report-table th { font-size: 12px; letter-spacing: .02em; }
+.report-table th, .report-table td { padding: 12px 14px; }
+.site-footer { max-width: 1400px; border-top: 1px solid var(--border); padding-block: 24px; }
+.game-card .game-heading { padding: 16px 20px; }
+.game-card .game-controls { padding: 20px; }
+.game-card .game-heading h2 { font-size: 22px; }
+.game-card .game-toolbar .button-play { border-radius: 9px; }
+.garden-game .game-board { border-radius: 14px; box-shadow: none; }
+.garden-game .garden-tile { border-radius: 8px; }
+.garden-game .path-tile { box-shadow: none; }
+.garden-game .occupied-tile { box-shadow: inset 0 0 0 2px #5c93cf; }
+.garden-game .garden-kody { width: 78%; height: 85%; max-width: 64px; max-height: 64px; padding: 0; border: 0; border-radius: 0; background: url('../../public/images/kody-explorer.svg') center / contain no-repeat; color: transparent; font-size: 0; letter-spacing: 0; box-shadow: none; transform: none; }
+.garden-game .garden-kody::after { display: none; }
+.garden-game .goal-tile .tile-actor:not(.garden-kody), .garden-game .crystal-tile .tile-actor:not(.garden-kody) { width: 72%; height: 72%; background: url('../../public/images/garden-flag.svg') center / contain no-repeat; font-size: 0; }
+.garden-game .crystal-tile .tile-actor:not(.garden-kody) { background-image: url('../../public/images/garden-crystal.svg'); }
+.garden-game .command-buttons button { border: 1px solid var(--accent-line); border-bottom-width: 3px; border-radius: 9px; box-shadow: none; }
+.garden-game .command-buttons button:hover { background: var(--surface-hover); border-color: var(--accent); }
+.garden-game .command-buttons button:active { transform: none; border-bottom-width: 1px; }
+.garden-game .command-buttons .undo-command { border: 1px solid var(--border); }
+.garden-game .program-step:hover { border-color: var(--accent); background: var(--accent-soft); }
+.arcade-instruction button:hover, .game-reset:hover { color: var(--accent-text); background: var(--accent-soft); }
+@media (max-width: 760px) {
+    .hero { padding-block: 24px; gap: 24px; }
+    .journey-section, .creator-section { gap: 24px; padding-block: 28px; }
+    .has-workspace .page-width { padding-inline: 20px; }
+    .has-workspace .account-shell { padding: 20px; margin-block: 20px; }
+    .progress-stats > div { padding: 12px; }
+    .game-card .game-controls { padding: 16px; }
+    .page-width { padding-inline: 20px; }
+    .app-header .brand-mark { width: 30px; height: 30px; }
+}
+@media (max-width: 400px) {
+    .page-width, .has-workspace .page-width { padding-inline: 16px; }
+    .app-header .brand-mark { display: block; width: 26px; height: 26px; }
+    .app-header .play-brand { gap: 5px; font-size: 22px; }
+    .hero h1 { font-size: 36px; }
+    .app-header .theme-toggle { min-width: 44px; }
+    .app-header .theme-icon { display: block; }
+    .app-header .theme-toggle > span:not(.theme-icon) { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { .app-header { transition: none; } }

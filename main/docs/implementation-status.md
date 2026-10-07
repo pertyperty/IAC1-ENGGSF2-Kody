@@ -4,6 +4,8 @@ Start here for current scope, detailed evidence and the next useful improvements
 This index consolidates the feature summaries previously repeated in README.
 It does not replace approved requirements, decisions or the implementation records.
 Last reviewed: 2026-10-07.
+The [navigation and visual polish](navigation-and-visual-polish.md) follow-up owns
+sticky/revealing menus, flatter controls, pinned fonts and original Kody SVG art.
 The [interactive workspace follow-up](interactive-workspaces.md) records the newer
 role navigation, creator/staff surfaces and direct game interactions.
 The [requirements acceptance audit](requirements-acceptance-audit.md) is the master

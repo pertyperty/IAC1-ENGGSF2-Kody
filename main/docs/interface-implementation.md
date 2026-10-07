@@ -181,3 +181,31 @@ tests / 5,325 assertions**. Temporary testing caches were cleared afterward.
 No migration, dependency addition, new permission or live provider is introduced.
 This is local Chromium evidence, not real-device, staging performance or complete
 WCAG certification. Earlier dated verification counts remain historical records.
+
+### Navigation and visual polish — 2026-10-07
+
+The next owner-requested refinement adds flatter shared surfaces, tighter grids,
+stable color/border hover feedback and tactile buttons. Sticky desktop/mobile
+workspace menus accompany a top bar that hides on downward scrolling and returns
+by upward scrolling, top-edge hover, keyboard focus or a labelled reveal button.
+Open menus and focused controls guard against accidental hiding. Skip links and
+anchor targets account for sticky layers; short-screen menus scroll independently.
+See [the implementation and asset record](navigation-and-visual-polish.md).
+
+Original SVG logo/favicon, explorer, flag, crystal and landing illustrations
+replace the earlier text/CSS placeholders. Space Grotesk headings accompany
+Instrument Sans body/control text with explicit pinned weights. Seven unmodified
+WOFF2 files, their checksums and both OFL notices are included; builds now use
+local fonts without provider calls or additional packages.
+
+Local verification passed **65 focused PostgreSQL tests / 520 assertions**, **45
+frontend tests**, and **13 isolated Chromium workflows**. Checks cover all five
+roles, both themes, 1440/1280px desktops, 390/320px layouts, short touch viewports,
+scroll direction, hover, keyboard reveal and focus, sticky menus, axe, overflow,
+registration, creator review/publication and real server-validated game saves.
+The complete browser pass took 3.0 minutes; later source refinements also run
+through CI against the pushed revision. Pint, Vite build and whitespace checks
+passed. Font/provider traffic is unnecessary during the build.
+
+No migration, role-policy change or live provider activation is included.
+Chromium evidence remains distinct from staging, real-device and full WCAG claims.

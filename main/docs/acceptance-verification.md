@@ -5,6 +5,10 @@ maps all 61 original use cases and identifies source gaps/NFR limits.
 [Launch curriculum review](launch-curriculum-review.md) supplies a concrete
 eleven-lesson editorial queue. Neither document replaces approved source rules.
 
+The later [navigation/visual follow-up](navigation-and-visual-polish.md) adds
+scroll/hover/keyboard reveal and short-screen touch-menu checks, bringing the
+browser suite to thirteen workflows. Its font assets are pinned for offline builds.
+
 ## Isolated browser acceptance
 
 Install locked npm dependencies, build assets and install the test browser:

@@ -6,6 +6,10 @@ and [play implementation](play-implementation.md). It changes presentation and
 local interaction; existing role policies, immutable assessments, server replay,
 attempt limits and financial/progression rules remain authoritative.
 
+The later [navigation and visual polish](navigation-and-visual-polish.md) refines
+these surfaces, replaces the CSS mascot with original SVG artwork, and pins the
+fonts locally. Its sticky/revealing chrome supersedes the static positioning here.
+
 ## Design and provenance
 
 The review used [Coddy](https://coddy.tech/), [Codecademy](https://www.codecademy.com/)

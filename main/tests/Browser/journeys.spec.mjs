@@ -32,6 +32,70 @@ async function accountLink(page, name) {
     await page.locator('.account-menu > summary').click();
     await page.getByRole('navigation', { name: 'Account navigation', exact: true }).getByRole('link', { name, exact: true }).click();
 }
+
+test('navigation hides on downward scroll and returns by upward scroll, hover and keyboard without trapping menus', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 800 });
+    await page.goto('/');
+    const shell = page.locator('[data-scroll-navigation]');
+    const header = page.locator('.app-header');
+    await page.screenshot({ path: 'storage/app/browser-results/polished-landing.png' });
+    await page.keyboard.press('Tab');
+    await expect(page.getByRole('link', { name: 'Skip to content' })).toBeFocused();
+    await page.keyboard.press('Enter');
+    await expect(page.locator('#main-content')).toBeFocused();
+    await expect(page.getByRole('link', { name: 'Kody home', exact: true })).toBeVisible();
+    await expect(page.getByRole('img', { name: /Kody building a puzzle/ })).toHaveJSProperty('complete', true);
+    await page.mouse.move(700, 600);
+    await page.mouse.wheel(0, 650);
+    await expect(shell).toHaveClass(/navigation-hidden/);
+    await expect(page.getByRole('button', { name: 'Show navigation' })).toBeVisible();
+    await page.mouse.wheel(0, -100);
+    await expect(shell).not.toHaveClass(/navigation-hidden/);
+    await page.mouse.wheel(0, 150);
+    await expect(shell).toHaveClass(/navigation-hidden/);
+    await page.mouse.move(10, 4);
+    await expect(shell).not.toHaveClass(/navigation-hidden/);
+    await page.mouse.move(700, 600);
+    await page.mouse.wheel(0, 150);
+    await expect(shell).toHaveClass(/navigation-hidden/);
+    await page.getByRole('button', { name: 'Show navigation' }).focus();
+    expect(await page.getByRole('button', { name: 'Show navigation' }).evaluate(element => {
+        const box = element.getBoundingClientRect();
+        return element.contains(document.elementFromPoint(box.x + box.width / 2, box.y + box.height / 2));
+    })).toBe(true);
+    await page.keyboard.press('Enter');
+    await expect(shell).not.toHaveClass(/navigation-hidden/);
+    await expect(header.getByRole('link', { name: 'Kody home' })).toBeFocused();
+    await page.mouse.wheel(0, 100);
+    await expect(header).toBeInViewport();
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await audit(page);
+});
+
+test('workspace navigation sticks on short desktops and touch layouts; expanded mobile menus stay reachable', async ({ browser }) => {
+    const context = await browser.newContext({ viewport: { width: 1440, height: 600 }, isMobile: true, hasTouch: true, reducedMotion: 'reduce' });
+    try {
+        const page = await context.newPage();
+        await context.route('**/*', route => new URL(route.request().url()).origin === process.env.KODY_BROWSER_BASE_URL ? route.continue() : route.abort());
+        await login(page, 'stickylearner');
+        await page.goto('/learn/sequences');
+        await page.evaluate(() => window.scrollTo(0, 500));
+        await expect(page.locator('.app-rail')).toBeInViewport();
+        await expect.poll(async () => (await page.locator('.app-rail').boundingBox()).y).toBeGreaterThanOrEqual(0);
+        await expect.poll(async () => (await page.locator('.app-rail').boundingBox()).y).toBeLessThan(160);
+        await page.setViewportSize({ width: 320, height: 740 });
+        await page.goto('/learn/sequences');
+        await page.evaluate(() => window.scrollTo(0, 450));
+        const workspace = page.locator('.mobile-workspace');
+        await expect(workspace.locator('summary')).toBeInViewport();
+        await workspace.locator('summary').click();
+        await expect(workspace).toHaveAttribute('open', '');
+        await audit(page);
+        await workspace.getByRole('link', { name: 'Help center', exact: true }).click();
+        await expect(page).toHaveURL(/\/help$/);
+        await audit(page);
+    } finally { await context.close(); }
+});
 async function solveGarden(page, saved = true) {
     const game = page.locator('[data-coding-game]');
     for (const direction of ['right', 'right', 'up', 'right', 'right']) await game.getByRole('button', { name: `Add ${direction}`, exact: true }).click();
@@ -245,7 +309,6 @@ test('interactive games edit and preview locally; confirmed runs save through th
     await login(page, 'interactive');
     await page.goto('/learn/sequences');
     const garden = page.locator('[data-coding-game]');
-    await expect(garden.locator('[data-game-board]')).toHaveAttribute('aria-label', /Path tiles/);
     await expect(garden.locator('[data-game-board]')).toHaveAttribute('aria-label', /Path tiles/);
     let saves = 0;
     const completion = await garden.getAttribute('data-completion-url');
