@@ -63,8 +63,7 @@ button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
 .theme-toggle { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); color: var(--text); font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: background .18s, border-color .18s; }
 .theme-toggle:hover { background: var(--accent-soft); border-color: var(--accent-line); }
 .theme-toggle[aria-pressed="true"] .theme-icon { transform: rotate(180deg); }
-.theme-icon { font-size: 19px; transition: transform .18s; }
-.account-header { gap: 20px; }
+.theme-icon { font-size: 19px; }
 .account-shell { width: calc(100% - 32px); }
 .account-shell-wide { max-width: 900px; }
 .account-shell > p:not(.notice, .eyebrow, .secondary-link) { line-height: 1.7; margin-block: 16px; }
@@ -82,16 +81,14 @@ button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
 .account-form input[type="checkbox"], .account-form input[type="radio"] { width: auto; }
 .account-form input:not([type="checkbox"], [type="radio"]), .account-form select, .account-form textarea, .catalog-search input, .catalog-search select, .studio-form input:not([type="hidden"], [type="checkbox"], [type="radio"]), .studio-form textarea, .studio-form select { font-size: 16px; min-height: 44px; }
 .account-form label:has(input[type="checkbox"]), .account-form label:has(input[type="radio"]) { display: flex; align-items: flex-start; min-height: 44px; line-height: 1.6; }
-.primary-button { min-height: 48px; gap: 12px; transition: background .18s, box-shadow .18s, transform .18s; }
+.primary-button { min-height: 48px; gap: 12px; transition: background .18s; }
 .button { min-height: 44px; }
 .primary-button:disabled, .button:disabled { transform: none; box-shadow: none; opacity: .6; cursor: wait; }
-.review-page, .module-play, .hero-copy, .hero-game, .module-play-grid > *, .form-row > *, .studio-form { min-width: 0; }
+.review-page, .module-play, .hero-copy, .hero-game, .form-row > *, .studio-form { min-width: 0; }
 .journey-section > *, .creator-section > * { min-width: 0; }
 .ladder-node { flex: 1 1 0; min-width: 0; max-width: 92px; }
-.site-header nav a, .nav-login { display: inline-flex; align-items: center; min-height: 44px; transition: color .18s; }
-.site-header nav a:hover, .nav-login:hover { color: var(--accent-text); }
 .brand-mark { color: var(--accent-text); }
-.button-play { flex: 0 1 auto; justify-content: center; gap: 12px; font-size: 14px; padding: 12px 18px; background: var(--accent); color: var(--on-accent); box-shadow: 0 3px 0 var(--accent-hover); }
+.button-play { flex: 0 1 auto; justify-content: center; gap: 12px; font-size: 14px; padding: 12px 18px; background: var(--accent); color: var(--on-accent); box-shadow: none; }
 .continue-card > div { flex: 1 1 240px; min-width: 0; }
 .game-toolbar { flex-wrap: wrap; }
 .game-toolbar .button-play { flex: 1 1 140px; }
@@ -114,7 +111,7 @@ progress::-webkit-progress-bar { background: var(--surface-soft); border-radius:
 progress::-webkit-progress-value { background: var(--accent); border-radius: 10px; }
 .quiz-option-editor .studio-actions { gap: 10px; margin: 8px 0; }
 .practice-quiz [data-question-feedback] { font-size: 13px; color: var(--muted); line-height: 1.7; }
-.starter-card, .review-list > a { transition: border-color .18s, box-shadow .18s, transform .18s; }
+.starter-card, .review-list > a { transition: border-color .18s; }
 .report-table tbody tr:hover { background: var(--surface-soft); }
 .lesson-note { color: var(--muted); }
 .number-display, .sort-tile { color: var(--text); }
@@ -127,24 +124,15 @@ progress::-webkit-progress-value { background: var(--accent); border-radius: 10p
 .site-footer a:not(.play-brand) { color: var(--accent-text); }
 @media (hover: hover) and (pointer: fine) {
     .button-dark:hover, .button-play:hover { background: var(--accent-hover); }
-    .primary-button:hover { transform: translateY(-1px); box-shadow: 0 5px 16px var(--shadow); }
-    .starter-card:hover, .review-list > a:hover { border-color: var(--accent-line); transform: translateY(-2px); box-shadow: 0 8px 24px var(--shadow); }
-    .module-card:hover .module-symbol { transform: rotate(-3deg) scale(1.04); }
+    .primary-button:hover { box-shadow: none; }
+    .starter-card:hover, .review-list > a:hover { border-color: var(--accent-line); box-shadow: none; }
     .practice-quiz label:hover { background: var(--surface-hover); }
 }
-.module-symbol { transition: transform .2s; }
-@media (hover: none) {
-    .button:hover, .module-card:hover { transform: none; }
-}
 @media (min-width: 761px) and (max-width: 1100px) {
-    .site-header { flex-wrap: wrap; }
-    .site-header .nav-actions { flex-wrap: wrap; margin-left: auto; }
     .module-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 760px) {
     .dashboard-grid { grid-template-columns: 1fr; }
-    .learning-page .site-header { gap: 12px; }
-    .learning-page .site-header .nav-actions { flex: 1; gap: 12px; }
     .theme-toggle { margin-left: auto; }
     .account-shell { padding: 24px; }
     .course-slot { flex-wrap: wrap; }
@@ -156,7 +144,7 @@ progress::-webkit-progress-value { background: var(--accent); border-radius: 10p
     .command-buttons .undo-command { margin-left: 0; }
 }
 @media (max-width: 400px) {
-    .page-width, .site-header { padding-inline: 16px; }
+    .page-width { padding-inline: 16px; }
     .game-controls { padding-inline: 12px; }
     .account-shell { padding: 20px; }
     .profile-details { grid-template-columns: 1fr; gap: 8px; }
@@ -164,19 +152,7 @@ progress::-webkit-progress-value { background: var(--accent); border-radius: 10p
     .hero h1 { font-size: 36px; }
 }
 /* A consistent control surface, from a first sign-in to the staff workspace. */
-.site-header { gap: 24px; }
-.site-header nav { gap: 8px; }
-.site-header nav a { padding: 10px 14px; border-radius: 12px; border-bottom: 0; }
-.site-header nav a[aria-current] { background: var(--accent-soft); color: var(--accent-text); border-bottom: 0; }
-.site-header nav a:hover { background: var(--surface-hover); }
-.nav-actions { gap: 16px; }
-.nav-actions .button { display: inline-flex; }
-.account-header { flex-wrap: wrap; }
-.account-header nav { display: flex; flex-wrap: wrap; gap: 8px; margin-left: auto; }
-.account-header nav a { display: inline-flex; align-items: center; min-height: 44px; padding: 8px 12px; color: var(--muted); text-decoration: none; border-radius: 10px; }
-.account-header nav a:hover, .account-header nav a[aria-current] { background: var(--accent-soft); color: var(--accent-text); }
-.account-header .theme-toggle { margin-left: 0; }
-.account-form input, .account-form textarea, .account-form select, .studio-form input, .studio-form textarea, .studio-form select, .catalog-search input, .catalog-search select { transition: border-color .18s, box-shadow .18s; }
+.account-form input, .account-form textarea, .account-form select, .studio-form input, .studio-form textarea, .studio-form select, .catalog-search input, .catalog-search select { transition: border-color .18s; }
 .account-form input:hover, .account-form textarea:hover, .account-form select:hover, .studio-form input:hover, .studio-form textarea:hover, .studio-form select:hover, .catalog-search input:hover, .catalog-search select:hover { border-color: var(--accent-line); }
 .account-form :is(input, textarea, select):focus-visible, .studio-form :is(input, textarea, select):focus-visible, .catalog-search :is(input, select):focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
 .password-field { display: grid; gap: 7px; }
@@ -200,7 +176,7 @@ progress::-webkit-progress-value { background: var(--accent); border-radius: 10p
 .staff-workspace h2 { margin: 0; font-size: clamp(23px, 3vw, 30px); line-height: 1.2; font-weight: 650; }
 .staff-workspace .section-heading > p { color: var(--muted); font-size: 13px; margin: 0; }
 .workspace-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 12px; }
-.workspace-grid > a { display: grid; gap: 9px; padding: 20px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface); text-decoration: none; transition: transform .18s, border-color .18s, box-shadow .18s; }
+.workspace-grid > a { display: grid; gap: 9px; padding: 20px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface); text-decoration: none; transition:  border-color .18s; }
 .workspace-grid strong { color: var(--text); font-size: 15px; }
 .workspace-grid > a > span:last-child { color: var(--muted); font-size: 13px; line-height: 1.6; }
 .workspace-icon { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 10px; background: var(--accent-soft); color: var(--accent-text); font-size: 20px; }
@@ -221,16 +197,10 @@ progress::-webkit-progress-value { background: var(--accent); border-radius: 10p
 .empty-state p { color: var(--muted); line-height: 1.6; }
 .button-danger { border: 1px solid var(--error-text); background: var(--error-soft); color: var(--error-text); }
 @media (hover: hover) and (pointer: fine) {
-    .workspace-grid > a:hover { border-color: var(--accent-line); box-shadow: 0 5px 18px var(--shadow); transform: translateY(-2px); }
+    .workspace-grid > a:hover { border-color: var(--accent-line); box-shadow: none; }
     .account-shell .account-result:hover { border-color: var(--accent-line); background: var(--accent-soft); text-decoration: none; }
 }
 @media (max-width: 760px) {
-    .site-header .theme-toggle { margin-left: 0; }
-    .learning-page .site-header .nav-actions { flex: 0 0 100%; order: 4; justify-content: flex-start; }
-    .learning-page .site-header nav { flex: 0 0 100%; order: 3; }
-    .learning-page .site-header > .theme-toggle { margin-left: auto; }
-    .account-header nav { order: 3; flex-basis: 100%; margin-left: 0; }
-    .account-header .theme-toggle { margin-left: auto; }
     .catalog-filter-panel > .filter-grid, .governance-filters { grid-template-columns: 1fr; }
     .catalog-search.catalog-filter-panel, .staff-workspace { padding: 18px; }
     .staff-workspace .workspace-grid { grid-template-columns: 1fr; }
@@ -240,5 +210,4 @@ progress::-webkit-progress-value { background: var(--accent); border-radius: 10p
 }
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
-    .button:hover, .module-card:hover, .primary-button:hover, .starter-card:hover, .review-list > a:hover, .workspace-grid > a:hover { transform: none; }
 }

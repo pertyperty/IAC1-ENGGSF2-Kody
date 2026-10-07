@@ -60,8 +60,13 @@ export function mountGarden(root) {
     const programTrack = root.querySelector('[data-game-program]');
     const success = root.querySelector('[data-game-success]');
     const progress = root.querySelector('[data-game-progress]');
+    const objectives = root.querySelector('[data-game-objectives]');
+    const earlier = root.querySelector('[data-step-earlier]');
+    const later = root.querySelector('[data-step-later]');
+    const remove = root.querySelector('[data-step-remove]');
     const program = [];
     let running = false;
+    let selected = -1;
     const tiles = [];
     board.style.setProperty('--columns', instance.width);
     const path = new Set(instance.path.map(key));
@@ -86,8 +91,16 @@ export function mountGarden(root) {
             actor.textContent = isKody ? '••' : key(point) === key(instance.goal) ? '⚑' : crystals.includes(key(point)) ? '◆' : '';
             tile.classList.toggle('goal-tile', key(point) === key(instance.goal));
             tile.classList.toggle('crystal-tile', crystals.includes(key(point)));
+            tile.classList.toggle('occupied-tile', isKody);
         }
-        board.setAttribute('aria-label', `Kody is at column ${position[0] + 1}, row ${position[1] + 1}. Flag at column ${instance.goal[0] + 1}, row ${instance.goal[1] + 1}. ${crystals.length} crystals left.`);
+        const coordinates = points => points.map(([x, y]) => `${x + 1},${y + 1}`).join('; ');
+        board.setAttribute('aria-label', `Kody is at column ${position[0] + 1}, row ${position[1] + 1}. Flag at column ${instance.goal[0] + 1}, row ${instance.goal[1] + 1}. Path tiles (column,row): ${coordinates(instance.path)}. ${crystals.length} crystals left${crystals.length ? ` at ${coordinates(crystals.map(point => point.split(',').map(Number)))}` : ''}.`);
+        if (objectives) objectives.textContent = crystals.length ? `${crystals.length} crystals left` : (instance.crystals.length ? 'All crystals collected' : 'Follow the path to the flag');
+    };
+    const updateTools = () => {
+        if (earlier) earlier.disabled = running || selected <= 0;
+        if (later) later.disabled = running || selected < 0 || selected >= program.length - 1;
+        if (remove) remove.disabled = running || selected < 0;
     };
     const renderProgram = () => {
         programTrack.replaceChildren();
@@ -95,28 +108,67 @@ export function mountGarden(root) {
             const empty = document.createElement('span'); empty.textContent = 'Add an arrow to start your program'; programTrack.append(empty);
         }
         program.forEach((command, index) => {
-            const step = document.createElement('span');
-            step.className = 'program-step'; step.textContent = arrows[command]; step.setAttribute('aria-label', `Step ${index + 1}: ${command}`); programTrack.append(step);
+            const step = document.createElement('button');
+            step.type = 'button'; step.className = 'program-step';
+            const number = document.createElement('small'); number.textContent = index + 1;
+            const arrow = document.createElement('span'); arrow.textContent = arrows[command]; step.append(number, arrow);
+            step.setAttribute('aria-label', `Step ${index + 1}: ${command}`);
+            step.setAttribute('aria-pressed', String(index === selected)); step.disabled = running;
+            step.addEventListener('click', () => { selected = index; renderProgram(); programTrack.children[index]?.focus(); });
+            step.addEventListener('keydown', (event) => {
+                if (running) return;
+                if (event.key === 'Delete' || event.key === 'Backspace') { event.preventDefault(); selected = index; editStep('remove'); }
+                else if (event.altKey && ['ArrowLeft', 'ArrowRight'].includes(event.key)) { event.preventDefault(); selected = index; editStep(event.key === 'ArrowLeft' ? 'earlier' : 'later'); }
+            });
+            programTrack.append(step);
         });
         progress.textContent = `${program.length} / ${instance.maxCommands} instructions`;
+        updateTools();
     };
-    root.querySelectorAll('[data-command]').forEach((button) => button.addEventListener('click', () => {
-        if (running) return;
-        success.hidden = true;
-        if (program.length >= instance.maxCommands) { feedback.textContent = `Keep it to ${instance.maxCommands} instructions. Undo a step to change your program.`; return; }
-        program.push(button.dataset.command); renderProgram(); renderBoard(); feedback.textContent = 'Ready when you are. Run your code to see what happens.';
+    const changed = () => { root.dataset.playState = 'ready'; success.hidden = true; renderProgram(); renderBoard(); tiles.forEach(({ tile }) => tile.classList.remove('visited-tile')); };
+    root.querySelectorAll('[data-game-repeat], [data-game-conditional]').forEach(input => input.addEventListener('change', () => {
+        if (!running) { changed(); feedback.textContent = 'Rule updated. Run your program to test it.'; }
     }));
-    root.querySelector('[data-game-undo]').addEventListener('click', () => { if (!running) { program.pop(); renderProgram(); renderBoard(); success.hidden = true; } });
+    const editStep = (action) => {
+        if (running || selected < 0) return;
+        if (action === 'remove') { program.splice(selected, 1); selected = Math.min(selected, program.length - 1); }
+        else {
+            const destination = selected + (action === 'earlier' ? -1 : 1);
+            if (destination < 0 || destination >= program.length) return;
+            [program[selected], program[destination]] = [program[destination], program[selected]]; selected = destination;
+        }
+        changed(); programTrack.children[selected]?.focus(); feedback.textContent = 'Program updated. Run it to test your idea.';
+    };
+    earlier?.addEventListener('click', () => editStep('earlier'));
+    later?.addEventListener('click', () => editStep('later'));
+    remove?.addEventListener('click', () => editStep('remove'));
+    const addMove = (command) => {
+        if (running) return;
+        if (program.length >= instance.maxCommands) { feedback.textContent = `Keep it to ${instance.maxCommands} instructions. Undo a step to change your program.`; return; }
+        program.push(command); selected = program.length - 1; changed(); feedback.textContent = 'Ready when you are. Run your code to see what happens.';
+    };
+    root.querySelectorAll('[data-command]').forEach((button) => button.addEventListener('click', () => addMove(button.dataset.command)));
+    const undo = () => { if (!running) { program.pop(); selected = Math.min(selected, program.length - 1); changed(); } };
+    root.querySelector('[data-game-undo]').addEventListener('click', undo);
     root.querySelector('[data-game-reset]').addEventListener('click', () => {
         if (running) return;
-        program.length = 0; renderProgram(); renderBoard(); success.hidden = true;
+        program.length = 0; selected = -1; changed();
         root.querySelectorAll('input').forEach((input) => { input.checked = false; });
         feedback.textContent = 'A fresh start. Build a new program and give it a try.';
     });
     root.querySelector('[data-game-hint]').addEventListener('click', () => { feedback.textContent = instance.hint; });
+    root.addEventListener('keydown', (event) => {
+        // Shortcuts belong to the focused game, never the page or an editable field.
+        if (event.target !== root || event.altKey || event.ctrlKey || event.metaKey) return;
+        const command = { ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right' }[event.key];
+        if (command) { event.preventDefault(); addMove(command); }
+        else if (event.key === 'Enter') { event.preventDefault(); root.querySelector('[data-game-run]').click(); }
+        else if (event.key === 'Backspace') { event.preventDefault(); undo(); }
+    });
     root.querySelector('[data-game-run]').addEventListener('click', async () => {
         if (running) return;
-        running = true; success.hidden = true; renderBoard();
+        running = true; success.hidden = true; renderBoard(); tiles.forEach(({ tile }) => tile.classList.remove('visited-tile'));
+        root.dataset.playState = 'running'; root.setAttribute('aria-busy', 'true');
         const result = runProgram(instance, program, { repeat: root.querySelector('[data-game-repeat]')?.checked, conditional: root.querySelector('[data-game-conditional]')?.checked });
         root.querySelectorAll('button, input').forEach((control) => { control.disabled = true; });
         feedback.textContent = 'Kody is following your instructions…';
@@ -125,9 +177,11 @@ export function mountGarden(root) {
             for (const frame of result.trace) {
                 if (delay) await new Promise((resolve) => setTimeout(resolve, delay));
                 renderBoard(frame.position, frame.crystals);
+                tiles.find(({ point }) => key(point) === key(frame.position))?.tile.classList.add('visited-tile');
                 programTrack.querySelectorAll('.program-step').forEach((step, index) => step.classList.toggle('executing', index === frame.index));
             }
             feedback.textContent = result.message; success.hidden = !result.success;
+            root.dataset.playState = result.success ? 'success' : 'retry';
             if (result.success) {
                 const saved = await saveCompletion(root, { program, repeat: !!root.querySelector('[data-game-repeat]')?.checked, conditional: !!root.querySelector('[data-game-conditional]')?.checked });
                 if (saved) feedback.textContent = `${result.message} ${saved}`;
@@ -135,9 +189,11 @@ export function mountGarden(root) {
             progress.textContent = result.success ? 'Adventure complete ✦' : 'Try another idea';
         } finally {
             running = false;
+            root.setAttribute('aria-busy', 'false');
             root.querySelectorAll('button, input').forEach((control) => { control.disabled = false; });
+            updateTools();
             programTrack.querySelectorAll('.program-step').forEach((step) => step.classList.remove('executing'));
         }
     });
-    renderBoard();
+    renderBoard(); renderProgram();
 }

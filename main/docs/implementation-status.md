@@ -4,6 +4,10 @@ Start here for current scope, detailed evidence and the next useful improvements
 This index consolidates the feature summaries previously repeated in README.
 It does not replace approved requirements, decisions or the implementation records.
 Last reviewed: 2026-10-07.
+The [navigation and visual polish](navigation-and-visual-polish.md) follow-up owns
+sticky/revealing menus, flatter controls, pinned fonts and original Kody SVG art.
+The [interactive workspace follow-up](interactive-workspaces.md) records the newer
+role navigation, creator/staff surfaces and direct game interactions.
 The [requirements acceptance audit](requirements-acceptance-audit.md) is the master
 61-use-case/NFR checklist. [Repeatable acceptance verification](acceptance-verification.md)
 owns browser/upgrade/restore evidence; [launch curriculum review](launch-curriculum-review.md)
@@ -33,6 +37,9 @@ records code/evidence; [sustainability](sustainability-analysis.md) remains a se
 The 2026-10-07 follow-up adds [audited local Administrator provisioning](local-administrator-setup.md)
 and [account/staff interface polish](interface-implementation.md#account-and-staff-polish--2026-10-07).
 The private credential file is local-only and excluded from release artifacts.
+The owner-requested [local role seeder](local-administrator-setup.md#reproducible-local-role-accounts)
+recreates missing verified Active fixtures for all five roles without resetting
+existing accounts; default seeding provisions them only in local mode.
 
 | Area / use cases | Current implementation | Detailed records |
 | --- | --- | --- |
@@ -53,7 +60,7 @@ The private credential file is local-only and excluded from release artifacts.
 | Google identity / A03/A06 integration slice | Password-confirmed explicit linking of existing accounts; no email auto-linking/new Google accounts. Implemented but disabled pending owner-deferred live setup. | [Google identity](google-authentication-implementation.md) |
 | Economy / F01–F05, B03/B07 | Disabled GCash top-ups, exact FIFO ledger, reviewed pricing/gates, atomic access/earnings, mature claims/payout reservations, refunds and audited reconciliation. | [Economy implementation](economy-implementation.md) |
 | Achievements / B09, E01/E03–E06 | Server-validated once-per-content XP, five ranks, authenticated leaderboards and capped weekly rewards; no preview or historical backfill. | [Policies](economy-and-launch-decisions.md), [implementation](economy-implementation.md) |
-| Shared interface / cross-cutting NFRs | Blue/grey light and dark themes, persisted header toggle, keyboard bypass/focus, reduced motion, responsive forms/navigation and unsaved quiz preview. | [Interface implementation](interface-implementation.md) |
+| Shared interface / cross-cutting NFRs | Blue/grey themes, shared role workspaces, compact mobile menus, guided creator forms, game-first lessons, direct canvas/tile/program interactions, keyboard focus and reduced motion. | [Interface implementation](interface-implementation.md), [interactive workspaces](interactive-workspaces.md) |
 
 This is a scope map, not a claim that every original use case or NFR is complete.
 Notifications and background effects remain owned by their feature records;
@@ -81,8 +88,9 @@ provider-fake verification is not live delivery/execution evidence.
 - Variable-length quiz authoring, multi-question server completion, sequential
   creator paths, reading completion and dashboards are implemented in
   [the completion milestone](platform-completion-implementation.md).
-- Four isolated Chromium browser workflows now exercise real registration, play,
-  creator/staff publication, mobile arcade assessments, themes and axe checks. Exercise
+- Eleven isolated Chromium browser workflows now exercise real registration, play,
+  creator/staff publication, all five role workspaces, direct/mobile game interactions,
+  themes, save-failure retry and axe checks. Exercise
   long content, keyboard authoring and error/retry paths across actual
   Safari, Firefox and mobile devices. Local checks use one Chromium surface.
 - Supply reviewed Terms content/version, then add recorded server-enforced

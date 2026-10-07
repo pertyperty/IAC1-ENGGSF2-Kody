@@ -31,6 +31,34 @@ test('login and registration offer progressive password visibility without echoi
     }
 });
 
+test('role navigation distinguishes participant studios and staff tools without granting new access', function (Role $role) {
+    moduleSignIn($this, moduleAccount($role));
+    $response = $this->get(route('dashboard'))->assertOk()->assertSee('Your workspace')
+        ->assertSee('Account menu')->assertSee('Profile & security', false);
+    if ($role === Role::Instructor) {
+        $response->assertSee('Module studio')->assertSee('Course builder')->assertSee('Quest studio');
+    } elseif ($role === Role::Contributor) {
+        $response->assertSee('Quest studio')->assertDontSee('Module studio')->assertDontSee('Course builder');
+    } else {
+        $response->assertDontSee('Quest studio')->assertDontSee('Module studio');
+    }
+    if ($role === Role::Moderator) {
+        $response->assertSee('Weekly planning')->assertDontSee('Accounting');
+    } elseif ($role === Role::Administrator) {
+        $response->assertSee('Accounting')->assertDontSee('Weekly planning');
+    } else {
+        $response->assertDontSee('Accounting')->assertDontSee('Publication reviews');
+    }
+})->with(Role::cases());
+
+test('starter learning puts the interactive game before supporting explanations and quiz', function () {
+    signInForLearning($this);
+    $response = $this->get(route('learning.show', 'sequences'))->assertOk();
+    $html = $response->getContent();
+    expect(strpos($html, 'data-coding-game'))->toBeLessThan(strpos($html, 'data-practice-quiz'));
+    $response->assertSee('data-step-earlier', false)->assertSee('data-step-remove', false);
+});
+
 test('validated quiz copy reflects adopted XP while unsaved previews promise no persisted progress', function () {
     signInForLearning($this);
     $this->get(route('learning.show', 'sequences'))->assertOk()->assertSee('eligible first-completion XP')

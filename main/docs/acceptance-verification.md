@@ -5,6 +5,10 @@ maps all 61 original use cases and identifies source gaps/NFR limits.
 [Launch curriculum review](launch-curriculum-review.md) supplies a concrete
 eleven-lesson editorial queue. Neither document replaces approved source rules.
 
+The later [navigation/visual follow-up](navigation-and-visual-polish.md) adds
+scroll/hover/keyboard reveal and short-screen touch-menu checks, bringing the
+browser suite to thirteen workflows. Its font assets are pinned for offline builds.
+
 ## Isolated browser acceptance
 
 Install locked npm dependencies, build assets and install the test browser:
@@ -88,3 +92,10 @@ journeys and the populated restore rehearsal. Matching clients come from the
 [official PostgreSQL Ubuntu repository](https://www.postgresql.org/download/linux/ubuntu/).
 Browser/accessibility dependencies follow [Playwright's testing guidance](https://playwright.dev/docs/accessibility-testing).
 Re-run the workflow on the exact proposed commit before merging.
+
+The [2026-10-07 interactive workspace follow-up](interactive-workspaces.md)
+expands the suite to **eleven** workflows, adding all five role surfaces and direct
+game editing/painting/swapping/terminal history, plus a failed completion-save retry.
+The original registration, creator publication, reading and mobile assessment
+journeys remain in the same isolated runner. These newer checks supersede the
+earlier workflow count, without replacing the recorded restoration evidence.

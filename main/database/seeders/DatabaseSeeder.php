@@ -14,6 +14,9 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Foundation seeders deliberately create no accounts or credentials.
+        // Never provision development identities through production/staging seeds.
+        if (app()->environment('local')) {
+            $this->call(LocalRoleAccountsSeeder::class);
+        }
     }
 }
