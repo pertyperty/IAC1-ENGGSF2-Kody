@@ -134,8 +134,16 @@ suite also exercises password visibility and empty/cleared account searches.
 These checks remain local Chromium evidence, not an all-device WCAG claim.
 
 Local checks for this follow-up: 43 focused PostgreSQL tests / 267 assertions,
-all five isolated Chromium workflows, 44 frontend tests, Pint, Vite build,
+all five isolated Chromium workflows, 45 frontend tests, Pint, Vite build,
 Markdown file links and Composer/npm security audits passed. The new provisioning
 tests also join CI's cached configuration/routes/views verification. Screenshots
 are ignored local artifacts; synthetic browser accounts are separate from the
 owner's development Administrator.
+
+CI's full development-dependency audit also identified GHSA-pqg4-j6r4-53mv in
+`concurrently`'s pinned `shell-quote` 1.9.0. A scoped npm override pins patched
+1.11.0 while retaining the Node 22/concurrently 10 baseline. A regression resolves
+the runner's actual dependency and checks rejection of all four line terminators
+after a comment token without executing any shell string. See
+[the upstream advisory](https://github.com/advisories/GHSA-pqg4-j6r4-53mv).
+Keep the override until a reviewed upstream release includes the fix.
