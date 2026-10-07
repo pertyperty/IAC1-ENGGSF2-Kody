@@ -62,7 +62,8 @@ try {
         $accounts = [];
         foreach (['instructor' => Role::Instructor, 'moderator' => Role::Moderator, 'administrator' => Role::Administrator, 'learner' => Role::Learner, 'arcadelearner' => Role::Learner,
             'navlearner' => Role::Learner, 'navcontributor' => Role::Contributor, 'navinstructor' => Role::Instructor,
-            'navmoderator' => Role::Moderator, 'navadministrator' => Role::Administrator, 'interactive' => Role::Learner] as $name => $role) {
+            'navmoderator' => Role::Moderator, 'navadministrator' => Role::Administrator, 'interactive' => Role::Learner,
+            'stickylearner' => Role::Learner] as $name => $role) {
             $accounts[$name] = User::factory()->create(['username' => 'browser_'.$name, 'email' => $name.'@browser.example.test',
                 'password' => Hash::make('BrowserStrong12!'), 'account_role' => $role,
                 'active_session_hash' => hash('sha256', 'browser-seed-session'), 'active_session_expires_at' => now()->addHour()]);
