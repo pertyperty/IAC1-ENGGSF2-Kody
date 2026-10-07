@@ -9,9 +9,11 @@ import { mountQuiz } from './games/choice-quiz.js';
 import { mountArcade } from './games/arcade-games.js';
 import { mountTheme } from './theme.js';
 import { mountAccountLinks } from './account-links.js';
+import { mountPasswordFields } from './password-fields.js';
 
 mountTheme(document, window);
 mountAccountLinks(document, window);
+mountPasswordFields(document);
 
 document.querySelectorAll('[data-module-editor]').forEach(mountModuleEditor);
 document.querySelectorAll('[data-preset-editor]').forEach(mountPresetEditor);

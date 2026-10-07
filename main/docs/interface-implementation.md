@@ -101,3 +101,49 @@ The isolated browser suite exposed and fixed 320px landing ladder overflow.
 Grid children now shrink within their tracks and ladder nodes flex to available
 space. Both themes pass the exercised keyboard/axe/overflow checks; original
 quiz feedback now reflects eligible XP. See [repeatable evidence](acceptance-verification.md).
+
+### Account and staff polish — 2026-10-07
+
+The dashboard, profile and account-governance pages now group staff destinations
+into descriptive workspace cards. Existing policies select visible tools; route
+and service authorization still enforce access. Moderator-only weekly planning
+stays separate from Administrator finance, reports, presets and FAQ management.
+Account pages have Dashboard/My account/Workspace/Help navigation instead of
+requiring a return through the landing page.
+
+Learning and challenge search use bordered filter panels with responsive field
+grids, explicit submit actions and conditional Clear filters links. Challenge
+results show a total. Account governance uses responsive result rows with initial
+avatars, role text, status pills and useful empty-state feedback. Profile tools
+are grouped rather than repeated as a long staff-link list.
+
+Login and registration password fields gain independent Show/Hide buttons with
+labelled controls and pressed state. They start hidden without JavaScript; inputs
+remain normal password fields, keep autocomplete/length constraints and never
+echo submitted passwords. Toggling changes only visibility, never the value,
+validation, saved state or form submission. Shared controls have restrained hover
+borders, current-page navigation pills and focus treatment; workspace cards lift
+slightly on pointer hover, with reduced-motion support. Destructive buttons use
+the existing semantic error palette. Blue/grey light/dark tokens remain canonical.
+
+Mobile navigation uses explicit full-width rows and keeps the registration action
+visible; the old sub-1000px rule hid that action. Exercised staff dashboard,
+account filters/profile and guest pages are checked for horizontal overflow and
+axe accessibility violations at 1280px, 390px and 320px in both themes. The browser
+suite also exercises password visibility and empty/cleared account searches.
+These checks remain local Chromium evidence, not an all-device WCAG claim.
+
+Local checks for this follow-up: 43 focused PostgreSQL tests / 267 assertions,
+all five isolated Chromium workflows, 45 frontend tests, Pint, Vite build,
+Markdown file links and Composer/npm security audits passed. The new provisioning
+tests also join CI's cached configuration/routes/views verification. Screenshots
+are ignored local artifacts; synthetic browser accounts are separate from the
+owner's development Administrator.
+
+CI's full development-dependency audit also identified GHSA-pqg4-j6r4-53mv in
+`concurrently`'s pinned `shell-quote` 1.9.0. A scoped npm override pins patched
+1.11.0 while retaining the Node 22/concurrently 10 baseline. A regression resolves
+the runner's actual dependency and checks rejection of all four line terminators
+after a comment token without executing any shell string. See
+[the upstream advisory](https://github.com/advisories/GHSA-pqg4-j6r4-53mv).
+Keep the override until a reviewed upstream release includes the fix.

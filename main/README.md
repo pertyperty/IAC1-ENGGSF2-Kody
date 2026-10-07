@@ -23,6 +23,11 @@ provider configuration is covered by [integration setup](docs/integration-setup.
 
 Commands below run from the Laravel directory (`main/` in this repository).
 
+For a fresh local Administrator, run `php artisan kody:admin-create-local admin@kody.local`
+and enter its password privately at the terminal. Optional `--generate` saves a
+new private credential file instead. See [local Administrator setup](docs/local-administrator-setup.md)
+for environment guards, storage handling and the existing-account protections.
+
 Requirements: Composer 2; PHP 8.4.1+ (within PHP 8.x) for application, development
 and tests; Node 22.12+ with npm; PostgreSQL 17
 (CI's baseline). Enable PHP ctype, curl, dom, fileinfo, filter, intl, mbstring,

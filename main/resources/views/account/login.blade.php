@@ -8,7 +8,7 @@
     <form method="post" action="{{ route('login.store') }}" class="account-form">
         @csrf
         <label>Email address<input type="email" name="email" autocomplete="username" value="{{ old('email') }}" maxlength="100" required></label>
-        <label>Password<input type="password" name="password" autocomplete="current-password" maxlength="1024" required></label>
+        <x-password-field name="password" label="Password" autocomplete="current-password" :maxlength="1024" />
         <button type="submit" class="primary-button">Sign in</button>
     </form>
     @if(app(\App\Services\Account\GoogleOAuth::class)->available())

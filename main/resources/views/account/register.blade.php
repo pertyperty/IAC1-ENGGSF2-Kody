@@ -15,8 +15,8 @@
         </div>
         <label>Username<input name="username" value="{{ old('username') }}" autocomplete="username" minlength="6" maxlength="30" required><small>6–30 characters. Choose a unique username.</small></label>
         <label>Email address<input type="email" name="email" value="{{ old('email') }}" autocomplete="email" maxlength="100" required></label>
-        <label>Password<input type="password" name="password" autocomplete="new-password" minlength="12" maxlength="32" required><small>12–32 characters, including uppercase, lowercase, a number and a symbol.</small></label>
-        <label>Confirm password<input type="password" name="password_confirmation" autocomplete="new-password" minlength="12" maxlength="32" required></label>
+        <x-password-field name="password" label="Password" :minlength="12" hint="12–32 characters, including uppercase, lowercase, a number and a symbol." />
+        <x-password-field name="password_confirmation" label="Confirm password" :minlength="12" />
         <label>I’m joining as<select name="account_type" id="account-type"><option value="learner" @selected(old('account_type', 'learner') === 'learner')>Learner</option><option value="instructor" @selected(old('account_type') === 'instructor')>Instructor applicant</option></select></label>
         <fieldset id="instructor-fields">
             <legend>Instructor application</legend>

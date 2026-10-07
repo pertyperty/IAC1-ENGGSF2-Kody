@@ -5,6 +5,32 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
+test('staff workspace respects existing role policies and guest/participant navigation', function (Role $role) {
+    moduleSignIn($this, moduleAccount($role));
+    $response = $this->get(route('dashboard'))->assertOk();
+    if (in_array($role, [Role::Moderator, Role::Administrator], true)) {
+        $response->assertSee('YOUR STAFF WORKSPACE')->assertSee('Community accounts')->assertSee('Module reviews');
+        $this->get(route('account.show'))->assertOk()->assertSee('account-shell-wide')->assertSee('Account navigation');
+        $this->get(route('account-governance.index'))->assertOk()->assertSee('account-result', false)->assertSee('Apply filters');
+        if ($role === Role::Administrator) {
+            $response->assertSee('Finance workspace')->assertSee('Game presets')->assertDontSee('Prepare future weeks');
+        } else {
+            $response->assertSee('Prepare future weeks')->assertDontSee('Finance workspace')->assertDontSee('Game presets');
+        }
+    } else {
+        $response->assertDontSee('YOUR STAFF WORKSPACE')->assertDontSee('Finance workspace');
+        $this->get(route('account-governance.index'))->assertForbidden();
+    }
+})->with(Role::cases());
+
+test('login and registration offer progressive password visibility without echoing old secrets', function () {
+    foreach (['login', 'register'] as $route) {
+        $response = $this->withSession(['_old_input' => ['password' => 'NeverEchoSecret12!', 'password_confirmation' => 'NeverEchoSecret12!']])
+            ->get(route($route))->assertOk()->assertSee('data-password-toggle', false)
+            ->assertSee('type="password"', false)->assertDontSee('NeverEchoSecret12!');
+    }
+});
+
 test('validated quiz copy reflects adopted XP while unsaved previews promise no persisted progress', function () {
     signInForLearning($this);
     $this->get(route('learning.show', 'sequences'))->assertOk()->assertSee('eligible first-completion XP')

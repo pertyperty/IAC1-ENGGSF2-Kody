@@ -8,12 +8,12 @@
 
         <div class="section-heading"><div><p class="overline">YOUR NEXT “AHA!” MOMENT</p><h1 id="modules-heading">Pick a little adventure.</h1></div><p>Real programming ideas.<br>Small games. Room to experiment.</p></div>
 
-        <form method="get" action="{{ route('learning.catalog') }}" class="catalog-search">
-            <label for="module-search">Find your next idea</label>
-            <input id="module-search" type="search" name="q" value="{{ $query }}" maxlength="80" placeholder="Try loops, crystals, or first steps">
-            <label for="module-template">Play style</label>
-            <select id="module-template" name="template"><option value="">All games and quizzes</option>@foreach($templates as $slug => $label)<option value="{{ $slug }}" @selected($template === $slug)>{{ $label }}</option>@endforeach</select>
-            <button class="button button-dark button-small" type="submit">Find adventures</button>
+        <form method="get" action="{{ route('learning.catalog') }}" class="catalog-search catalog-filter-panel">
+            <div class="filter-grid">
+                <div><label for="module-search">Find your next idea</label><input id="module-search" type="search" name="q" value="{{ $query }}" maxlength="80" placeholder="Try loops, crystals, or first steps"></div>
+                <div><label for="module-template">Play style</label><select id="module-template" name="template"><option value="">All games and quizzes</option>@foreach($templates as $slug => $label)<option value="{{ $slug }}" @selected($template === $slug)>{{ $label }}</option>@endforeach</select></div>
+            </div>
+            <div class="filter-actions"><button class="button button-dark button-small" type="submit">Find adventures</button>@if($query !== '' || $template)<a class="quiet-link" href="{{ route('learning.catalog') }}">Clear filters</a>@endif</div>
         </form>
 
         <p><a class="button button-dark button-small" href="{{ route('course-learning.catalog') }}">Explore courses →</a> @auth <a class="quiet-link" href="{{ route('course-learning.mine') }}">Your journeys</a> @endauth</p>

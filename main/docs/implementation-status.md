@@ -3,7 +3,7 @@
 Start here for current scope, detailed evidence and the next useful improvements.
 This index consolidates the feature summaries previously repeated in README.
 It does not replace approved requirements, decisions or the implementation records.
-Last reviewed: 2026-10-05.
+Last reviewed: 2026-10-07.
 The [requirements acceptance audit](requirements-acceptance-audit.md) is the master
 61-use-case/NFR checklist. [Repeatable acceptance verification](acceptance-verification.md)
 owns browser/upgrade/restore evidence; [launch curriculum review](launch-curriculum-review.md)
@@ -29,6 +29,10 @@ records code/evidence; [sustainability](sustainability-analysis.md) remains a se
   rehearsal evidence. README owns local setup and common commands.
 
 ## Delivered slices and boundaries
+
+The 2026-10-07 follow-up adds [audited local Administrator provisioning](local-administrator-setup.md)
+and [account/staff interface polish](interface-implementation.md#account-and-staff-polish--2026-10-07).
+The private credential file is local-only and excluded from release artifacts.
 
 | Area / use cases | Current implementation | Detailed records |
 | --- | --- | --- |

@@ -1,5 +1,13 @@
 # Kody Engineering Agent Guidelines
 
+The owner requested local Administrator provisioning on 2026-10-07. Use the
+audited `kody:admin-create-local` command described in
+[local setup](docs/local-administrator-setup.md). It requires local/testing and
+loopback PostgreSQL, never overwrites an existing account, and keeps generated
+credentials in ignored private storage. It is not production bootstrap or a
+public role-elevation path. Staff workspace cards must retain existing policies,
+including Moderator-only weekly scheduling and Administrator-only finance tools.
+
 ## Mission
 
 On 2026-10-04 the owner explicitly delegated recommendations and implementation
