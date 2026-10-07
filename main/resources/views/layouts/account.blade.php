@@ -11,7 +11,15 @@
 </head>
 <body class="account-page">
     <a class="skip-link" href="#main-content">Skip to content</a>
-    <header class="account-header"><a href="{{ url('/') }}" class="brand">Kody<span>.</span></a><span>Learn. Practice. Progress.</span>@include('layouts.theme-toggle')</header>
+    <header class="account-header"><a href="{{ url('/') }}" class="brand">Kody<span>.</span></a>
+        <nav aria-label="Account navigation">
+            <a href="{{ auth()->check() ? route('dashboard') : route('home') }}">{{ auth()->check() ? 'Dashboard' : 'Play' }}</a>
+            @auth<a href="{{ route('account.show') }}" @if(request()->routeIs('account.show', 'account.edit')) aria-current="page" @endif>My account</a>@endauth
+            @can('viewAny', \App\Models\User::class)<a href="{{ route('account-governance.index') }}" @if(request()->routeIs('account-governance.*')) aria-current="page" @endif>Workspace</a>@endcan
+            <a href="{{ route('help.index') }}">Help</a>
+        </nav>
+        @include('layouts.theme-toggle')
+    </header>
     <main id="main-content" tabindex="-1" class="account-shell @yield('shell-class')">
         @if (session('status'))
             <p class="notice" role="status">{{ session('status') }}</p>

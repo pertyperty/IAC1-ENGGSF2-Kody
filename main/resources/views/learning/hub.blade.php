@@ -2,6 +2,7 @@
 @section('title', 'Your playground — Kody')
 @section('content')
     <section class="play-hub page-width"><div class="section-heading"><div><p class="overline">A LITTLE BETTER, EVERY DAY</p><h1>Your next little win.</h1></div><a class="quiet-link" href="{{ route('account.show') }}">View your profile →</a></div>
+        @include('layouts.staff-tools')
         <div class="continue-card">@if($progress['next_level'])<div><p class="overline">READY WHEN YOU ARE</p><h2>{{ $progress['levels'][$progress['next_level']]['title'] }}</h2><p>{{ $progress['completed_count'] === 0 ? 'Start your first saved adventure.' : 'Your next level is unlocked. Try a new idea.' }}</p></div><a class="button button-play" href="{{ route('learning.show', $progress['next_level']) }}">Continue playing →</a>@else<div><h2>You cleared your starter trail!</h2><p>Replay a favorite or discover a creator adventure.</p></div><a class="button button-play" href="{{ route('learning.catalog') }}">Find your next adventure →</a>@endif</div>
         @can('viewLearning', \App\Models\LearningCourse::class)<p><a class="button button-dark button-small" href="{{ route('course-learning.mine') }}">Continue your learning journeys →</a></p>@endcan
         <p><a class="quiet-link" href="{{ route('challenges.catalog') }}">Explore coding quests →</a></p>

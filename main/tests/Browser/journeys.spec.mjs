@@ -40,6 +40,39 @@ test.beforeEach(async ({ page }) => {
     await page.route('**/*', route => new URL(route.request().url()).origin === process.env.KODY_BROWSER_BASE_URL ? route.continue() : route.abort());
 });
 
+test('staff workspace, account filters and password controls stay accessible in both themes and narrow layouts', async ({ page }) => {
+    await page.goto('/login');
+    await page.getByLabel('Password', { exact: true }).fill('BrowserStrong12!');
+    await page.getByRole('button', { name: 'Show password', exact: true }).click();
+    await expect(page.getByLabel('Password', { exact: true })).toHaveAttribute('type', 'text');
+    await page.getByRole('button', { name: 'Hide password', exact: true }).click();
+    await expect(page.getByLabel('Password', { exact: true })).toHaveAttribute('type', 'password');
+    await login(page, 'administrator');
+    await expect(page.getByRole('heading', { name: 'Help good learning happen.' })).toBeVisible();
+    for (const width of [1280, 390, 320]) {
+        await page.setViewportSize({ width, height: 900 });
+        for (const dark of [false, true]) {
+            const toggle = page.getByRole('button', { name: 'Dark mode', exact: true });
+            if ((await toggle.getAttribute('aria-pressed') === 'true') !== dark) await toggle.click();
+            await audit(page);
+            await page.getByRole('link', { name: 'Workspace', exact: true }).click();
+            await expect(page.getByRole('heading', { name: 'Keep the community safe' })).toBeVisible();
+            await page.getByLabel('Username', { exact: true }).fill('no_such_player');
+            await page.getByRole('button', { name: 'Apply filters', exact: true }).click();
+            await expect(page.getByRole('heading', { name: 'No accounts found' })).toBeVisible();
+            await page.getByRole('link', { name: 'Clear filters', exact: true }).click();
+            await audit(page);
+            await page.getByRole('link', { name: 'My account', exact: true }).click();
+            await audit(page);
+            await page.getByRole('link', { name: 'Dashboard', exact: true }).click();
+        }
+    }
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.screenshot({ path: 'storage/app/browser-results/staff-workspace.png' });
+    await page.getByRole('button', { name: 'Sign out', exact: true }).click();
+    await expect(page).toHaveURL(/\/login$/);
+});
+
 test('A01 A02 B03 B05: guest trial, registration, verified play, reading and course assessment persist exactly once', async ({ page }) => {
     const email = 'newplayer@browser.example.test';
     await page.goto('/');
@@ -52,7 +85,7 @@ test('A01 A02 B03 B05: guest trial, registration, verified play, reading and cou
     await page.getByLabel('Username').fill('browser_newplayer');
     await page.getByLabel('Email address').fill(email);
     await page.getByLabel(/^Password/).fill('BrowserStrong12!');
-    await page.getByLabel('Confirm password').fill('BrowserStrong12!');
+    await page.getByLabel('Confirm password', { exact: true }).fill('BrowserStrong12!');
     await audit(page);
     await page.getByRole('button', { name: 'Create account' }).click();
     await expect(page).toHaveURL(/\/email\/verify/);
