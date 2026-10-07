@@ -60,12 +60,6 @@ php artisan about
 php artisan migrate:status
 ```
 
-For the five verified Active local role accounts, run `php artisan db:seed` with
-`APP_ENV=local` and loopback PostgreSQL. Generated passwords are saved in ignored
-private storage; reruns preserve existing accounts. See
-[local account setup](docs/local-administrator-setup.md#reproducible-local-role-accounts).
-Default production/staging seeding creates no development accounts.
-
 Run `php artisan serve` and `npm run dev` in separate terminals. Run the database
 worker in another terminal:
 
