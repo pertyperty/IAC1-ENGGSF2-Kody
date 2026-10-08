@@ -18,6 +18,13 @@ including Moderator-only weekly scheduling and Administrator-only finance tools.
 
 ## Mission
 
+The owner's 2026-10-09 usability request adds direct policy-filtered navigation,
+context-aware back buttons, a server-owned learner HUD and shared dismissible
+toasts. See [navigation and feedback](docs/navigation-and-feedback-implementation.md).
+Keep the HUD out of focused editing/security flows; staff have no participant
+progression. Never replace inline field errors or game context with toast-only
+feedback, and never treat preview wins as saved progress.
+
 The owner's next interface polish request adds flatter surfaces, pinned local
 fonts, original SVG branding/game art and accessible sticky/revealing navigation.
 See [navigation and visual polish](docs/navigation-and-visual-polish.md).

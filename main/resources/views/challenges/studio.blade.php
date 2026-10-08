@@ -1,7 +1,7 @@
 @extends('layouts.learning')
 @section('title', 'Challenge studio — Kody')
 @section('content')
-@if(session('status'))<p class="lesson-note page-width" role="status">{{ session('status') }}</p>@endif
+
 <section class="review-page page-width">
 <div class="studio-heading"><div><p class="overline">CODING QUEST WORKSPACE</p><h1>Make a little coding quest.</h1><p>Start with a clear problem. Add examples and hidden checks, then send your quest for review.</p></div><a class="button button-play" href="{{ route('challenges.create') }}">Create a challenge +</a></div>
 <nav class="studio-wayfinding" aria-label="Challenge tools"><a href="{{ route('challenges.catalog') }}">Explore published challenges →</a>@can('create', \App\Models\LearningModule::class)<a href="{{ route('studio.index') }}">Your learning adventures →</a>@endcan</nav>

@@ -1,7 +1,7 @@
 @extends('layouts.learning')
 @section('title', 'Creator studio — Kody')
 @section('content')
-@if(session('status'))<p class="lesson-note page-width" role="status">{{ session('status') }}</p>@endif
+
 <section class="review-page page-width">
     <div class="studio-heading"><div><p class="overline">INSTRUCTOR WORKSPACE</p><h1>Your creator studio.</h1><p>Turn an idea into a little adventure. Add a lesson, choose a game or quiz, and send it for review.</p></div><a class="button button-play" href="{{ route('studio.create') }}">Create an adventure +</a></div>
     <nav class="studio-wayfinding" aria-label="Creator tools"><a href="{{ route('courses.index') }}">≡ Course builder</a><a href="{{ route('challenges.index') }}">{ } Coding quests</a><a href="{{ route('curriculum.index') }}">✦ Beginner course plans</a></nav>

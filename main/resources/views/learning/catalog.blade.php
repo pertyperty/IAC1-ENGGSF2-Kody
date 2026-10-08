@@ -16,7 +16,7 @@
             <div class="filter-actions"><button class="button button-dark button-small" type="submit">Find adventures</button>@if($query !== '' || $template)<a class="quiet-link" href="{{ route('learning.catalog') }}">Clear filters</a>@endif</div>
         </form>
 
-        <p><a class="button button-dark button-small" href="{{ route('course-learning.catalog') }}">Explore courses →</a> @auth <a class="quiet-link" href="{{ route('course-learning.mine') }}">Your journeys</a> @endauth</p>
+        <p><a class="button button-dark button-small" href="{{ route('course-learning.catalog') }}">Explore courses →</a> @can('viewLearning', \App\Models\LearningCourse::class) <a class="button button-secondary button-small" href="{{ route('course-learning.mine') }}">Your journeys</a> @endcan</p>
         <div class="module-grid">
             @forelse($modules as $slug => $module)
 

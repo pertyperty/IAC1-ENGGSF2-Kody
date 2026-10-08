@@ -4,6 +4,7 @@ export function mountScrollNavigation(doc, win) {
     if (!shell) return;
     const header = shell.querySelector('.app-header');
     const reveal = shell.querySelector('[data-navigation-reveal]');
+    const strip = shell.querySelector('[data-progress-strip]');
     let previous = Math.max(0, win.scrollY);
     let distance = 0;
     let direction = 0;
@@ -14,7 +15,9 @@ export function mountScrollNavigation(doc, win) {
         shell.classList.toggle('navigation-hidden', hidden);
         // A focused reveal control must survive scroll/focus events until activation or Tab.
         reveal.hidden = !hidden && doc.activeElement !== reveal;
-        doc.documentElement.style.setProperty('--navigation-offset', `${hidden ? 12 : height}px`);
+        const stripHeight = strip?.getBoundingClientRect().height ?? 0;
+        doc.documentElement.style.setProperty('--progress-height', `${stripHeight}px`);
+        doc.documentElement.style.setProperty('--navigation-offset', `${(hidden ? 12 : height) + stripHeight}px`);
     };
     const measure = () => {
         height = header.getBoundingClientRect().height;
@@ -55,7 +58,11 @@ export function mountScrollNavigation(doc, win) {
                 && !doc.querySelector('.account-menu[open], .mobile-workspace[open]')) setHidden(true);
         });
     }, { passive: true });
-    if (win.ResizeObserver) new win.ResizeObserver(measure).observe(header);
+    if (win.ResizeObserver) {
+        const observer = new win.ResizeObserver(measure);
+        observer.observe(header);
+        if (strip) observer.observe(strip);
+    }
     else win.addEventListener('resize', measure);
     measure();
 }

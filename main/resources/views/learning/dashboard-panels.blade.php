@@ -1,5 +1,7 @@
 <div class="dashboard-grid">
+@can('viewLearning', \App\Models\LearningCourse::class)
 <section class="dashboard-panel"><h2>{{ $dashboard['achievements']['rank'] }} · {{ number_format($dashboard['achievements']['xp']) }} XP</h2><p>First-time validated wins build your achievement rank.</p><a class="quiet-link" href="{{ route('leaderboards.index') }}">Explore the ladder →</a><p><a class="quiet-link" href="{{ route('wallet.index') }}">{{ $dashboard['wallet']['available'] }} KB available · Your wallet →</a></p></section>
+    @endcan
     @can('viewLearning', \App\Models\LearningCourse::class)
     <section class="dashboard-panel" aria-labelledby="dashboard-journeys"><div class="section-heading"><h2 id="dashboard-journeys">Your learning journeys</h2><a class="quiet-link" href="{{ route('course-learning.mine') }}">View all →</a></div>
         <div class="review-list">@forelse($dashboard['courses'] as $enrollment)

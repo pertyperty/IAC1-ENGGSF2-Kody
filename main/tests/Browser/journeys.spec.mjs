@@ -108,6 +108,51 @@ test.beforeEach(async ({ page }) => {
     await page.route('**/*', route => new URL(route.request().url()).origin === process.env.KODY_BROWSER_BASE_URL ? route.continue() : route.abort());
 });
 
+test('clear back buttons, dismissible errors and persistent progress work through account and mobile navigation', async ({ page }) => {
+    await page.goto('/login');
+    await page.getByRole('link', { name: 'Back to home', exact: false }).click();
+    await expect(page).toHaveURL(/\/$/);
+    await page.goto('/login');
+    await page.getByLabel('Email address').fill('missing@browser.example.test');
+    await page.getByLabel('Password', { exact: true }).fill('BrowserStrong12!');
+    await page.getByRole('button', { name: 'Sign in', exact: false }).click();
+    const error = page.locator('.toast-error');
+    await expect(error).toBeVisible();
+    await error.getByRole('button', { name: 'Dismiss notification' }).focus();
+    await page.keyboard.press('Enter');
+    await expect(error).toHaveCount(0);
+    await login(page, 'usabilitylearner');
+    const strip = page.locator('[data-progress-strip]');
+    await page.mouse.move(700, 700);
+    await page.mouse.wheel(0, 600);
+    await expect(strip).toBeInViewport();
+    await page.goto('/account/edit');
+    await expect(strip).toHaveCount(0);
+    await page.getByRole('navigation', { name: 'Page navigation' }).getByRole('link', { name: 'Back to my account', exact: false }).click();
+    await expect(page).toHaveURL(/\/account$/);
+    await expect(strip).toBeVisible();
+    await page.setViewportSize({ width: 320, height: 740 });
+    const menu = page.locator('.mobile-workspace');
+    await menu.locator('summary').click();
+    await page.keyboard.press('Escape');
+    await expect(menu).not.toHaveAttribute('open', '');
+    await expect(menu.locator('summary')).toBeFocused();
+    await audit(page);
+    await page.screenshot({ path: 'storage/app/browser-results/learner-progress-mobile.png' });
+    const notify = () => page.evaluate(() => document.dispatchEvent(new CustomEvent('kody:feedback', {
+        detail: { message: '<img src=x onerror=alert(1)> Saved safely', kind: 'success' },
+    })));
+    await notify();
+    const notice = page.locator('.toast-success');
+    await expect(notice).toContainText('<img src=x onerror=alert(1)>');
+    await expect(notice.locator('img')).toHaveCount(0);
+    await notify();
+    await expect(notice).toHaveCount(1);
+    await notice.getByRole('button', { name: 'Dismiss notification' }).click();
+    await notify();
+    await expect(notice).toBeVisible();
+});
+
 test('staff workspace, account filters and password controls stay accessible in both themes and narrow layouts', async ({ page }) => {
     await page.goto('/login');
     await page.getByLabel('Password', { exact: true }).fill('BrowserStrong12!');
@@ -166,6 +211,12 @@ test('A01 A02 B03 B05: guest trial, registration, verified play, reading and cou
     await page.goto('/learn/sequences');
     await solveGarden(page);
     expect(JSON.parse(fixture('snapshot', email))).toMatchObject({ xp: 20, levels: 1, streak: 1 });
+    await expect(page.locator('[data-progress-xp]')).toHaveText('20');
+    await expect(page.locator('[data-progress-streak]')).toHaveText('1');
+    await expect(page.locator('[data-progress-level]')).toHaveText('1 / 3');
+    await expect(page.locator('.toast-success')).toBeVisible();
+    await page.locator('.toast-success').getByRole('button', { name: 'Dismiss notification' }).click();
+    await expect(page.locator('.toast-success')).toHaveCount(0);
     const course = manifest.courses['first-programs'];
     await page.goto(`/learn/courses/${course.id}`);
     await page.getByRole('button', { name: 'Join this journey' }).click();
@@ -273,7 +324,7 @@ test('B05: four creator arcade assessments and a multi-question quiz save valida
 
 for (const [role, destination, link] of [
     ['learner', '/learn', 'Learning catalog'], ['contributor', '/create/challenges', 'Quest studio'],
-    ['instructor', '/create', 'Module studio'], ['moderator', '/manage/modules', 'Publication reviews'],
+    ['instructor', '/create', 'Module studio'], ['moderator', '/manage/modules', 'Module reviews'],
     ['administrator', '/manage/accounts', 'Community'],
 ]) {
     test(`${role} workspace has focused navigation and usable desktop/mobile surfaces in both themes`, async ({ page }) => {
@@ -299,6 +350,17 @@ for (const [role, destination, link] of [
             await page.keyboard.press('Escape');
             await expect(page.locator('.account-menu')).not.toHaveAttribute('open', '');
             await expect(page.locator('.account-menu > summary')).toBeFocused();
+        }
+        // Follow every policy-filtered workspace destination, not just the first role card.
+        await page.setViewportSize({ width: 1440, height: 900 });
+        const destinations = await page.getByRole('navigation', { name: 'Your workspace', exact: true }).locator('a').evaluateAll(links => links.map(link => link.getAttribute('href')));
+        test.setTimeout(180_000);
+        await page.setViewportSize({ width: 320, height: 900 });
+        for (const destination of destinations) {
+            const response = await page.goto(destination);
+            expect(response.status(), destination).toBe(200);
+            await expect(page.locator('#main-content')).toBeVisible();
+            await audit(page);
         }
     });
 }

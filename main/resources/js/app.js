@@ -12,11 +12,15 @@ import { mountAccountLinks } from './account-links.js';
 import { mountPasswordFields } from './password-fields.js';
 import { mountWorkspaceMenus } from './workspace-menus.js';
 import { mountScrollNavigation } from './scroll-navigation.js';
+import { mountFeedback } from './feedback.js';
+import { mountProgressStrip } from './progress-strip.js';
 
 mountTheme(document, window);
 mountAccountLinks(document, window);
 mountPasswordFields(document);
 mountWorkspaceMenus(document);
+mountFeedback(document, window);
+mountProgressStrip(document, window);
 mountScrollNavigation(document, window);
 
 document.querySelectorAll('[data-module-editor]').forEach(mountModuleEditor);

@@ -2,7 +2,7 @@
 @section('title', $revision->title.' — Kody')
 @section('content')
 <section class="review-page page-width"><a class="quiet-link" href="{{ route('course-learning.catalog') }}">← Learning journeys</a><p class="overline">{{ $revision->category }} · {{ $revision->difficulty }} · {{ $revision->estimated_duration }} hours</p><h1>{{ $revision->title }}</h1><p>{{ $revision->description }}</p>
-@if(session('status'))<p class="lesson-note" role="status">{{ session('status') }}</p>@endif
+
 @if($errors->any())<div class="studio-errors" role="alert">@foreach($errors->all() as $error)<p>{{ $error }}</p>@endforeach</div>@endif
 @if($course->status === 'Archived')<p class="lesson-note">This journey is archived. You can keep learning because you joined before it was archived.</p>@endif
 @if(!$accessible && !$requirements['eligible'])<p class="lesson-note">Unlock requirement: {{ $requirements['minimum_xp'] }} XP. Adventures still to clear: {{ implode(', ', $requirements['missing_titles']) ?: 'none' }}.</p>@endif

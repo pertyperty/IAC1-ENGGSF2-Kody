@@ -3,7 +3,7 @@
 @section('content')
 <section class="review-page page-width"><a class="quiet-link" href="{{ route('game-presets.index') }}">← Preset workshop</a><h1>{{ $preset ? 'Shape the next version.' : 'Plant a new idea.' }}</h1>
 <p>Garden trails share Kody’s movement and objective rules. Practice quizzes support up to ten questions with two to six choices each. Creator lessons use the existing verified Active participant access rules. Validated module wins qualify for daily activity and the platform’s first-completion XP. Presets cannot set extra XP or KodeBit prizes.</p>
-@if(session('status'))<p class="lesson-note" role="status">{{ session('status') }}</p>@endif
+
 @if($errors->any())<div class="form-errors" role="alert">@foreach($errors->all() as $error)<p>{{ $error }}</p>@endforeach</div>@endif
 @if($preset)<p class="step-pill">{{ $preset->status }} · {{ $uses }} saved module revision references</p>@endif
 @php

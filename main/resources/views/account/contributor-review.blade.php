@@ -2,7 +2,7 @@
 @section('title', 'Review Contributor application — Kody')
 @section('content')
 <h1>Contributor application #{{ $application->id }}</h1><p>{{ $application->user->name }} · {{ $application->approval_status }}</p>
-@if(session('status'))<p class="notice" role="status">{{ session('status') }}</p>@endif
+
 @if($errors->any())<div class="form-errors" role="alert">@foreach($errors->all() as $error)<p>{{ $error }}</p>@endforeach</div>@endif
 <p>{{ $application->request_message }}</p>
 <p>At submission: {{ $application->account_age_days }} days · {{ $application->completed_modules_count }} modules · {{ $application->completed_challenges_count }} coding challenges.</p>

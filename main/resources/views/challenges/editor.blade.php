@@ -8,7 +8,7 @@
 <a class="quiet-link" href="{{ route('challenges.index') }}">← Your challenges</a><h1>Turn a problem into possibility.</h1><p>Help someone discover what their code can do.</p>
 <nav class="editor-jumps" aria-label="Quest setup"><a href="#quest-idea"><span>01</span> Problem</a><a href="#quest-checks"><span>02</span> Test cases</a><a href="#access-settings"><span>03</span> Access</a><a href="#draft-save"><span>04</span> Save & review</a></nav>
 @if(!empty($starter))<p class="lesson-note">Your example is ready to customize. It has not been saved or published. Check the problem, sample cases and hidden edge cases before submitting a draft for review.</p>@endif
-@if(session('status'))<p class="lesson-note" role="status">{{ session('status') }}</p>@endif
+
 @if($errors->any())<div class="studio-errors" role="alert">@foreach($errors->all() as $error)<p>{{ $error }}</p>@endforeach</div>@endif
 @if($revision)<p class="step-pill">{{ $challenge->status }} · Revision {{ $revision->number }} · {{ $revision->review_status }}</p>@if($revision->review_notes)<p class="lesson-note">{{ $revision->review_notes }}</p>@endif @endif
 <form class="studio-form" method="post" action="{{ $challenge ? route('challenges.update', $challenge) : route('challenges.store') }}">@csrf @if($challenge)@method('put')@endif<input type="hidden" name="record_version" value="{{ $challenge?->record_version ?? 1 }}">

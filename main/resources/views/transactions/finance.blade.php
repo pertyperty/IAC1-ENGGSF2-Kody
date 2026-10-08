@@ -2,7 +2,7 @@
 @section('title', 'Financial review — Kody')
 @section('content')
 <section class="review-page page-width"><p class="overline">ADMINISTRATOR FINANCE</p><h1>Review with a clear trail.</h1>
-@if(session('status'))<p class="lesson-note" role="status">{{ session('status') }}</p>@endif
+
 @if($errors->any())<p class="studio-errors" role="alert">{{ $errors->first() }}</p>@endif
 <p class="lesson-note">Platform cash: PHP {{ \App\Support\ExactMoney::decimal($cash->platform_minor) }} · Reserved: PHP {{ \App\Support\ExactMoney::decimal($cash->reserved_minor) }}. Held margins and recipient earnings are excluded from reward funding.</p>
 <div class="dashboard-grid"><article class="lesson-note"><h2>Wallet liabilities</h2><p>PHP {{ \App\Support\ExactMoney::decimal($summary['wallet_backing']) }} backing current wallet lots.</p></article><article class="lesson-note"><h2>Creator liabilities</h2><p>PHP {{ \App\Support\ExactMoney::decimal($summary['unclaimed_creator']) }} allocated, including immature and reserved earnings.</p></article><article class="lesson-note"><h2>Verified purchases</h2><p>PHP {{ \App\Support\ExactMoney::decimal($summary['confirmed_purchases']) }} retained gross receipts; PHP {{ \App\Support\ExactMoney::decimal($summary['confirmed_refunds']) }} fully refunded.</p></article></div>

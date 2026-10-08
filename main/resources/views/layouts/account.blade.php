@@ -11,15 +11,14 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="account-page">
+    @include('layouts.feedback')
     <a class="skip-link" href="#main-content">Skip to content</a>
     @include('layouts.app-header')
     <div class="app-frame {{ auth()->check() ? 'has-workspace' : '' }}">
     @auth<aside class="app-rail"><div class="rail-identity"><span class="rail-emblem" aria-hidden="true">k</span><div><b>Make a little progress.</b><span>{{ auth()->user()->account_role->name }}</span></div></div>@include('layouts.workspace-nav')</aside>
     <details class="mobile-workspace"><summary>Explore your workspace <span aria-hidden="true">⌄</span></summary>@include('layouts.workspace-nav', ['mobile' => true])</details>@endauth
     <main id="main-content" tabindex="-1" class="account-shell @yield('shell-class')">
-        @if (session('status'))
-            <p class="notice" role="status">{{ session('status') }}</p>
-        @endif
+        @include('layouts.page-navigation')
         @yield('content')
     </main>
     </div>
