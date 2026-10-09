@@ -1,8 +1,8 @@
-export function publishFeedback(root, message, kind = 'info', progressSaved = false) {
+export function publishFeedback(root, message, kind = 'info', progressSaved = false, journey = null) {
     const doc = root.ownerDocument ?? globalThis.document;
     if (!doc?.dispatchEvent) return;
     const Event = doc.defaultView?.CustomEvent ?? globalThis.CustomEvent;
-    doc.dispatchEvent(new Event('kody:feedback', { detail: { message, kind, progressSaved } }));
+    doc.dispatchEvent(new Event('kody:feedback', { detail: { message, kind, progressSaved, journey } }));
 }
 
 export function mountFeedback(doc, win) {

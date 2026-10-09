@@ -1,0 +1,44 @@
+/* Game-first goals and revision-pinned course trails. */
+.course-lesson-page { max-width: 1200px; }
+.course-trail-page { max-width: 1100px; }
+.course-lesson-page .lesson-reader { max-width: 80ch; }
+.mission-board { margin-block: 20px 28px; }
+.mission-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.mission-heading h2 { margin: 0 0 8px; font-size: clamp(24px, 3vw, 32px); }
+.mission-heading p { margin: 0 0 12px; color: var(--muted); }
+.mission-heading img { flex: 0 0 auto; object-fit: contain; }
+.mission-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.mission-card { display: flex; flex-direction: column; gap: 12px; padding: 20px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; }
+.mission-card h3 { margin: 0; font-size: 19px; }
+.mission-card p { margin: 0; color: var(--muted); flex: 1; }
+.mission-card .button { align-self: flex-start; }
+.mission-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.mission-icon { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 10px; background: var(--accent-soft); color: var(--accent-text); font-size: 24px; }
+.mission-state, .trail-state { font-size: 12px; font-weight: 700; color: var(--accent-text); }
+.mission-done { border-color: var(--accent-line); background: var(--accent-soft); }
+.mission-board progress, .journey-next progress { width: 100%; height: 8px; accent-color: var(--accent); }
+.journey-next { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 20px; margin-block: 20px; background: var(--accent-soft); border: 1px solid var(--accent-line); border-radius: 14px; }
+.journey-next > div { min-width: 0; }
+.journey-next h2 { font-size: 23px; margin: 0 0 10px; }
+.journey-next p { margin: 4px 0; }
+.journey-next .field-hint { margin-top: 12px; }
+.journey-actions { display: flex; flex-direction: column; align-items: stretch; gap: 10px; flex-shrink: 0; }
+.course-trail { list-style: none; margin: 20px 0; padding: 0; display: grid; gap: 12px; }
+.trail-step { position: relative; display: grid; grid-template-columns: 48px minmax(0, 1fr) auto; gap: 16px; align-items: center; padding: 20px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface); }
+.trail-step:not(:last-child)::after { content: ''; position: absolute; left: 43px; bottom: -13px; width: 2px; height: 12px; background: var(--border); }
+.trail-marker { display: grid; place-items: center; width: 48px; height: 48px; border: 2px solid var(--border); border-radius: 50%; font-family: var(--font-display); font-size: 20px; font-weight: 700; color: var(--muted); background: var(--surface-soft); }
+.trail-ready { border-color: var(--accent-line); }
+.trail-ready .trail-marker, .trail-cleared .trail-marker { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.trail-copy h3 { margin: 4px 0; font-size: 19px; overflow-wrap: anywhere; }
+.trail-copy p { margin: 6px 0 0; color: var(--muted); }
+.trail-ready:hover { background: var(--surface-hover); }
+@media (max-width: 900px) { .mission-grid { grid-template-columns: 1fr; } .mission-card .button { align-self: stretch; } }
+@media (max-width: 600px) {
+    .mission-heading img { width: 70px; height: 70px; }
+    .mission-card, .journey-next, .trail-step { padding: 16px; }
+    .journey-next { flex-direction: column; align-items: stretch; }
+    .trail-step { grid-template-columns: 40px minmax(0, 1fr); gap: 12px; }
+    .trail-marker { width: 40px; height: 40px; }
+    .trail-step:not(:last-child)::after { left: 35px; }
+    .trail-step > .button { grid-column: 2; }
+}

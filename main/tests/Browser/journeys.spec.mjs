@@ -207,6 +207,15 @@ test('A01 A02 B03 B05: guest trial, registration, verified play, reading and cou
     await expect(page.getByRole('heading', { name: 'You’re verified' })).toBeVisible();
     await expect(page).not.toHaveURL(/#/);
     await login(page, 'newplayer');
+    await expect(page.getByRole('heading', { name: 'Your mission board' })).toBeVisible();
+    await page.setViewportSize({ width: 320, height: 900 });
+    for (const dark of [false, true]) {
+        const toggle = page.getByRole('button', { name: 'Dark mode' });
+        if ((await toggle.getAttribute('aria-pressed')) !== String(dark)) await toggle.click();
+        await audit(page);
+    }
+    await page.screenshot({ path: 'storage/app/browser-results/mission-board-mobile.png', fullPage: true });
+    await page.setViewportSize({ width: 1280, height: 900 });
     expect(JSON.parse(fixture('snapshot', email))).toMatchObject({ xp: 0, levels: 0 });
     await page.goto('/learn/sequences');
     await solveGarden(page);
@@ -223,8 +232,13 @@ test('A01 A02 B03 B05: guest trial, registration, verified play, reading and cou
     await page.goto(`/learn/courses/${course.id}/modules/${course.slots[0]}`);
     await page.getByRole('button', { name: 'Mark as read' }).click();
     expect(JSON.parse(fixture('snapshot', email))).toMatchObject({ xp: 20, completed_lessons: 1 });
-    await page.goto(`/learn/courses/${course.id}/modules/${course.slots[1]}`);
+    await page.locator('[data-journey-next]').click();
+    await expect(page).toHaveURL(new RegExp(`/modules/${course.slots[1]}$`));
     await solveGarden(page);
+    await expect(page.locator('[data-journey-next]')).toHaveAttribute('href', new RegExp(`/modules/${course.slots[2]}$`));
+    await expect(page.locator('[data-journey-count]')).toHaveText('2 of 5 adventures completed.');
+    await page.locator('[data-course-journey]').scrollIntoViewIfNeeded();
+    await page.screenshot({ path: 'storage/app/browser-results/saved-course-next-step.png' });
     await page.reload();
     await solveGarden(page);
     expect(JSON.parse(fixture('snapshot', email))).toMatchObject({ xp: 60, xp_awards: 2, completed_lessons: 2, streak: 1 });

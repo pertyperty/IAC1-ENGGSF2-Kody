@@ -18,6 +18,12 @@ including Moderator-only weekly scheduling and Administrator-only finance tools.
 
 ## Mission
 
+The owner's continued 2026-10-09 game-first polish adds a saved-goal mission board
+and revision-pinned course trails with direct continuation after confirmed wins.
+See [gamified journeys](docs/gamified-journey-flow.md). These are progress displays,
+not a new reward or daily quest policy. Keep reading outside streak/XP qualification,
+never recommend locked/withdrawn lessons, and reauthorize the next lesson on GET.
+
 The owner's 2026-10-09 workflow audit consolidates both shells under
 `layouts.base`, with shared workspace, form-error, review-action and empty-state
 surfaces. See [workflow quality](docs/workflow-quality-audit.md). Keep notification
