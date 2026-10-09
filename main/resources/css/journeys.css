@@ -1,5 +1,6 @@
 /* Game-first goals and revision-pinned course trails. */
 .course-lesson-page { max-width: 1200px; }
+.course-lesson-page .game-card { max-width: none; }
 .course-trail-page { max-width: 1100px; }
 .course-lesson-page .lesson-reader { max-width: 80ch; }
 .mission-board { margin-block: 20px 28px; }

@@ -234,6 +234,7 @@ test('A01 A02 B03 B05: guest trial, registration, verified play, reading and cou
     expect(JSON.parse(fixture('snapshot', email))).toMatchObject({ xp: 20, completed_lessons: 1 });
     await page.locator('[data-journey-next]').click();
     await expect(page).toHaveURL(new RegExp(`/modules/${course.slots[1]}$`));
+    expect((await page.locator('[data-coding-game]').boundingBox()).width).toBeGreaterThan(800);
     await solveGarden(page);
     await expect(page.locator('[data-journey-next]')).toHaveAttribute('href', new RegExp(`/modules/${course.slots[2]}$`));
     await expect(page.locator('[data-journey-count]')).toHaveText('2 of 5 adventures completed.');
