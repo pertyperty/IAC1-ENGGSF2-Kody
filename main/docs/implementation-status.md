@@ -4,6 +4,9 @@ Start here for current scope, detailed evidence and the next useful improvements
 This index consolidates the feature summaries previously repeated in README.
 It does not replace approved requirements, decisions or the implementation records.
 Last reviewed: 2026-10-09.
+The [workflow quality audit](workflow-quality-audit.md) records the all-module
+regression pass, shared base layout/partials, bounded polling and reactions,
+policy-safe notification destinations and progression query optimizations.
 The [navigation and feedback follow-up](navigation-and-feedback-implementation.md)
 owns direct role destinations, context-aware back buttons, persistent learner
 progression, distinguishable actions and shared dismissible notifications.

@@ -27,6 +27,7 @@ export function mountContentReactions(root, fetcher = globalThis.fetch) {
         render();
         try {
             const response = await fetcher(url, { method: 'POST', credentials: 'same-origin', cache: 'no-store',
+                redirect: 'error', signal: AbortSignal.timeout(10000),
                 headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
                 body: JSON.stringify({ _token: form.querySelector('[name="_token"]').value,
                     record_version: state.record_version, reaction: wanted }) });

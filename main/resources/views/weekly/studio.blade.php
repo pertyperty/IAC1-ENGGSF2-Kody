@@ -4,7 +4,7 @@
 <section class="review-page page-width"><a class="quiet-link" href="{{ route('module-reviews.index') }}">← Review studio</a><h1>A fresh quest for every week.</h1>
 <p>Sunday 00:00 to the next Sunday 00:00, Manila time. Only one week can be active. An active event's problem and rules stay fixed.</p>
 
-@if($errors->any())<div class="studio-errors" role="alert">@foreach($errors->all() as $error)<p>{{ $error }}</p>@endforeach</div>@endif
+@include('layouts.form-errors')
 <form class="catalog-search" method="GET"><label for="week">Choose a Sunday</label><input id="week" type="date" name="week" value="{{ $week }}" required><label for="q">Search approved quests</label><input id="q" type="search" name="q" value="{{ $query }}" maxlength="80"><button class="button button-dark button-small">Open calendar week</button></form>
 @if($event)<p class="lesson-note">{{ $event->revision->title }} · {{ $event->status }} · Version {{ $event->record_version }}</p>@endif
 @if($editable)<p>Choose a quest below. Only its approved revision is included. New events use the approved capped reward policy; prizes require both earned issuance allowance and matured platform funding.</p>

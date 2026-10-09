@@ -5,7 +5,7 @@
 @include('transactions.review-access')
 <a class="quiet-link" href="{{ route('challenge-reviews.index') }}">← Challenge reviews</a><h1>{{ $revision->title }}</h1><p class="step-pill">Revision {{ $revision->number }} · {{ $revision->review_status }}</p>
 
-@if($errors->any())<div class="studio-errors" role="alert">@foreach($errors->all() as $error)<p>{{ $error }}</p>@endforeach</div>@endif
+@include('layouts.form-errors')
 @include('challenges.problem')
 <h2>Every check</h2>@foreach($revision->testCases as $case)<div class="lesson-note challenge-case"><h3>Check {{ $case->position }} · {{ $case->hidden ? 'Hidden' : 'Sample' }}</h3><p>Input</p><pre>{{ $case->input }}</pre><p>Expected output</p><pre>{{ $case->expected_output }}</pre></div>@endforeach
 @if($revision->review_notes)<p class="lesson-note">{{ $revision->review_notes }}</p>@endif

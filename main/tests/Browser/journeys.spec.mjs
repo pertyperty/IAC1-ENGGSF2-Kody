@@ -261,12 +261,41 @@ test('D01 D05 D07: creator draft, staff review, course composition and learner p
         await authorPage.getByRole('button', { name: 'Submit saved course for review' }).click();
         await reviewerPage.goto(`/manage/courses/${courseId}`);
         await reviewerPage.getByRole('button', { name: 'Approve course publication' }).click();
+        await authorPage.goto('/updates');
+        const courseNotice = authorPage.locator('.lesson-note').filter({ hasText: 'Browser reviewed journey' });
+        await expect(courseNotice.getByRole('link', { name: 'Open current details' })).toHaveAttribute('href', new RegExp(`/create/courses/${courseId}$`));
+        await courseNotice.getByRole('button', { name: 'Mark as read' }).click();
+        await expect(authorPage.locator('[data-flash-toast]')).toContainText('Update marked as read');
+        await expect(authorPage.locator('.lesson-note').filter({ hasText: 'Browser reviewed journey' }).getByText('Read', { exact: true })).toBeVisible();
+        await audit(authorPage);
         await login(learnerPage, 'learner');
         await learnerPage.goto(`/learn/courses/${courseId}`);
         await expect(learnerPage.getByRole('heading', { name: 'Browser reviewed journey' })).toBeVisible();
         await learnerPage.getByRole('button', { name: 'Join this journey' }).click();
         await audit(learnerPage);
     } finally { await Promise.all([creator.close(), staff.close(), learner.close()]); }
+});
+
+test('empty catalogs offer clear next actions on narrow screens in both themes', async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 740 });
+    for (const dark of [false, true]) {
+        for (const [path, title, action] of [
+            ['/learn', 'No adventures found', 'See all modules'],
+            ['/learn/courses', 'No journeys found', 'Explore adventures'],
+            ['/challenges', 'No coding quests found', 'Explore adventures'],
+        ]) {
+            await page.goto(`${path}?q=zzzz-no-matching-content`);
+            const toggle = page.getByRole('button', { name: 'Dark mode' });
+            if ((await toggle.getAttribute('aria-pressed')) !== String(dark)) await toggle.click();
+            const empty = page.locator('.catalog-empty');
+            await expect(empty.getByRole('heading', { name: title })).toBeVisible();
+            await expect(empty.getByRole('link', { name: action })).toHaveAttribute('href', /\/learn$/);
+            await audit(page);
+            await empty.getByRole('link', { name: action }).click();
+            await expect(page).toHaveURL(/\/learn$/);
+            await expect(page.locator('.module-card').first()).toBeVisible();
+        }
+    }
 });
 
 test('Shared interface: keyboard navigation, light/dark themes, narrow layouts and disabled-provider wallet', async ({ page }) => {

@@ -22,8 +22,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        View::composer(['layouts.account', 'layouts.learning'], function ($view): void {
-            $view->with('chrome', app(ApplicationChrome::class)->snapshot(request()));
+        View::composer('layouts.base', function ($view): void {
+            $view->with('chrome', app(ApplicationChrome::class)->snapshot(request(), $view->getData()));
         });
         View::composer(['content.editor', 'content.course-editor', 'challenges.editor'], function ($view): void {
             $view->with('accessModules', app(AccessSettings::class)->options(auth()->user()));

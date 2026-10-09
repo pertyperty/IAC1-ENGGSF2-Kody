@@ -26,9 +26,11 @@ class PlayController extends Controller
 
     public function hub(Request $request, LearningProgression $progression, PlatformDashboard $dashboard): Response
     {
-        return response()->view('learning.hub', ['progress' => $progression->snapshot($request->user()->id),
+        $participant = Gate::allows('viewLearning', LearningCourse::class);
+
+        return response()->view('learning.hub', ['progress' => $participant ? $progression->snapshot($request->user()->id) : null,
             'dashboard' => $dashboard->snapshot($request->user()),
-            'weekly' => WeeklyEvent::open()->with('revision:id,title,language,difficulty')->first()])->header('Cache-Control', 'no-store, private');
+            'weekly' => $participant ? WeeklyEvent::open()->with('revision:id,title,language,difficulty')->first() : null])->header('Cache-Control', 'no-store, private');
     }
 
     public function game(CompleteGameRequest $request, string $level, LearningProgression $progression): JsonResponse

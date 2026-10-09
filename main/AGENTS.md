@@ -18,6 +18,13 @@ including Moderator-only weekly scheduling and Administrator-only finance tools.
 
 ## Mission
 
+The owner's 2026-10-09 workflow audit consolidates both shells under
+`layouts.base`, with shared workspace, form-error, review-action and empty-state
+surfaces. See [workflow quality](docs/workflow-quality-audit.md). Keep notification
+destinations policy-checked after role changes, dashboard snapshots owned by the
+current request and pending evaluation polling recoverable after browser history
+restoration. Browser interruptions never cancel committed evaluations.
+
 The owner's 2026-10-09 usability request adds direct policy-filtered navigation,
 context-aware back buttons, a server-owned learner HUD and shared dismissible
 toasts. See [navigation and feedback](docs/navigation-and-feedback-implementation.md).

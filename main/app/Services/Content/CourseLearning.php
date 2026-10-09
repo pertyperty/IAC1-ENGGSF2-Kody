@@ -66,8 +66,13 @@ class CourseLearning
             $revision->load('modules.revision', 'modules.module');
             $progress = $enrollment === null ? collect() : DB::table('course_module_progress')->where('enrollment_id', $enrollment->id)->get()->keyBy('assignment_id');
 
-            $unlocked = $revision->modules->mapWithKeys(fn ($slot) => [$slot->id => ! $enrollment?->sequential
-                || $revision->modules->where('position', '<', $slot->position)->every(fn ($previous) => $progress->get($previous->id)?->completed_at !== null)]);
+            $previousComplete = true;
+            $unlocked = $revision->modules->mapWithKeys(function ($slot) use ($enrollment, $progress, &$previousComplete): array {
+                $available = ! $enrollment?->sequential || $previousComplete;
+                $previousComplete = $previousComplete && $progress->get($slot->id)?->completed_at !== null;
+
+                return [$slot->id => $available];
+            });
 
             $accessible = $enrollment !== null && $this->hasAccess($user, $course, $revision);
             $price = app(ContentAccess::class)->price($revision, $course->created_by);
