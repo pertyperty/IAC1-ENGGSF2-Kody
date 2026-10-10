@@ -20,33 +20,51 @@ class ModulePublishing
 {
     public function save(User $actor, string $sessionId, array $data, ?LearningModule $module = null): LearningModule
     {
-        return DB::transaction(function () use ($actor, $sessionId, $data, $module): LearningModule {
-            $user = User::whereKey($actor->id)->lockForUpdate()->firstOrFail();
-            app(CurrentAccountSession::class)->assert($user, $sessionId);
-            if ($module === null) {
-                Gate::forUser($user)->authorize('create', LearningModule::class);
-                $current = LearningModule::create(['created_by' => $user->id]);
-                $number = 1;
-            } else {
-                $current = LearningModule::whereKey($module->id)->lockForUpdate()->firstOrFail();
-                Gate::forUser($user)->authorize('update', $current);
-                $this->version($current, (int) $data['record_version']);
-                $latest = $current->latestRevision;
-                if ($latest->review_status === 'Pending') {
-                    throw ValidationException::withMessages(['module' => 'This revision is awaiting review. Save changes after the review finishes.']);
+        $uploaded = [];
+        try {
+            return DB::transaction(function () use ($actor, $sessionId, $data, $module, &$uploaded): LearningModule {
+                $user = User::whereKey($actor->id)->lockForUpdate()->firstOrFail();
+                app(CurrentAccountSession::class)->assert($user, $sessionId);
+                if ($module === null) {
+                    Gate::forUser($user)->authorize('create', LearningModule::class);
+                    $current = LearningModule::create(['created_by' => $user->id]);
+                    $number = 1;
+                } else {
+                    $current = LearningModule::whereKey($module->id)->lockForUpdate()->firstOrFail();
+                    Gate::forUser($user)->authorize('update', $current);
+                    $this->version($current, (int) $data['record_version']);
+                    $latest = $current->latestRevision;
+                    if ($latest->review_status === 'Pending') {
+                        throw ValidationException::withMessages(['module' => 'This revision is awaiting review. Save changes after the review finishes.']);
+                    }
+                    $number = $latest->number + 1;
+                    $current->increment('record_version');
                 }
-                $number = $latest->number + 1;
-                $current->increment('record_version');
-            }
-            ModuleRevision::create(['module_id' => $current->id, 'number' => $number,
-                'title' => $data['title'], 'description' => $data['description'], 'content' => $data['content'],
-                'type' => $data['type'], 'video_url' => $data['type'] === 'Video' ? $data['video_url'] : null,
-                'assessment' => $this->assessment($data),
-                'game_preset_revision_id' => $data['assessment_kind'] === 'preset' ? (int) $data['managed_preset'] : null] + app(AccessSettings::class)->attributes($user, 'module', $data, $current->id));
-            $this->audit($user, $current, 'module.saved', ['revision' => $number]);
+                $attachments = app(ModuleMedia::class)->retain($module === null ? null : $latest, $data['retain_attachments'] ?? []);
+                if (count($attachments) + count($data['attachments'] ?? []) > 5) {
+                    throw ValidationException::withMessages(['attachments' => 'Keep up to five lesson attachments. Remove one before adding another.']);
+                }
+                foreach ($data['attachments'] ?? [] as $file) {
+                    $asset = app(ModuleMedia::class)->upload($file);
+                    $uploaded[] = $asset;
+                    $attachments[] = $asset;
+                }
+                ModuleRevision::create(['module_id' => $current->id, 'number' => $number,
+                    'title' => $data['title'], 'description' => $data['description'], 'content' => $data['content'],
+                    'type' => $data['type'], 'video_url' => $data['video_url'] ?? null, 'attachments' => $attachments,
+                    'assessment' => $this->assessment($data),
+                    'game_preset_revision_id' => $data['assessment_kind'] === 'preset' ? (int) $data['managed_preset'] : null] + app(AccessSettings::class)->attributes($user, 'module', $data, $current->id));
+                $this->audit($user, $current, 'module.saved', ['revision' => $number]);
 
-            return $current;
-        });
+                return $current;
+            });
+        } catch (\Throwable $exception) {
+            // Only newly uploaded objects belong to this rolled-back write; retained revisions stay intact.
+            foreach ($uploaded as $asset) {
+                app(ModuleMedia::class)->queueRemoval($actor->id, $asset);
+            }
+            throw $exception;
+        }
     }
 
     public function submit(User $actor, string $sessionId, LearningModule $module, int $version): void

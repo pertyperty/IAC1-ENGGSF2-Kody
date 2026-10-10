@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Account;
 
 use App\Actions\Account\LoginAccount;
 use App\Enums\LoginOutcome;
+use App\Enums\Role;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Account\ConfirmLoginRequest;
 use App\Http\Requests\Account\LoginRequest;
@@ -57,7 +58,9 @@ class LoginController extends Controller
     private function respond(Request $request, LoginOutcome $outcome): JsonResponse|RedirectResponse
     {
         if ($outcome === LoginOutcome::Authenticated) {
-            return $request->expectsJson() ? response()->json(['redirect' => route('dashboard')]) : redirect()->route('dashboard');
+            $destination = $request->user()->account_role === Role::Learner ? 'home' : 'dashboard';
+
+            return $request->expectsJson() ? response()->json(['redirect' => route($destination)]) : redirect()->route($destination);
         }
         if ($outcome === LoginOutcome::Conflict) {
             return $request->expectsJson()

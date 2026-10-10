@@ -4,6 +4,7 @@ namespace App\Services\Content;
 
 use App\Models\LearningCourse;
 use App\Models\LearningModule;
+use App\Models\ModuleRevision;
 use App\Services\Publishing\OwnedContentDeletion;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -36,6 +37,11 @@ class ContentDeletion extends OwnedContentDeletion
     protected function removeDefinition(string $kind, Model $content): void
     {
         if ($kind === 'module') {
+            foreach (ModuleRevision::where('module_id', $content->id)->cursor() as $revision) {
+                foreach ($revision->attachments as $asset) {
+                    app(ModuleMedia::class)->queueRemoval($content->created_by, $asset);
+                }
+            }
             DB::table('module_revisions')->where('module_id', $content->id)->delete();
 
             return;

@@ -1,0 +1,1 @@
+<a href="{{ route('home') }}" class="play-brand" aria-label="Kody home"><img class="brand-mark" src="{{ asset(config('branding.mark')) }}" width="36" height="36" alt="">kody<span class="brand-dot">.</span></a>

@@ -5,6 +5,7 @@ use App\Enums\Role;
 use App\Models\AccountRecovery;
 use App\Models\EmailVerification;
 use App\Models\InstructorApplication;
+use App\Models\TowerLevel;
 use App\Models\User;
 use App\Models\VerificationDelivery;
 use App\Services\Account\AccountRecoveryService;
@@ -14,6 +15,7 @@ use App\Services\Challenges\ChallengePublishing;
 use App\Services\Content\CoursePublishing;
 use App\Services\Content\ModulePublishing;
 use App\Services\Engagement\ContentFeedback;
+use Database\Seeders\TowerLevelSeeder;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
@@ -22,6 +24,19 @@ use Illuminate\Support\Str;
 use Symfony\Component\Process\Process;
 
 uses(DatabaseMigrations::class);
+
+test('tower overlapping validated clears save one checkpoint clearance and streak without XP', function () {
+    $this->seed(TowerLevelSeeder::class);
+    $level = TowerLevel::where('position', 1)->sole();
+    $user = moduleAccount(Role::Learner);
+    $results = simultaneousAccountRequests('tower-complete', ['actor_id' => $user->id, 'session_id' => 'module-test-session',
+        'level_id' => $level->id, 'revision_id' => $level->current_revision_id], fn () => User::whereKey($user->id)->lockForUpdate()->first());
+    expect($results)->toBe(['saved', 'saved']);
+    $this->assertDatabaseCount('tower_clearances', 1);
+    $this->assertDatabaseCount('tower_stage_completions', 1);
+    $this->assertDatabaseCount('learning_activity_days', 1);
+    $this->assertDatabaseCount('xp_awards', 0);
+});
 
 test('A03 Google simultaneous callback claims permit only one provider exchange', function () {
     $sessionId = Str::random(40);

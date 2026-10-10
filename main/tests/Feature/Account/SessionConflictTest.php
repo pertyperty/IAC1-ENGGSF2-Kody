@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\AccountStatus;
+use App\Enums\Role;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -23,7 +24,7 @@ test('A03 conflict prompts only after correct credentials and continue replaces 
     expect($user->fresh()->active_session_hash)->toBe($oldHash)->and($user->fresh()->failed_login_attempts)->toBe(2)
         ->and(session('login_confirmation'))->not->toHaveKey('password');
     $this->get(route('login.confirmation'))->assertOk()->assertSee('Continue here?');
-    $this->post(route('login.confirm'), ['choice' => 'continue', 'user_id' => 999])->assertRedirect(route('dashboard'));
+    $this->post(route('login.confirm'), ['choice' => 'continue', 'user_id' => 999])->assertRedirect(route(auth()->user()->account_role === Role::Learner ? 'home' : 'dashboard'));
     $this->assertAuthenticatedAs($user);
     expect($user->fresh()->active_session_hash)->not->toBe($oldHash)
         ->and($user->fresh()->failed_login_attempts)->toBe(0)->and(session('login_confirmation'))->toBeNull();
@@ -58,7 +59,7 @@ test('A03 absent expired or stale confirmation cannot replace another session', 
 test('A03 an expired previous session does not require replacement confirmation', function () {
     $user = conflictingLogin();
     $user->forceFill(['active_session_expires_at' => now()])->save();
-    $this->post(route('login.store'), ['email' => $user->email, 'password' => 'password'])->assertRedirect(route('dashboard'));
+    $this->post(route('login.store'), ['email' => $user->email, 'password' => 'password'])->assertRedirect(route(auth()->user()->account_role === Role::Learner ? 'home' : 'dashboard'));
     $this->assertAuthenticatedAs($user);
 });
 

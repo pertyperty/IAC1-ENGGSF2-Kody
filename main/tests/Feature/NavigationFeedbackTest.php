@@ -9,13 +9,13 @@ uses(RefreshDatabase::class);
 test('shared navigation exposes progress only to participants and hides it during account editing', function (Role $role) {
     moduleSignIn($this, moduleAccount($role));
     $response = $this->get(route('dashboard'))->assertOk();
-    if (in_array($role, [Role::Learner, Role::Contributor, Role::Instructor], true)) {
+    if ($role === Role::Learner) {
         $response->assertSee('data-progress-strip', false)->assertSee('data-progress-xp', false);
         $this->getJson(route('play.progress'))->assertOk()->assertJsonPath('achievements.xp', 0)
             ->assertJsonPath('progress.completed_count', 0)->assertHeader('Cache-Control', 'no-store, private');
     } else {
         $response->assertDontSee('data-progress-strip', false)->assertDontSee('Continue your learning journeys');
-        $this->getJson(route('play.progress'))->assertForbidden();
+        $this->getJson(route('play.progress'))->assertStatus(in_array($role, [Role::Contributor, Role::Instructor], true) ? 200 : 403);
     }
     $this->get(route('account.edit'))->assertOk()->assertDontSee('data-progress-strip', false)
         ->assertSee('Back to my account');

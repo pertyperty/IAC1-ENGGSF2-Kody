@@ -46,9 +46,9 @@ test('B05 next adventure and daily feedback follow persisted validated progress'
 });
 
 test('B01 landing trial invites guests to save and signed in players to continue', function () {
-    $this->get(route('home'))->assertOk()->assertSee('This trial stays here')->assertSee('Start your saved adventure');
+    $this->get(route('welcome'))->assertOk()->assertSee('This trial stays here')->assertSee('Start your saved adventure');
     signInForLearning($this);
-    $this->get(route('home'))->assertOk()->assertSee('Continue your saved adventure')->assertSee('Continue your saved trail');
+    $this->get(route('welcome'))->assertOk()->assertSee('Continue your saved adventure')->assertSee('Continue your saved trail');
     $this->get(route('learning.show', 'sequences'))->assertOk()->assertSee('Continue playing');
 });
 
@@ -58,7 +58,7 @@ test('A01 A02 B03 B05 registration to verified play enrollment and assessment wo
     $accountId = User::where('email', 'learner@example.test')->value('id');
     $delivery = VerificationDelivery::where('user_id', $accountId)->sole();
     $this->post(route('verification.verify'), ['verification_token' => $delivery->token])->assertOk();
-    $this->post(route('login.store'), ['email' => 'learner@example.test', 'password' => 'StrongPass12!'])->assertRedirect(route('dashboard'));
+    $this->post(route('login.store'), ['email' => 'learner@example.test', 'password' => 'StrongPass12!'])->assertRedirect(route(auth()->user()->account_role === Role::Learner ? 'home' : 'dashboard'));
     $this->withCredentials()->withCookie(config('session.cookie'), session()->getId());
     $this->postJson(route('play.game', 'sequences'), sequenceSolution())->assertOk()->assertJsonPath('progress.next_level', 'loops');
     $this->post(route('course-learning.enroll', $course), ['revision_id' => $course->published_revision_id])->assertRedirect();

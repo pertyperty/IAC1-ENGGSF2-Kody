@@ -1,7 +1,7 @@
 <div class="lesson-reader">@unless($headingShown ?? false)@if($preview ?? false)<h2>{{ $revision->title }}</h2>@else<h1>{{ $revision->title }}</h1>@endif @endunless<p>{{ $revision->description }}</p>
     @if($revision->assessment)<details class="lesson-reading"><summary>Read the lesson before you play</summary>@endif
     <div class="lesson-text">{{ $revision->content }}</div>
-    @if($revision->type === 'Video')<p><a class="quiet-link" href="{{ $revision->video_url }}" target="_blank" rel="noopener noreferrer">Watch the lesson video ↗</a></p>@endif
+    @include('content.media')
     @if($revision->assessment)</details>@endif
 </div>
 @if($revision->assessment)

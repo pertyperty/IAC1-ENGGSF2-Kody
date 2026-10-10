@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        $this->call(TowerLevelSeeder::class);
         // Never provision development identities through production/staging seeds.
         if (app()->environment('local')) {
             $this->call(LocalRoleAccountsSeeder::class);

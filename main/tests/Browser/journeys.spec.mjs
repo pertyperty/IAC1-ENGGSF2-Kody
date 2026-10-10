@@ -11,10 +11,12 @@ function fixture(operation, email) {
 }
 async function login(page, role) {
     await page.goto('/login');
-    await page.getByLabel('Email address').fill(`${role}@browser.example.test`);
+    await page.getByLabel('Email or username').fill(`${role}@browser.example.test`);
     await page.getByLabel(/^Password/).fill('BrowserStrong12!');
     await page.getByRole('button', { name: 'Sign in', exact: false }).click();
-    await expect(page).toHaveURL(/\/dashboard$/);
+    const creatorOrStaff = ['instructor','moderator','administrator','navinstructor','navmoderator','navadministrator','navcontributor','toweradmin'].includes(role);
+    await expect(page).toHaveURL(creatorOrStaff ? /\/dashboard$/ : /\/$/);
+    if (!creatorOrStaff) await page.goto('/dashboard');
 }
 async function audit(page) {
     await page.evaluate(async () => {
@@ -43,8 +45,8 @@ test('navigation hides on downward scroll and returns by upward scroll, hover an
     await expect(page.getByRole('link', { name: 'Skip to content' })).toBeFocused();
     await page.keyboard.press('Enter');
     await expect(page.locator('#main-content')).toBeFocused();
-    await expect(page.getByRole('link', { name: 'Kody home', exact: true })).toBeVisible();
-    await expect(page.getByRole('img', { name: /Kody building a puzzle/ })).toHaveJSProperty('complete', true);
+    await expect(header.getByRole('link', { name: 'Kody home', exact: true })).toBeVisible();
+    await expect(page.locator('[data-tower-stop]')).toHaveCount(25);
     await page.mouse.move(700, 600);
     await page.mouse.wheel(0, 650);
     await expect(shell).toHaveClass(/navigation-hidden/);
@@ -113,7 +115,7 @@ test('clear back buttons, dismissible errors and persistent progress work throug
     await page.getByRole('link', { name: 'Back to home', exact: false }).click();
     await expect(page).toHaveURL(/\/$/);
     await page.goto('/login');
-    await page.getByLabel('Email address').fill('missing@browser.example.test');
+    await page.getByLabel('Email or username').fill('missing@browser.example.test');
     await page.getByLabel('Password', { exact: true }).fill('BrowserStrong12!');
     await page.getByRole('button', { name: 'Sign in', exact: false }).click();
     const error = page.locator('.toast-error');
@@ -188,7 +190,7 @@ test('staff workspace, account filters and password controls stay accessible in 
 
 test('A01 A02 B03 B05: guest trial, registration, verified play, reading and course assessment persist exactly once', async ({ page }) => {
     const email = 'newplayer@browser.example.test';
-    await page.goto('/');
+    await page.goto('/welcome');
     await expect(page.locator('[data-coding-game]')).toBeVisible();
     await audit(page);
     await solveGarden(page, false);
@@ -222,7 +224,7 @@ test('A01 A02 B03 B05: guest trial, registration, verified play, reading and cou
     expect(JSON.parse(fixture('snapshot', email))).toMatchObject({ xp: 20, levels: 1, streak: 1 });
     await expect(page.locator('[data-progress-xp]')).toHaveText('20');
     await expect(page.locator('[data-progress-streak]')).toHaveText('1');
-    await expect(page.locator('[data-progress-level]')).toHaveText('1 / 3');
+    await expect(page.locator('[data-progress-level]')).toHaveText('0 / 25');
     await expect(page.locator('.toast-success')).toBeVisible();
     await page.locator('.toast-success').getByRole('button', { name: 'Dismiss notification' }).click();
     await expect(page.locator('.toast-success')).toHaveCount(0);
@@ -246,6 +248,88 @@ test('A01 A02 B03 B05: guest trial, registration, verified play, reading and cou
     await audit(page);
 });
 
+test('tower guest trials unlock locally and level four invites registration on desktop and mobile', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.locator('[data-tower-stop="2"] a')).toHaveAttribute('aria-disabled', 'true');
+    await page.locator('[data-tower-stop="1"] a').click();
+    await solveGarden(page, false);
+    await expect(page.locator('[data-tower-victory]')).toBeVisible();
+    await page.locator('[data-tower-next]').click();
+    await expect(page.locator('[data-tower-stop="2"] a')).toHaveAttribute('aria-disabled', 'false');
+    await page.locator('[data-tower-stop="2"] a').click();
+    const loop = page.locator('[data-coding-game]');
+    for (const direction of ['right', 'up', 'right']) await loop.getByRole('button', { name: `Add ${direction}`, exact: true }).click();
+    await loop.locator('[data-game-repeat]').check(); await loop.locator('[data-game-run]').click();
+    await expect(page.locator('[data-tower-victory]')).toBeVisible();
+    await page.locator('[data-tower-next]').click();
+    await page.locator('[data-tower-stop="3"] a').click();
+    await page.locator('[data-game-conditional]').check(); await solveGarden(page, false);
+    await page.locator('[data-tower-next]').click(); await expect(page).toHaveURL(/\/welcome$/);
+    await page.goto('/'); await page.setViewportSize({ width: 390, height: 844 });
+    await audit(page); await page.locator('[data-tower-stop="4"] a').click();
+    await expect(page).toHaveURL(/\/welcome$/);
+});
+
+test('learner username sign-in lands on the tower and saved wins refresh the deliberate HUD', async ({ page }) => {
+    await page.goto('/login');
+    await page.getByLabel('Email or username').fill('browser_towerlearner');
+    await page.getByLabel(/^Password/).fill('BrowserStrong12!');
+    await page.getByRole('button', { name: 'Sign in', exact: false }).click();
+    await expect(page).toHaveURL(/\/$/);
+    await expect(page.locator('.header-username')).toContainText('browser_towerlearner');
+    await page.locator('[data-tower-stop="1"] a').click(); await solveGarden(page);
+    await expect(page.locator('[data-progress-level]')).toContainText('1 / 25');
+    await expect(page.locator('[data-tower-victory]')).toBeVisible();
+    await page.reload(); await page.getByRole('link', { name: 'Level map', exact: false }).click();
+    await expect(page.locator('[data-tower-stop="1"]')).toHaveClass(/is-cleared/);
+    await expect(page.locator('[data-tower-stop="2"]')).not.toHaveClass(/is-locked/);
+    await page.setViewportSize({ width: 320, height: 740 }); await audit(page);
+});
+
+test('Administrator rail pulls and pins labels; tower drafts preview without publishing and preserve changes', async ({ page }) => {
+    await login(page, 'toweradmin');
+    const rail = page.locator('[data-navigation-rail]');
+    const railLinks = rail.locator('.workspace-nav a');
+    await expect(rail.locator('.nav-icon svg')).toHaveCount(await railLinks.count());
+    await expect(rail.locator('.nav-label')).toHaveCount(await railLinks.count());
+    for (const icon of await rail.locator('.nav-icon').all()) {
+        expect((await icon.boundingBox()).width).toBeGreaterThanOrEqual(22);
+    }
+    const tower = rail.getByRole('link', { name: 'Tower studio', exact: true });
+    await tower.hover();
+    await expect.poll(async () => (await tower.boundingBox()).width).toBeGreaterThan(200);
+    await rail.locator('[data-rail-toggle]').click();
+    await expect(page.locator('html')).toHaveAttribute('data-rail', 'expanded');
+    await tower.click(); await page.locator('.tower-editor-card').first().click();
+    await page.getByText('Customize stage 1', { exact: true }).click();
+    await page.getByLabel('Stage title', { exact: true }).fill('Draft garden adventure');
+    await page.getByRole('button', { name: 'Try unsaved stage', exact: true }).click();
+    const preview = page.locator('.tower-draft-preview');
+    await expect(preview.getByRole('heading', { name: 'Draft garden adventure' })).toBeVisible();
+    await expect(preview.locator('[data-completion-url]')).toHaveCount(0);
+    for (const direction of ['right', 'right', 'up', 'right', 'right']) await preview.getByRole('button', { name: `Add ${direction}`, exact: true }).click();
+    await preview.getByRole('button', { name: 'Run my code', exact: true }).click();
+    await expect(preview.locator('[data-game-success]')).toBeVisible();
+    await page.screenshot({ path: 'storage/app/browser-results/tower-stage-editor.png', fullPage: true });
+    await page.getByRole('button', { name: '+ A quick idea check', exact: true }).click();
+    const quizStage = page.locator('.tower-stage-summary').last();
+    await quizStage.getByText('Customize stage 2', { exact: true }).click();
+    await quizStage.getByLabel('Question', { exact: true }).fill('Can instruction order change the result?');
+    await quizStage.getByRole('button', { name: 'Try unsaved stage', exact: true }).click();
+    const quizPreview = quizStage.locator('.tower-draft-preview');
+    const editorUrl = page.url();
+    await quizPreview.getByRole('radio').first().check();
+    await quizPreview.getByRole('button', { name: 'Check my idea', exact: true }).click();
+    await expect(quizPreview.locator('[data-quiz-feedback]')).toContainText('You got it');
+    await expect(page).toHaveURL(editorUrl);
+    await expect(page.locator('[name="record_version"]')).toHaveValue('1');
+    await audit(page);
+    await page.getByRole('button', { name: 'Publish level revision', exact: true }).click();
+    await expect(page.locator('.toast')).toContainText('Tower revision published.');
+    await page.reload(); await expect(page.locator('html')).toHaveAttribute('data-rail', 'expanded');
+    await page.setViewportSize({ width: 390, height: 844 }); await audit(page);
+});
+
 test('D01 D05 D07: creator draft, staff review, course composition and learner publication use the real UI', async ({ browser }) => {
     const creator = await browser.newContext();
     const staff = await browser.newContext();
@@ -256,6 +340,8 @@ test('D01 D05 D07: creator draft, staff review, course composition and learner p
         await login(authorPage, 'instructor');
         await authorPage.goto('/create/modules/new?example=programming-check');
         await authorPage.getByLabel('Adventure title').fill('Browser review adventure');
+        await authorPage.getByLabel('Add PDF, DOCX or PPTX resources').setInputFiles({ name: 'browser-notes.docx', mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', buffer: Buffer.from(fixture('office-fixture'), 'base64') });
+        await authorPage.getByLabel('Video or media link (optional)').fill('https://youtu.be/dQw4w9WgXcQ');
         await audit(authorPage);
         await authorPage.getByRole('button', { name: 'Save draft', exact: true }).click();
         await expect(authorPage).toHaveURL(/\/create\/modules\/\d+$/);
@@ -288,6 +374,17 @@ test('D01 D05 D07: creator draft, staff review, course composition and learner p
         await expect(learnerPage.getByRole('heading', { name: 'Browser reviewed journey' })).toBeVisible();
         await learnerPage.getByRole('button', { name: 'Join this journey' }).click();
         await audit(learnerPage);
+        await learnerPage.locator(`a[href*="/learn/courses/${courseId}/modules/"]`).first().click();
+        await learnerPage.getByText('Read the lesson before you play', { exact: true }).click();
+        await expect(learnerPage.locator('.lesson-video iframe')).toHaveAttribute('src', 'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ');
+        await learnerPage.locator('.resource-card').getByRole('link', { name: 'View', exact: true }).click();
+        await expect(learnerPage.getByText('Browser notes: instruction order matters.', { exact: true })).toBeVisible();
+        await audit(learnerPage);
+        const downloaded = learnerPage.waitForEvent('download');
+        await learnerPage.getByRole('link', { name: 'Download original', exact: false }).click();
+        expect((await downloaded).suggestedFilename()).toBe('browser-notes.docx');
+        await learnerPage.getByRole('link', { name: 'Back to this lesson', exact: false }).click();
+        await expect(learnerPage.locator('[data-practice-quiz]')).toBeVisible();
     } finally { await Promise.all([creator.close(), staff.close(), learner.close()]); }
 });
 

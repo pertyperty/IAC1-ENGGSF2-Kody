@@ -99,3 +99,24 @@ game editing/painting/swapping/terminal history, plus a failed completion-save r
 The original registration, creator publication, reading and mobile assessment
 journeys remain in the same isolated runner. These newer checks supersede the
 earlier workflow count, without replacing the recorded restoration evidence.
+
+## Tower and private-media follow-up — 2026-10-10
+
+The suite now exercises 18 workflows, including guest levels 1–3/level-4 welcome,
+username sign-in to the Learner tower, saved tower wins/HUD refresh, the collapsed
+rail and persistent expansion, and unsaved Administrator game/quiz previews.
+The creator-to-learner publication workflow now uploads a private DOCX and embeds
+YouTube alongside its quiz, then verifies authorized text preview, original
+download and a direct return to the lesson. Desktop and narrow layouts retain
+axe checks in both themes. All 18 workflows passed together in the final local
+run (4.6 minutes); CI runs the entire suite again on the proposed commit.
+
+The baseline excludes both new tower/media migrations, then upgrades populated
+history and seeds the missing tower positions. Legacy-table digests are compared
+with only newly added columns excluded; restored-database comparisons include
+every column. The latest local PostgreSQL 18 drill matched **79 table
+fingerprints**, retained 60 XP/50 synthetic KB, decrypted its fixture and passed
+the ledger check. Restoration plus verification took **2,788 ms**. This supersedes
+the earlier local table count while retaining the same staged-operation limits.
+See [tower and media implementation](tower-and-media-implementation.md) for
+feature, regression and publication boundaries.

@@ -18,6 +18,20 @@ including Moderator-only weekly scheduling and Administrator-only finance tools.
 
 ## Mission
 
+The owner's 2026-10-10 redesign makes the editable 25-level tower the guest/Learner
+landing page, with local guest trials 1–3 and the welcome invitation at level 4.
+Signed-in unlocks are sequential and server validated; edits preserve old clears.
+Only final-stage tower wins qualify Manila streaks; no additional tower XP/KB.
+Initial levels are free, with optional Learning links. Other roles retain focused
+dashboards and no participant HUD. See [tower/media](docs/tower-and-media-implementation.md)
+and [editorial sourcing](docs/tower-content-guide.md). Native document uploads stay
+private and revision-pinned; office previews are escaped text, not full rendering.
+Never allow arbitrary uploaded embed HTML, executable scenarios or host CLI code.
+The compact rail supports focus/touch expansion and reduced motion. Branding is
+centralized in config/branding.php; public/images assets are replaceable placeholders.
+Login accepts case-insensitive email or exact-case username; names allow spaces
+and apostrophes without weakening existing status/session/lockout policies.
+
 The owner's continued 2026-10-09 game-first polish adds a saved-goal mission board
 and revision-pinned course trails with direct continuation after confirmed wins.
 See [gamified journeys](docs/gamified-journey-flow.md). These are progress displays,

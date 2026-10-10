@@ -57,10 +57,10 @@ try {
     if (interrupted) throw new Error('Isolated verification interrupted.');
     if (rehearsal) {
         fixture('seed-history');
-        const beforeUpgrade = JSON.parse(fixture('fingerprint'));
+        const beforeUpgrade = JSON.parse(fixture('fingerprint-legacy'));
         fixture('migrate');
-        const afterUpgrade = JSON.parse(fixture('fingerprint'));
-        for (const table of Object.keys(beforeUpgrade).filter(table => !['migrations', 'coding_challenge_revisions'].includes(table))) {
+        const afterUpgrade = JSON.parse(fixture('fingerprint-legacy'));
+        for (const table of Object.keys(beforeUpgrade).filter(table => table !== 'migrations')) {
             if (JSON.stringify(beforeUpgrade[table]) !== JSON.stringify(afterUpgrade[table])) throw new Error(`Upgrade changed retained ${table} history.`);
         }
         console.log(fixture('check-upgrade'));

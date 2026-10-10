@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\Role;
 use App\Http\Requests\Learning\CompleteGameRequest;
 use App\Http\Requests\Learning\CompleteQuizRequest;
 use App\Models\LearningCourse;
@@ -10,6 +11,7 @@ use App\Services\Engagement\LearnerMissions;
 use App\Services\Engagement\PlatformDashboard;
 use App\Services\Gamification\Achievements;
 use App\Services\Gamification\LearningProgression;
+use App\Services\Gamification\TowerProgression;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -22,12 +24,13 @@ class PlayController extends Controller
         Gate::authorize('viewLearning', LearningCourse::class);
 
         return response()->json(['progress' => $progression->snapshot($request->user()->id),
-            'achievements' => $achievements->snapshot($request->user()->id)])->header('Cache-Control', 'no-store, private');
+            'achievements' => $achievements->snapshot($request->user()->id),
+            'tower' => app(TowerProgression::class)->counts($request->user()->id)])->header('Cache-Control', 'no-store, private');
     }
 
     public function hub(Request $request, LearningProgression $progression, PlatformDashboard $dashboard): Response
     {
-        $participant = Gate::allows('viewLearning', LearningCourse::class);
+        $participant = $request->user()->account_role === Role::Learner && Gate::allows('viewLearning', LearningCourse::class);
         $progress = $participant ? $progression->snapshot($request->user()->id) : null;
         $dashboard = $dashboard->snapshot($request->user());
         $missions = $participant ? app(LearnerMissions::class)->snapshot($progress, $dashboard['achievements']) : [];

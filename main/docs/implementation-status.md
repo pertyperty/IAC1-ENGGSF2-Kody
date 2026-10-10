@@ -3,7 +3,11 @@
 Start here for current scope, detailed evidence and the next useful improvements.
 This index consolidates the feature summaries previously repeated in README.
 It does not replace approved requirements, decisions or the implementation records.
-Last reviewed: 2026-10-09.
+Last reviewed: 2026-10-10.
+The [tower and media redesign](tower-and-media-implementation.md) owns the editable
+25-level main adventure, guest trials, role-focused landing/workspaces, private
+lesson documents/video, compact pulling navigation and inclusive sign-in.
+The [tower content guide](tower-content-guide.md) owns future editorial sourcing.
 The [gamified journey flow](gamified-journey-flow.md) adds saved-goal mission cards,
 numbered course trails and direct next-lesson actions after confirmed wins.
 The [workflow quality audit](workflow-quality-audit.md) records the all-module
@@ -51,11 +55,13 @@ existing accounts; default seeding provisions them only in local mode.
 
 | Area / use cases | Current implementation | Detailed records |
 | --- | --- | --- |
+| Main tower / approved B01/B02/B05 amendment | 25 free editable levels, sequential server clears, local guest trials 1–3, multi-stage bosses 10/20, final-win streak credit with no additional XP/KB. Learners land on the map; other roles land on their workspace. | [Tower/media](tower-and-media-implementation.md), [content guide](tower-content-guide.md) |
+| Private lesson media / D01–D02, B04 | Revision-pinned PDF/DOCX/PPTX uploads, authorized view/download, text-only office previews, canonical YouTube/Vimeo embeds and quizzes alongside media. | [Tower/media](tower-and-media-implementation.md) |
 | Account registration / A01–A02 | Validated registration, private Instructor credentials, Unverified activation, bounded resend and transactional delivery. | [Registration and verification](account-implementation-plan.md) |
 | Sign-in and recovery / A03–A05 | Progressive lockouts, replacement-session consent, POST logout and generic recovery; approved Archived reactivation. | [Login](login-implementation.md), [recovery/profile](recovery-profile-implementation.md) |
 | Personal accounts / A06–A07 | All-role self editing; password-confirmed sensitive changes; participant archival. Deletion also covers retained creator material after explicit consent, staff privacy inventory review and financial/evaluation settlement. | [Editing](profile-editing-implementation.md), [archival](account-archival-implementation.md), [deletion](account-deletion-plan.md) |
 | Role applications / A09–A10, G05 | Private credential history, one Pending role application, rejection/resubmission and staff review; Contributor eligibility uses distinct validated achievements. | [Instructor review](creator-review-implementation.md), [Contributor application](contributor-application-plan.md) |
-| Game-first journey / B01–B02, B05, partial E01/E05/E06 | Landing trial, saved hub, three starter levels and Manila daily streaks. Game clearance unlocks the next level; quiz wins qualify daily activity. Browser trials/previews never grant progress. | [Play](play-implementation.md), [guided journeys](creator-learner-journey.md) |
+| Starter practice / B01–B02, B05, partial E01/E05/E06 | Welcome-page trial, saved hub, three retained starter levels and Manila daily streaks. The main entry is now the tower above. Game clearance unlocks the next starter; quiz wins qualify daily activity. Browser trials/previews never grant progress. | [Play](play-implementation.md), [guided journeys](creator-learner-journey.md) |
 | Customizable assessments / D01–D02, G08–G10 | Garden, Pixel Studio, Number Machine, Sort Lab, virtual Terminal Quest and practice quizzes; typed creator data, server replay and immutable preset snapshots. Twelve lesson starters, two curriculum plans, 1-10-question quizzes and 2-6 choices with immutable snapshots. | [Arcade](arcade-templates-implementation.md), [garden designer](garden-designer-implementation.md), [presets](game-presets-implementation.md) |
 | Module and course authoring / D01–D09 | Owned drafts, moderated new/replacement publication, revision-pinned course composition, creator archival and protected deletion. Retained dependencies block deletion. | [Studio](creator-studio-implementation.md), [courses](course-composition-implementation.md), [deletion](content-deletion-implementation.md) |
 | Learning / B03–B04 | Authenticated module discovery and assessment filters; reviewed free/paid course enrollment, pinned lessons, saved assessment/reading progress, optional sequential paths and consolidated dashboards. Reading grants no streak or Contributor credit. Archived courses retain existing enrollment access; archived modules remain unavailable. | [Discovery](module-discovery-implementation.md), [course learning](course-learning-implementation.md) |

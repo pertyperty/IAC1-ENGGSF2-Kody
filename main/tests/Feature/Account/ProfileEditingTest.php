@@ -26,7 +26,7 @@ function profileEditData(User $user, array $overrides = []): array
 
 function profileSignIn($test, User $user): void
 {
-    $test->post(route('login.store'), ['email' => $user->email, 'password' => 'password'])->assertRedirect(route('dashboard'));
+    $test->post(route('login.store'), ['email' => $user->email, 'password' => 'password'])->assertRedirect(route($user->account_role === Role::Learner ? 'home' : 'dashboard'));
     $test->withCredentials()->withCookie(config('session.cookie'), session()->getId());
 }
 

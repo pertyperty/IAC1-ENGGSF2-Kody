@@ -112,6 +112,18 @@ class LearningProgression
         });
     }
 
+    /** Tower owns objective replay and the locked level revision; this writer grants streak credit only. */
+    public function recordTowerActivity(User $user, string $sessionId, int $levelId, array $instance, array $input): void
+    {
+        if (DB::transactionLevel() === 0) {
+            throw new \LogicException('Tower activity must share the clearance transaction.');
+        }
+        app(CurrentAccountSession::class)->assert($user, $sessionId);
+        Gate::forUser($user)->authorize('viewLearning', LearningCourse::class);
+        $this->saveActivity($user, $this->snapshot($user->id), 'tower-'.$levelId,
+            $instance['template'] === 'choice-quiz' ? 'quiz' : 'game', $instance, $input);
+    }
+
     private function saveActivity(User $user, array $state, string $level, string $kind, array $instance, array $input): void
     {
         $today = CarbonImmutable::now('Asia/Manila')->startOfDay();

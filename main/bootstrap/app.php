@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\Role;
 use App\Http\Controllers\HealthController;
 use App\Http\Controllers\Transactions\PaymentController;
 use App\Http\Middleware\EnsureActiveAccountSession;
@@ -26,7 +27,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias(['account.session' => EnsureActiveAccountSession::class]);
         $middleware->prependToPriorityList(ThrottleRequests::class, GoogleCallbackPrivacy::class);
         $middleware->redirectGuestsTo(fn () => route('login'));
-        $middleware->redirectUsersTo(fn () => route('dashboard'));
+        $middleware->redirectUsersTo(fn (Request $request) => route($request->user()->account_role === Role::Learner ? 'home' : 'dashboard'));
         $middleware->trustProxies(at: '*'); // Remove later
         // Test-case whitespace is part of the expected program behavior.
         $middleware->trimStrings(except: ['test_cases.*.input', 'test_cases.*.expected_output', 'source_code']);

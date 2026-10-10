@@ -66,7 +66,7 @@ test('A07 archive revokes old recovery proof and a fresh A04 recovery reactivate
     expect($recovery->complete($proof, 'NewStrongPass12!'))->toBeTrue()
         ->and($user->fresh()->account_status)->toBe(AccountStatus::Active)->and($user->fresh()->account_role)->toBe(Role::Instructor)
         ->and($user->fresh()->active_session_hash)->toBeNull();
-    $this->post(route('login.store'), ['email' => $user->email, 'password' => 'NewStrongPass12!'])->assertRedirect(route('dashboard'));
+    $this->post(route('login.store'), ['email' => $user->email, 'password' => 'NewStrongPass12!'])->assertRedirect(route(auth()->user()->account_role === Role::Learner ? 'home' : 'dashboard'));
 });
 
 test('A07 action rejects revoked sessions and restricted fresh account states', function (string $change) {

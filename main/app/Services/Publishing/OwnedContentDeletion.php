@@ -55,7 +55,7 @@ abstract class OwnedContentDeletion
                     ['version' => $version, 'prior_status' => $status]);
             });
         } catch (QueryException $exception) {
-            if ($exception->getCode() === '23503') {
+            if (in_array($exception->getCode(), ['23503', '23001'], true)) {
                 throw ValidationException::withMessages(['content' => 'Retained dependencies prevent deletion. Reload to review your options.']);
             }
             // SQL bindings can contain private author content; log only the failure class.

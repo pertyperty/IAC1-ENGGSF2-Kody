@@ -1,8 +1,8 @@
 <div class="dashboard-grid">
-@can('viewLearning', \App\Models\LearningCourse::class)
+@if($progress)
 <section class="dashboard-panel"><h2>{{ $dashboard['achievements']['rank'] }} · {{ number_format($dashboard['achievements']['xp']) }} XP</h2><p>First-time validated wins build your achievement rank.</p><a class="quiet-link" href="{{ route('leaderboards.index') }}">Explore the ladder →</a><p><a class="quiet-link" href="{{ route('wallet.index') }}">{{ $dashboard['wallet']['available'] }} KB available · Your wallet →</a></p></section>
-    @endcan
-    @can('viewLearning', \App\Models\LearningCourse::class)
+    @endif
+    @if($progress)
     <section class="dashboard-panel" aria-labelledby="dashboard-journeys"><div class="section-heading"><h2 id="dashboard-journeys">Your learning journeys</h2><a class="quiet-link" href="{{ route('course-learning.mine') }}">View all →</a></div>
         <div class="review-list">@forelse($dashboard['courses'] as $enrollment)
             @if(in_array($enrollment->course->status, ['Published', 'Archived'], true) && !$enrollment->course->isWithdrawn())
@@ -12,7 +12,7 @@
     </section>
     <section class="dashboard-panel" aria-labelledby="dashboard-activity"><h2 id="dashboard-activity">Pick up where you left off</h2><div class="review-list">@forelse($dashboard['activity'] as $visit)<a href="{{ route('course-learning.lesson', [$visit->course_id, $visit->slot_id]) }}"><b>{{ $visit->title }}</b><span>{{ $visit->completed_at ? 'Completed · Revisit' : 'Continue learning' }} · {{ \Carbon\CarbonImmutable::parse($visit->last_accessed_at)->setTimezone('Asia/Manila')->format('M j, g:i a') }}</span></a>@empty<p class="field-hint">Your recent course adventures will appear here after you open them.</p>@endforelse</div></section>
     <section class="dashboard-panel" aria-labelledby="dashboard-quests"><div class="section-heading"><h2 id="dashboard-quests">Recent coding quests</h2><a class="quiet-link" href="{{ route('challenges.catalog') }}">Explore →</a></div><div class="review-list">@forelse($dashboard['quests'] as $quest)<a href="{{ route('challenge-attempts.show', $quest->id) }}"><b>{{ $quest->title }}</b><span>{{ $quest->status }} · Attempt {{ $quest->attempt }}{{ $quest->weekly_event_id ? ' · Weekly quest' : '' }}</span></a>@empty<p class="field-hint">Your confirmed attempts and their results will appear here.</p>@if(!config('judge0.enabled'))<p class="field-hint">Code evaluation is currently unavailable. You can still explore quest examples.</p>@endif @endforelse</div></section>
-    @endcan
+    @endif
     <section class="dashboard-panel" aria-labelledby="dashboard-updates"><div class="section-heading"><h2 id="dashboard-updates">Your updates</h2><a class="quiet-link" href="{{ route('notifications.index') }}">{{ $dashboard['unread'] }} unread →</a></div>@forelse($dashboard['updates'] as $update)<div class="lesson-note"><b>{{ $update->data['title'] ?? 'Account update' }}</b><p>{{ $update->data['decision'] ?? '' }}{{ $update->read_at ? ' · Read' : ' · Unread' }}</p></div>@empty<p class="field-hint">Review decisions and platform notices will appear here.</p>@endforelse</section>
 </div>
 @if($dashboard['creator'])<section aria-labelledby="dashboard-studio"><h2 id="dashboard-studio">Your creator studio</h2><div class="dashboard-grid creator-dashboard-grid">@foreach($dashboard['creator'] as $summary)<article class="dashboard-panel"><h3>{{ $summary['label'] }}</h3><p>{{ $summary['published'] }} published · {{ $summary['pending'] }} awaiting review · {{ $summary['drafts'] }} drafts or corrections</p><a class="button button-dark button-small" href="{{ route($summary['route']) }}">Continue creating →</a></article>@endforeach</div></section>@endif

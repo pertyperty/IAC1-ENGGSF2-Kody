@@ -14,10 +14,12 @@ use App\Services\Content\CreatorExamples;
 use App\Services\Content\ModulePublishing;
 use App\Services\Gamification\LearningProgression;
 use App\Services\Transactions\WalletLedger;
+use Database\Seeders\TowerLevelSeeder;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 require __DIR__.'/../../../vendor/autoload.php';
@@ -45,25 +47,31 @@ try {
         config(['database.connections.browser_admin' => array_replace(config('database.connections.pgsql'), ['database' => 'postgres'])]);
         $connection = DB::connection('browser_admin');
         // The runner creates a fresh unpredictable name, then drops only that owned database.
-        $connection->statement($operation === 'create' ? 'CREATE DATABASE "'.$database.'"' : 'DROP DATABASE "'.$database.'" WITH (FORCE)');
+        $connection->statement($operation === 'create' ? 'CREATE DATABASE "'.$database.'" ENCODING \'UTF8\' TEMPLATE template0 LC_COLLATE \'C\' LC_CTYPE \'C\'' : 'DROP DATABASE "'.$database.'" WITH (FORCE)');
     } elseif (in_array($operation, ['migrate', 'migrate-baseline'], true)) {
         $options = ['--force' => true];
         if ($operation === 'migrate-baseline') {
             $options += ['--realpath' => true, '--path' => array_values(array_filter(glob(database_path('migrations/*.php')),
-                fn (string $path) => ! str_ends_with($path, '2026_10_05_000038_add_challenge_discovery_metadata.php')))];
+                fn (string $path) => ! str_ends_with($path, '2026_10_05_000038_add_challenge_discovery_metadata.php') && ! str_contains(basename($path), '2026_10_10_')))];
         }
         if (Artisan::call('migrate', $options) !== 0) {
             throw new RuntimeException('Browser migrations failed.');
+        }
+        if ($operation === 'migrate') {
+            (new TowerLevelSeeder)->run();
         }
     } elseif ($operation === 'seed') {
         if (User::exists()) {
             throw new RuntimeException('Fixtures require a newly migrated empty database.');
         }
+        if (Schema::hasTable('tower_levels')) {
+            (new TowerLevelSeeder)->run();
+        }
         $accounts = [];
         foreach (['instructor' => Role::Instructor, 'moderator' => Role::Moderator, 'administrator' => Role::Administrator, 'learner' => Role::Learner, 'arcadelearner' => Role::Learner,
             'navlearner' => Role::Learner, 'navcontributor' => Role::Contributor, 'navinstructor' => Role::Instructor,
             'navmoderator' => Role::Moderator, 'navadministrator' => Role::Administrator, 'interactive' => Role::Learner,
-            'stickylearner' => Role::Learner, 'usabilitylearner' => Role::Learner] as $name => $role) {
+            'towerlearner' => Role::Learner, 'toweradmin' => Role::Administrator, 'stickylearner' => Role::Learner, 'usabilitylearner' => Role::Learner] as $name => $role) {
             $accounts[$name] = User::factory()->create(['username' => 'browser_'.$name, 'email' => $name.'@browser.example.test',
                 'password' => Hash::make('BrowserStrong12!'), 'account_role' => $role,
                 'active_session_hash' => hash('sha256', 'browser-seed-session'), 'active_session_expires_at' => now()->addHour()]);
@@ -111,6 +119,8 @@ try {
         $revision = CodingChallengeRevision::where('title', 'Upgrade history quest')->sole();
         $learner = User::where('email', 'learner@browser.example.test')->sole();
         if ($revision->category !== 'foundations' || $revision->tags !== []
+            || DB::table('tower_levels')->count() !== 25 || DB::table('tower_revisions')->count() !== 25
+            || DB::table('module_revisions')->where('attachments', '!=', '[]')->exists()
             || VerificationDelivery::where('user_id', $learner->id)->sole()->token !== str_repeat('a', 64)
             || app(WalletLedger::class)->snapshot($learner->id)['balance'] !== 50
             || (int) DB::table('xp_totals')->where('user_id', $learner->id)->value('xp') !== 60
@@ -118,15 +128,34 @@ try {
             throw new RuntimeException('Upgrade/restore integrity check failed.');
         }
         echo 'Upgrade defaults, encrypted fixture, validated progress and ledger integrity passed.';
-    } elseif ($operation === 'fingerprint') {
+    } elseif (in_array($operation, ['fingerprint', 'fingerprint-legacy'], true)) {
         $fingerprints = [];
         foreach (DB::select("SELECT tablename FROM pg_tables WHERE schemaname = 'public' ORDER BY tablename") as $table) {
             if (! preg_match('/^[a-z_][a-z0-9_]*$/D', $table->tablename)) {
                 throw new RuntimeException('Unexpected fixture table name.');
             }
-            $fingerprints[$table->tablename] = DB::selectOne('SELECT count(*) AS rows, md5(coalesce(string_agg(row_data, \'\' ORDER BY row_data), \'\')) AS digest FROM (SELECT to_jsonb(t)::text AS row_data FROM "'.$table->tablename.'" t) records');
+            $row = 'to_jsonb(t)';
+            if ($operation === 'fingerprint-legacy') {
+                $row .= match ($table->tablename) {
+                    'module_revisions' => " - 'attachments'", 'coding_challenge_revisions' => " - 'category' - 'tags'", default => '',
+                };
+            }
+            $fingerprints[$table->tablename] = DB::selectOne('SELECT count(*) AS rows, md5(coalesce(string_agg(row_data, \'\' ORDER BY row_data), \'\')) AS digest FROM (SELECT ('.$row.')::text AS row_data FROM "'.$table->tablename.'" t) records');
         }
         echo json_encode($fingerprints, JSON_THROW_ON_ERROR);
+    } elseif ($operation === 'office-fixture') {
+        $path = tempnam(sys_get_temp_dir(), 'kody-browser-document-');
+        try {
+            $zip = new ZipArchive;
+            $zip->open($path, ZipArchive::OVERWRITE);
+            $zip->addFromString('[Content_Types].xml', '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>');
+            $zip->addFromString('_rels/.rels', '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>');
+            $zip->addFromString('word/document.xml', '<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body><w:p><w:r><w:t>Browser notes: instruction order matters.</w:t></w:r></w:p></w:body></w:document>');
+            $zip->close();
+            echo base64_encode(file_get_contents($path));
+        } finally {
+            unlink($path);
+        }
     } elseif ($operation === 'verify-token') {
         $email = $argv[2] ?? '';
         if (! preg_match('/^[a-z0-9_-]+@browser\.example\.test$/D', $email)) {

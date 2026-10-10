@@ -2,9 +2,12 @@
 
 namespace App\Services\Engagement;
 
+use App\Enums\Role;
 use App\Models\LearningCourse;
+use App\Models\LearningModule;
 use App\Services\Gamification\Achievements;
 use App\Services\Gamification\LearningProgression;
+use App\Services\Gamification\TowerProgression;
 use Illuminate\Http\Request;
 
 class ApplicationChrome
@@ -18,7 +21,7 @@ class ApplicationChrome
         // Only the dashboard controller supplies these owned, already-computed snapshots.
         $dashboard = $request->routeIs('dashboard') ? ($viewData['dashboard'] ?? null) : null;
         $progress = null;
-        if ($user?->can('viewLearning', LearningCourse::class) && ! $focused) {
+        if ($user?->account_role === Role::Learner && $user->can('viewLearning', LearningCourse::class) && ! $focused) {
             $progress = $dashboard !== null && isset($viewData['progress'])
                 ? $viewData['progress'] : app(LearningProgression::class)->snapshot($user->id);
         }
@@ -31,6 +34,7 @@ class ApplicationChrome
             'instructor-reviews.*' => ['instructor-reviews.index', 'Back to Instructor applications'],
             'contributor-reviews.*' => ['contributor-reviews.index', 'Back to Contributor applications'],
             'game-presets.*' => ['game-presets.index', 'Back to game presets'], 'faq-management.*' => ['faq-management.index', 'Back to FAQ management'],
+            'tower.*' => ['home', 'Back to the tower'], 'tower-studio.*' => ['tower-studio.index', 'Back to tower studio'],
             'creator-erasure.*' => ['creator-erasure.index', 'Back to privacy reviews'], 'finance.*' => ['finance.index', 'Back to accounting'],
             'wallet.*' => ['wallet.index', 'Back to my wallet'], 'earnings.*' => ['wallet.index', 'Back to my wallet'],
             'help.*' => ['help.index', 'Back to Help'],
@@ -51,8 +55,20 @@ class ApplicationChrome
             $back = ['url' => route('course-learning.show', $request->route('course')), 'label' => 'Back to this course'];
         } elseif ($request->routeIs('course-learning.show')) {
             $back = ['url' => route('course-learning.catalog'), 'label' => 'Back to courses'];
+        } elseif ($request->routeIs('module-media.show')) {
+            if ($request->integer('course') > 0 && $request->integer('slot') > 0) {
+                $back = ['url' => route('course-learning.lesson', [$request->integer('course'), $request->integer('slot')]), 'label' => 'Back to this lesson'];
+            } elseif ($user?->can('viewOwned', $request->route('module'))) {
+                $back = ['url' => route('studio.edit', $request->route('module')), 'label' => 'Back to module studio'];
+            } elseif ($user?->can('viewAny', LearningModule::class)) {
+                $back = ['url' => route('module-reviews.show', $request->route('module')), 'label' => 'Back to module review'];
+            } else {
+                $back = ['url' => route('modules.show', $request->route('module')), 'label' => 'Back to this lesson'];
+            }
         }
 
-        return compact('focused', 'progress', 'achievements', 'back') + ['unread' => $dashboard['unread'] ?? $user?->unreadNotifications()->count() ?? 0];
+        $tower = $progress === null ? null : app(TowerProgression::class)->counts($user->id);
+
+        return compact('focused', 'progress', 'achievements', 'back', 'tower') + ['unread' => $dashboard['unread'] ?? $user?->unreadNotifications()->count() ?? 0];
     }
 }

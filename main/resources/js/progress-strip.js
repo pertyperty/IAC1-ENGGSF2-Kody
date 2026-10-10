@@ -4,10 +4,15 @@ export function progressValues(result) {
         || !Number.isInteger(progress.completed_count) || progress.completed_count < 0
         || !progress.levels || typeof progress.levels !== 'object' || typeof progress.active_today !== 'boolean'
         || !Number.isInteger(achievements.xp) || achievements.xp < 0 || typeof achievements.rank !== 'string') return null;
-    const total = Object.keys(progress.levels).length;
-    if (progress.completed_count > total) return null;
+    const starterTotal = Object.keys(progress.levels).length;
+    if (progress.completed_count > starterTotal) return null;
+    const tower = result.tower;
+    if (tower && (!Number.isInteger(tower.completed_count) || !Number.isInteger(tower.total)
+        || tower.total < 0 || tower.completed_count < 0 || tower.completed_count > tower.total)) return null;
+    const total = tower?.total ?? starterTotal;
+    const completed = tower?.completed_count ?? progress.completed_count;
     return { streak: String(progress.current_streak), today: progress.active_today ? 'Today saved' : 'Play today',
-        xp: achievements.xp.toLocaleString('en-US'), rank: achievements.rank, level: `${progress.completed_count} / ${total}` };
+        xp: achievements.xp.toLocaleString('en-US'), rank: achievements.rank, level: `${completed} / ${total}` };
 }
 
 export function mountProgressStrip(doc, win, fetcher = globalThis.fetch) {
