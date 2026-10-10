@@ -161,7 +161,7 @@ Local verification passed 126 focused PostgreSQL checks (1,195 assertions),
 including simultaneous tower clears, revision conflicts, erasure, all 25 seeded
 solutions and the six failures found by the broader 1,175-test diagnostic run.
 Frontend checks passed 51 tests; the production build and Pint passed. All 18
-browser workflows passed across the complete run and targeted correction runs,
+browser workflows passed together in the final run (4.6 minutes),
 including private-document publication/download and unsaved quiz/game previews.
 The populated upgrade/restore drill matched all 79 table fingerprints on local
 PostgreSQL 18; restoration plus verification took 2,788 ms. CI repeats the full
@@ -173,3 +173,6 @@ real-device, capacity or production-readiness evidence.
 The new tower/media/identity slice also passed 37 checks with cached routes and
 configuration (289 assertions). The final shared rail-icon correction passed
 three desktop/mobile/staff/Administrator browser workflows and the rebuilt assets.
+Related interface/navigation/workflow regressions passed 41 checks with 351
+assertions after replacing the old raw-ampersand expectation with an escaped-label
+assertion; the shared partial retains ordinary Blade escaping.

@@ -108,8 +108,8 @@ rail and persistent expansion, and unsaved Administrator game/quiz previews.
 The creator-to-learner publication workflow now uploads a private DOCX and embeds
 YouTube alongside its quiz, then verifies authorized text preview, original
 download and a direct return to the lesson. Desktop and narrow layouts retain
-axe checks in both themes. All workflows passed across the full run and targeted
-reruns after fixes; CI runs the entire suite again on the proposed commit.
+axe checks in both themes. All 18 workflows passed together in the final local
+run (4.6 minutes); CI runs the entire suite again on the proposed commit.
 
 The baseline excludes both new tower/media migrations, then upgrades populated
 history and seeds the missing tower positions. Legacy-table digests are compared

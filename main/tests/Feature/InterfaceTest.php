@@ -34,7 +34,7 @@ test('login and registration offer progressive password visibility without echoi
 test('role navigation distinguishes participant studios and staff tools without granting new access', function (Role $role) {
     moduleSignIn($this, moduleAccount($role));
     $response = $this->get(route('dashboard'))->assertOk()->assertSee('Your workspace')
-        ->assertSee('Account menu')->assertSee('Profile & security', false);
+        ->assertSee('Account menu')->assertSee('Profile & security');
     if ($role === Role::Instructor) {
         $response->assertSee('Module studio')->assertSee('Course builder')->assertSee('Quest studio');
     } elseif ($role === Role::Contributor) {
