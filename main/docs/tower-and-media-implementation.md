@@ -137,7 +137,8 @@ No cross-page animation or script-based navigation interception is added.
 
 `config/branding.php` is the single logo path/name. `public/images/kody-mark.svg`
 remains the current replaceable placeholder; `public/images/navigation.svg` is
-original placeholder icon artwork. Replace these assets through configuration
+original placeholder icon artwork shared by every rail item through one partial.
+The rail keeps each icon's width while its text label reveals. Replace assets through configuration
 without editing every template. Font files remain pinned local assets.
 
 Name validation now accepts Unicode letters/combining marks and single spaces,
@@ -168,3 +169,7 @@ suite, cached routes/configuration, browser workflows and restore on the propose
 commit. Consult its result before merging; the diagnostic run is not a claim that
 the final full suite passed locally. These checks are not live-provider,
 real-device, capacity or production-readiness evidence.
+
+The new tower/media/identity slice also passed 37 checks with cached routes and
+configuration (289 assertions). The final shared rail-icon correction passed
+three desktop/mobile/staff/Administrator browser workflows and the rebuilt assets.

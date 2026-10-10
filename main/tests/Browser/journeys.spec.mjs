@@ -289,6 +289,12 @@ test('learner username sign-in lands on the tower and saved wins refresh the del
 test('Administrator rail pulls and pins labels; tower drafts preview without publishing and preserve changes', async ({ page }) => {
     await login(page, 'toweradmin');
     const rail = page.locator('[data-navigation-rail]');
+    const railLinks = rail.locator('.workspace-nav a');
+    await expect(rail.locator('.nav-icon svg')).toHaveCount(await railLinks.count());
+    await expect(rail.locator('.nav-label')).toHaveCount(await railLinks.count());
+    for (const icon of await rail.locator('.nav-icon').all()) {
+        expect((await icon.boundingBox()).width).toBeGreaterThanOrEqual(22);
+    }
     const tower = rail.getByRole('link', { name: 'Tower studio', exact: true });
     await tower.hover();
     await expect.poll(async () => (await tower.boundingBox()).width).toBeGreaterThan(200);
