@@ -13,6 +13,13 @@ switch `current` atomically. Keep the application key stable and backed up secur
 verification delivery and other encrypted data depend on it. Never run
 `migrate:fresh` or seed test credentials on the release database.
 
+For the 2026-10-10 tower release, run
+`php artisan db:seed --class=TowerLevelSeeder --force` after migrations and before
+the switch. It installs missing curriculum positions without overwriting edits
+or creating accounts. Private lesson media joins credential storage: verify upload
+limits, authorized revision-pinned streaming and the erasure worker using
+[the tower/media record](tower-and-media-implementation.md).
+
 The [Supervisor example](../ops/supervisor/kody-worker.conf.example) runs the
 database payments/notifications/default queues as an unprivileged service user. Review executable,
 release/storage paths, ownership and log retention before installing. The example

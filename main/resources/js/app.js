@@ -15,8 +15,13 @@ import { mountScrollNavigation } from './scroll-navigation.js';
 import { mountFeedback } from './feedback.js';
 import { mountProgressStrip } from './progress-strip.js';
 import { mountCourseJourney } from './course-journey.js';
+import { mountTower, mountTowerEditor } from './tower.js';
+import { mountNavigationRail } from './navigation-rail.js';
 
 mountTheme(document, window);
+mountNavigationRail(document, window);
+mountTower(document, window);
+document.querySelectorAll('[data-tower-editor]').forEach(mountTowerEditor);
 mountAccountLinks(document, window);
 mountPasswordFields(document);
 mountWorkspaceMenus(document);

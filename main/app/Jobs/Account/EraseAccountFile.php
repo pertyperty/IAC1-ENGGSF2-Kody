@@ -35,7 +35,8 @@ class EraseAccountFile implements ShouldQueue
             }
             try {
                 $path = $erasure->path;
-                if (! is_string($path) || (! str_starts_with($path, 'instructor-credentials/') && ! str_starts_with($path, 'contributor-credentials/')) || str_contains($path, '..') || str_contains($path, '\\')
+                if (! is_string($path) || (! str_starts_with($path, 'instructor-credentials/') && ! str_starts_with($path, 'contributor-credentials/')
+                    && ! preg_match('~^module-media/[0-9a-f-]{36}\.(?:pdf|docx|pptx)$~D', $path)) || str_contains($path, '..') || str_contains($path, '\\')
                     || $erasure->disk === 'public' || ! is_array(config('filesystems.disks.'.$erasure->disk))
                     || config('filesystems.disks.'.$erasure->disk.'.visibility') === 'public') {
                     throw new RuntimeException('Invalid private erasure target.');

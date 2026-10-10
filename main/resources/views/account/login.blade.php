@@ -7,7 +7,7 @@
     @if ($errors->any())<div class="form-errors" role="alert">{{ $errors->first() }}</div>@endif
     <form method="post" action="{{ route('login.store') }}" class="account-form">
         @csrf
-        <label>Email address<input type="email" name="email" autocomplete="username" value="{{ old('email') }}" maxlength="100" required></label>
+        <label>Email or username<input type="text" name="email" autocomplete="username" autocapitalize="none" spellcheck="false" value="{{ old('email') }}" maxlength="100" required placeholder="you@example.com or your username"></label>
         <x-password-field name="password" label="Password" autocomplete="current-password" :maxlength="1024" />
         <button type="submit" class="primary-button">Sign in</button>
     </form>

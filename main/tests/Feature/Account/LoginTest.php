@@ -16,7 +16,7 @@ test('A03 verified users of every role can sign in with a rotated session', func
     $oldId = session()->getId();
     $oldToken = session()->token();
     $this->post(route('login.store'), ['email' => strtoupper($user->email), 'password' => 'password'])
-        ->assertRedirect(route('dashboard'));
+        ->assertRedirect(route(auth()->user()->account_role === Role::Learner ? 'home' : 'dashboard'));
     $this->assertAuthenticatedAs($user);
     expect(session()->getId())->not->toBe($oldId)
         ->and(session()->token())->not->toBe($oldToken)
@@ -38,7 +38,7 @@ test('A03 unknown email and wrong password return the same credentials error', f
 
 test('A03 malformed inputs do not count as password failures', function () {
     $user = User::factory()->create();
-    $this->postJson(route('login.store'), ['email' => 'invalid', 'password' => ''])->assertJsonValidationErrors(['email', 'password']);
+    $this->postJson(route('login.store'), ['email' => '', 'password' => ''])->assertJsonValidationErrors(['email', 'password']);
     $this->postJson(route('login.store'), ['email' => $user->email, 'password' => str_repeat('x', 1025)])->assertJsonValidationErrors('password');
     expect($user->fresh()->failed_login_attempts)->toBe(0);
 });
@@ -59,7 +59,7 @@ test('A03 unverified and restricted accounts cannot authenticate', function (Acc
 test('A03 wrong passwords do not disclose restricted status', function () {
     $user = User::factory()->create(['account_status' => AccountStatus::Suspended]);
     $this->postJson(route('login.store'), ['email' => $user->email, 'password' => 'wrong'])
-        ->assertJsonPath('errors.email.0', 'Invalid email or password.');
+        ->assertJsonPath('errors.email.0', 'Invalid sign-in details.');
 });
 
 test('A03 lockouts follow the approved schedule and do not reset on cooldown', function () {
@@ -75,7 +75,7 @@ test('A03 lockouts follow the approved schedule and do not reset on cooldown', f
         expect($user->fresh()->failed_login_attempts)->toBe($threshold);
         $this->travel($minutes)->minutes();
     }
-    $this->post(route('login.store'), ['email' => $user->email, 'password' => 'password'])->assertRedirect(route('dashboard'));
+    $this->post(route('login.store'), ['email' => $user->email, 'password' => 'password'])->assertRedirect(route(auth()->user()->account_role === Role::Learner ? 'home' : 'dashboard'));
     expect($user->fresh()->failed_login_attempts)->toBe(0)->and($user->fresh()->login_locked_until)->toBeNull();
 });
 
@@ -83,7 +83,7 @@ test('A03 login rehashes an outdated password without changing its value', funct
     $user = User::factory()->create();
     Hash::driver()->setRounds(5);
     $oldHash = $user->password;
-    $this->post(route('login.store'), ['email' => $user->email, 'password' => 'password'])->assertRedirect(route('dashboard'));
+    $this->post(route('login.store'), ['email' => $user->email, 'password' => 'password'])->assertRedirect(route(auth()->user()->account_role === Role::Learner ? 'home' : 'dashboard'));
     expect($user->fresh()->password)->not->toBe($oldHash)->and(Hash::check('password', $user->fresh()->password))->toBeTrue();
 });
 
@@ -93,7 +93,7 @@ test('A03 failures never flash passwords or grant privileges from login input', 
         ->assertSessionHasErrors('email');
     expect(session()->getOldInput('password'))->toBeNull();
     $this->post(route('login.store'), ['email' => $user->email, 'password' => 'password', 'account_role' => 'Admin', 'redirect' => 'https://example.test'])
-        ->assertRedirect(route('dashboard'));
+        ->assertRedirect(route(auth()->user()->account_role === Role::Learner ? 'home' : 'dashboard'));
     expect($user->fresh()->account_role)->toBe(Role::Learner);
 });
 
@@ -125,7 +125,7 @@ test('A03 sign out clears the current session and allows a new login', function 
     expect($user->fresh()->active_session_hash)->toBeNull()->and(session()->token())->not->toBe($oldToken);
     $this->get(route('dashboard'))->assertRedirect(route('login'));
     $this->app['auth']->forgetGuards();
-    $this->post(route('login.store'), ['email' => $user->email, 'password' => 'password'])->assertRedirect(route('dashboard'));
+    $this->post(route('login.store'), ['email' => $user->email, 'password' => 'password'])->assertRedirect(route(auth()->user()->account_role === Role::Learner ? 'home' : 'dashboard'));
 });
 
 test('A03 suspended accounts and replaced or expired sessions lose protected access', function (string $change) {
@@ -146,7 +146,7 @@ test('A03 suspended accounts and replaced or expired sessions lose protected acc
 test('A03 authenticated users cannot login again and session secrets are hidden', function () {
     $user = User::factory()->create();
     $this->post(route('login.store'), ['email' => $user->email, 'password' => 'password']);
-    $this->get(route('login'))->assertRedirect(route('dashboard'));
+    $this->get(route('login'))->assertRedirect(route(auth()->user()->account_role === Role::Learner ? 'home' : 'dashboard'));
     expect($user->fresh()->toArray())->not->toHaveKeys(['active_session_hash', 'active_session_expires_at', 'password', 'failed_login_attempts']);
 });
 

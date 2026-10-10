@@ -24,7 +24,7 @@ test('dashboard reuses its owned snapshots rather than querying progression and 
     try {
         $this->get(route('dashboard'))->assertOk();
         $queries = collect(DB::getQueryLog())->pluck('query');
-        $participant = in_array($role, [Role::Learner, Role::Contributor, Role::Instructor], true);
+        $participant = $role === Role::Learner;
         expect($queries->filter(fn ($sql) => str_contains($sql, '"learning_progress"'))->count())->toBe($participant ? 1 : 0)
             ->and($queries->filter(fn ($sql) => str_contains($sql, '"learning_level_completions"'))->count())->toBe($participant ? 1 : 0)
             ->and($queries->filter(fn ($sql) => str_contains($sql, '"xp_totals"'))->count())->toBe(1)

@@ -19,6 +19,7 @@ use App\Http\Controllers\Administration\ContentModerationController;
 use App\Http\Controllers\Administration\FaqController;
 use App\Http\Controllers\Administration\GamePresetController;
 use App\Http\Controllers\Administration\SystemReportController;
+use App\Http\Controllers\Administration\TowerStudioController;
 use App\Http\Controllers\Challenges\ChallengeReviewController;
 use App\Http\Controllers\Challenges\ChallengeStudioController;
 use App\Http\Controllers\Challenges\ChallengeSubmissionController;
@@ -29,6 +30,7 @@ use App\Http\Controllers\Content\CourseLearningController;
 use App\Http\Controllers\Content\CourseReviewController;
 use App\Http\Controllers\Content\CourseStudioController;
 use App\Http\Controllers\Content\CurriculumController;
+use App\Http\Controllers\Content\ModuleMediaController;
 use App\Http\Controllers\Content\ModuleReviewController;
 use App\Http\Controllers\Content\ModuleStudioController;
 use App\Http\Controllers\Content\PublishedModuleController;
@@ -39,19 +41,30 @@ use App\Http\Controllers\HelpController;
 use App\Http\Controllers\LearningController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PlayController;
+use App\Http\Controllers\TowerController;
 use App\Http\Controllers\Transactions\ContentAccessController;
 use App\Http\Controllers\Transactions\EarningsController;
 use App\Http\Controllers\Transactions\FinanceController;
 use App\Http\Controllers\Transactions\PaymentController;
 use App\Http\Controllers\Transactions\WalletController;
 use App\Http\Middleware\GoogleCallbackPrivacy;
+use App\Http\Middleware\OptionalAccountSession;
 use Illuminate\Support\Facades\Route;
 
 Route::pattern('course', '[0-9]+');
 Route::pattern('challenge', '[0-9]+');
 Route::pattern('weeklyEvent', '[0-9]+');
 
-Route::get('/', [LearningController::class, 'home'])->name('home');
+Route::get('/', [TowerController::class, 'index'])->middleware(OptionalAccountSession::class)->name('home');
+Route::get('/welcome', [LearningController::class, 'home'])->name('welcome');
+Route::get('/tower/{level}', [TowerController::class, 'show'])->whereNumber('level')->middleware(OptionalAccountSession::class)->name('tower.show');
+Route::post('/tower/{level}/revisions/{revision}/stages/{stage}', [TowerController::class, 'complete'])
+    ->whereNumber(['level', 'revision', 'stage'])->middleware(['auth', 'account.session', 'throttle:30,1,tower:'])->name('tower.complete');
+Route::middleware(['auth', 'account.session'])->prefix('manage/tower')->name('tower-studio.')->group(function (): void {
+    Route::get('/', [TowerStudioController::class, 'index'])->name('index');
+    Route::get('/{level}', [TowerStudioController::class, 'edit'])->whereNumber('level')->name('edit');
+    Route::put('/{level}', [TowerStudioController::class, 'update'])->whereNumber('level')->middleware('throttle:10,1,tower-studio:')->name('update');
+});
 Route::middleware(['auth', 'account.session'])->group(function (): void {
     Route::post('/wallet/purchases', [PaymentController::class, 'purchase'])->middleware('throttle:5,1,purchase:')->name('wallet.purchase');
     Route::get('/wallet/purchases/{purchase}/checkout', [PaymentController::class, 'checkout'])->whereUuid('purchase')->name('wallet.checkout');
@@ -81,6 +94,8 @@ Route::post('/manage/creator-erasure/{review}', [CreatorErasureController::class
 Route::get('/wallet', [WalletController::class, 'index'])->middleware(['auth', 'account.session'])->name('wallet.index');
 Route::post('/unlock/{kind}/{content}', [ContentAccessController::class, 'store'])->whereIn('kind', ['module', 'challenge'])->whereNumber('content')->middleware(['auth', 'account.session', 'throttle:10,1,content-unlock:'])->name('content-access.store');
 Route::get('/playground', [LearningController::class, 'arcade'])->name('arcade');
+Route::get('/learn/modules/{module}/revisions/{revision}/resources/{asset}', [ModuleMediaController::class, 'show'])
+    ->whereNumber(['module', 'revision', 'asset'])->middleware(['auth', 'account.session', 'throttle:60,1,module-media:'])->name('module-media.show');
 Route::get('/learn', [LearningController::class, 'catalog'])->name('learning.catalog');
 Route::get('/learn/courses', [CourseLearningController::class, 'catalog'])->name('course-learning.catalog');
 Route::get('/challenges', [PublishedChallengeController::class, 'catalog'])->name('challenges.catalog');

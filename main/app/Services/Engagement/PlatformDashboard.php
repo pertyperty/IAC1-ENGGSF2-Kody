@@ -2,6 +2,7 @@
 
 namespace App\Services\Engagement;
 
+use App\Enums\Role;
 use App\Models\CodingChallenge;
 use App\Models\CourseEnrollment;
 use App\Models\LearningCourse;
@@ -19,7 +20,7 @@ class PlatformDashboard
         $courses = collect();
         $activity = collect();
         $quests = collect();
-        if ($gate->allows('viewLearning', LearningCourse::class)) {
+        if ($user->account_role === Role::Learner && $gate->allows('viewLearning', LearningCourse::class)) {
             $courses = CourseEnrollment::where('user_id', $user->id)->whereNotExists(fn ($q) => $q->selectRaw('1')->from('content_entitlements')->whereColumn('content_id', 'course_enrollments.course_id')->whereColumn('user_id', 'course_enrollments.user_id')->where('content_type', 'course')->whereNotNull('revoked_at'))->with('course', 'revision')
                 ->select('course_enrollments.*')
                 ->selectSub(DB::table('course_revision_modules')->selectRaw('count(*)')

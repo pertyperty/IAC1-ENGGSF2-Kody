@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\Role;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
@@ -26,7 +27,7 @@ test('A03 verified legacy bcrypt passwords upgrade to the configured Argon2id ha
     $user = User::factory()->create();
     config(['hashing.driver' => 'argon2id']);
     Hash::forgetDrivers();
-    $this->post(route('login.store'), ['email' => $user->email, 'password' => 'password'])->assertRedirect(route('dashboard'));
+    $this->post(route('login.store'), ['email' => $user->email, 'password' => 'password'])->assertRedirect(route(auth()->user()->account_role === Role::Learner ? 'home' : 'dashboard'));
     expect(password_get_info($user->fresh()->password)['algoName'])->toBe('argon2id')
         ->and(Hash::check('password', $user->fresh()->password))->toBeTrue();
 });

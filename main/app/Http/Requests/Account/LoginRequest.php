@@ -9,7 +9,7 @@ class LoginRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         if (is_string($this->input('email'))) {
-            $this->merge(['email' => mb_strtolower(trim($this->input('email')))]);
+            $this->merge(['email' => trim($this->input('email'))]);
         }
     }
 
@@ -21,7 +21,7 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['required', 'string', 'email', 'max:100'],
+            'email' => ['required', 'string', 'max:100'],
             // Authenticate existing passwords without imposing new registration rules.
             'password' => ['required', 'string', 'max:1024'],
         ];

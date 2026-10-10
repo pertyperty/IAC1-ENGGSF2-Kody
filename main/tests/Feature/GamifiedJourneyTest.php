@@ -15,7 +15,7 @@ test('mission board shows owned saved goals only to participant roles without gr
     $user = moduleAccount($role);
     moduleSignIn($this, $user);
     $response = $this->get(route('dashboard'))->assertOk();
-    if (in_array($role, [Role::Learner, Role::Contributor, Role::Instructor], true)) {
+    if ($role === Role::Learner) {
         $response->assertSee('Your mission board')->assertSee('Save a daily win')->assertSee('Grow toward Explorer');
     } else {
         $response->assertDontSee('Your mission board');

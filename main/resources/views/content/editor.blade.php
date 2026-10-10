@@ -26,7 +26,7 @@
             'quiz_b' => $kind === 'quiz' ? ($assessment['options'][1]['label'] ?? '') : '', 'quiz_explanation' => $kind === 'quiz' ? ($assessment['explanation'] ?? '') : ''];
         $fields = array_replace($fields, $starter ?? []);
     @endphp
-    <form class="studio-form" method="post" action="{{ $module ? route('studio.update', $module) : route('studio.store') }}" data-module-editor data-game-presets="{{ json_encode(config('learning.instances'), JSON_THROW_ON_ERROR) }}">
+    <form class="studio-form creator-editor" method="post" enctype="multipart/form-data" action="{{ $module ? route('studio.update', $module) : route('studio.store') }}" data-module-editor data-game-presets="{{ json_encode(config('learning.instances'), JSON_THROW_ON_ERROR) }}">
         @csrf @if($module)@method('put')@endif
         <input type="hidden" name="record_version" value="{{ $module?->record_version ?? 1 }}">
         <fieldset @disabled($revision?->review_status === 'Pending' || $module?->status === 'Archived')>
@@ -36,7 +36,10 @@
             <label for="description">A little invitation</label><textarea id="description" name="description" rows="3" maxlength="5000" required>{{ old('description', $fields['description']) }}</textarea>
             <label for="type">Lesson format</label><select id="type" name="type">@foreach(['Article','Interactive','Video'] as $type)<option @selected(old('type', $revision?->type ?? $starter['type'] ?? 'Interactive') === $type)>{{ $type }}</option>@endforeach</select>
             <label for="content">Teach the idea</label><p class="field-hint">Write your explanation and code examples as plain text. Your learners will see exactly what you write.</p><textarea id="content" name="content" rows="10" maxlength="50000" required>{{ old('content', $fields['content']) }}</textarea>
-            <div data-video-fields><label for="video_url">Video link</label><p class="field-hint">For video lessons, add an HTTPS link to your video. It opens in a new tab.</p><input id="video_url" type="url" name="video_url" value="{{ old('video_url', $fields['video_url']) }}" maxlength="2000"></div>
+            <section class="creator-media-panel"><h3>Make the lesson richer</h3><label for="attachments">Add PDF, DOCX or PPTX resources</label><input id="attachments" name="attachments[]" type="file" accept=".pdf,.docx,.pptx" multiple><p class="field-hint">Up to five resources, 20 MB each. PDFs open in the browser; Word and PowerPoint files have text previews and original downloads. Uploads stay private until the lesson is approved and access is authorized.</p>
+            @foreach($revision?->attachments ?? [] as $index => $asset)<label class="game-option"><input type="checkbox" name="retain_attachments[]" value="{{ $index }}" @checked(in_array((string) $index, array_map('strval', old('retain_attachments', array_keys($revision->attachments))), true))> Keep {{ $asset['name'] }}</label>@endforeach
+            <div data-video-fields><label for="video_url">Video or media link (optional)</label><p class="field-hint">YouTube and Vimeo links play here. Other HTTPS links open safely in a new tab. Video format requires a link; any format can pair a video with a quiz.</p><input id="video_url" type="url" name="video_url" value="{{ old('video_url', $fields['video_url']) }}" maxlength="2000"></div></section>
+        </fieldset><fieldset class="creator-activity-pane" @disabled($revision?->review_status === 'Pending' || $module?->status === 'Archived')><legend>Your activity</legend>
             <h2 id="assessment-edit">2. Give the idea a playground</h2><p class="field-hint">Choose a template, make its scenario yours, then try the preview. Previewing never saves learner progress.</p>
             <label for="assessment_kind">Make it playable</label><select id="assessment_kind" name="assessment_kind">@foreach(['game' => 'Coding game', 'quiz' => 'Quick quiz', 'preset' => 'Workshop preset', 'none' => 'Lesson only (Article or Video)'] as $value => $label)<option value="{{ $value }}" @selected(old('assessment_kind', $revision?->game_preset_revision_id ? 'preset' : ($revision ? $kind : ($starter['assessment_kind'] ?? 'game'))) === $value)>{{ $label }}</option>@endforeach</select>
             <div data-preset-fields><h2>Start from a workshop preset</h2><p class="field-hint">Choose saved game or quiz prompts and give the activity a title. Your lesson keeps this version when the preset changes.</p>
@@ -78,6 +81,7 @@
                 @endphp
                 @include('games.quiz-editor')
             </div>
+        </fieldset><fieldset class="creator-publish-pane" @disabled($revision?->review_status === 'Pending' || $module?->status === 'Archived')><legend>Save and publish</legend>
             @include('transactions.access-settings', ['accessKind' => 'module'])
             <div class="studio-actions" id="draft-save"><button class="button button-play" type="submit">Save draft</button><a class="quiet-link" href="{{ route('studio.index') }}">Cancel</a></div>
         </fieldset>

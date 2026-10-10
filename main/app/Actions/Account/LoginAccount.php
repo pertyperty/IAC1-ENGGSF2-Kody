@@ -20,7 +20,10 @@ class LoginAccount
         $session->forget('login_confirmation');
 
         return $this->transaction($session, function () use ($email, $password, $session): LoginOutcome {
-            $user = User::whereRaw('LOWER(email) = ?', [mb_strtolower($email)])->lockForUpdate()->first();
+            // Preserve case-sensitive username uniqueness and case-insensitive email sign-in.
+            // Email takes precedence if a legacy username overlaps another account's email.
+            $user = User::whereRaw('LOWER(email) = ?', [mb_strtolower(trim($email))])->lockForUpdate()->first()
+                ?? User::where('username', trim($email))->lockForUpdate()->first();
             if ($user === null) {
                 // Perform password work for missing accounts too; never authenticate a dummy identity.
                 Hash::check($password, Hash::make(Str::random(40)));

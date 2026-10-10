@@ -1,5 +1,6 @@
 <nav class="workspace-nav" aria-label="{{ ($mobile ?? false) ? 'Mobile workspace' : 'Your workspace' }}">
     <p class="rail-label">@can('viewAny', \App\Models\User::class)Explore Kody @else Your playground @endcan</p>
+    @if(auth()->user()->account_role === \App\Enums\Role::Learner)<a href="{{ route('home') }}" @if(request()->routeIs('home', 'tower.*')) aria-current="page" @endif><span class="nav-icon" aria-hidden="true"><svg width="22" height="22"><use href="{{ asset('images/navigation.svg') }}#tower"/></svg></span><span class="nav-label">The Tower</span></a>@endif
     <a href="{{ route('dashboard') }}" @if(request()->routeIs('dashboard', 'learning.show')) aria-current="page" @endif><span aria-hidden="true">◈</span>Overview</a>
     <a href="{{ route('learning.catalog') }}" @if(request()->routeIs('learning.catalog', 'modules.*', 'course-learning.show', 'course-learning.lesson')) aria-current="page" @endif><span aria-hidden="true">▤</span>Learning catalog</a>
     <a href="{{ route('course-learning.catalog') }}" @if(request()->routeIs('course-learning.catalog')) aria-current="page" @endif><span aria-hidden="true">≡</span>Browse courses</a>
@@ -24,6 +25,7 @@
     @can('manage', \App\Models\WeeklyEvent::class)<a href="{{ route('weekly-studio.index') }}" @if(request()->routeIs('weekly-studio.*')) aria-current="page" @endif><span aria-hidden="true">▦</span>Weekly planning</a>@endcan
     @can('viewReports', \App\Models\User::class)<a href="{{ route('system-reports') }}" @if(request()->routeIs('system-reports')) aria-current="page" @endif><span aria-hidden="true">▥</span>Platform reports</a><a href="{{ route('finance.index') }}" @if(request()->routeIs('finance.*')) aria-current="page" @endif><span aria-hidden="true">⇄</span>Accounting</a>@endcan
     @endcan
+    @can('manage', \App\Models\TowerLevel::class)<a href="{{ route('tower-studio.index') }}"><span class="nav-icon" aria-hidden="true"><svg width="22" height="22"><use href="{{ asset('images/navigation.svg') }}#tower"/></svg></span><span class="nav-label">Tower studio</span></a>@endcan
     <p class="rail-label">A little support</p>
     @can('viewAny', \App\Models\GamePreset::class)<a href="{{ route('game-presets.index') }}" @if(request()->routeIs('game-presets.*')) aria-current="page" @endif><span aria-hidden="true">⌘</span>Game presets</a>@endcan
     @can('viewAny', \App\Models\FaqEntry::class)<a href="{{ route('faq-management.index') }}" @if(request()->routeIs('faq-management.*')) aria-current="page" @endif><span aria-hidden="true">?</span>FAQ management</a>@endcan

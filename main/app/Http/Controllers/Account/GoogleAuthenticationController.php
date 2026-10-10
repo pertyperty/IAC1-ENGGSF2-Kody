@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Account;
 
 use App\Actions\Account\LoginAccount;
 use App\Enums\LoginOutcome;
+use App\Enums\Role;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Account\GoogleLinkRequest;
 use App\Services\Account\GoogleAuthentication;
@@ -63,7 +64,7 @@ class GoogleAuthenticationController extends Controller
             }
             $outcome = $login->fromGoogle($subject, $request->session());
             if ($outcome === LoginOutcome::Authenticated) {
-                return $this->protectedRedirect(redirect()->route('dashboard'));
+                return $this->protectedRedirect(redirect()->route($request->user()->account_role === Role::Learner ? 'home' : 'dashboard'));
             }
             if ($outcome === LoginOutcome::Conflict) {
                 return $this->protectedRedirect(redirect()->route('login.confirmation'));

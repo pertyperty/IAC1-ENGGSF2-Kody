@@ -25,8 +25,8 @@ class RegisterAccountRequest extends FormRequest
         return [
             'username' => ['required', 'string', 'min:6', 'max:30', Rule::unique('users', 'username')],
             'email' => ['required', 'string', 'email', 'max:100', Rule::unique('users', 'email')],
-            'first_name' => ['required', 'string', 'max:50', 'regex:/\A\p{L}+\z/u'],
-            'last_name' => ['required', 'string', 'max:50', 'regex:/\A\p{L}+\z/u'],
+            'first_name' => ['required', 'string', 'max:50', 'regex:/\A\p{L}[\p{L}\p{M}]*(?:[ \x{0027}\x{2019}-]\p{L}[\p{L}\p{M}]*)*\z/u'],
+            'last_name' => ['required', 'string', 'max:50', 'regex:/\A\p{L}[\p{L}\p{M}]*(?:[ \x{0027}\x{2019}-]\p{L}[\p{L}\p{M}]*)*\z/u'],
             'password' => AccountPasswords::rules(),
             'account_type' => ['required', Rule::in(['learner', 'instructor'])],
             'account_role' => ['prohibited'],

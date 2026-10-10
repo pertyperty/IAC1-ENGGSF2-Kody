@@ -94,7 +94,7 @@ test('A03 Google sign-in uses PKCE and server userinfo without storing tokens', 
     parse_str(parse_url($response->headers->get('Location'), PHP_URL_QUERY), $query);
     expect($query['scope'])->toBe('openid email')->and($query['code_challenge_method'])->toBe('S256')
         ->and($query['state'])->toBe(session('state'))->and($query['code_challenge'])->toBe(rtrim(strtr(base64_encode(hash('sha256', session('code_verifier'), true)), '+/', '-_'), '='));
-    googleCallback($this)->assertRedirect(route('dashboard'));
+    googleCallback($this)->assertRedirect(route(auth()->user()->account_role === Role::Learner ? 'home' : 'dashboard'));
     $this->assertAuthenticatedAs($user);
     expect($user->fresh()->failed_login_attempts)->toBe(0)->and(count($history))->toBe(2);
     $tokenRequest = $history[0]['request'];
@@ -184,7 +184,7 @@ test('A06 unlink requires password and preserves a versioned tombstone even when
     expect(app(GoogleAuthentication::class)->state($user))->toBe(['linked' => false, 'identity_version' => 2])
         ->and($user->fresh()->profile_version)->toBe(2);
     $this->assertDatabaseHas('audit_events', ['event' => 'account.google-unlinked']);
-    $this->post(route('login.store'), ['email' => $user->email, 'password' => 'password'])->assertRedirect(route('dashboard'));
+    $this->post(route('login.store'), ['email' => $user->email, 'password' => 'password'])->assertRedirect(route(auth()->user()->account_role === Role::Learner ? 'home' : 'dashboard'));
 });
 
 test('A03 Google authentication preserves account status restrictions', function (AccountStatus $status) {
@@ -218,7 +218,7 @@ test('A03 Google uses existing session conflict confirmation and invalidates unl
         $this->postJson(route('login.confirm'), ['choice' => 'continue'])->assertUnprocessable();
         $this->assertGuest();
     } else {
-        $this->post(route('login.confirm'), ['choice' => 'continue'])->assertRedirect(route('dashboard'));
+        $this->post(route('login.confirm'), ['choice' => 'continue'])->assertRedirect(route(auth()->user()->account_role === Role::Learner ? 'home' : 'dashboard'));
         $this->assertAuthenticatedAs($user);
     }
 })->with([true, false]);

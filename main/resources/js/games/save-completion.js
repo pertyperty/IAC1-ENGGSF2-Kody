@@ -1,7 +1,10 @@
 import { publishFeedback } from '../feedback.js';
 
 export async function saveCompletion(root, input) {
-    if (!root.dataset.completionUrl) return '';
+    if (!root.dataset.completionUrl) {
+        root.dispatchEvent?.(new CustomEvent('kody:completed', { bubbles: true, detail: { local: true } }));
+        return '';
+    }
     try {
         const response = await fetch(root.dataset.completionUrl, {
             method: 'POST', credentials: 'same-origin', redirect: 'error', signal: AbortSignal.timeout(10000),
@@ -14,6 +17,7 @@ export async function saveCompletion(root, input) {
             return message;
         }
         const result = await response.json();
+        root.dispatchEvent?.(new CustomEvent('kody:completed', { bubbles: true, detail: result }));
         const message = typeof result.message === 'string' ? result.message : 'Your win was saved.';
         publishFeedback(root, message, 'success', true, result.journey ?? null);
         return message;

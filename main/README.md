@@ -1,6 +1,6 @@
 # Kody
 
-Game-first coding platform with creator-authored lessons, customizable games and
+Game-first coding platform with an editable 25-level tower, creator-authored lessons, customizable games and
 reviewed courses. Laravel modular monolith with PostgreSQL as the canonical database.
 
 Read `AGENTS.md` and [architecture conventions](docs/architecture.md) first.
@@ -53,6 +53,7 @@ each local environment file. `.env.testing` uses the dedicated test role.
 php artisan key:generate
 php artisan key:generate --env=testing
 php artisan migrate
+php artisan db:seed --class=TowerLevelSeeder
 php artisan migrate --env=testing
 npm ci
 npm run build
@@ -65,6 +66,12 @@ For the five verified Active local role accounts, run `php artisan db:seed` with
 private storage; reruns preserve existing accounts. See
 [local account setup](docs/local-administrator-setup.md#reproducible-local-role-accounts).
 Default production/staging seeding creates no development accounts.
+
+Install the tower curriculum after release migrations with the explicit
+`TowerLevelSeeder`; reruns preserve Administrator edits and saved clears.
+See [tower/media](docs/tower-and-media-implementation.md) for private PDF/DOCX/PPTX
+storage, upload/proxy limits and text-only office previews, and the
+[content guide](docs/tower-content-guide.md) for original/source-checked authoring.
 
 Run `php artisan serve` and `npm run dev` in separate terminals. Run the database
 worker in another terminal:

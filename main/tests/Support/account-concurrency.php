@@ -10,6 +10,7 @@ use App\Models\GamePreset;
 use App\Models\InstructorApplication;
 use App\Models\LearningCourse;
 use App\Models\LearningModule;
+use App\Models\TowerLevel;
 use App\Models\User;
 use App\Models\WeeklyEvent;
 use App\Services\Account\AccountArchival;
@@ -35,6 +36,7 @@ use App\Services\Content\ModulePublishing;
 use App\Services\Engagement\ContentFeedback;
 use App\Services\Games\GamePresets;
 use App\Services\Gamification\LearningProgression;
+use App\Services\Gamification\TowerProgression;
 use App\Services\Gamification\WeeklyEvents;
 use App\Services\Transactions\ContentAccess;
 use App\Services\Transactions\PublisherSettlements;
@@ -65,6 +67,7 @@ try {
     $session->start();
 
     $result = match ($argv[1]) {
+        'tower-complete' => app(TowerProgression::class)->complete(User::findOrFail($input['actor_id']), $input['session_id'], TowerLevel::findOrFail($input['level_id']), $input['revision_id'], 0, ['program' => ['right', 'right', 'up', 'right', 'right']]) ? 'saved' : 'error',
         'economy-unlock' => (function () use ($input, $argv): string {
             $index = (int) $argv[3] - 1;
             app(ContentAccess::class)->unlock(User::findOrFail($input['actor_id']), 'module-test-session', 'module', $input['content_ids'][$index], $input['revision_ids'][$index]);

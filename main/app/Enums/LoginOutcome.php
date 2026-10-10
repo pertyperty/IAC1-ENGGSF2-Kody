@@ -14,7 +14,7 @@ enum LoginOutcome
     public function message(): string
     {
         return match ($this) {
-            self::Invalid => 'Invalid email or password.',
+            self::Invalid => 'Invalid sign-in details.',
             self::Unverified => 'Verify your email before signing in.',
             self::Restricted => 'Access to this account is restricted.',
             self::Locked => 'This account is temporarily locked. Try again after the cooldown.',
