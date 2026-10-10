@@ -63,17 +63,14 @@ class CourseLearning
             abort_unless($course->status === 'Published' || ($course->status === 'Archived' && $enrollment !== null), 404);
             $revision = $enrollment?->revision ?? $course->publishedRevision;
             abort_unless($revision?->review_status === 'Approved', 404);
-            $revision->load('modules.revision', 'modules.module');
-            $progress = $enrollment === null ? collect() : DB::table('course_module_progress')->where('enrollment_id', $enrollment->id)->get()->keyBy('assignment_id');
-
-            $unlocked = $revision->modules->mapWithKeys(fn ($slot) => [$slot->id => ! $enrollment?->sequential
-                || $revision->modules->where('position', '<', $slot->position)->every(fn ($previous) => $progress->get($previous->id)?->completed_at !== null)]);
+            [$progress, $unlocked] = $this->pathState($revision, $enrollment);
 
             $accessible = $enrollment !== null && $this->hasAccess($user, $course, $revision);
             $price = app(ContentAccess::class)->price($revision, $course->created_by);
             $requirements = app(ContentAccess::class)->requirements($user, $revision);
+            $trail = app(CourseTrail::class)->snapshot($course, $revision, $progress, $unlocked, $accessible);
 
-            return compact('course', 'enrollment', 'revision', 'progress', 'unlocked', 'accessible', 'price', 'requirements');
+            return compact('course', 'enrollment', 'revision', 'progress', 'unlocked', 'accessible', 'price', 'requirements', 'trail');
         });
     }
 
@@ -83,9 +80,11 @@ class CourseLearning
             $user = $this->account($actor, $sessionId);
             [$course, $enrollment, $slot] = $this->entitlement($user, $courseId, $slotId);
             $this->visit($enrollment, $slot);
-            $progress = DB::table('course_module_progress')->where('enrollment_id', $enrollment->id)->where('assignment_id', $slot->id)->first();
+            [$pathProgress, $unlocked] = $this->pathState($enrollment->revision, $enrollment);
+            $progress = $pathProgress->get($slot->id);
+            $trail = app(CourseTrail::class)->snapshot($course, $enrollment->revision, $pathProgress, $unlocked, true, $slotId);
 
-            return ['course' => $course, 'enrollment' => $enrollment, 'slot' => $slot, 'revision' => $slot->revision, 'progress' => $progress];
+            return ['course' => $course, 'enrollment' => $enrollment, 'slot' => $slot, 'revision' => $slot->revision, 'progress' => $progress, 'trail' => $trail];
         });
     }
 
@@ -93,14 +92,17 @@ class CourseLearning
     {
         return DB::transaction(function () use ($actor, $sessionId, $courseId, $slotId, $kind, $input): array {
             $user = $this->account($actor, $sessionId);
-            [, $enrollment, $slot] = $this->entitlement($user, $courseId, $slotId);
+            [$course, $enrollment, $slot] = $this->entitlement($user, $courseId, $slotId);
             $result = app(LearningProgression::class)->recordApprovedModule($user, $sessionId, $slot->module_id, $slot->module_revision_id, $kind, $input);
             $this->visit($enrollment, $slot);
             // Preserve the first validated clearance; subsequent wins can qualify a new daily streak.
             DB::table('course_module_progress')->where('enrollment_id', $enrollment->id)->where('assignment_id', $slot->id)->whereNull('completed_at')
                 ->update(['completed_at' => now(), 'validated_input' => json_encode($input, JSON_THROW_ON_ERROR)]);
 
-            return $result;
+            [$progress, $unlocked] = $this->pathState($enrollment->revision, $enrollment);
+            $trail = app(CourseTrail::class)->snapshot($course, $enrollment->revision, $progress, $unlocked, true, $slotId);
+
+            return $result + ['journey' => array_diff_key($trail, ['steps' => true])];
         });
     }
 
@@ -117,6 +119,21 @@ class CourseLearning
                     ['assignment_id' => $slot->id, 'revision_id' => $slot->module_revision_id]);
             }
         });
+    }
+
+    private function pathState(CourseRevision $revision, ?CourseEnrollment $enrollment): array
+    {
+        $revision->loadMissing('modules.revision', 'modules.module');
+        $progress = $enrollment === null ? collect() : DB::table('course_module_progress')->where('enrollment_id', $enrollment->id)->get()->keyBy('assignment_id');
+        $previousComplete = true;
+        $unlocked = $revision->modules->mapWithKeys(function ($slot) use ($enrollment, $progress, &$previousComplete): array {
+            $available = ! $enrollment?->sequential || $previousComplete;
+            $previousComplete = $previousComplete && $progress->get($slot->id)?->completed_at !== null;
+
+            return [$slot->id => $available];
+        });
+
+        return [$progress, $unlocked];
     }
 
     private function account(User $actor, string $sessionId): User

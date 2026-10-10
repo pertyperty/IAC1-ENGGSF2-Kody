@@ -13,7 +13,7 @@ test('B01 catalog combines literal search with published assessment template fil
     $this->get(route('learning.catalog', ['template' => 'terminal-quest', 'q' => 'DELIVERY']))
         ->assertOk()->assertSee('Terminal delivery')->assertDontSee('Pixel delivery')
         ->assertDontSee('Other terminal')->assertDontSee('Draft delivery')->assertDontSee('First steps');
-    $this->get(route('learning.catalog', ['q' => '%']))->assertOk()->assertSee('No adventures match');
+    $this->get(route('learning.catalog', ['q' => '%']))->assertOk()->assertSee('No adventures found')->assertSee('See all modules');
 });
 
 test('B01 discovery excludes archived withdrawn and unpublished replacement revisions', function () {
@@ -27,7 +27,7 @@ test('B01 discovery excludes archived withdrawn and unpublished replacement revi
 
     $this->get(route('learning.catalog', ['template' => 'terminal-quest']))->assertOk()
         ->assertSee('Published terminal')->assertDontSee('Archived terminal')->assertDontSee('Withdrawn terminal')->assertDontSee('Replacement pixels');
-    $this->get(route('learning.catalog', ['template' => 'pixel-studio']))->assertOk()->assertSee('No adventures match');
+    $this->get(route('learning.catalog', ['template' => 'pixel-studio']))->assertOk()->assertSee('No adventures found')->assertSee('See all modules');
 });
 
 test('B01 starter trails expose both their garden and quiz activities', function () {

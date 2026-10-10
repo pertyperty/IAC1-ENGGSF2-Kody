@@ -6,6 +6,7 @@ use App\Http\Requests\Learning\CompleteGameRequest;
 use App\Http\Requests\Learning\CompleteQuizRequest;
 use App\Models\LearningCourse;
 use App\Models\WeeklyEvent;
+use App\Services\Engagement\LearnerMissions;
 use App\Services\Engagement\PlatformDashboard;
 use App\Services\Gamification\Achievements;
 use App\Services\Gamification\LearningProgression;
@@ -26,9 +27,13 @@ class PlayController extends Controller
 
     public function hub(Request $request, LearningProgression $progression, PlatformDashboard $dashboard): Response
     {
-        return response()->view('learning.hub', ['progress' => $progression->snapshot($request->user()->id),
-            'dashboard' => $dashboard->snapshot($request->user()),
-            'weekly' => WeeklyEvent::open()->with('revision:id,title,language,difficulty')->first()])->header('Cache-Control', 'no-store, private');
+        $participant = Gate::allows('viewLearning', LearningCourse::class);
+        $progress = $participant ? $progression->snapshot($request->user()->id) : null;
+        $dashboard = $dashboard->snapshot($request->user());
+        $missions = $participant ? app(LearnerMissions::class)->snapshot($progress, $dashboard['achievements']) : [];
+
+        return response()->view('learning.hub', ['progress' => $progress, 'dashboard' => $dashboard, 'missions' => $missions,
+            'weekly' => $participant ? WeeklyEvent::open()->with('revision:id,title,language,difficulty')->first() : null])->header('Cache-Control', 'no-store, private');
     }
 
     public function game(CompleteGameRequest $request, string $level, LearningProgression $progression): JsonResponse

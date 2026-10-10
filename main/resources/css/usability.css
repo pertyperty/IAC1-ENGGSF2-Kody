@@ -57,6 +57,9 @@ html:not(.feedback-ready) .toast-region { position: static; width: auto; max-hei
 .review-list > a { position: relative; }
 .review-list > a:hover { border-color: var(--accent-text); }
 .review-list > a:focus-visible { outline-offset: 2px; }
+.catalog-empty { grid-column: 1 / -1; padding: 24px; border-style: solid; }
+.catalog-empty h2 { margin-top: 0; font-size: 22px; }
+.catalog-empty .button { margin-top: 8px; }
 @media (max-width: 1000px) { .app-primary-nav { margin-left: 0; gap: 2px; } .app-primary-nav a { padding-inline: 10px; } .app-header { gap: 12px; } }
 @media (max-width: 760px) {
     .page-navigation { margin-inline: 20px; gap: 4px; }

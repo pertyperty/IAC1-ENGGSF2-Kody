@@ -68,3 +68,30 @@ test('transient status failures remain retryable and closing the page stops poll
         assert.equal(timers.size, 0);
     });
 });
+
+test('restoring a pending attempt from page cache resumes polling without duplicating requests', async () => {
+    await withStatusPage(async ({ root, timers, events, tick }) => {
+        let calls = 0;
+        globalThis.fetch = async () => { calls++; return { ok: true, json: async () => ({ status: 'Evaluating', completed: false }) }; };
+        mountChallengeStatus(root);
+        await tick();
+        events.pagehide();
+        assert.equal(timers.size, 0);
+        events.pageshow({ persisted: true });
+        await tick();
+        assert.equal(calls, 2);
+        assert.equal(timers.size, 1);
+    });
+});
+
+test('incomplete and impossible terminal results never display a false pass or stop updates', async () => {
+    for (const patch of [{ completed: false }, { total_cases: -1 }, { passed_cases: 3 }, { feedback: null }]) {
+        await withStatusPage(async ({ root, nodes, timers, tick }) => {
+            globalThis.fetch = async () => ({ ok: true, json: async () => ({ status: 'Passed', completed: true, feedback: 'Passed', passed_cases: 2, total_cases: 2, ...patch }) });
+            mountChallengeStatus(root);
+            await tick();
+            assert.equal(nodes.status.textContent, '');
+            assert.equal(timers.size, 1);
+        });
+    }
+});

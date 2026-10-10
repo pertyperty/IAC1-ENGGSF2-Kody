@@ -7,7 +7,7 @@
 <div class="lesson-note" role="status" aria-live="polite" @if(!$submission->completed_at) data-challenge-status="{{ route('challenge-attempts.status', $submission->id) }}" @endif><h2 data-attempt-status>{{ $submission->status }}</h2>
 <p data-attempt-feedback>{{ $submission->feedback ?? 'Your code is saved. Evaluation continues if you close this page.' }}</p>
 <p data-attempt-counts>@if($submission->completed_at){{ $submission->passed_cases }} / {{ $submission->total_cases }} test cases passed.@endif</p>
-@if(!$submission->completed_at)<a class="button button-play" href="{{ route('challenge-attempts.show', $submission->id) }}">Refresh result →</a>@endif</div>
+@if(!$submission->completed_at)<a data-attempt-refresh class="button button-play" href="{{ route('challenge-attempts.show', $submission->id) }}">Refresh result →</a>@endif</div>
 <h2>Your code</h2><pre class="challenge-case">{{ $submission->source_code }}</pre>
 <a class="quiet-link" href="{{ $weeklyEvent ? route('weekly-events.index') : route('challenges.show', $submission->challenge_id) }}">{{ $weeklyEvent ? 'Your weekly quests' : 'Return to quest' }}</a></section>
 @endsection

@@ -9,15 +9,20 @@ use Illuminate\Http\Request;
 
 class ApplicationChrome
 {
-    public function snapshot(Request $request): array
+    public function snapshot(Request $request, array $viewData = []): array
     {
         $user = $request->user();
         $focused = $request->routeIs('account.edit', 'account.google', 'account.archive', 'account.delete',
             'studio.create', 'studio.edit', 'courses.create', 'courses.edit', 'challenges.create', 'challenges.edit',
             'game-presets.create', 'game-presets.edit');
-        $progress = $user?->can('viewLearning', LearningCourse::class) && ! $focused
-            ? app(LearningProgression::class)->snapshot($user->id) : null;
-        $achievements = $progress !== null ? app(Achievements::class)->snapshot($user->id) : null;
+        // Only the dashboard controller supplies these owned, already-computed snapshots.
+        $dashboard = $request->routeIs('dashboard') ? ($viewData['dashboard'] ?? null) : null;
+        $progress = null;
+        if ($user?->can('viewLearning', LearningCourse::class) && ! $focused) {
+            $progress = $dashboard !== null && isset($viewData['progress'])
+                ? $viewData['progress'] : app(LearningProgression::class)->snapshot($user->id);
+        }
+        $achievements = $progress !== null ? ($dashboard['achievements'] ?? app(Achievements::class)->snapshot($user->id)) : null;
         $back = ['url' => route($user ? 'dashboard' : 'home'), 'label' => $user ? 'Back to your workspace' : 'Back to home'];
         foreach (['studio.*' => ['studio.index', 'Back to module studio'], 'courses.*' => ['courses.index', 'Back to course builder'],
             'curriculum.*' => ['courses.index', 'Back to course builder'], 'module-reviews.*' => ['module-reviews.index', 'Back to module reviews'],
@@ -48,6 +53,6 @@ class ApplicationChrome
             $back = ['url' => route('course-learning.catalog'), 'label' => 'Back to courses'];
         }
 
-        return compact('focused', 'progress', 'achievements', 'back') + ['unread' => $user?->unreadNotifications()->count() ?? 0];
+        return compact('focused', 'progress', 'achievements', 'back') + ['unread' => $dashboard['unread'] ?? $user?->unreadNotifications()->count() ?? 0];
     }
 }

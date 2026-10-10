@@ -14,6 +14,7 @@ import { mountWorkspaceMenus } from './workspace-menus.js';
 import { mountScrollNavigation } from './scroll-navigation.js';
 import { mountFeedback } from './feedback.js';
 import { mountProgressStrip } from './progress-strip.js';
+import { mountCourseJourney } from './course-journey.js';
 
 mountTheme(document, window);
 mountAccountLinks(document, window);
@@ -21,6 +22,7 @@ mountPasswordFields(document);
 mountWorkspaceMenus(document);
 mountFeedback(document, window);
 mountProgressStrip(document, window);
+document.querySelectorAll('[data-course-journey]').forEach(root => mountCourseJourney(root, document, window));
 mountScrollNavigation(document, window);
 
 document.querySelectorAll('[data-module-editor]').forEach(mountModuleEditor);

@@ -23,6 +23,8 @@ test('reactions add replace and remove in place using server counts and version'
         assert.equal(url.origin, window.location.origin);
         assert.equal(options.credentials, 'same-origin');
         assert.equal(options.cache, 'no-store');
+        assert.equal(options.redirect, 'error');
+        assert.ok(options.signal instanceof AbortSignal);
         const data = JSON.parse(options.body);
         assert.equal(data.record_version, state.record_version);
         state.record_version++;

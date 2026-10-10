@@ -4,6 +4,11 @@ Start here for current scope, detailed evidence and the next useful improvements
 This index consolidates the feature summaries previously repeated in README.
 It does not replace approved requirements, decisions or the implementation records.
 Last reviewed: 2026-10-09.
+The [gamified journey flow](gamified-journey-flow.md) adds saved-goal mission cards,
+numbered course trails and direct next-lesson actions after confirmed wins.
+The [workflow quality audit](workflow-quality-audit.md) records the all-module
+regression pass, shared base layout/partials, bounded polling and reactions,
+policy-safe notification destinations and progression query optimizations.
 The [navigation and feedback follow-up](navigation-and-feedback-implementation.md)
 owns direct role destinations, context-aware back buttons, persistent learner
 progression, distinguishable actions and shared dismissible notifications.
@@ -91,7 +96,7 @@ provider-fake verification is not live delivery/execution evidence.
 - Variable-length quiz authoring, multi-question server completion, sequential
   creator paths, reading completion and dashboards are implemented in
   [the completion milestone](platform-completion-implementation.md).
-- Eleven isolated Chromium browser workflows now exercise real registration, play,
+- Fifteen isolated Chromium browser workflows now exercise real registration, play,
   creator/staff publication, all five role workspaces, direct/mobile game interactions,
   themes, save-failure retry and axe checks. Exercise
   long content, keyboard authoring and error/retry paths across actual
