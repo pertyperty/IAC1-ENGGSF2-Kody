@@ -4,15 +4,26 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Learning\CompleteGameRequest;
 use App\Http\Requests\Learning\CompleteQuizRequest;
+use App\Models\LearningCourse;
 use App\Models\WeeklyEvent;
 use App\Services\Engagement\PlatformDashboard;
+use App\Services\Gamification\Achievements;
 use App\Services\Gamification\LearningProgression;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Gate;
 
 class PlayController extends Controller
 {
+    public function progress(Request $request, LearningProgression $progression, Achievements $achievements): JsonResponse
+    {
+        Gate::authorize('viewLearning', LearningCourse::class);
+
+        return response()->json(['progress' => $progression->snapshot($request->user()->id),
+            'achievements' => $achievements->snapshot($request->user()->id)])->header('Cache-Control', 'no-store, private');
+    }
+
     public function hub(Request $request, LearningProgression $progression, PlatformDashboard $dashboard): Response
     {
         return response()->view('learning.hub', ['progress' => $progression->snapshot($request->user()->id),

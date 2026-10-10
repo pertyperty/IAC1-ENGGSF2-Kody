@@ -3,7 +3,7 @@
 @section('content')
 <p class="eyebrow">BUILD THE NEXT QUEST</p><h1>Become a Contributor</h1>
 <p class="intro">Share what you know by creating coding challenges for fellow explorers. Your Learner access stays available while we review your application.</p>
-@if(session('status'))<p class="notice" role="status">{{ session('status') }}</p>@endif
+
 @if($errors->any())<div class="form-errors" role="alert">@foreach($errors->all() as $error)<p>{{ $error }}</p>@endforeach</div>@endif
 <p>Account age: {{ $progress['account_age_days'] }} / 30 days · Modules completed: {{ $progress['completed_modules_count'] }} / 25 · Coding challenges passed: {{ $progress['completed_challenges_count'] }} / 50</p>
 <p>Each module and coding challenge counts once. Landing-page practice does not count toward this application.</p>

@@ -2,7 +2,7 @@
 @section('title', 'Write a helpful answer — Kody')
 @section('content')
 <section class="review-page page-width"><a class="quiet-link" href="{{ route('faq-management.index') }}">← Help workshop</a><h1>{{ $entry ? 'Keep the answer useful.' : 'Clear up a little mystery.' }}</h1><p>Write a clear question and a friendly answer. Saving publishes it to public Help.</p>
-@if(session('status'))<p class="lesson-note" role="status">{{ session('status') }}</p>@endif
+
 @if($errors->any())<div class="form-errors" role="alert">@foreach($errors->all() as $error)<p>{{ $error }}</p>@endforeach</div>@endif
 <form class="studio-form" method="POST" action="{{ $entry ? route('faq-management.update', $entry) : route('faq-management.store') }}">@csrf @if($entry)@method('PUT')@endif<input type="hidden" name="record_version" value="{{ $entry?->record_version ?? 1 }}">
 <label for="category">Topic</label><select id="category" name="category">@foreach(config('help.categories') as $key => $label)<option value="{{ $key }}" @selected(old('category', $entry?->category) === $key)>{{ $label }}</option>@endforeach</select>

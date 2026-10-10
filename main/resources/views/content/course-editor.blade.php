@@ -7,7 +7,7 @@
 @if($course?->isWithdrawn())<p class="lesson-note">Staff withdrawal is active. Learner access is blocked. Draft corrections, publication review and creator archival do not lift this block; only staff restoration can do that.</p>@endif
 <a class="quiet-link" href="{{ route('courses.index') }}">← Your courses</a><h1>Give your journey a shape.</h1><p>Start with one clear goal. Build toward it with small adventures.</p>
 @if(!empty($starter))<p class="lesson-note">This course plan is unsaved. Customize its title, then select your approved lesson versions in this order: {{ collect($starter['lessons'])->map(fn ($slug) => config('creator-examples.'.$slug.'.title'))->join(' → ') }}. <a class="quiet-link" href="{{ route('curriculum.index') }}">Return to the lesson examples →</a></p>@endif
-    @if(session('status'))<p class="lesson-note" role="status">{{ session('status') }}</p>@endif
+
     @if($errors->any())<div class="studio-errors" role="alert">@foreach($errors->all() as $error)<p>{{ $error }}</p>@endforeach</div>@endif
     @if($revision)<p class="step-pill">Revision {{ $revision->number }} · {{ $revision->review_status }}</p>@if($revision->review_notes)<p class="lesson-note">{{ $revision->review_notes }}</p>@endif @endif
     <form method="get" class="catalog-search"><label for="course-adventure-search">Find adventures to add (save changes before searching)</label><div><input id="course-adventure-search" type="search" name="q" value="{{ request('q') }}" maxlength="80" placeholder="Search your published adventures"><button class="button button-dark button-small">Find</button></div></form>

@@ -2,7 +2,7 @@
 @section('title', 'Your wallet — Kody')
 @section('content')
 <section class="review-page page-width"><p class="overline">YOUR KODY WALLET</p><h1>More adventures ahead.</h1>
-@if(session('status'))<p class="lesson-note" role="status">{{ session('status') }}</p>@endif
+
 @if($errors->any())<p class="studio-errors" role="alert">{{ $errors->first() }}</p>@endif
 <div class="dashboard-grid"><article class="lesson-note"><h2>{{ number_format($wallet['available']) }} KB available</h2><p>{{ $wallet['reserved'] }} KB reserved · {{ $wallet['balance'] }} KB total</p></article><article class="lesson-note"><h2>{{ $rank['rank'] }}</h2><p>{{ number_format($rank['xp']) }} XP earned through validated learning. Purchasing KodeBits grants no XP.</p></article></div>
 <h2>Choose your next boost</h2><p class="field-hint">One-time PHP purchases. KodeBits do not expire and cannot be exchanged for cash.</p>

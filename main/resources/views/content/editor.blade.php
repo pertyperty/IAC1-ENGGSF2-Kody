@@ -10,7 +10,7 @@
     <p>Teach a small idea with a lesson and a playful activity. Save a draft, try it out, then submit it for review.</p>
     <nav class="editor-jumps" aria-label="Adventure setup"><a href="#lesson-edit"><span>01</span> Lesson</a><a href="#assessment-edit"><span>02</span> Activity</a><a href="#access-settings"><span>03</span> Access</a><a href="#draft-save"><span>04</span> Save & review</a></nav>
     @if(!empty($starter))<p class="lesson-note">Your example is ready to customize. It has not been saved or published yet.</p>@endif
-    @if(session('status'))<p role="status" class="lesson-note">{{ session('status') }}</p>@endif
+
     @if($errors->any())<div role="alert" class="studio-errors"><b>Please check your adventure.</b><ul>@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
     @if($revision)<p class="step-pill">Revision {{ $revision->number }} · {{ $revision->review_status }} · {{ $module->status }}</p>@if($revision->review_notes)<p class="lesson-note">Reviewer feedback: {{ $revision->review_notes }}</p>@endif @endif
     @php

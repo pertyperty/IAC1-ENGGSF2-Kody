@@ -2,7 +2,7 @@
 @section('title', 'Earnings and refunds — Kody')
 @section('content')
 <section class="review-page page-width"><p class="overline">YOUR PRIVATE EARNINGS</p><h1>Keep your work rewarding.</h1><p><a class="quiet-link" href="{{ route('wallet.index') }}">← Wallet and sales history</a></p>
-@if(session('status'))<p class="lesson-note" role="status">{{ session('status') }}</p>@endif
+
 @if($errors->any())<div class="studio-errors" role="alert">{{ $errors->first() }}</div>@endif
 @if(in_array(auth()->user()->account_role, [\App\Enums\Role::Contributor, \App\Enums\Role::Instructor], true))
 <details class="lesson-note"><summary>Claim matured Contributor KodeBits</summary><p>Whole KodeBits from eligible Contributor sales can be claimed after 14 days. Fractional earnings stay saved.</p><form class="studio-form" method="post" action="{{ route('earnings.claim') }}">@csrf<input type="hidden" name="confirmation_id" value="{{ $confirmationId }}">@include('transactions.password-confirmation')<button class="button button-play">Claim available whole KB</button></form></details>@endif

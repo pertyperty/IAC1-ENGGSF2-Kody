@@ -2,7 +2,7 @@
 @section('title', 'Review staff withdrawal — Kody')
 @section('content')
 <section class="review-page page-width moderation-details"><h1>{{ $revision?->title ?? ucfirst($kind).' #'.$item->id }}</h1>
-@if(session('status'))<p class="lesson-note" role="status">{{ session('status') }}</p>@endif
+
 @if($errors->any())<div role="alert" class="form-errors">@foreach($errors->all() as $error)<p>{{ $error }}</p>@endforeach</div>@endif
 <p>{{ ucfirst($kind) }} #{{ $item->id }} · {{ $item->status }} · {{ $item->isWithdrawn() ? 'Staff withdrawal active' : 'No staff block' }}</p>
 <p>{{ $revision?->description }}</p>

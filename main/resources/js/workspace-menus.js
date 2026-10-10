@@ -1,5 +1,5 @@
 export function mountWorkspaceMenus(doc) {
-    doc.querySelectorAll('.account-menu').forEach(menu => {
+    doc.querySelectorAll('.account-menu, .mobile-workspace').forEach(menu => {
         const summary = menu.querySelector('summary');
         menu.addEventListener('keydown', event => {
             if (event.key === 'Escape' && menu.open) {

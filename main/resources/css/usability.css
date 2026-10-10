@@ -1,0 +1,76 @@
+/* Shared action hierarchy, readable surfaces and predictable feedback layers. */
+:root { --success-soft: #e8f4ef; --success-text: #176443; }
+:root[data-theme="dark"] { --success-soft: #183b30; --success-text: #a5e4c5; }
+.page-navigation { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 20px 28px 0; }
+.account-shell .page-navigation { margin: 0 0 24px; }
+.page-navigation + .review-page, .page-navigation + .play-hub { padding-top: 24px; }
+.button.button-secondary, .button.button-dark, a.quiet-link, button.quiet-link, .secondary-link a { display: inline-flex; justify-content: center; align-items: center; min-height: 44px; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface-soft); color: var(--text); font-size: 13px; font-weight: 600; line-height: 1.4; text-decoration: none; cursor: pointer; }
+.button.button-secondary:not(:disabled):hover, .button.button-dark:not(:disabled):hover, a.quiet-link:hover, button.quiet-link:hover, .secondary-link a:hover { color: var(--text); background: var(--surface-hover); border-color: var(--muted); }
+.button.button-quiet { background: transparent; color: var(--accent-text); border: 1px solid transparent; }
+.button.button-quiet:hover { background: var(--accent-soft); color: var(--accent-text); border-color: var(--accent-line); }
+.button.button-danger { background: var(--error-soft); color: var(--error-text); border: 1px solid var(--error-text); }
+.button.button-danger:not(:disabled):hover { background: var(--error-soft); color: var(--error-text); outline: 1px solid var(--error-text); outline-offset: -2px; }
+.button.button-success { background: var(--success-soft); color: var(--success-text); border: 1px solid var(--success-text); }
+.button.button-success:hover { background: var(--success-soft); color: var(--success-text); }
+.button.button-warning { background: var(--warm-soft); color: var(--warm-text); border: 1px solid var(--warm-text); }
+.button.button-warning:not(:disabled):hover { background: var(--warm-soft); color: var(--warm-text); outline: 1px solid currentColor; outline-offset: -2px; }
+.account-shell a.button-play { color: var(--on-accent); }
+.account-shell :is(a.button-secondary, a.button-dark) { color: var(--text); }
+.account-shell a.button-danger { color: var(--error-text); }
+.secondary-link { margin-block: 12px; font-size: 14px; }
+.profile-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-block: 20px; }
+.profile-actions a { display: inline-flex; align-items: center; min-height: 44px; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface-soft); font-weight: 600; text-decoration: none; }
+.profile-actions a:hover { background: var(--surface-hover); }
+.account-shell { max-width: 620px; padding: 28px; }
+.account-shell-wide { max-width: 1200px; }
+.account-shell h1, .review-page h1 { font-size: clamp(28px, 3vw, 38px); }
+.account-form label { font-size: 14px; }
+.account-form small, .field-hint, .form-note { font-size: 13px; }
+.profile-details { gap: 12px 20px; padding-block: 20px; border-block: 1px solid var(--border); }
+.header-updates { min-height: 44px; display: inline-flex; align-items: center; gap: 6px; color: var(--text); padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; font-weight: 600; text-decoration: none; }
+.header-updates:hover { background: var(--surface-hover); }
+.unread-badge { display: inline-grid; place-items: center; min-width: 22px; min-height: 22px; border-radius: 6px; background: var(--accent); color: var(--on-accent); font-size: 11px; }
+.menu-signout { width: 100%; min-height: 44px; padding: 10px 14px; border: 0; border-top: 1px solid var(--border); background: transparent; color: var(--error-text); text-align: left; font-size: 14px; cursor: pointer; }
+.menu-signout:hover { background: var(--error-soft); }
+.account-menu[open] > nav { z-index: 10; box-shadow: 0 6px 16px var(--shadow); }
+.progress-strip { position: relative; z-index: 2; display: flex; justify-content: center; align-items: stretch; background: var(--surface); border-bottom: 1px solid var(--border); pointer-events: auto; font-size: 12px; }
+.progress-strip a { display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; padding: 8px 18px; color: var(--text); text-decoration: none; border-right: 1px solid var(--border); font-variant-numeric: tabular-nums; }
+.progress-strip a:hover { background: var(--surface-hover); }
+.progress-strip b { font-weight: 700; }
+.progress-strip .progress-streak > span:first-child { color: var(--warm-text); }
+.progress-today { color: var(--muted); padding-left: 8px; }
+.progress-rank { color: var(--accent-text); }
+.progress-strip button { background: var(--surface-soft); color: var(--text); border: 1px solid var(--border); padding: 6px 10px; cursor: pointer; }
+.app-header-shell:has(.progress-strip) .header-hover-edge { top: var(--progress-height, 44px); }
+.app-header-shell:has(.progress-strip) .navigation-reveal { top: var(--progress-height, 44px); }
+.toast-region { position: fixed; right: 24px; bottom: 24px; z-index: 70; width: min(420px, calc(100% - 32px)); max-height: min(40dvh, 420px); overflow: auto; display: grid; gap: 8px; pointer-events: none; }
+.toast { display: flex; align-items: start; gap: 12px; padding: 14px 12px 14px 16px; border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 10px; background: var(--surface); color: var(--text); box-shadow: 0 4px 16px var(--shadow); font-size: 14px; line-height: 1.6; pointer-events: auto; }
+.toast > span { flex: 1; min-width: 0; }
+.toast-error { border-left-color: var(--error-text); background: var(--error-soft); color: var(--error-text); }
+.toast-success { border-left-color: var(--success-text); background: var(--success-soft); color: var(--success-text); }
+.toast button { flex-shrink: 0; min-height: 44px; min-width: 44px; margin: -6px -6px -6px 0; border: 0; border-radius: 6px; background: transparent; color: inherit; font-size: 22px; cursor: pointer; }
+.toast button:hover { outline: 1px solid currentColor; }
+.toast-region:empty { display: none; }
+html:not(.feedback-ready) .toast-region { position: static; width: auto; max-height: none; margin: 16px; }
+.report-table { display: block; max-width: 100%; overflow-x: auto; }
+.report-table :is(th, td) { min-width: 110px; }
+.review-list > a { position: relative; }
+.review-list > a:hover { border-color: var(--accent-text); }
+.review-list > a:focus-visible { outline-offset: 2px; }
+@media (max-width: 1000px) { .app-primary-nav { margin-left: 0; gap: 2px; } .app-primary-nav a { padding-inline: 10px; } .app-header { gap: 12px; } }
+@media (max-width: 760px) {
+    .page-navigation { margin-inline: 20px; gap: 4px; }
+    .page-navigation .button { font-size: 12px; }
+    .progress-strip a { flex: 1; padding: 6px 8px; flex-wrap: wrap; gap: 4px; font-size: 11px; }
+    .progress-today, .progress-rank { display: none; }
+    .header-updates { font-size: 12px; padding-inline: 8px; }
+    .app-header-actions { gap: 6px; }
+    .app-header .theme-toggle { min-width: 44px; }
+    .app-header .theme-toggle > span:not(.theme-icon) { display: none; }
+    .app-header .theme-icon { display: block; }
+    .app-primary-nav { overflow-x: auto; }
+    .app-primary-nav a { flex: 1; white-space: nowrap; padding-inline: 10px; }
+    .toast-region { right: 16px; bottom: 16px; }
+    .profile-details { grid-template-columns: 90px minmax(0, 1fr); }
+    .account-shell { padding: 22px; }
+}

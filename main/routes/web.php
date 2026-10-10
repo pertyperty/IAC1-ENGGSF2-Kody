@@ -161,6 +161,7 @@ Route::middleware('guest')->group(function (): void {
 });
 Route::post('/email/verify', [EmailVerificationController::class, 'verify'])->middleware('throttle:30,1')->name('verification.verify');
 Route::get('/dashboard', [PlayController::class, 'hub'])->middleware(['auth', 'account.session'])->name('dashboard');
+Route::get('/play/progress', [PlayController::class, 'progress'])->middleware(['auth', 'account.session', 'throttle:60,1,progress:'])->name('play.progress');
 Route::post('/play/{level}/game', [PlayController::class, 'game'])->middleware(['auth', 'account.session', 'throttle:20,1,play-game:'])->name('play.game');
 Route::post('/play/{level}/quiz', [PlayController::class, 'quiz'])->middleware(['auth', 'account.session', 'throttle:20,1,play-quiz:'])->name('play.quiz');
 Route::get('/account', ProfileController::class)->middleware(['auth', 'account.session'])->name('account.show');

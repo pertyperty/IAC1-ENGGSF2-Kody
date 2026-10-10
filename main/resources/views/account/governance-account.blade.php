@@ -2,7 +2,7 @@
 @section('title', 'Account governance — Kody')
 @section('content')
 <h1>{{ $account->username ?? 'Account #'.$account->id }}</h1><p>{{ $account->account_role->name }} · {{ $account->account_status->value }}</p>
-@if(session('status'))<p class="notice" role="status">{{ session('status') }}</p>@endif
+
 @if($errors->any())<div class="form-errors" role="alert">@foreach($errors->all() as $error)<p>{{ $error }}</p>@endforeach</div>@endif
 @can('manage', $account)
 @if(in_array($account->account_status, [\App\Enums\AccountStatus::Active, \App\Enums\AccountStatus::Suspended], true))
