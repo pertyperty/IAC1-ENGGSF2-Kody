@@ -29,6 +29,7 @@ export default defineConfig({
     ],
     server: {
         watch: {
+            allowedHosts: ['.sharedwithexpose.com'], // remove later
             ignored: ['**/storage/framework/views/**'],
         },
     },

@@ -27,6 +27,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->prependToPriorityList(ThrottleRequests::class, GoogleCallbackPrivacy::class);
         $middleware->redirectGuestsTo(fn () => route('login'));
         $middleware->redirectUsersTo(fn () => route('dashboard'));
+        $middleware->trustProxies(at: '*'); // Remove later
         // Test-case whitespace is part of the expected program behavior.
         $middleware->trimStrings(except: ['test_cases.*.input', 'test_cases.*.expected_output', 'source_code']);
     })
