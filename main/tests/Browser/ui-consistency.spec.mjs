@@ -14,6 +14,7 @@ test('course cards render unjoined progress and shared actions have aligned icon
     await page.getByLabel('Email or username').fill('browser_questlearner');
     await page.getByLabel(/^Password/).fill('BrowserStrong12!');
     await page.getByRole('button', { name: /Sign in/ }).click();
+    await expect(page).toHaveURL(/\/$/);
     await page.setViewportSize({ width: 1920, height: 1080 });
     await page.goto('/learn/courses');
     const cards = page.locator('.module-card');
