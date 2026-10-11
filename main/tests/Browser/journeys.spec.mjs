@@ -81,8 +81,12 @@ test('workspace navigation sticks on short desktops and touch layouts; expanded 
         await expect.poll(async () => (await page.locator('.app-rail').boundingBox()).y).toBeGreaterThanOrEqual(0);
         await expect.poll(async () => (await page.locator('.app-rail').boundingBox()).y).toBeLessThan(160);
         await page.setViewportSize({ width: 320, height: 740 });
+        await expect(page.locator('.mobile-workspace summary')).toBeInViewport();
         await page.goto('/learn/sequences');
         await page.evaluate(() => window.scrollTo(0, 450));
+        // Scroll navigation is coalesced in animation frames. Inspect its settled
+        // reveal state rather than taking a stale visibility snapshot immediately.
+        await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
         const workspace = page.locator('.mobile-workspace');
         if (await page.locator('[data-navigation-reveal]').isVisible()) await page.locator('[data-navigation-reveal]').click();
         await expect(workspace.locator('summary')).toBeInViewport();

@@ -25,6 +25,14 @@ export function mountScrollNavigation(doc, win) {
         setHidden(shell.classList.contains('navigation-hidden'));
     };
     const show = () => { distance = 0; setHidden(false); };
+    const restore = () => {
+        previous = Math.max(0, win.scrollY);
+        direction = 0; distance = 0;
+        measure(); show();
+    };
+    // A new viewport/history context should present its navigation immediately.
+    win.addEventListener('resize', restore);
+    win.addEventListener('pageshow', restore);
     doc.addEventListener('kody:tour-start', show);
     shell.addEventListener('pointerenter', event => {
         // Let the reveal receive its click; hovering it must not remove its own hit target.

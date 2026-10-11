@@ -21,6 +21,12 @@ Arcade headings; ordinary sentence punctuation is preserved.
 
 ## Courses and progress chrome
 
+Changing viewport size or restoring browser history now reveals the top bar and
+resets its scroll baseline. A previous hidden state must not conceal the mobile
+hamburger after changing context. The touch regression waits for coalesced scroll
+frames before inspecting the reveal button; a pre-frame visibility snapshot had
+skipped the reveal action on the faster CI browser.
+
 The compressed `@else@include` sequence prevented Blade from recognizing the
 unjoined-course progress include. Browse Courses now uses readable separated
 directives for enrolled and unjoined cards. The same adjacency pattern was
