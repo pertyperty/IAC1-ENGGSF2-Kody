@@ -255,7 +255,7 @@ export function mountArcade(root) {
     async function enterCommand() {
         const command = build();
         if (busy || !add(command)) return;
-        history.push(command); historyIndex = history.length; terminalInput.value = ''; await run(); terminalInput.focus();
+        history.push(command); historyIndex = history.length; terminalInput.value = ''; await run(false); terminalInput.focus();
     }
     controls.append(button(game.template === 'terminal-quest' ? 'Enter command' : 'Add instruction', 'button button-dark', null, async () => {
         if (game.template === 'terminal-quest') await enterCommand(); else add(build());
@@ -265,7 +265,7 @@ export function mountArcade(root) {
     }));
     code.addEventListener('input', () => { if (!busy) preview(); });
     root.querySelector('[data-arcade-help]').textContent = { 'pixel-studio': 'Syntax: paint 1 1 mint. Blank cells must stay blank.', 'number-machine': 'Syntax: add 3, subtract 2, multiply 2. One instruction per line.', 'sort-lab': 'Syntax: swap 1 2. Sort smallest to largest.', 'logic-switchboard': 'Tap the switches or use flip 1. AND: all on · OR: any on · XOR: odd number on.', 'string-forge': 'Commands: upper · lower · reverse · trim · append Code. One transformation per line.', 'memory-trail': 'Commands: push 2 · pop · duplicate · swap. The rightmost value is the top.', 'terminal-quest': 'Commands: ls · cat filename · cp source destination. Up/Down recalls commands. No pipes, scripts or host shell access.' }[game.template];
-    async function run() {
+    async function run(showResult = true) {
         if (busy) return;
         busy = true; selectedPosition = null; root.dataset.playState = 'running'; root.setAttribute('aria-busy', 'true');
         root.querySelectorAll('button, input, select, textarea').forEach(control => { control.disabled = true; });
@@ -282,7 +282,7 @@ export function mountArcade(root) {
             output.textContent = [...result.output, result.error ?? (result.success ? `Objective complete! ${game.learningIdea}` : 'Keep experimenting. The objective is not complete yet.')].join('\n');
             root.dataset.playState = result.success ? 'success' : 'retry';
             previewStatus.textContent = result.success ? 'Objective complete. You made that happen!' : 'Try changing a step, then run it again.';
-            if (!result.success) publishFeedback(root, result.error ?? 'Your objective is not complete yet. Change a step and run again.', result.error ? 'error' : 'info');
+            if (!result.success && showResult) publishFeedback(root, result.error ?? 'Your objective is not complete yet. Change a step and run again.', result.error ? 'error' : 'info', false, null, null, true);
             if (result.success) {
                 const message = await saveCompletion(root, { program });
                 if (message) output.textContent += `\n${message}`;

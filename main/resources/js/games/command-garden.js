@@ -183,7 +183,7 @@ export function mountGarden(root) {
             }
             feedback.textContent = result.message; success.hidden = !result.success;
             root.dataset.playState = result.success ? 'success' : 'retry';
-            if (!result.success) publishFeedback(root, result.message);
+            if (!result.success) publishFeedback(root, result.message, 'info', false, null, null, true);
             if (result.success) {
                 const saved = await saveCompletion(root, { program, repeat: !!root.querySelector('[data-game-repeat]')?.checked, conditional: !!root.querySelector('[data-game-conditional]')?.checked });
                 if (saved) feedback.textContent = `${result.message} ${saved}`;

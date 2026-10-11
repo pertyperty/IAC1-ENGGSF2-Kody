@@ -11,7 +11,9 @@ use App\Models\CourseEnrollment;
 use App\Models\CourseRevision;
 use App\Models\LearningCourse;
 use App\Services\Content\CourseLearning;
+use App\Services\Content\LearningHistory;
 use App\Services\Engagement\ContentFeedback;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -28,15 +30,25 @@ class CourseLearningController extends Controller
             ->when(trim($query) !== '', fn ($builder) => $builder->where(fn ($search) => $search->where('title', 'ilike', '%'.addcslashes(trim($query), '%_\\').'%')->orWhere('description', 'ilike', '%'.addcslashes(trim($query), '%_\\').'%')->orWhere('category', 'ilike', '%'.addcslashes(trim($query), '%_\\').'%')))
             ->orderByDesc('id')->paginate(12)->withQueryString();
 
-        return response()->view('learning.courses', compact('courses', 'query'));
+        $participant = app(LearningHistory::class)->participant($request);
+        $enrollments = $participant === null ? new Collection : CourseEnrollment::where('user_id', $participant->id)->whereIn('course_id', $courses->pluck('course_id'))->with('course', 'revision')->get();
+        $saved = $participant === null ? collect() : app(CourseLearning::class)->summaries($participant, $enrollments);
+        $courseProgress = $enrollments->mapWithKeys(fn ($enrollment) => [$enrollment->course_id => $saved->get($enrollment->id) + ['edition' => $enrollment->course_revision_id]]);
+
+        return response()->view('learning.courses', compact('courses', 'query', 'courseProgress', 'participant'))->header('Cache-Control', 'no-store, private');
     }
 
     public function mine(Request $request): Response
     {
         Gate::authorize('viewLearning', LearningCourse::class);
         $enrollments = CourseEnrollment::where('user_id', $request->user()->id)->with('course', 'revision')->orderByDesc('enrolled_at')->orderByDesc('id')->paginate(15);
+        $history = app(LearningHistory::class);
+        $participant = $history->participant($request);
+        $courseProgress = app(CourseLearning::class)->summaries($participant, $enrollments->getCollection());
+        $recentModules = $history->recentModules($participant);
+        $moduleProgress = $history->modules($participant, $recentModules->pluck('publishedRevision')->filter());
 
-        return response()->view('learning.my-courses', compact('enrollments'))->header('Cache-Control', 'no-store, private');
+        return response()->view('learning.my-courses', compact('enrollments', 'courseProgress', 'recentModules', 'moduleProgress'))->header('Cache-Control', 'no-store, private');
     }
 
     public function show(Request $request, LearningCourse $course, CourseLearning $learning, ContentFeedback $feedback): Response

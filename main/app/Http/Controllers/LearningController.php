@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\BrowseModulesRequest;
 use App\Models\ModuleRevision;
+use App\Services\Content\LearningHistory;
 use App\Services\Gamification\LearningProgression;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -37,7 +38,12 @@ class LearningController extends Controller
             ->when($template !== '', fn ($builder) => $builder->where('assessment->template', $template))
             ->orderByDesc('id')->paginate(12)->withQueryString();
 
-        return response()->view('learning.catalog', compact('modules', 'query', 'published', 'template', 'templates'));
+        $history = app(LearningHistory::class);
+        $participant = $history->participant($request);
+        $moduleProgress = $participant === null ? collect() : $history->modules($participant, $published->getCollection());
+        $starterProgress = $participant === null ? null : app(LearningProgression::class)->snapshot($participant->id);
+
+        return response()->view('learning.catalog', compact('modules', 'query', 'published', 'template', 'templates', 'moduleProgress', 'starterProgress'))->header('Cache-Control', 'no-store, private');
     }
 
     public function show(Request $request, string $module, LearningProgression $progression): Response

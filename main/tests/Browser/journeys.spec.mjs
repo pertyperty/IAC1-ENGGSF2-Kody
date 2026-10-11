@@ -95,6 +95,7 @@ async function solveGarden(page, saved = true) {
     await game.getByRole('button', { name: 'Run my code', exact: true }).click();
     await expect(game.locator('[data-game-success]')).toBeVisible();
     if (saved) await expect(game.locator('[data-game-feedback]')).toContainText('saved');
+    await expect(page.locator('[data-game-result]')).toBeVisible(); await page.locator('[data-result-return]').click();
 }
 test.beforeEach(async ({ page }) => {
     // Acceptance tests cannot accidentally visit or contact a live provider.
@@ -216,9 +217,7 @@ test('A01 A02 B03 B05: guest trial, registration, verified play, reading and cou
     await expect(page.locator('[data-progress-xp]')).toHaveText('20');
     await expect(page.locator('[data-progress-streak]')).toHaveText('1');
     await expect(page.locator('[data-progress-level]')).toHaveText('0 / 50');
-    await expect(page.locator('.toast-success')).toBeVisible();
-    await page.locator('.toast-success').getByRole('button', { name: 'Dismiss notification' }).click();
-    await expect(page.locator('.toast-success')).toHaveCount(0);
+    await expect(page.locator('[data-game-feedback]')).toContainText('saved');
     const course = manifest.courses['first-programs'];
     await page.goto(`/learn/courses/${course.id}`);
     await page.getByRole('button', { name: 'Join this journey' }).click();
@@ -251,6 +250,7 @@ test('tower guest trials unlock locally and level four invites registration on d
     const loop = page.locator('[data-coding-game]');
     for (const direction of ['right', 'up', 'right']) await loop.getByRole('button', { name: `Add ${direction}`, exact: true }).click();
     await loop.locator('[data-game-repeat]').check(); await loop.locator('[data-game-run]').click();
+    await expect(page.locator('[data-game-result]')).toBeVisible(); await page.locator('[data-result-return]').click();
     await expect(page.locator('[data-tower-victory]')).toBeVisible();
     await page.locator('[data-tower-next]').click();
     await page.locator('[data-tower-stop="3"] a').click();
@@ -274,7 +274,15 @@ test('learner username sign-in lands on the tower and saved wins refresh the del
     await page.reload(); await page.getByRole('link', { name: 'Level map', exact: false }).click();
     await expect(page.locator('[data-tower-stop="1"]')).toHaveClass(/is-cleared/);
     await expect(page.locator('[data-tower-stop="2"]')).not.toHaveClass(/is-locked/);
+    const map = page.locator('[data-tower-viewport]');
+    const shell = await page.locator('[data-scroll-navigation]').boundingBox();
+    const canvas = await map.boundingBox();
+    expect(Math.abs(canvas.y - shell.y - shell.height)).toBeLessThan(2);
+    await page.locator('.rail-toggle').click();
+    await expect(page.locator('[data-tower-stop="2"] .tower-node')).toBeInViewport();
     await page.setViewportSize({ width: 320, height: 740 }); await audit(page);
+    await expect(page.locator('[data-tower-stop="2"] .tower-node')).toBeInViewport({ ratio: 0.99 });
+    await page.screenshot({ path: 'storage/app/browser-results/tower-learner-mobile.png' });
 });
 
 test('Administrator rail pulls and pins labels; tower drafts preview without publishing and preserve changes', async ({ page }) => {
@@ -301,6 +309,7 @@ test('Administrator rail pulls and pins labels; tower drafts preview without pub
     for (const direction of ['right', 'right', 'up', 'right', 'right']) await preview.getByRole('button', { name: `Add ${direction}`, exact: true }).click();
     await preview.getByRole('button', { name: 'Run my code', exact: true }).click();
     await expect(preview.locator('[data-game-success]')).toBeVisible();
+    await expect(page.locator('[data-game-result]')).toBeVisible(); await page.locator('[data-result-return]').click();
     await page.screenshot({ path: 'storage/app/browser-results/tower-stage-editor.png', fullPage: true });
     await page.getByRole('button', { name: '+ A quick idea check', exact: true }).click();
     const quizStage = page.locator('.tower-stage-summary').last();
@@ -312,6 +321,7 @@ test('Administrator rail pulls and pins labels; tower drafts preview without pub
     await quizPreview.getByRole('radio').first().check();
     await quizPreview.getByRole('button', { name: 'Check my idea', exact: true }).click();
     await expect(quizPreview.locator('[data-quiz-feedback]')).toContainText('You got it');
+    await expect(page.locator('[data-game-result]')).toBeVisible(); await page.locator('[data-result-return]').click();
     await expect(page).toHaveURL(editorUrl);
     await expect(page.locator('[name="record_version"]')).toHaveValue('1');
     await audit(page);
@@ -368,13 +378,35 @@ test('D01 D05 D07: creator draft, staff review, course composition and learner p
         await learnerPage.locator(`a[href*="/learn/courses/${courseId}/modules/"]`).first().click();
         await learnerPage.getByText('Read the lesson before you play', { exact: true }).click();
         await expect(learnerPage.locator('.lesson-video iframe')).toHaveAttribute('src', 'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ');
-        await learnerPage.locator('.resource-card').getByRole('link', { name: 'View', exact: true }).click();
-        await expect(learnerPage.getByText('Browser notes: instruction order matters.', { exact: true })).toBeVisible();
+        await learnerPage.setViewportSize({ width: 1920, height: 1000 });
+        const before = await learnerPage.locator('.lesson-primary').boundingBox();
+        const lessonUrl = learnerPage.url();
+        const view = learnerPage.locator('.resource-card').getByRole('link', { name: 'View', exact: true });
+        await view.click();
+        const viewer = learnerPage.locator('[data-resource-viewer]');
+        await expect(viewer).toBeVisible();
+        await expect(learnerPage).toHaveURL(lessonUrl);
+        await expect(learnerPage.frameLocator('[data-resource-frame]').getByText('Browser notes: instruction order matters.', { exact: true })).toBeVisible();
+        const split = await learnerPage.locator('.lesson-primary').boundingBox();
+        const pane = await viewer.boundingBox();
+        expect(split.width).toBeLessThan(before.width);
+        expect(pane.x).toBeGreaterThan(split.x + split.width);
         await audit(learnerPage);
+        await learnerPage.screenshot({path: 'storage/app/browser-results/lesson-resource-split.png'});
         const downloaded = learnerPage.waitForEvent('download');
-        await learnerPage.getByRole('link', { name: 'Download original', exact: false }).click();
+        await viewer.getByRole('link', { name: 'Download original', exact: false }).click();
         expect((await downloaded).suggestedFilename()).toBe('browser-notes.docx');
-        await learnerPage.getByRole('link', { name: 'Back to this lesson', exact: false }).click();
+        await viewer.locator('[data-resource-enlarge]').click();
+        await expect(viewer).toHaveJSProperty('open', true);
+        expect((await viewer.boundingBox()).width).toBe(1920);
+        await learnerPage.keyboard.press('Escape');
+        await expect(viewer).toBeHidden(); await expect(view).toBeFocused();
+        await learnerPage.setViewportSize({ width: 390, height: 844 });
+        await view.click();
+        expect((await viewer.boundingBox()).width).toBe(390);
+        await audit(learnerPage);
+        await viewer.locator('[data-resource-close]').click();
+        await expect(view).toBeFocused();
         await expect(learnerPage.locator('[data-practice-quiz]')).toBeVisible();
     } finally { await Promise.all([creator.close(), staff.close(), learner.close()]); }
 });
@@ -445,6 +477,7 @@ test('B05: four creator arcade assessments and a multi-question quiz save valida
     }
     await page.getByRole('button', { name: 'Check my idea' }).click();
     await expect(page.locator('[data-quiz-feedback]')).toContainText('try again');
+    await expect(page.locator('[data-game-result]')).toBeVisible(); await page.locator('[data-result-return]').click();
     expect(JSON.parse(fixture('snapshot', 'arcadelearner@browser.example.test'))).toMatchObject({ xp: 160, xp_awards: 4 });
     await audit(page);
     await page.getByRole('radio', { name: 'The robot may end up somewhere different', exact: true }).check();
@@ -520,6 +553,7 @@ test('interactive games edit and preview locally; confirmed runs save through th
     await page.route(completion, route => route.fulfill({ status: 503, contentType: 'application/json', body: '{}' }), { times: 1 });
     await garden.getByRole('button', { name: 'Run my code', exact: true }).click();
     await expect(garden.locator('[data-game-feedback]')).toContainText('wasn’t saved');
+    await expect(page.locator('[data-game-result]')).toBeVisible(); await page.locator('[data-result-return]').click();
     await expect(garden.getByRole('button', { name: 'Add right', exact: true })).toBeEnabled();
     expect(JSON.parse(fixture('snapshot', 'interactive@browser.example.test'))).toMatchObject({ xp: 0 });
     await garden.getByRole('button', { name: 'Run my code', exact: true }).click();
@@ -552,6 +586,7 @@ test('interactive games edit and preview locally; confirmed runs save through th
         await expect(prompt).toBeEnabled();
     }
     await expect(page.locator('[data-arcade-output]')).toContainText('saved');
+    await expect(page.locator('[data-game-result]')).toBeVisible(); await page.locator('[data-result-return]').click();
     await prompt.press('ArrowUp'); await expect(prompt).toHaveValue('cat release.txt');
     await prompt.press('ArrowDown'); await expect(prompt).toHaveValue('');
     await audit(page);

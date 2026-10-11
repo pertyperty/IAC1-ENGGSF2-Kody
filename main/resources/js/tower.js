@@ -1,5 +1,6 @@
 import { publishFeedback } from './feedback.js';
 import { editTowerStage, previewTowerStage } from './tower-stage-editor.js';
+import { mountTowerGrid } from './tower-grid.js';
 
 const KEY = 'kody-guest-tower-v1';
 
@@ -10,6 +11,7 @@ function guestClearance(win) {
 
 export function mountTower(doc, win) {
     const map = doc.querySelector('[data-tower-map]');
+    if (map) mountTowerGrid(map, win);
     const level = doc.querySelector('[data-tower-level]');
     const guest = map?.hasAttribute('data-guest-tower') || level?.hasAttribute('data-guest-tower');
     const applyMap = () => {
@@ -48,6 +50,8 @@ export function mountTower(doc, win) {
     }));
     applyMap();
     win.requestAnimationFrame?.(positionMap);
+    // Header wrapping and orientation changes resize the full-page map independently.
+    if (viewport && win.ResizeObserver) new win.ResizeObserver(positionMap).observe(viewport);
     win.addEventListener('pageshow', event => { if (!event.persisted) win.requestAnimationFrame?.(positionMap); });
     win.addEventListener('pageshow', applyMap);
     if (!level) return;
@@ -68,7 +72,7 @@ export function mountTower(doc, win) {
             nextStage.hidden = false;
             const tab = level.querySelector(`[data-tower-stage-link="${index + 1}"]`);
             tab?.removeAttribute('aria-disabled'); tab?.removeAttribute('tabindex');
-            publishFeedback(level, `Stage ${index + 1} complete. Stage ${index + 2} is ready below.`, 'success', false, null, { label: `Continue to stage ${index + 2}`, href: `${win.location.href.split('#')[0]}#tower-stage-${index + 1}` });
+            publishFeedback(event.target, `Stage ${index + 1} complete. Stage ${index + 2} is ready below.`, 'success', false, null, { label: `Continue to stage ${index + 2}`, href: `${win.location.href.split('#')[0]}#tower-stage-${index + 1}` }, true);
             return;
         }
         const victory = level.querySelector('[data-tower-victory]');
@@ -85,7 +89,7 @@ export function mountTower(doc, win) {
             const next = new URL(event.detail.tower.next ?? '/', win.location.origin);
             if (next.origin === win.location.origin && (/^\/tower\/\d+$/.test(next.pathname) || next.pathname === '/')) link.href = next.href;
         }
-        publishFeedback(level, victory.querySelector('[data-tower-result]').textContent, 'success', false, null, { label: link.textContent, href: link.href });
+        publishFeedback(event.target, victory.querySelector('[data-tower-result]').textContent, 'success', false, null, { label: link.textContent, href: link.href }, true);
     });
 }
 

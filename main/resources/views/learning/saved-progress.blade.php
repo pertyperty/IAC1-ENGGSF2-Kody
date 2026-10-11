@@ -1,0 +1,5 @@
+<div class="saved-progress saved-progress--{{ $saved['state'] }}">
+    <span class="saved-progress-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/>@if($saved['state'] === 'complete')<path d="m7 12 3 3 7-7"/>@elseif($saved['state'] === 'started')<path d="M12 6v6l4 2"/>@else<path d="m10 8 6 4-6 4z"/>@endif</svg>{{ $saved['label'] }}</span>
+    @if(isset($saved['total']))<progress max="{{ max(1, $saved['total']) }}" value="{{ $saved['completed'] }}" aria-label="{{ $saved['completed'] }} of {{ $saved['total'] }} lessons completed"></progress><span class="field-hint">{{ $saved['completed'] }} / {{ $saved['total'] }} lessons · {{ $saved['total'] ? round(100 * $saved['completed'] / $saved['total']) : 0 }}%</span>@endif
+    @if($saved['completed_at'] ?? null)<span class="field-hint">Completed <time datetime="{{ \Carbon\CarbonImmutable::parse($saved['completed_at'])->toIso8601String() }}">{{ \Carbon\CarbonImmutable::parse($saved['completed_at'])->timezone('Asia/Manila')->format('M j, Y') }}</time></span>@endif
+</div>

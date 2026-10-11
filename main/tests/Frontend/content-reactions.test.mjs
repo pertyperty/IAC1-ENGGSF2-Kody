@@ -7,7 +7,8 @@ function page() {
     const status = { textContent: '' };
     const forms = ['Like', 'Helpful', 'Favorite'].map((choice) => {
         const inputs = { record_version: { value: '0' }, reaction: { value: choice }, _token: { value: 'test-token' } };
-        const button = { disabled: false, attributes: {}, setAttribute(key, value) { this.attributes[key] = value; } };
+        const count = { textContent: '0' };
+        const button = { querySelector: () => count, disabled: false, attributes: {}, setAttribute(key, value) { this.attributes[key] = value; } };
         return { dataset: { reactionChoice: choice }, action: '/feedback/module/1', inputs, button,
             querySelector: (selector) => selector === 'button' ? button : inputs[selector.match(/name="([^"]+)"/)[1]],
             addEventListener(name, handler) { this.submit = () => handler({ preventDefault() {} }); } };
@@ -41,7 +42,7 @@ test('reactions add replace and remove in place using server counts and version'
     assert.equal(forms[1].inputs.record_version.value, 2);
     await forms[1].submit();
     assert.equal(status.textContent, 'Reaction removed.');
-    assert.equal(forms[1].button.textContent, 'Helpful · 0');
+    assert.equal(forms[1].button.attributes['aria-label'], 'Helpful · 0 reactions');
 });
 
 test('revoked access and stale versions stop further writes; external endpoints are refused', async () => {
@@ -88,7 +89,7 @@ test('malformed responses never inject labels or spoof counts and target identit
         mountContentReactions(root, async () => ({ ok: true, json: async () => ({ ...state, ...patch }) }));
         await forms[0].submit();
         assert.equal(forms[0].inputs.record_version.value, 0);
-        assert.equal(forms[0].button.textContent, 'Like · 0');
+        assert.equal(forms[0].button.attributes['aria-label'], 'Like · 0 reactions');
         assert.match(status.textContent, /Could not confirm/);
     }
 });

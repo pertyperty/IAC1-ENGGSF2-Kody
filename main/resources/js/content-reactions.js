@@ -15,7 +15,9 @@ export function mountContentReactions(root, fetcher = globalThis.fetch) {
         const button = form.querySelector('button');
         button.disabled = busy || blocked || !state.eligible;
         button.setAttribute('aria-pressed', String(selected));
-        button.textContent = `${choice} · ${state.counts[choice]}${selected ? ' · Remove' : ''}`;
+        button.setAttribute('aria-label', `${choice} · ${state.counts[choice]} reactions`);
+        const count = button.querySelector('[data-reaction-count]');
+        if (count) count.textContent = String(state.counts[choice]);
     });
     forms.forEach((form) => form.addEventListener('submit', async (event) => {
         event.preventDefault();
