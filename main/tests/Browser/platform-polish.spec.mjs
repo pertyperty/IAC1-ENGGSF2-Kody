@@ -58,6 +58,11 @@ test('tower climbs upward with centered levels accessible descriptions and conta
     await page.setViewportSize({ width: 390, height: 844 });
     await audit(page);
     await page.screenshot({ path: 'storage/app/browser-results/tower-upward-mobile.png' });
+    await page.setViewportSize({ width: 320, height: 740 });
+    await page.goto('/');
+    await expect(first).toBeInViewport({ ratio: 0.99 });
+    await audit(page);
+    await page.screenshot({ path: 'storage/app/browser-results/tower-start-mobile.png' });
 });
 
 for (const [template, program] of [['logic-switchboard', 'flip 1\nflip 2'], ['string-forge', 'upper\nreverse'], ['memory-trail', 'push 2\npush 3']]) {

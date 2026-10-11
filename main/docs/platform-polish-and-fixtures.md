@@ -125,3 +125,9 @@ The 2026-10-11 PostgreSQL 18 upgrade/restore drill matched 79 table fingerprints
 and preserved its encrypted fixture, XP and ledger; restoration took 3,682 ms.
 The full CLI test suite uses a 512 MB memory limit in `phpunit.xml` for accumulated
 provider-adapter fixtures; this does not change the web PHP memory limit.
+
+Local frontend verification passed 54 tests; all 23 browser journeys passed
+together with axe/overflow checks across roles and themes. A subsequent scoped
+tower check confirms the complete first-floor button is visible at 320×740
+without scrolling the outer page. Build, Composer validation/platform checks,
+PHP/npm audits, document renders and Pint passed. CI rechecks the pushed revision.

@@ -120,3 +120,14 @@ the ledger check. Restoration plus verification took **2,788 ms**. This supersed
 the earlier local table count while retaining the same staged-operation limits.
 See [tower and media implementation](tower-and-media-implementation.md) for
 feature, regression and publication boundaries.
+
+## Platform polish follow-up — 2026-10-11
+
+The suite now contains 23 workflows. New checks cover private picture uploads
+and removal, username sign-in, an attached hamburger menu, theme icons, ascending
+50-floor navigation and three new interactive game templates. The final local
+combined run passed in 4.9 minutes; mobile first-floor visibility was checked
+again after tightening the tower viewport. The shared audit waits for finite
+transitions while excluding closed native details, so it measures settled theme
+contrast without hanging on invisible panels. See
+[the current implementation record](platform-polish-and-fixtures.md).

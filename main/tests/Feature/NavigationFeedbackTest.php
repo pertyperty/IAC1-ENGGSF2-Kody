@@ -30,11 +30,12 @@ test('guest account pages have an explicit home button and public courses never 
     $this->get(route('play.progress'))->assertRedirect(route('login'));
 });
 
-test('feedback is escaped and displayed once in the shared dismissible notification layer', function () {
+test('feedback is escaped in one shared toast and a persistent inline receipt', function () {
     $message = '<script>alert("unsafe")</script> Saved';
     $response = $this->withSession(['status' => $message])->get(route('login'))->assertOk()
-        ->assertSee('data-flash-toast', false)->assertSee('Dismiss notification')->assertDontSee($message, false);
-    expect(substr_count($response->getContent(), e($message)))->toBe(1);
+        ->assertSee('data-flash-toast', false)->assertSee('Dismiss notification')->assertSee('action-receipt', false)->assertDontSee($message, false);
+    expect(substr_count($response->getContent(), e($message)))->toBe(2)
+        ->and(substr_count($response->getContent(), 'data-flash-toast'))->toBe(1);
 });
 
 test('progress refresh is scoped to the authenticated account and never accepts a browser supplied identity', function () {

@@ -105,6 +105,10 @@
     .tower-label p { display: none; }
     .tower-stop.show-info .tower-label p { display: block; }
     .tower-node { width: 72px; height: 72px; }
+    .tower-viewport { height: min(300px, 38dvh); }
+    .tower-heading { gap: 10px; padding-bottom: 16px; }
+    .tower-heading h1 { font-size: 28px; }
+    .tower-resume { margin-top: 12px; }
     .tower-map-tools { flex-wrap: wrap; }
     .app-header { padding-inline: 10px; flex-wrap: wrap; }
     .app-header-actions { margin-left: auto; gap: 6px; }
