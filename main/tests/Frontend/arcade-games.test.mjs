@@ -5,7 +5,7 @@ import { evaluateArcade, validScenario } from '../../resources/js/games/arcade-g
 
 const games = JSON.parse(execFileSync('php', ['-r', 'echo json_encode(require "config/arcade.php");']).toString());
 const solutions = { 'pixel-studio': ['paint 1 1 mint', 'paint 2 2 peach'], 'number-machine': ['add 3', 'multiply 2'],
-    'sort-lab': ['swap 1 2', 'swap 2 3'], 'terminal-quest': ['ls', 'cp hello.txt release.txt', 'cat release.txt'] };
+    'sort-lab': ['swap 1 2', 'swap 2 3'], 'terminal-quest': ['ls', 'cp hello.txt release.txt', 'cat release.txt'], 'logic-switchboard': ['flip 1', 'flip 2'], 'string-forge': ['upper', 'reverse'], 'memory-trail': ['push 2', 'push 3'] };
 for (const [template, program] of Object.entries(solutions)) {
     test(`${template} wins with deterministic immutable state and rejects invalid commands`, () => {
         const before = structuredClone(games[template]);

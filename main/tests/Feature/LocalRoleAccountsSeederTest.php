@@ -5,6 +5,7 @@ use App\Enums\Role;
 use App\Models\User;
 use App\Services\Administration\AuditRecorder;
 use Database\Seeders\DatabaseSeeder;
+use Database\Seeders\LocalLearnerAccountsSeeder;
 use Database\Seeders\LocalRoleAccountsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -25,9 +26,9 @@ afterEach(function () {
     File::deleteDirectory($this->roleStorage);
 });
 
-test('local default seeds create verified Active accounts for every role with private random passwords', function () {
+test('local role seeds create verified Active accounts for every role with private random passwords', function () {
     app()['env'] = 'local';
-    $this->seed(DatabaseSeeder::class);
+    $this->seed(LocalRoleAccountsSeeder::class);
     $files = File::glob(storage_path('app/private/local-role-credentials-*.txt'));
     expect($files)->toHaveCount(1)->and(User::count())->toBe(5);
     $credentials = File::get($files[0]);
@@ -123,3 +124,16 @@ test('audit or private storage failure rolls back all seeded accounts', function
         expect(File::get(storage_path('app/private')))->toBe('preserve this existing file');
     }
 })->with(['audit', 'storage']);
+
+test('renamed role fixtures preserve their owner profile and four extra learners are repeatable', function () {
+    $this->seed(LocalRoleAccountsSeeder::class);
+    $learner = User::where('email', 'learner@kody.local')->sole();
+    $learner->update(['username' => 'Learner 1']);
+    $before = $learner->fresh()->getRawOriginal();
+    $this->seed(LocalRoleAccountsSeeder::class);
+    $this->seed(LocalLearnerAccountsSeeder::class);
+    $this->seed(LocalLearnerAccountsSeeder::class);
+    expect(User::count())->toBe(9)->and($learner->fresh()->getRawOriginal())->toBe($before);
+    expect(User::whereIn('email', ['learner2@kody.local', 'learner3@kody.local', 'learner4@kody.local', 'learner5@kody.local'])->get()
+        ->every(fn ($user) => $user->account_role === Role::Learner && $user->account_status === AccountStatus::Active && $user->email_verified_at !== null))->toBeTrue();
+});

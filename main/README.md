@@ -207,3 +207,7 @@ PostgreSQL role with CREATE DATABASE and privately supplied connection variables
 They create/drop only their own random testing databases. See
 [setup and evidence](docs/acceptance-verification.md) and the
 [master requirements checklist](docs/requirements-acceptance-audit.md).
+
+Profile pictures require PHP GD (declared in Composer). Private photo storage and
+the removable learner/course showcase fixtures are described in
+[the current polish record](docs/platform-polish-and-fixtures.md).

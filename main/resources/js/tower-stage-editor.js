@@ -68,6 +68,15 @@ export function editTowerStage(root, stage, index, changed, previewHost) {
             if (stage.template === 'pixel-studio') field(details, 'Target pixels · one column row color per line (1–3; mint, peach, lavender)', scenario.pixels.join('\n'), value => scenario.pixels = value.split('\n').filter(Boolean), { area: true });
             if (stage.template === 'number-machine') for (const key of ['start', 'target']) field(details, `${key === 'start' ? 'Starting' : 'Target'} number (−100 to 100)`, scenario[key], value => scenario[key] = value.trim() === '' ? null : Number(value));
             if (stage.template === 'sort-lab') field(details, 'Array · 2–6 numbers separated by commas (0–99)', scenario.items.join(', '), value => scenario.items = value.split(',').map(item => item.trim() === '' ? null : Number(item.trim())));
+            if (['logic-switchboard', 'string-forge', 'memory-trail'].includes(stage.template)) {
+                if (stage.template === 'logic-switchboard') {
+                    field(details, 'Inputs · true/false separated by commas (2–4)', scenario.inputs.join(', '), value => scenario.inputs = value.split(',').map(item => item.trim() === 'true' ? true : item.trim() === 'false' ? false : null));
+                    field(details, 'Gate · and, or or xor', scenario.gate, value => scenario.gate = value);
+                    field(details, 'Target output · true or false', String(scenario.target), value => scenario.target = value === 'true' ? true : value === 'false' ? false : null);
+                } else for (const key of ['start', 'target']) {
+                    field(details, `${key} ${stage.template === 'memory-trail' ? 'stack · 0–9 separated by commas' : 'text · up to 40 characters'}`, Array.isArray(scenario[key]) ? scenario[key].join(', ') : scenario[key], value => scenario[key] = stage.template === 'memory-trail' ? (value.trim() === '' ? [] : value.split(',').map(item => item.trim() === '' ? null : Number(item.trim()))) : value);
+                }
+            }
             if (stage.template === 'terminal-quest') {
                 field(details, 'Virtual files · one filename | content per line (up to 8)', scenario.files.map(file => `${file.name} | ${file.content}`).join('\n'), value => scenario.files = value.split('\n').filter(Boolean).map(line => {
                     const divider = line.indexOf('|'); return { name: divider < 0 ? '' : line.slice(0, divider).trim(), content: divider < 0 ? '' : line.slice(divider + 1).replace(/^ /, '') };

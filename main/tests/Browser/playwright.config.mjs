@@ -9,6 +9,6 @@ export default defineConfig({
     timeout: 60_000, expect: { timeout: 10_000 }, retries: 0,
     reporter: [['list'], ['html', { outputFolder: resolve(import.meta.dirname, '../../storage/app/browser-report'), open: 'never' }]],
     outputDir: resolve(import.meta.dirname, '../../storage/app/browser-results'),
-    use: { baseURL: process.env.KODY_BROWSER_BASE_URL, serviceWorkers: 'block', screenshot: 'only-on-failure', trace: 'off' },
+    use: { baseURL: process.env.KODY_BROWSER_BASE_URL, serviceWorkers: 'block', screenshot: 'only-on-failure', trace: process.env.KODY_BROWSER_TRACE === '1' ? 'retain-on-failure' : 'off' },
     projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
 });

@@ -21,6 +21,7 @@
         @include('layouts.workspace')
         <main id="main-content" tabindex="-1" class="@yield('main-class')">
             @include('layouts.page-navigation')
+            @if(session('status'))<details class="action-receipt" open><summary>Latest update</summary><p>{{ session('status') }}</p></details>@endif
             @yield('content')
         </main>
     </div>

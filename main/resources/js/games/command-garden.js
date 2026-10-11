@@ -1,3 +1,4 @@
+import { publishFeedback } from '../feedback.js';
 import { saveCompletion } from './save-completion.js';
 
 const moves = Object.freeze({ up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] });
@@ -156,7 +157,7 @@ export function mountGarden(root) {
         root.querySelectorAll('input').forEach((input) => { input.checked = false; });
         feedback.textContent = 'A fresh start. Build a new program and give it a try.';
     });
-    root.querySelector('[data-game-hint]').addEventListener('click', () => { feedback.textContent = instance.hint; });
+    root.querySelector('[data-game-hint]').addEventListener('click', () => { feedback.textContent = instance.hint; publishFeedback(root, instance.hint); });
     root.addEventListener('keydown', (event) => {
         // Shortcuts belong to the focused game, never the page or an editable field.
         if (event.target !== root || event.altKey || event.ctrlKey || event.metaKey) return;
@@ -182,6 +183,7 @@ export function mountGarden(root) {
             }
             feedback.textContent = result.message; success.hidden = !result.success;
             root.dataset.playState = result.success ? 'success' : 'retry';
+            if (!result.success) publishFeedback(root, result.message);
             if (result.success) {
                 const saved = await saveCompletion(root, { program, repeat: !!root.querySelector('[data-game-repeat]')?.checked, conditional: !!root.querySelector('[data-game-conditional]')?.checked });
                 if (saved) feedback.textContent = `${result.message} ${saved}`;

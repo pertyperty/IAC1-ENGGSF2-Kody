@@ -22,25 +22,20 @@ class LocalRoleAccountsSeeder extends Seeder
             throw new RuntimeException('Role account fixtures require local/testing and loopback PostgreSQL.');
         }
 
-        $accounts = [
-            ['learner@kody.local', 'kody_learner', Role::Learner],
-            ['contributor@kody.local', 'kody_contributor', Role::Contributor],
-            ['instructor@kody.local', 'kody_instructor', Role::Instructor],
-            ['moderator@kody.local', 'kody_moderator', Role::Moderator],
-            ['admin2@kody.local', 'kody_admin_two', Role::Administrator],
-        ];
+        $accounts = $this->accounts();
         $credentialPath = storage_path('app/private/local-role-credentials-'.Str::uuid().'.txt');
         $createdFile = false;
 
         try {
             DB::transaction(function () use ($accounts, $audit, $credentialPath, &$createdFile): void {
+                DB::select("SELECT pg_advisory_xact_lock(hashtext('kody_local_role_seed'))");
                 $credentials = "Local Kody role accounts\n\n";
                 $created = 0;
                 foreach ($accounts as [$email, $username, $role]) {
                     $existing = User::query()->where('email', $email)->orWhere('username', $username)->get();
                     if ($existing->isNotEmpty()) {
                         if ($existing->count() !== 1 || $existing->sole()->email !== $email
-                            || $existing->sole()->username !== $username || $existing->sole()->account_role !== $role) {
+                            || $existing->sole()->account_role !== $role) {
                             throw new RuntimeException('A fixture identity conflicts with an existing account.');
                         }
 
@@ -98,5 +93,16 @@ class LocalRoleAccountsSeeder extends Seeder
         } else {
             $this->command?->info('Local role accounts already exist; no accounts or passwords changed.');
         }
+    }
+
+    protected function accounts(): array
+    {
+        return [
+            ['learner@kody.local', 'kody_learner', Role::Learner],
+            ['contributor@kody.local', 'kody_contributor', Role::Contributor],
+            ['instructor@kody.local', 'kody_instructor', Role::Instructor],
+            ['moderator@kody.local', 'kody_moderator', Role::Moderator],
+            ['admin2@kody.local', 'kody_admin_two', Role::Administrator],
+        ];
     }
 }

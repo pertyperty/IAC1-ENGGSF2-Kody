@@ -25,6 +25,14 @@ class ArcadeGames
                 $this->invalid();
             }
         }
+        if (in_array($template, PuzzleGames::TEMPLATES, true)) {
+            if (! is_array($scenario)) {
+                $this->invalid();
+            }
+            app(PuzzleGames::class)->validate($template, $scenario);
+
+            return array_replace($instance, ['scenario' => $scenario]);
+        }
         $rules = match ($template) {
             'pixel-studio' => ['scenario' => ['required', 'array:pixels'], 'scenario.pixels' => ['required', 'array', 'list', 'min:1', 'max:9'],
                 'scenario.pixels.*' => ['required', 'string', 'regex:/^[1-3] [1-3] (mint|peach|lavender)$/D']],
@@ -70,6 +78,9 @@ class ArcadeGames
     {
         if (! $this->supports($instance) || ! array_is_list($program) || $program === [] || count($program) > 12) {
             return false;
+        }
+        if (in_array($instance['template'], PuzzleGames::TEMPLATES, true)) {
+            return app(PuzzleGames::class)->succeeds($instance, $program);
         }
         $scenario = $instance['scenario'];
         $number = $scenario['start'] ?? 0;

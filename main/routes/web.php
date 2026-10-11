@@ -12,6 +12,7 @@ use App\Http\Controllers\Account\InstructorReviewController;
 use App\Http\Controllers\Account\LoginController;
 use App\Http\Controllers\Account\ProfileController;
 use App\Http\Controllers\Account\ProfileEditingController;
+use App\Http\Controllers\Account\ProfilePictureController;
 use App\Http\Controllers\Account\RecoveryController;
 use App\Http\Controllers\Account\RegistrationController;
 use App\Http\Controllers\Administration\AccountGovernanceController;
@@ -245,3 +246,6 @@ Route::middleware(['auth', 'account.session'])->prefix('manage/instructors')->na
     Route::get('/{application}/credential', [InstructorReviewController::class, 'credential'])->middleware('throttle:20,1,credential-read:')->name('credential');
     Route::post('/{application}', [InstructorReviewController::class, 'review'])->middleware('throttle:10,1,creator-review:')->name('review');
 });
+
+Route::post('/account/picture', [ProfilePictureController::class, 'update'])->middleware(['auth', 'account.session', 'throttle:10,1,profile-picture:'])->name('account.picture-update');
+Route::get('/accounts/{user}/picture', [ProfilePictureController::class, 'show'])->whereNumber('user')->middleware(['auth', 'account.session'])->name('account.picture');

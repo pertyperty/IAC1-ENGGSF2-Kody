@@ -4,8 +4,6 @@ namespace App\Services\Account;
 
 use App\Enums\AccountStatus;
 use App\Enums\Role;
-use App\Jobs\Account\EraseAccountFile;
-use App\Models\AccountFileErasure;
 use App\Models\User;
 use App\Services\Administration\AuditRecorder;
 use App\Services\Transactions\WalletLedger;
@@ -14,7 +12,6 @@ use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use LogicException;
@@ -68,7 +65,7 @@ class AccountDeletion
                 app(CurrentAccountSession::class)->assert($user, $sessionId);
                 app(AccountSecurity::class)->revoke($user);
                 $this->removePrivateData($user);
-                $user->forceFill(['name' => 'Deleted account', 'username' => null, 'first_name' => null, 'last_name' => null,
+                $user->forceFill(['profile_picture' => null, 'name' => 'Deleted account', 'username' => null, 'first_name' => null, 'last_name' => null,
                     'email' => Str::uuid().'@deleted.invalid', 'password' => Str::random(64), 'remember_token' => null,
                     'email_verified_at' => null, 'account_status' => AccountStatus::Deleted, 'account_role' => Role::Learner,
                     'last_login_at' => null, 'login_locked_until' => null, 'failed_login_attempts' => 0,
@@ -99,6 +96,9 @@ class AccountDeletion
 
     private function removePrivateData(User $user): void
     {
+        if ($user->profile_picture !== null) {
+            $this->queueFile($user, $user->profile_picture['disk'], $user->profile_picture['path']);
+        }
         DB::table('contributor_applications')->where('user_id', $user->id)->chunkById(100, function ($applications) use ($user): void {
             foreach ($applications as $application) {
                 $this->queueFile($user, $application->credential_disk, $application->credential_path);
@@ -140,14 +140,6 @@ class AccountDeletion
 
     private function queueFile(User $user, string $disk, string $path): void
     {
-        if ((config('queue.connections.database.connection') ?? config('database.default')) !== config('database.default')) {
-            throw new LogicException('Account erasure requires the application database queue.');
-        }
-        $erasure = AccountFileErasure::firstOrCreate(['user_id' => $user->id, 'disk' => $disk, 'path_digest' => hash('sha256', $path)],
-            ['id' => (string) Str::uuid(), 'path' => $path, 'last_queued_at' => now()]);
-        if ($erasure->wasRecentlyCreated) {
-            $jobId = Queue::connection('database')->push((new EraseAccountFile($erasure->id))->beforeCommit());
-            $erasure->update(['queued_job_id' => $jobId]);
-        }
+        app(PrivateFileRemoval::class)->queue($user->id, $disk, $path);
     }
 }

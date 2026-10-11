@@ -3,9 +3,12 @@
 Start here for current scope, detailed evidence and the next useful improvements.
 This index consolidates the feature summaries previously repeated in README.
 It does not replace approved requirements, decisions or the implementation records.
-Last reviewed: 2026-10-10.
+Last reviewed: 2026-10-11.
+The [platform polish and fixtures](platform-polish-and-fixtures.md) record owns
+private profile pictures, four extra Learners, reviewed local learning showcases,
+three new games, the 50-floor ascent and responsive header/layout refinements.
 The [tower and media redesign](tower-and-media-implementation.md) owns the editable
-25-level main adventure, guest trials, role-focused landing/workspaces, private
+initial main adventure, guest trials, role-focused landing/workspaces, private
 lesson documents/video, compact pulling navigation and inclusive sign-in.
 The [tower content guide](tower-content-guide.md) owns future editorial sourcing.
 The [gamified journey flow](gamified-journey-flow.md) adds saved-goal mission cards,

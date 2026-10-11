@@ -24,7 +24,7 @@ uploaded programs. Current implementation and approved access/reward rules are i
    quizzes, vary correct-answer positions, explain each objective and use 2–6
    distinct choices. Multiquestion completion requires every answer to be correct.
 6. Test each stage in unsaved preview, then test ordered progression through the
-   level. Boss levels 10/20 require at least two complementary stages. Reuse a
+   level. Boss levels at every multiple of ten require at least two complementary stages. Reuse a
    concept across game/quiz/terminal formats so the boss checks understanding.
 7. Check desktop/mobile, keyboard, color-independent instructions and concise
    plain language. Peer-review technical accuracy and provenance before an
@@ -59,6 +59,9 @@ The Administrator editor produces a list of 1–4 stages. Templates:
 | `number-machine` | Integer `start`, `target` | −100 to 100; supported bounded arithmetic; 12 instructions |
 | `sort-lab` | Integer `items` | 2–6 items, each 0–99; swaps by 1-based position; 12 instructions |
 | `terminal-quest` | `files`, `destination`, required `content` | 1–8 files; safe flat names; content up to 300 characters; objective content must exist in a source file; 12 instructions |
+| `logic-switchboard` | Boolean `inputs`, gate and target | 2–4 true/false inputs; AND/OR/XOR; 12 flips |
+| `string-forge` | ASCII `start`, `target` text | 1–40 characters; reachable by case/reversal/trim/append; 12 instructions |
+| `memory-trail` | Integer `start`, `target` stacks | 0–6 values, 0–9; push/pop/duplicate/swap; 12 instructions |
 | `choice-quiz` | Version 1 single question or version 2 questions | 1–10 questions, 2–6 choices; stable choice/question IDs; explicit correct answer and explanation |
 
 Game prompts are `title`, `concept`, `instructions`, `hint`, `learningIdea`.

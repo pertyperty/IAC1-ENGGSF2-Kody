@@ -68,3 +68,6 @@ if (cooldown) {
     const timer = setInterval(updateCooldown, 1000);
     updateCooldown();
 }
+
+const pageContext = document.querySelector('[data-page-context]');
+if (pageContext) pageContext.textContent = document.querySelector('main h1')?.textContent?.trim() ?? '';
