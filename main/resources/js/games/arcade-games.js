@@ -140,7 +140,12 @@ export function mountArcade(root) {
             const start = node('div', '', 'machine-node'); start.append(node('small', 'START'), node('b', String(game.scenario.start)));
             const current = node('div', '', 'machine-node number-display'); current.append(node('small', 'YOUR VALUE'), node('b', String(state.number)));
             const target = node('div', '', 'machine-node'); target.append(node('small', 'TARGET'), node('b', String(game.scenario.target)));
-            world.append(start, node('span', '→', 'machine-arrow'), current, node('span', '→', 'machine-arrow'), target);
+            const arrow = () => {
+                const element = node('span', '', 'machine-arrow');
+                element.append(createIcon(root.ownerDocument, 'right'));
+                return element;
+            };
+            world.append(start, arrow(), current, arrow(), target);
         } else if (game.template === 'sort-lab') {
             const stack = node('div', '', 'sort-stack');
             state.items.forEach((value, index) => {

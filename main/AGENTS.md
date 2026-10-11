@@ -1,5 +1,11 @@
 # Kody Engineering Agent Guidelines
 
+The owner's 2026-10-11 consistency audit replaces action glyphs with the shared
+SVG icon component, keeps sentence links underlined and centers the learner HUD.
+See [UI consistency](docs/ui-consistency-audit.md). Course-card directives must
+remain separated so Blade compiles every saved-progress branch. Tower grid colors
+follow theme and ascent zone; decoration never changes progression or rewards.
+
 The owner's 2026-10-11 follow-up adds head-only branding/favicons, route-specific
 guides, Arcade cabinets, illustrated weekly quests and their published-result
 archive, plus mixed MCQ/blank/matching quizzes. See

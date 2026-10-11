@@ -3,7 +3,7 @@
 @section('content')
 <section class="review-page page-width">
 @include('transactions.review-access')
-<a class="quiet-link" href="{{ route('challenge-reviews.index') }}">← Challenge reviews</a><h1>{{ $revision->title }}</h1><p class="step-pill">Revision {{ $revision->number }} · {{ $revision->review_status }}</p>
+<a class="quiet-link" href="{{ route('challenge-reviews.index') }}"><x-action-icon name="left"/> Challenge reviews</a><h1>{{ $revision->title }}</h1><p class="step-pill">Revision {{ $revision->number }} · {{ $revision->review_status }}</p>
 
 @include('layouts.form-errors')
 @include('challenges.problem')

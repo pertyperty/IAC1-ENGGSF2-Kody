@@ -4,8 +4,10 @@
 .page-navigation { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 20px 28px 0; }
 .account-shell .page-navigation { margin: 0 0 24px; }
 .page-navigation + .review-page, .page-navigation + .play-hub { padding-top: 24px; }
-.button.button-secondary, .button.button-dark, a.quiet-link, button.quiet-link, .secondary-link a { display: inline-flex; justify-content: center; align-items: center; min-height: 44px; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface-soft); color: var(--text); font-size: 13px; font-weight: 600; line-height: 1.4; text-decoration: none; cursor: pointer; }
-.button.button-secondary:not(:disabled):hover, .button.button-dark:not(:disabled):hover, a.quiet-link:hover, button.quiet-link:hover, .secondary-link a:hover { color: var(--text); background: var(--surface-hover); border-color: var(--muted); }
+.button.button-secondary, .button.button-dark, button.quiet-link { display: inline-flex; justify-content: center; align-items: center; min-height: 44px; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface-soft); color: var(--text); font-size: 13px; font-weight: 600; line-height: 1.4; text-decoration: none; cursor: pointer; }
+.button.button-secondary:not(:disabled):hover, .button.button-dark:not(:disabled):hover, button.quiet-link:hover { color: var(--text); background: var(--surface-hover); border-color: var(--muted); }
+a.quiet-link, .secondary-link a, main p a:not(.button):not(.primary-button) { display: inline; padding: 0; min-height: 0; border: 0; border-radius: 0; background: none; color: var(--accent-text); font-weight: 600; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .22em; }
+a.quiet-link:hover, .secondary-link a:hover, main p a:not(.button):not(.primary-button):hover { color: var(--text); text-decoration-thickness: 2px; }
 .button.button-quiet { background: transparent; color: var(--accent-text); border: 1px solid transparent; }
 .button.button-quiet:hover { background: var(--accent-soft); color: var(--accent-text); border-color: var(--accent-line); }
 .button.button-danger { background: var(--error-soft); color: var(--error-text); border: 1px solid var(--error-text); }

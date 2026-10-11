@@ -23,7 +23,7 @@ export async function saveCompletion(root, input) {
         const slug = result.progress?.next_level;
         const next = typeof slug === 'string' && /^[a-z0-9-]{1,40}$/.test(slug) && result.progress?.levels?.[slug]?.unlocked === true
             && /^\/play\/[a-z0-9-]+\/(game|quiz)$/.test(new URL(root.dataset.completionUrl, document.location.origin).pathname)
-            ? { label: 'Next lesson →', href: `/learn/${slug}` } : null;
+            ? { label: 'Next lesson', href: `/learn/${slug}` } : null;
         if (!root.closest?.('[data-tower-level]')) publishFeedback(root, message, 'success', true, result.journey ?? null, result.journey ? null : next, true);
         else publishFeedback(root, '', 'success', true); // The tower owns its result dialog; the HUD still refreshes after a save.
         return message;

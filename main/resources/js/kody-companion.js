@@ -1,4 +1,5 @@
 import { buildPageGuide, isGuideTargetVisible as visible } from './page-guide.js';
+import { setIconLabel } from './icons.js';
 const TOUR_KEY = 'kody-tour-v1';
 const PET_KEY = 'kody-companion-v1';
 
@@ -89,7 +90,7 @@ export function mountKodyCompanion(doc, win) {
         dialog.querySelector('#tour-title').textContent = current?.title ?? `Let's explore ` + pageName;
         dialog.querySelector('#tour-message').textContent = current?.message ?? 'I’m Kody, your coding companion. This guide explains the page you are on. You can skip it or replay it whenever you like.';
         dialog.querySelector('[data-tour-count]').textContent = index < 0 ? 'WELCOME TO KODY' : `YOUR GUIDE · ${index + 1} / ${steps.length}`;
-        next.textContent = index < 0 ? 'Click to begin' : index === steps.length - 1 ? 'Let’s explore' : 'Next tip →';
+        setIconLabel(next, 'right', index < 0 ? 'Click to begin' : index === steps.length - 1 ? 'Let’s explore' : 'Next tip');
         back.hidden = index <= 0; spot.hidden = index < 0; hole.setAttribute('r', '0');
         current?.target.scrollIntoView({ block: 'center', behavior: 'instant' });
         positionTip(); next.focus({ preventScroll: true });

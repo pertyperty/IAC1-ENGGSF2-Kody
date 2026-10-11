@@ -3,7 +3,7 @@
 @section('content')
 <section class="review-page page-width">
 @include('transactions.review-access')
-<a class="quiet-link" href="{{ route('module-reviews.index') }}">← Review queue</a><h1>Give this adventure a look.</h1><p>Revision {{ $revision->number }} · {{ $revision->review_status }}</p>
+<a class="quiet-link" href="{{ route('module-reviews.index') }}"><x-action-icon name="left"/> Review queue</a><h1>Give this adventure a look.</h1><p>Revision {{ $revision->number }} · {{ $revision->review_status }}</p>
 
     @include('layouts.form-errors')
     @include('content.lesson', ['module' => null, 'preview' => true])

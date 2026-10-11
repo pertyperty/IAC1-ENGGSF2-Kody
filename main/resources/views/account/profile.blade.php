@@ -21,10 +21,10 @@
     @if(in_array(auth()->user()->account_role, [\App\Enums\Role::Learner, \App\Enums\Role::Contributor], true))<a class="button button-secondary" href="{{ route('instructor-application.create') }}">Become a learning creator</a>@endif
     </section></div><div class="profile-support">
     <div class="profile-actions">
-        @can('create', \App\Models\LearningModule::class)<a href="{{ route('studio.index') }}">Open your creator studio →</a>@endcan
-        @can('create', \App\Models\CodingChallenge::class)<a href="{{ route('challenges.index') }}">Open your challenge studio →</a>@endcan
-        <a href="{{ route('notifications.index') }}">Your updates →</a>
-        @can('viewOwn', \App\Models\ContributorApplication::class)<a href="{{ route('contributor-application.create') }}">Contributor application and history →</a>@endcan
+        @can('create', \App\Models\LearningModule::class)<a href="{{ route('studio.index') }}">Open your creator studio <x-action-icon name="right"/></a>@endcan
+        @can('create', \App\Models\CodingChallenge::class)<a href="{{ route('challenges.index') }}">Open your challenge studio <x-action-icon name="right"/></a>@endcan
+        <a href="{{ route('notifications.index') }}">Your updates <x-action-icon name="right"/></a>
+        @can('viewOwn', \App\Models\ContributorApplication::class)<a href="{{ route('contributor-application.create') }}">Contributor application and history <x-action-icon name="right"/></a>@endcan
     </div>
     @include('layouts.staff-tools')
     @can('archive', auth()->user())<p class="secondary-link"><a href="{{ route('account.archive') }}">Take a break: archive your account</a></p>@endcan

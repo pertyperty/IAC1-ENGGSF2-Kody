@@ -119,7 +119,6 @@
     .app-header .play-brand { font-size: 22px; }
     .header-username { display: none; }
     .mobile-player-name { display: inline; font-weight: 700; color: var(--text); max-width: 100px; overflow: hidden; text-overflow: ellipsis; flex-shrink: 0; }
-    .mobile-player-name::after { content: " · "; color: var(--muted); }
     .header-page-context { display: flex; gap: 4px; order: 3; flex: 1 0 100%; max-width: none; font-size: 11px; line-height: 1.4; padding-left: 2px; }
     .app-header.is-signed-in .app-primary-nav { display: none; }
     .page-navigation { gap: 4px; margin-inline: 12px; }

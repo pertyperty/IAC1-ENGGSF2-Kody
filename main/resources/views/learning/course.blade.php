@@ -11,7 +11,7 @@
 <form method="post" action="{{ route('course-learning.enroll', $course) }}">
     @csrf<input type="hidden" name="revision_id" value="{{ $revision->id }}">
     @if($price > 0)<label class="checkbox-label"><input type="checkbox" name="confirmed" value="1" required> Confirm spending {{ $price }} KodeBits.</label>@endif
-    <button class="button button-play" @disabled(!$requirements['eligible'])>Join this journey · {{ $price ? $price.' KB' : 'Free' }} →</button>
+    <button class="button button-play" @disabled(!$requirements['eligible'])>Join this journey · {{ $price ? $price.' KB' : 'Free' }} <x-action-icon name="right"/></button>
 </form>
 @else
 <p class="field-hint">{{ $enrollment->sequential ? 'Complete each adventure to unlock the next.' : 'Explore the adventures in any order.' }}</p>

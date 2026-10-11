@@ -15,7 +15,7 @@
     <form action="{{ route('verification.resend') }}" method="post" class="account-form">
         @csrf
         <label>Email address<input name="email" type="email" autocomplete="email" value="{{ old('email') }}" maxlength="100" required></label>
-        <button class="primary-button" type="submit">Request verification link <span aria-hidden="true">↗</span></button>
+        <button class="primary-button" type="submit">Request verification link <span aria-hidden="true"><x-action-icon name="right"/></span></button>
     </form>
     <p class="secondary-link"><a href="{{ route('register') }}">Create a new account</a></p>
 @endsection

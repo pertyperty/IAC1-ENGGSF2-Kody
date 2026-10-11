@@ -5,8 +5,8 @@
 
 <section class="review-page page-width">
 @if($course?->isWithdrawn())<p class="lesson-note">Staff withdrawal is active. Learner access is blocked. Draft corrections, publication review and creator archival do not lift this block; only staff restoration can do that.</p>@endif
-<a class="quiet-link" href="{{ route('courses.index') }}">← Your courses</a><h1>Give your journey a shape.</h1><p>Start with one clear goal. Build toward it with small adventures.</p>
-@if(!empty($starter))<p class="lesson-note">This course plan is unsaved. Customize its title, then select your approved lesson versions in this order: {{ collect($starter['lessons'])->map(fn ($slug) => config('creator-examples.'.$slug.'.title'))->join(' → ') }}. <a class="quiet-link" href="{{ route('curriculum.index') }}">Return to the lesson examples →</a></p>@endif
+<a class="quiet-link" href="{{ route('courses.index') }}"><x-action-icon name="left"/> Your courses</a><h1>Give your journey a shape.</h1><p>Start with one clear goal. Build toward it with small adventures.</p>
+@if(!empty($starter))<p class="lesson-note">This course plan is unsaved. Customize its title, then select your approved lesson versions in this order: {{ collect($starter['lessons'])->map(fn ($slug) => config('creator-examples.'.$slug.'.title'))->join(', ') }}. <a class="quiet-link" href="{{ route('curriculum.index') }}">Return to the lesson examples <x-action-icon name="right"/></a></p>@endif
 
     @include('layouts.form-errors')
     @if($revision)<p class="step-pill">Revision {{ $revision->number }} · {{ $revision->review_status }}</p>@if($revision->review_notes)<p class="lesson-note">{{ $revision->review_notes }}</p>@endif @endif
@@ -35,11 +35,11 @@
 <div class="studio-actions"><button class="button button-play">Save course draft</button><a class="quiet-link" href="{{ route('courses.index') }}">Cancel</a></div>
         </fieldset>
     </form>
-    @if($revision?->review_status === 'Draft' && $course?->status !== 'Archived')<form method="post" action="{{ route('courses.submit', $course) }}" class="studio-actions">@csrf<input type="hidden" name="record_version" value="{{ $course->record_version }}"><button class="button button-dark">Submit saved course for review →</button></form>@endif
+    @if($revision?->review_status === 'Draft' && $course?->status !== 'Archived')<form method="post" action="{{ route('courses.submit', $course) }}" class="studio-actions">@csrf<input type="hidden" name="record_version" value="{{ $course->record_version }}"><button class="button button-dark">Submit saved course for review <x-action-icon name="right"/></button></form>@endif
     @can('archive', $course)<p><a class="quiet-link" href="{{ route('courses.archive-confirmation', $course) }}">Archive this course</a></p>@endcan
     @if($course?->status === 'Archived')<p class="lesson-note">This course is archived. Enrollments and progress are retained; new learners cannot enroll. Existing learners can continue while no staff withdrawal is active.</p>@endif
     @if($revision)<h2>Try your saved journey</h2>@include('content.course-outline')@endif
-@if($course)@can('delete', $course)<p><a class="quiet-link" href="{{ route('content-deletion.show', ['course', $course->id]) }}">Delete this course →</a></p>@endcan
+@if($course)@can('delete', $course)<p><a class="quiet-link" href="{{ route('content-deletion.show', ['course', $course->id]) }}">Delete this course <x-action-icon name="right"/></a></p>@endcan
 @endif
 </section>
 @endsection

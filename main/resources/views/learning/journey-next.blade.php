@@ -5,7 +5,7 @@
         <p class="field-hint" data-journey-note role="status">{{ $trail['finished'] ? 'All your lesson progress is saved. Discover another journey or revisit a favorite.' : ($trail['next'] ? 'Keep going when you’re ready. Your next step is available.' : ($trail['current_completed'] ? 'Open the trail to check the remaining adventures.' : 'Complete this adventure to save your course progress.')) }}</p>
     </div>
     <div class="journey-actions">
-        <a data-journey-next class="button button-play" href="{{ $trail['next']['url'] ?? route('course-learning.show', $course) }}" @if(!$trail['next']) hidden @endif>Next adventure →</a>
+        <a data-journey-next class="button button-play" href="{{ $trail['next']['url'] ?? route('course-learning.show', $course) }}" @if(!$trail['next']) hidden @endif>Next adventure <x-action-icon name="right"/></a>
         <a class="button button-secondary" href="{{ $trail['finished'] ? route('course-learning.catalog') : route('course-learning.show', $course) }}" data-journey-overview>{{ $trail['finished'] ? 'Find another journey' : 'View your trail' }}</a>
     </div>
 </section>

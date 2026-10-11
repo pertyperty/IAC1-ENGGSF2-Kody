@@ -28,7 +28,7 @@
 .ascent-details .ascent-detail-1 { left: auto; right: 9%; top: 64%; width: 90px; height: 90px; transform: rotate(16deg); }
 .ascent-details .ascent-detail-2 { left: 16%; top: 78%; width: 42px; height: 42px; transform: rotate(-12deg); }
 [data-ascent-zone="0"] .ascent-details-0, [data-ascent-zone="1"] .ascent-details-1, [data-ascent-zone="2"] .ascent-details-2, [data-ascent-zone="3"] .ascent-details-3, [data-ascent-zone="4"] .ascent-details-4 { opacity: 1; }
-.workspace-icon .action-icon, .mission-icon .action-icon { width: 28px; height: 28px; }.module-symbol .action-icon { width: 72px; height: 72px; }.boss-crown .action-icon { width: 28px; height: 28px; }.profile-edit-icon .action-icon { width: 32px; height: 32px; }.action-icon { flex-shrink: 0; vertical-align: middle; }
+.workspace-icon .action-icon, .mission-icon .action-icon { width: 28px; height: 28px; }.module-symbol .action-icon { width: 72px; height: 72px; }.boss-crown .action-icon { width: 28px; height: 28px; }.profile-edit-icon .action-icon { width: 32px; height: 32px; }
 .peach .module-symbol { background: var(--warm-soft); border-color: var(--warm-text); }.lavender .module-symbol { background: var(--violet-soft); border-color: var(--violet-text); }
 .quest-play-columns > aside { position: sticky; top: calc(var(--navigation-offset, 128px) + 16px); }
 .execution-pending { padding: 20px; border: 1px solid var(--border); border-inline-start: 4px solid var(--accent); border-radius: 12px; background: var(--surface-soft); }

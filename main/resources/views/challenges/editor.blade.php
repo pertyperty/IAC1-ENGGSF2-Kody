@@ -5,7 +5,7 @@
 
 <section class="review-page page-width">
 @if($challenge?->isWithdrawn())<p class="lesson-note">Staff withdrawal is active. Learner access is blocked. Draft corrections, publication review and creator archival do not lift this block; only staff restoration can do that.</p>@endif
-<a class="quiet-link" href="{{ route('challenges.index') }}">← Your challenges</a><h1>Turn a problem into possibility.</h1><p>Help someone discover what their code can do.</p>
+<a class="quiet-link" href="{{ route('challenges.index') }}"><x-action-icon name="left"/> Your challenges</a><h1>Turn a problem into possibility.</h1><p>Help someone discover what their code can do.</p>
 <nav class="editor-jumps" aria-label="Quest setup"><a href="#quest-idea"><span>01</span> Problem</a><a href="#quest-checks"><span>02</span> Test cases</a><a href="#access-settings"><span>03</span> Access</a><a href="#draft-save"><span>04</span> Save & review</a></nav>
 @if(!empty($starter))<p class="lesson-note">Your example is ready to customize. It has not been saved or published. Check the problem, sample cases and hidden edge cases before submitting a draft for review.</p>@endif
 
@@ -42,10 +42,10 @@
 <button type="button" class="button button-dark button-small" data-add-case>Add a check +</button><p data-case-feedback role="status" class="field-hint"></p></section>
 @include('transactions.access-settings', ['accessKind' => 'challenge'])
 <div class="studio-actions" id="draft-save"><button class="button button-play">Save challenge draft</button><a class="quiet-link" href="{{ route('challenges.index') }}">Cancel</a></div></fieldset></form>
-@if($revision?->review_status === 'Draft' && $challenge?->status !== 'Archived')<form method="post" action="{{ route('challenges.submit', $challenge) }}" class="studio-actions">@csrf<input type="hidden" name="record_version" value="{{ $challenge->record_version }}"><button class="button button-dark">Submit saved challenge for review →</button></form>@endif
+@if($revision?->review_status === 'Draft' && $challenge?->status !== 'Archived')<form method="post" action="{{ route('challenges.submit', $challenge) }}" class="studio-actions">@csrf<input type="hidden" name="record_version" value="{{ $challenge->record_version }}"><button class="button button-dark">Submit saved challenge for review <x-action-icon name="right"/></button></form>@endif
 @can('archive', $challenge)<p><a class="quiet-link" href="{{ route('challenges.archive-confirmation', $challenge) }}">Archive this challenge</a></p>@endcan
 @if($challenge?->status === 'Archived')<p class="lesson-note">This challenge is archived. Its revisions and review history are preserved.</p>@endif
-<p class="field-hint">Approved quests appear in the coding catalog. Full code evaluation will open when the platform's execution service is ready.</p>@if($challenge)@can('delete', $challenge)<p><a class="quiet-link" href="{{ route('content-deletion.show', ['challenge', $challenge->id]) }}">Delete this challenge →</a></p>@endcan
+<p class="field-hint">Approved quests appear in the coding catalog. Full code evaluation will open when the platform's execution service is ready.</p>@if($challenge)@can('delete', $challenge)<p><a class="quiet-link" href="{{ route('content-deletion.show', ['challenge', $challenge->id]) }}">Delete this challenge <x-action-icon name="right"/></a></p>@endcan
 @endif
 </section>
 @endsection

@@ -20,7 +20,6 @@
 .tower-map-page .tower-heading { top: 16px; left: var(--tower-overlay-left); display: block; width: min(310px, calc(100% - var(--tower-overlay-left) - 16px)); padding: 12px 16px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); }
 .tower-title-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
 .tower-map-page .tower-heading h1 { font-size: 24px; margin: 0; white-space: nowrap; }
-.tower-heading .brand-dot { margin-left: 0; }
 .tower-map-page .tower-overview { display: flex; flex-wrap: wrap; gap: 6px; padding: 0; margin-top: 4px; min-width: 0; width: auto; border: 0; background: none; align-items: baseline; }
 .tower-map-page .tower-overview b { font-size: 12px; }
 .tower-guide summary { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid var(--accent-line); border-radius: 50%; color: var(--accent-text); cursor: pointer; list-style: none; font-weight: 700; }
