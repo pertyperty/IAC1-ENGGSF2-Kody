@@ -1,6 +1,7 @@
 import { publishFeedback } from './feedback.js';
 import { editTowerStage, previewTowerStage } from './tower-stage-editor.js';
 import { mountTowerGrid } from './tower-grid.js';
+import { mountTowerScenery } from './tower-scenery.js';
 
 const KEY = 'kody-guest-tower-v1';
 
@@ -11,7 +12,7 @@ function guestClearance(win) {
 
 export function mountTower(doc, win) {
     const map = doc.querySelector('[data-tower-map]');
-    if (map) mountTowerGrid(map, win);
+    if (map) { mountTowerGrid(map, win); mountTowerScenery(map, win); }
     const level = doc.querySelector('[data-tower-level]');
     const guest = map?.hasAttribute('data-guest-tower') || level?.hasAttribute('data-guest-tower');
     const applyMap = () => {
@@ -44,6 +45,7 @@ export function mountTower(doc, win) {
     map?.querySelectorAll('[data-tower-scroll]').forEach(button => button.addEventListener('click', () => {
         viewport?.scrollBy({ top: (button.dataset.towerScroll === 'up' ? -1 : 1) * viewport.clientHeight * .7, behavior: win.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
     }));
+    map?.querySelector('[data-tower-present]')?.addEventListener('click', positionMap);
     map?.querySelectorAll('.tower-info').forEach(button => button.addEventListener('click', () => {
         const open = button.getAttribute('aria-expanded') !== 'true';
         map.querySelectorAll('.tower-info').forEach(other => { other.setAttribute('aria-expanded', String(other === button && open)); other.closest('.tower-stop').classList.toggle('show-info', other === button && open); });

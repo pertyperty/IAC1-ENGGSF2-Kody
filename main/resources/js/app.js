@@ -19,6 +19,7 @@ import { mountTower, mountTowerEditor } from './tower.js';
 import { mountNavigationRail } from './navigation-rail.js';
 import { mountResourceViewer } from './resource-viewer.js';
 import { mountGameResult } from './game-result.js';
+import { mountKodyCompanion, mountPageLoader } from './kody-companion.js';
 
 mountTheme(document, window);
 mountNavigationRail(document, window);
@@ -75,3 +76,5 @@ if (cooldown) {
 
 const pageContext = document.querySelector('[data-page-context]');
 if (pageContext) pageContext.textContent = document.querySelector('main h1')?.textContent?.trim() ?? '';
+mountKodyCompanion(document, window);
+mountPageLoader(document, window);

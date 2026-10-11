@@ -3,6 +3,11 @@ import { audit } from './support/audit.mjs';
 import { readFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 
+// These returning-user journeys opt out of cosmetic onboarding; its first-visit flow has dedicated coverage.
+test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => { localStorage.setItem('kody-tour-v1', 'dismissed'); localStorage.setItem('kody-companion-v1', JSON.stringify({ hidden: true })); });
+});
+
 const manifest = JSON.parse(readFileSync(process.env.KODY_BROWSER_MANIFEST, 'utf8'));
 function fixture(operation, email) {
     const result = spawnSync(process.env.KODY_TEST_PHP, ['tests/Browser/support/fixture.php', operation, email], { encoding: 'utf8', windowsHide: true, timeout: 30_000 });

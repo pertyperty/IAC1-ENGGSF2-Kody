@@ -8,6 +8,7 @@ use App\Models\CodingChallengeRevision;
 use App\Models\LearningCourse;
 use App\Models\User;
 use App\Models\VerificationDelivery;
+use App\Services\Administration\FaqManagement;
 use App\Services\Content\CourseLearning;
 use App\Services\Content\CoursePublishing;
 use App\Services\Content\CreatorExamples;
@@ -71,12 +72,18 @@ try {
         foreach (['instructor' => Role::Instructor, 'moderator' => Role::Moderator, 'administrator' => Role::Administrator, 'learner' => Role::Learner, 'arcadelearner' => Role::Learner,
             'navlearner' => Role::Learner, 'navcontributor' => Role::Contributor, 'navinstructor' => Role::Instructor,
             'navmoderator' => Role::Moderator, 'navadministrator' => Role::Administrator, 'interactive' => Role::Learner,
-            'towerlearner' => Role::Learner, 'toweradmin' => Role::Administrator, 'stickylearner' => Role::Learner, 'usabilitylearner' => Role::Learner, 'picturelearner' => Role::Learner, 'librarylearner' => Role::Learner] as $name => $role) {
+            'towerlearner' => Role::Learner, 'toweradmin' => Role::Administrator, 'stickylearner' => Role::Learner, 'usabilitylearner' => Role::Learner, 'picturelearner' => Role::Learner, 'librarylearner' => Role::Learner, 'guidelearner' => Role::Learner] as $name => $role) {
             $accounts[$name] = User::factory()->create(['username' => 'browser_'.$name, 'email' => $name.'@browser.example.test',
                 'password' => Hash::make('BrowserStrong12!'), 'account_role' => $role,
                 'active_session_hash' => hash('sha256', 'browser-seed-session'), 'active_session_expires_at' => now()->addHour()]);
         }
         $manifest = ['courses' => [], 'modules' => []];
+        foreach (config('help.categories') as $category => $label) {
+            app(FaqManagement::class)->save($accounts['administrator'], 'browser-seed-session', [
+                'question' => 'How do I explore '.$label.'?', 'answer' => 'Use the relevant workspace destination. The Kody button replays the current page guide.',
+                'category' => $category, 'record_version' => 1,
+            ]);
+        }
         $publishing = app(ModulePublishing::class);
         $courses = app(CoursePublishing::class);
         foreach (config('curriculum') as $slug => $plan) {

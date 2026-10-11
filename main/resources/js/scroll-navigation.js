@@ -25,6 +25,7 @@ export function mountScrollNavigation(doc, win) {
         setHidden(shell.classList.contains('navigation-hidden'));
     };
     const show = () => { distance = 0; setHidden(false); };
+    doc.addEventListener('kody:tour-start', show);
     shell.addEventListener('pointerenter', event => {
         // Let the reveal receive its click; hovering it must not remove its own hit target.
         if (event.pointerType !== 'touch' && !reveal.contains(doc.elementFromPoint(event.clientX, event.clientY))) show();
@@ -58,7 +59,7 @@ export function mountScrollNavigation(doc, win) {
             if (position < height || (delta < 0 && distance >= 16)) show();
             else if (delta > 0 && position > height + 48 && distance >= 24
                 && !header.matches(':hover, :focus-within')
-                && !doc.querySelector('.account-menu[open], .mobile-workspace[open]')) setHidden(true);
+                && !doc.querySelector('.account-menu[open], .mobile-workspace[open], dialog[open]')) setHidden(true);
         });
     }, { passive: true });
     if (win.ResizeObserver) {

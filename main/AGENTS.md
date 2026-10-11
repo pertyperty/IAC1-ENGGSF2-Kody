@@ -1,5 +1,13 @@
 # Kody Engineering Agent Guidelines
 
+The owner's 2026-10-11 asset/tour amendment adds a reusable mascot/coin/world set,
+contextual native-modal tutorials and a locally positioned cosmetic companion.
+See [Kody world implementation](docs/kody-world-implementation.md). Keep art under
+public/images/kody and its paths in branding config; retain original sources and
+generation provenance. Tutorials/companions never grant progress, modify roles or
+submit actions. Preserve skip/replay/Escape, touch/keyboard movement, reduced motion,
+private profile upload rules and loader restoration after browser navigation.
+
 The owner's 2026-10-11 learning polish connects catalog completion to owned,
 revision-aware course/standalone history and adds centered game result dialogs.
 See [learning workspace polish](docs/learning-workspace-polish.md). Reading stays

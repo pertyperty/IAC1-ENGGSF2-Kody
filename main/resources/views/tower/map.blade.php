@@ -5,6 +5,8 @@
 @section('footer')@endsection
 @section('content')
 <section class="tower-page" data-tower-map data-welcome-url="{{ route('welcome') }}" @guest data-guest-tower @endguest>
+    <div class="tower-scenery" aria-hidden="true"><img data-ascent-art src="{{ asset(config('branding.assets.tower')) }}" alt=""><x-kody-art name="satellite" class="ascent-satellite" size="140"/><div class="ascent-glow"></div></div>
+    <span class="tower-altitude" data-tower-altitude aria-hidden="true">Meadow · floors 1–10</span>
     <canvas class="tower-grid" data-tower-grid aria-hidden="true"></canvas>
     <div class="tower-heading tower-overlay">
         <div class="tower-title-row"><h1>Kody Tower<span class="brand-dot">.</span></h1>
@@ -16,7 +18,7 @@
         <div class="tower-resume">@if($tower['next'])<a class="button button-play" data-tower-continue href="{{ route('tower.show', $tower['next']) }}">{{ $tower['completed_count'] ? 'Continue' : 'Start' }} level {{ $tower['next']->position }} →</a>@endif
             @can('manage', \App\Models\TowerLevel::class)<a class="button button-secondary button-small" href="{{ route('tower-studio.index') }}">Tower studio</a>@endcan
         </div>
-        <div><button type="button" class="button button-secondary button-small" data-tower-scroll="up" aria-label="Climb higher">↑ Higher</button><button type="button" class="button button-secondary button-small" data-tower-scroll="down" aria-label="Return to lower floors">↓ Lower</button></div>
+        <div class="tower-direction-tools"><button type="button" class="button button-secondary button-small" data-tower-scroll="up" aria-label="Climb higher" title="Climb higher">↑</button><button type="button" class="button button-secondary button-small" data-tower-present aria-label="Jump to your current level" title="Jump to your current level">◎</button><button type="button" class="button button-secondary button-small" data-tower-scroll="down" aria-label="Return to lower floors" title="Return to lower floors">↓</button></div>
     </div>
     <div class="tower-viewport" data-tower-viewport data-next-position="{{ $tower['next']?->position ?? 1 }}" tabindex="0" role="region" aria-label="Tower map. Level 1 is at the bottom. Scroll up to climb; use the Higher and Lower buttons or arrow keys.">
     <div class="tower-path" aria-label="Numbered tower levels">
