@@ -135,7 +135,7 @@
 .document-pages { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 20px; }
 .document-page { padding: 24px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); overflow-wrap: anywhere; }
 .primary-button { display: inline-flex; justify-content: center; align-items: center; min-height: 48px; width: 100%; border-radius: 9px; }
-.account-shell .secondary-link { display: inline-flex; margin: 6px 4px 6px 0; }
+.account-shell .secondary-link { display: block; margin: 12px 0; }
 .toast { box-shadow: none; }
 [hidden] { display: none !important; }
 @media (max-width: 1100px) {
