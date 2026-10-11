@@ -150,4 +150,9 @@ test('custom errors have a safe exit and slow navigation loader releases on brow
     const download = page.waitForEvent('download');
     await page.getByRole('link', { name: 'Download mascot' }).click(); await download;
     await page.clock.runFor(500); await expect(page.locator('[data-page-loader]')).toBeHidden();
+    // Protected endpoints retain normal redirect/error navigation when access expires.
+    let unexpectedDownload = false; page.on('download', () => { unexpectedDownload = true; });
+    await page.evaluate(() => { const link = document.createElement('a'); link.href = '/manage/instructors/1/credential'; link.setAttribute('data-navigation-download', ''); link.textContent = 'Expired private download'; document.querySelector('main').append(link); });
+    await page.getByRole('link', { name: 'Expired private download' }).click();
+    await expect(page).toHaveURL(/\/login$/); expect(unexpectedDownload).toBe(false);
 });

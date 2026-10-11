@@ -18,8 +18,9 @@ placeholders, not user uploads. XP, rank medals, Run, warning and satellite asse
 are editable original SVGs matching the existing code-native icon system.
 See [art provenance and exact generation prompts](../public/images/kody/README.md).
 
-The logo, header guide, companion, Help, loading and result surfaces reuse the
-mascot. Wallet balances/packages use the coin; progress uses XP; leaderboard
+The logo, header guide, companion, mission board, playable Garden character,
+Help, loading and result surfaces reuse the mascot. Wallet balances/packages
+use the coin; progress uses XP; leaderboard
 medals distinguish the first three positions; game/submission buttons use Run.
 Amounts, rank names and leaderboard positions remain server-owned.
 
@@ -57,6 +58,10 @@ links. It never delays navigation, masks form submissions, intercepts downloads,
 external links, hash changes or modified clicks. It resets on pagehide/pageshow
 and after six seconds if navigation is cancelled. The welcome is an explicit
 user-dismissed screen; the loader is not a fabricated progress percentage.
+Protected download links use a loader-exclusion marker while retaining the
+server's Content-Disposition decision. Expired access still opens sign-in/errors,
+instead of forcing an HTML response into a downloaded file. Result-dialog close
+events do not steal focus from a subsequently focused game input or a new dialog.
 
 ## Tower, Help and profile
 
@@ -94,8 +99,9 @@ real Administrator management service only in a guarded isolated database.
 
 Local verification passed 87 focused account/FAQ/Tower PostgreSQL tests with
 805 assertions, all 54 frontend tests, the production build and Pint. Full PR CI
-passed all 32 browser journeys and the 79-table PostgreSQL upgrade/restore
-rehearsal. The backend run reports 1,030 passed and 177 risky tests (8,921
+includes 33 browser journeys and the 79-table PostgreSQL upgrade/restore
+rehearsal; previous 32-journey revisions passed both full checks. The backend
+run reports 1,030 passed and 177 risky tests (8,921
 assertions); cached configuration/routes report 644 passed and 131 risky tests
 (5,865 assertions). These Pest warnings remain visible; a green workflow does
 not mean the suite is warning-free. Download regression coverage confirms native

@@ -1,6 +1,6 @@
 <dialog class="resource-viewer" id="resource-viewer-{{ $revision->id }}" data-resource-viewer aria-label="Lesson resource preview">
     <header class="resource-viewer-toolbar"><div><p class="overline">LESSON RESOURCE</p><h2 data-resource-title>Resource preview</h2></div><div class="resource-viewer-actions">
-        <a class="button button-secondary button-small" data-resource-download download>Download original ↓</a>
+        <a class="button button-secondary button-small" data-resource-download data-navigation-download>Download original ↓</a>
         <button class="button button-secondary button-small" type="button" data-resource-enlarge>⛶ Enlarge preview</button>
         <button class="button button-quiet button-small" type="button" data-resource-close aria-label="Close preview">× Close</button>
     </div></header>

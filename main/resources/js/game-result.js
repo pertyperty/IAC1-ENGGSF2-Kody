@@ -7,9 +7,14 @@ export function mountGameResult(doc, win) {
     const next = dialog.querySelector('[data-result-next]');
     let reactions = null, placeholder = null, focus = null;
     const restore = () => {
+        // Native close events are queued. Do not steal focus from the next control
+        // or restore an earlier result after another result has already opened.
+        if (dialog.open) return;
+        const needsFocus = doc.activeElement === doc.body || dialog.contains(doc.activeElement);
         if (reactions && placeholder) placeholder.replaceWith(reactions);
         reactions = placeholder = null;
-        focus?.focus?.({ preventScroll: true });
+        if (needsFocus && focus?.isConnected) focus.focus({ preventScroll: true });
+        focus = null;
     };
     dialog.addEventListener('close', restore);
     dialog.querySelector('[data-result-return]').addEventListener('click', () => dialog.close());

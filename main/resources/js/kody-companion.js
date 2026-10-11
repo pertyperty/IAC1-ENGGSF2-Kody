@@ -151,7 +151,7 @@ export function mountPageLoader(doc, win) {
     win.addEventListener('pageshow', reset); win.addEventListener('pagehide', reset);
     doc.addEventListener('click', event => {
         const link = event.target.closest('a[href]');
-        if (!link || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || link.hasAttribute('download') || link.target && link.target !== '_self') return;
+        if (!link || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || link.hasAttribute('download') || link.hasAttribute('data-navigation-download') || link.target && link.target !== '_self') return;
         const url = new URL(link.href, win.location.href);
         if (url.origin !== win.location.origin || url.pathname === win.location.pathname && url.search === win.location.search) return;
         // Only show on a genuine slow navigation, and release if navigation is cancelled.

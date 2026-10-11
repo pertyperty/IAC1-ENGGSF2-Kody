@@ -1,6 +1,7 @@
 /* Replaceable Kody art and interaction surfaces. Decoration never owns progress. */
 .kody-art { display: inline-block; flex-shrink: 0; object-fit: contain; vertical-align: middle; }
 .brand-mark { object-fit: contain; transform: scale(1.16); }
+.garden-game .garden-kody { background-image: var(--kody-mascot); }
 .header-tour { width: 44px; height: 44px; padding: 4px; display: grid; place-items: center; border-radius: 12px; border: 1px solid var(--border); background: var(--surface); cursor: pointer; }
 .header-tour:hover { background: var(--accent-soft); }
 .button { transition: background .18s ease, border-color .18s ease, transform .18s ease; }

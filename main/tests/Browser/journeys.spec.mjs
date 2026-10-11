@@ -542,6 +542,7 @@ test('interactive games edit and preview locally; confirmed runs save through th
     await page.goto('/learn/sequences');
     const garden = page.locator('[data-coding-game]');
     await expect(garden.locator('[data-game-board]')).toHaveAttribute('aria-label', /Path tiles/);
+    await expect(garden.locator('.garden-kody')).toHaveCSS('background-image', /mascot\.webp/);
     let saves = 0;
     const completion = await garden.getAttribute('data-completion-url');
     page.on('request', request => { if (request.method() === 'POST' && request.url() === completion) saves++; });
