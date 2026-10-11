@@ -95,6 +95,41 @@ test('help topics profile photo and sidebar labels have coherent wide and mobile
     await page.setViewportSize({ width: 320, height: 740 }); await audit(page);
 });
 
+test('contextual guides explain all five role workspaces without submitting forms', async ({ browser }) => {
+    test.setTimeout(150000);
+    for (const [role, path, expected] of [
+        ['guidewallet', '/wallet', 'Know what is available'],
+        ['guideinstructor', '/create/modules/new', 'Give the idea a playground'],
+        ['guidecontributor', '/create/challenges/new', 'Check the important cases'],
+        ['guidemoderator', '/manage/accounts', 'Find the right account'],
+        ['guideadministrator', '/manage/accounts', 'Your staff workspace'],
+    ]) {
+        const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+        try {
+            await context.route('**/*', route => new URL(route.request().url()).origin === process.env.KODY_BROWSER_BASE_URL ? route.continue() : route.abort());
+            const page = await context.newPage(); await returning(page);
+            await page.goto('/login'); await page.getByLabel('Email or username').fill(`browser_${role}`);
+            await page.getByLabel(/^Password/).fill('BrowserStrong12!'); await page.getByRole('button', { name: /Sign in/ }).click();
+            await page.goto(path); const mutations = [];
+            page.on('request', request => { if (!['GET', 'HEAD'].includes(request.method())) mutations.push(request.method()); });
+            const tour = page.locator('[data-kody-tour]');
+            await page.getByRole('button', { name: 'Kody guide and companion' }).click(); await tour.locator('[data-tour-next]').click();
+            let found = false;
+            for (let step = 0; step < 40 && await tour.isVisible(); step++) {
+                if (await tour.locator('#tour-title').textContent() === expected) { found = true; break; }
+                await tour.locator('[data-tour-next]').click();
+            }
+            expect(found, `${role} should have a relevant page guide`).toBe(true);
+            expect(Number(await tour.locator('[data-tour-hole]').getAttribute('r'))).toBeGreaterThan(30);
+            await audit(page); await page.screenshot({ path: `storage/app/browser-results/kody-guide-${role}.png` });
+            await page.setViewportSize({ width: 320, height: 740 }); await audit(page);
+            await tour.getByRole('button', { name: 'Skip tutorial' }).click();
+            expect(mutations).toEqual([]); await expect(page).toHaveURL(new RegExp(`${path}$`));
+            if (role.includes('moderator') || role.includes('administrator')) await expect(page.locator('[data-progress-strip]')).toHaveCount(0);
+        } finally { await context.close(); }
+    }
+});
+
 test('custom errors have a safe exit and slow navigation loader releases on browser restoration', async ({ page }) => {
     await returning(page); const response = await page.goto('/a-missing-kody-path'); expect(response.status()).toBe(404);
     await expect(page.getByRole('heading', { name: 'This path leads somewhere new.' })).toBeVisible(); await audit(page);

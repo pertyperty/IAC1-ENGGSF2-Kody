@@ -79,7 +79,18 @@ export function mountKodyCompanion(doc, win) {
         ['.header-join', 'Save your adventure', 'Create an account to save validated progress. You can keep trying the first three Tower floors as a guest.'],
         ['.mobile-workspace > summary', 'Your workspace in one tap', 'Open this menu to find the tools and destinations available to your account.'],
         ['[data-navigation-rail] [data-rail-toggle]', 'A little more room', 'Pin the side menu to keep labels visible. Hover or focus a collapsed button to pull its label into view.'],
+        ['.app-primary-nav a[href$="/create/modules"], .app-primary-nav a[href$="/create/challenges"]', 'Your creator workspace', 'Create opens the studio available to your role. Save a draft, preview it and submit the saved version for staff review.'],
+        ['.header-updates', 'Stay in the loop', 'Updates collect your review decisions, account notices and learning messages. Open an item to see its details.'],
+        ['.account-menu > summary', 'Your account and security', 'Open your account menu for your profile, security settings, Help and sign out.'],
         ['[data-progress-strip]', 'Your saved progress', 'Streaks and XP come from eligible server-validated achievements. Local practice and reading do not award play rewards.'],
+        ['.editor-jumps', 'Build in manageable steps', 'This pinned step menu moves between the sections of your editor. Changing sections does not save or publish your work.'],
+        ['#lesson-edit', 'Make the idea clear', 'Give your lesson a title, explain the idea and add resources. Write for someone discovering this topic for the first time.'],
+        ['#assessment-edit', 'Give the idea a playground', 'Choose a reusable game, quiz or preset, then customize its prompts and scenario. Preview play never saves learner progress.'],
+        ['#quest-checks', 'Check the important cases', 'Sample tests help learners understand the problem. Hidden tests check edge cases and remain private to the creator and reviewers.'],
+        ['#tower-prompts legend', 'Shape this Tower floor', 'Edit the story and stages, review source notes and try the saved preview. Publishing keeps earlier cleared floors intact.'],
+        ['.staff-workspace h2', 'Your staff workspace', 'These tools follow your current role. Review content, support accounts and open the management tools available to you.'],
+        ['.governance-filters input[name="q"]', 'Find the right account', 'Filter by username, role or status, then open an account to inspect its history before taking action. This guide makes no account changes.'],
+        ['.wallet-summary h2', 'Know what is available', 'Your wallet distinguishes available and reserved KodeBits. Read transaction history for recorded changes; purchases become available after payment setup.'],
         ['[data-resource-workspace] h1', 'A place to learn', 'Read the lesson, open its resources alongside it and try the assessment. A confirmed result shows the next available lesson.'],
         ['[data-coding-game], [data-arcade-game], [data-practice-quiz]', 'Try, adjust, then run', 'Explore the controls, build your answer and run when ready. Practice previews stay separate from saved achievements.'],
         ['.help-search', 'Find a helpful answer', 'Search or choose a topic. Expand a guide to read its answer, or open it on its own page.'],
@@ -108,7 +119,7 @@ export function mountKodyCompanion(doc, win) {
         dialog.querySelector('[data-tour-count]').textContent = index < 0 ? 'WELCOME TO KODY' : `YOUR GUIDE · ${index + 1} / ${steps.length}`;
         next.textContent = index < 0 ? 'Click to begin' : index === steps.length - 1 ? 'Let’s explore' : 'Next tip →';
         back.hidden = index <= 0; spot.hidden = index < 0; hole.setAttribute('r', '0');
-        current?.target.scrollIntoView({ block: 'nearest', behavior: 'instant' });
+        current?.target.scrollIntoView({ block: 'center', behavior: 'instant' });
         positionTip(); next.focus({ preventScroll: true });
     };
     const finish = () => { write(win, TOUR_KEY, 'dismissed'); dialog.close(); };

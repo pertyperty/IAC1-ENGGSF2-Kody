@@ -72,7 +72,9 @@ try {
         foreach (['instructor' => Role::Instructor, 'moderator' => Role::Moderator, 'administrator' => Role::Administrator, 'learner' => Role::Learner, 'arcadelearner' => Role::Learner,
             'navlearner' => Role::Learner, 'navcontributor' => Role::Contributor, 'navinstructor' => Role::Instructor,
             'navmoderator' => Role::Moderator, 'navadministrator' => Role::Administrator, 'interactive' => Role::Learner,
-            'towerlearner' => Role::Learner, 'toweradmin' => Role::Administrator, 'stickylearner' => Role::Learner, 'usabilitylearner' => Role::Learner, 'picturelearner' => Role::Learner, 'librarylearner' => Role::Learner, 'guidelearner' => Role::Learner] as $name => $role) {
+            'towerlearner' => Role::Learner, 'toweradmin' => Role::Administrator, 'stickylearner' => Role::Learner, 'usabilitylearner' => Role::Learner, 'picturelearner' => Role::Learner, 'librarylearner' => Role::Learner, 'guidelearner' => Role::Learner,
+            'guidewallet' => Role::Learner, 'guideinstructor' => Role::Instructor, 'guidecontributor' => Role::Contributor,
+            'guidemoderator' => Role::Moderator, 'guideadministrator' => Role::Administrator] as $name => $role) {
             $accounts[$name] = User::factory()->create(['username' => 'browser_'.$name, 'email' => $name.'@browser.example.test',
                 'password' => Hash::make('BrowserStrong12!'), 'account_role' => $role,
                 'active_session_hash' => hash('sha256', 'browser-seed-session'), 'active_session_expires_at' => now()->addHour()]);

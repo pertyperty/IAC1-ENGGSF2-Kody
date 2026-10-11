@@ -110,7 +110,7 @@ provider-fake verification is not live delivery/execution evidence.
 - Variable-length quiz authoring, multi-question server completion, sequential
   creator paths, reading completion and dashboards are implemented in
   [the completion milestone](platform-completion-implementation.md).
-- Thirty-two isolated Chromium browser workflows now exercise real registration, play,
+- Thirty-three isolated Chromium browser workflows now exercise real registration, play,
   creator/staff publication, all five role workspaces, direct/mobile game interactions,
   themes, save-failure retry and axe checks. Exercise
   long content, keyboard authoring and error/retry paths across actual

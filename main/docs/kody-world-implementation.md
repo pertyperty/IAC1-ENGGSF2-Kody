@@ -36,6 +36,10 @@ steps use circular spotlight windows and mascot text for visible controls on the
 current page. Next, Previous, the spotlight and Escape advance/dismiss the guide;
 it never submits forms, grants progress or executes a privileged action.
 The header Kody button and Help tour action replay it for all roles.
+Contextual tips include creator setup sections, private test cases, Tower story
+editing, staff tools/account filters, account menus, updates and wallet history.
+Only visible controls receive tips. Long pages center each target before showing
+its spotlight; tutorials never submit a form or mutate the current account.
 
 Native modal focus containment, return focus, readable mobile cards and reduced
 motion apply. The header remains revealed during the tour. `kody-tour-v1` stores
@@ -83,7 +87,9 @@ keyboard focus, bounded companion movement/preferences, land-to-space scrolling,
 present-floor jump, reduced motion, Help grouping, profile editing, sidebar
 direction, custom errors and delayed navigation/back restoration. Existing
 returning-user journeys explicitly dismiss cosmetic onboarding; first-visit
-coverage remains independent. Browser fixtures create Active guides through the
+coverage remains independent. A dedicated five-role journey verifies contextual
+editor, moderation and wallet tips at desktop and 320-pixel widths, with no
+mutation requests. Browser fixtures create Active guides through the
 real Administrator management service only in a guarded isolated database.
 
 Local verification passed 87 focused account/FAQ/Tower PostgreSQL tests with
