@@ -274,7 +274,15 @@ test('learner username sign-in lands on the tower and saved wins refresh the del
     await page.reload(); await page.getByRole('link', { name: 'Level map', exact: false }).click();
     await expect(page.locator('[data-tower-stop="1"]')).toHaveClass(/is-cleared/);
     await expect(page.locator('[data-tower-stop="2"]')).not.toHaveClass(/is-locked/);
+    const map = page.locator('[data-tower-viewport]');
+    const shell = await page.locator('[data-scroll-navigation]').boundingBox();
+    const canvas = await map.boundingBox();
+    expect(Math.abs(canvas.y - shell.y - shell.height)).toBeLessThan(2);
+    await page.locator('.rail-toggle').click();
+    await expect(page.locator('[data-tower-stop="2"] .tower-node')).toBeInViewport();
     await page.setViewportSize({ width: 320, height: 740 }); await audit(page);
+    await expect(page.locator('[data-tower-stop="2"] .tower-node')).toBeInViewport({ ratio: 0.99 });
+    await page.screenshot({ path: 'storage/app/browser-results/tower-learner-mobile.png' });
 });
 
 test('Administrator rail pulls and pins labels; tower drafts preview without publishing and preserve changes', async ({ page }) => {

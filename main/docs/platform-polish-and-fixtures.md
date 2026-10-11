@@ -54,6 +54,24 @@ feedback no longer calls page `scrollIntoView`; learners decide when to continue
 
 ## Tower and new activities
 
+The owner's subsequent full-page request removes the above-map introduction and
+footer from the tower landing page. Its canvas fills the viewport below the shared
+header/HUD, with the title/progress, expandable guide and continuation/scroll
+controls overlaid on the map. Only the level path scrolls. Desktop rail navigation
+remains above the canvas; narrow screens retain the header hamburger. Level nodes
+follow a gentle repeating curved trail with smaller bends on mobile. Header-size
+and orientation changes recenter the next floor, while map scrolling itself does
+not trigger the outer navigation's hide behavior. Other pages retain their layouts.
+The decorative dot grid repels around a mouse pointer or passive touch/swipe,
+then settles with no idle animation loop. Point count and backing pixels are
+bounded; hidden pages stop drawing. Reduced motion/no canvas uses a static CSS
+grid, and theme changes repaint the dots. The effect never intercepts scrolling,
+level clicks or saves and has no progression/reward meaning.
+Five focused browser checks passed for full-viewport geometry, desktop/mobile
+and landscape accessibility, rail pinning, guest/saved progression, mouse/tap
+repulsion, reduced motion and native touch scrolling. Frontend tests (54), Pint
+and the production build also passed; PR CI verifies the complete application.
+
 The seed curriculum appends positions 26–50 without overwriting existing
 Administrator revisions. The map ascends visually from level 1 at the bottom,
 within a keyboard/touch-scrollable region with hidden visual scrollbars and

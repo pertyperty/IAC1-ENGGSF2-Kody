@@ -1,0 +1,52 @@
+/* The map is the page; only its path scrolls beneath the shared navigation. */
+.tower-map-page { height: 100dvh; overflow: hidden; }
+.tower-map-page .app-frame { position: fixed; inset: var(--navigation-offset, 128px) 0 0; min-height: 0; display: block; }
+.tower-map-page .app-rail { position: absolute; top: 0; left: 0; height: 100%; }
+.tower-map-main, .tower-map-page .tower-page { position: relative; height: 100%; padding: 0; }
+.tower-map-page .tower-page { --tower-bend: clamp(70px, 14vw, 150px); --tower-overlay-left: 20px; background: radial-gradient(circle, var(--accent-line) 1.3px, transparent 1.5px) 0 0 / 24px 24px, var(--surface-soft) url('/images/tower-landscape.svg') center / min(100%, 800px) auto repeat-y; }
+.tower-map-page .tower-page.has-interactive-grid { background-image: url('/images/tower-landscape.svg'); background-size: min(100%, 800px) auto; }
+.tower-grid { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; color: var(--accent-line); opacity: .8; }
+.tower-map-page .tower-viewport { position: absolute; inset: 0; height: 100%; border: 0; border-radius: 0; background: transparent; z-index: 2; }
+.tower-map-page .tower-path { max-width: none; padding-block: 160px; }
+.tower-map-page .tower-path::before { display: none; }
+.tower-map-page .tower-node { transform: translateX(calc(var(--lane) * var(--tower-bend))); }
+.tower-map-page .tower-node:hover { transform: translateX(calc(var(--lane) * var(--tower-bend))) translateY(-3px); }
+.tower-map-page .tower-node:active { transform: translateX(calc(var(--lane) * var(--tower-bend))) translateY(2px); }
+.tower-map-page .tower-info { left: calc(50% + var(--lane) * var(--tower-bend) + 47px); }
+.tower-map-page .tower-label { left: calc(50% + var(--lane) * var(--tower-bend) + 90px); }
+.tower-trail { position: absolute; bottom: 50%; left: 50%; transform: translateX(-50%); height: 130px; width: calc(2 * var(--tower-bend)); overflow: visible; pointer-events: none; }
+.tower-trail path { fill: none; stroke: var(--accent-line); stroke-width: 3; stroke-dasharray: 6 7; vector-effect: non-scaling-stroke; }
+.tower-overlay { position: absolute; z-index: 5; }
+.tower-map-page .tower-heading { top: 16px; left: var(--tower-overlay-left); display: block; width: min(310px, calc(100% - var(--tower-overlay-left) - 16px)); padding: 12px 16px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); }
+.tower-title-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.tower-map-page .tower-heading h1 { font-size: 24px; margin: 0; white-space: nowrap; }
+.tower-heading .brand-dot { margin-left: 0; }
+.tower-map-page .tower-overview { display: flex; flex-wrap: wrap; gap: 6px; padding: 0; margin-top: 4px; min-width: 0; width: auto; border: 0; background: none; align-items: baseline; }
+.tower-map-page .tower-overview b { font-size: 12px; }
+.tower-guide summary { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid var(--accent-line); border-radius: 50%; color: var(--accent-text); cursor: pointer; list-style: none; font-weight: 700; }
+.tower-guide summary::-webkit-details-marker { display: none; }
+.tower-guide[open] summary { background: var(--accent-soft); }
+.tower-guide > div { position: absolute; top: calc(100% + 8px); left: 0; right: 0; max-height: min(420px, 50dvh); overflow-y: auto; overscroll-behavior: contain; padding: 16px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); animation: panel-reveal .18s ease; }
+.tower-guide h2 { margin: 0 0 10px; font-size: 18px; }
+.tower-map-page .tower-guide p { font-size: 12px; line-height: 1.6; margin: 0 0 12px; }
+.tower-map-page .tower-map-tools { bottom: max(16px, env(safe-area-inset-bottom)); left: var(--tower-overlay-left); right: 20px; margin: 0; gap: 12px; pointer-events: none; }
+.tower-map-tools > div { pointer-events: auto; }
+.tower-map-page .tower-resume { margin: 0; flex-wrap: wrap; justify-content: start; }
+.tower-map-main > .action-receipt { position: absolute; top: 16px; right: 20px; z-index: 28; max-width: min(380px, calc(100% - 40px)); max-height: 40dvh; overflow-y: auto; margin: 0; }
+@media (min-width: 1101px) {
+    .tower-map-page .has-workspace .tower-page { --tower-overlay-left: calc(var(--rail-width) + 20px); }
+}
+@media (max-width: 680px) {
+    .tower-map-page .tower-page { --tower-bend: min(18vw, 64px); --tower-overlay-left: 12px; }
+    .tower-map-page .tower-heading { top: 12px; padding: 8px 12px; width: calc(100% - 24px); }
+    .tower-map-page .tower-heading h1 { font-size: 20px; }
+    .tower-map-page .tower-overview { margin: 0; }
+    .tower-map-page .tower-overview span { font-size: 11px; }
+    .tower-map-page .tower-map-tools { right: 12px; gap: 8px; align-items: end; }
+    .tower-map-tools .tower-resume { flex: 1; min-width: 0; }
+    .tower-map-tools .button { font-size: 11px; padding: 10px 8px; min-height: 44px; }
+    .tower-map-page .tower-label { left: 8px; width: calc(50% - 58px); }
+    .tower-map-page .tower-stop.show-info .tower-label { left: 8px; width: calc(100% - 16px); }
+    .tower-map-main > .action-receipt { top: 120px; right: 12px; max-width: calc(100% - 24px); }
+}
+@media (prefers-reduced-motion: reduce) { .tower-grid { display: none; } }

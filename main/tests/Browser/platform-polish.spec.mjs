@@ -39,16 +39,22 @@ test('current username sign-in pictures hamburger feedback and theme remain usab
     await expect(page.locator('.mobile-workspace')).not.toHaveAttribute('open');
 });
 
-test('tower climbs upward with centered levels accessible descriptions and contained scrolling', async ({ page }) => {
+test('tower fills the page and climbs along a responsive winding path with accessible descriptions', async ({ page }) => {
     await page.goto('/');
     await expect(page.locator('[data-tower-stop]')).toHaveCount(50);
     const map = page.locator('[data-tower-viewport]');
     const first = page.locator('[data-tower-stop="1"] .tower-node');
     const second = page.locator('[data-tower-stop="2"] .tower-node');
     await expect(first).toBeInViewport();
+    const header = await page.locator('[data-scroll-navigation]').boundingBox();
     const a = await first.boundingBox(), b = await second.boundingBox(), box = await map.boundingBox();
+    expect(Math.abs(box.y - header.y - header.height)).toBeLessThan(2);
+    expect(Math.abs(box.y + box.height - page.viewportSize().height)).toBeLessThan(2);
+    expect(await page.evaluate(() => document.documentElement.scrollHeight - innerHeight)).toBeLessThan(2);
+    await expect(page.locator('.site-footer')).toHaveCount(0);
     expect(a.y).toBeGreaterThan(b.y);
     expect(Math.abs(a.x + a.width / 2 - box.x - box.width / 2)).toBeLessThan(2);
+    expect(b.x).toBeGreaterThan(a.x + 20);
     await page.getByRole('button', { name: 'About level 1', exact: true }).click();
     await expect(page.locator('#tower-detail-1')).toHaveCSS('opacity', '1');
     const initial = await map.evaluate(element => element.scrollTop);
@@ -61,8 +67,59 @@ test('tower climbs upward with centered levels accessible descriptions and conta
     await page.setViewportSize({ width: 320, height: 740 });
     await page.goto('/');
     await expect(first).toBeInViewport({ ratio: 0.99 });
+    const mobileMap = await map.boundingBox();
+    expect(Math.abs(mobileMap.y + mobileMap.height - 740)).toBeLessThan(2);
+    expect(await page.evaluate(() => document.documentElement.scrollHeight - innerHeight)).toBeLessThan(2);
+    await page.getByLabel('Tower guide', { exact: true }).click();
+    await expect(page.getByRole('heading', { name: 'Your climb' })).toBeVisible();
+    await page.getByLabel('Tower guide', { exact: true }).click();
     await audit(page);
     await page.screenshot({ path: 'storage/app/browser-results/tower-start-mobile.png' });
+    await page.setViewportSize({ width: 740, height: 360 });
+    await page.goto('/');
+    await expect(first).toBeInViewport({ ratio: 0.99 });
+    await audit(page);
+});
+
+test('tower dot grid responds to the mouse and respects reduced motion', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await page.goto('/');
+    await expect(page.locator('[data-tower-map]')).toHaveClass(/has-interactive-grid/);
+    const canvas = page.locator('[data-tower-grid]');
+    const pixels = () => canvas.evaluate(element => element.toDataURL());
+    const before = await pixels();
+    const box = await canvas.boundingBox();
+    await page.mouse.move(48, box.y + box.height / 2);
+    await expect.poll(async () => (await pixels()) !== before).toBe(true);
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await expect(page.locator('[data-tower-map]')).not.toHaveClass(/has-interactive-grid/);
+    await expect(canvas).toBeHidden();
+    await expect(page.locator('[data-tower-stop="1"] .tower-node')).toBeInViewport();
+    await audit(page);
+});
+
+test.describe('touch tower grid', () => {
+    test.use({ hasTouch: true, viewport: { width: 390, height: 844 } });
+    test('taps repel dots and swipes retain native map scrolling', async ({ page }) => {
+        await page.goto('/');
+        const canvas = page.locator('[data-tower-grid]');
+        await expect(page.locator('[data-tower-map]')).toHaveClass(/has-interactive-grid/);
+        const pixels = () => canvas.evaluate(element => element.toDataURL());
+        const before = await pixels();
+        const box = await canvas.boundingBox();
+        await page.touchscreen.tap(36, box.y + box.height * .5);
+        await expect.poll(async () => (await pixels()) !== before).toBe(true);
+        const map = page.locator('[data-tower-viewport]');
+        const initial = await map.evaluate(element => element.scrollTop);
+        const session = await page.context().newCDPSession(page);
+        await session.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: 36, y: box.y + box.height * .35 }] });
+        for (const fraction of [.4, .5, .6, .7]) await session.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: 36, y: box.y + box.height * fraction }] });
+        await session.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+        await session.detach();
+        await expect.poll(() => map.evaluate(element => element.scrollTop)).toBeLessThan(initial);
+        expect(await page.evaluate(() => scrollY)).toBe(0);
+        await audit(page);
+    });
 });
 
 for (const [template, program] of [['logic-switchboard', 'flip 1\nflip 2'], ['string-forge', 'upper\nreverse'], ['memory-trail', 'push 2\npush 3']]) {
