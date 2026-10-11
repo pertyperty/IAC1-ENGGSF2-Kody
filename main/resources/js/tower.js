@@ -1,3 +1,4 @@
+import { setIconLabel } from './icons.js';
 import { publishFeedback } from './feedback.js';
 import { editTowerStage, previewTowerStage } from './tower-stage-editor.js';
 import { mountTowerGrid } from './tower-grid.js';
@@ -29,23 +30,24 @@ export function mountTower(doc, win) {
             const link = stop.querySelector('a');
             link.setAttribute('aria-disabled', String(locked));
             link.tabIndex = locked ? -1 : 0;
-            stop.querySelector('i').textContent = position <= cleared ? '✓' : position === 4 ? 'JOIN' : position % 10 === 0 ? 'BOSS' : 'PLAY';
+            if (position <= cleared) setIconLabel(stop.querySelector('i'), 'check'); else stop.querySelector('i').textContent = position === 4 ? 'JOIN' : position % 10 === 0 ? 'BOSS' : 'PLAY';
         });
     };
     map?.addEventListener('click', event => {
         if (event.target.closest('[aria-disabled="true"]')) event.preventDefault();
     });
     const viewport = map?.querySelector('[data-tower-viewport]');
-    const positionMap = () => {
+    const positionMap = (smooth = false) => {
         if (!viewport) return;
         const position = guest ? Math.min(4, guestClearance(win) + 1) : Number(viewport.dataset.nextPosition);
         const stop = map.querySelector(`[data-tower-stop="${position}"]`);
-        if (stop) viewport.scrollTop = stop.offsetTop - viewport.clientHeight / 2 + stop.offsetHeight / 2;
+        if (stop) viewport.scrollTo({ top: stop.offsetTop - viewport.clientHeight / 2 + stop.offsetHeight / 2,
+            behavior: smooth === true && !win.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'smooth' : 'instant' });
     };
     map?.querySelectorAll('[data-tower-scroll]').forEach(button => button.addEventListener('click', () => {
         viewport?.scrollBy({ top: (button.dataset.towerScroll === 'up' ? -1 : 1) * viewport.clientHeight * .7, behavior: win.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
     }));
-    map?.querySelector('[data-tower-present]')?.addEventListener('click', positionMap);
+    map?.querySelector('[data-tower-present]')?.addEventListener('click', () => positionMap(true));
     map?.querySelectorAll('.tower-info').forEach(button => button.addEventListener('click', () => {
         const open = button.getAttribute('aria-expanded') !== 'true';
         map.querySelectorAll('.tower-info').forEach(other => { other.setAttribute('aria-expanded', String(other === button && open)); other.closest('.tower-stop').classList.toggle('show-info', other === button && open); });

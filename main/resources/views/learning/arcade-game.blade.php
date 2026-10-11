@@ -8,7 +8,7 @@
         <ol class="arcade-program-list" data-arcade-program aria-label="Program instructions"></ol>
         <details class="arcade-source"><summary>Edit instructions as text</summary><label class="arcade-code-label">Your program · up to 12 instructions<textarea data-arcade-code rows="5" maxlength="1212" spellcheck="false" autocomplete="off" aria-label="Your program"></textarea></label></details>
         <p class="field-hint" data-arcade-help></p>
-        <div class="game-toolbar"><button class="button button-play" type="button" data-arcade-run aria-label="Run program"><x-kody-art name="run" size="28"/> Run</button><button class="game-reset" type="button" data-arcade-reset aria-label="Reset" title="Reset">↺</button><button class="game-reset" type="button" data-arcade-hint aria-label="Hint" title="Hint">?</button></div>
+        <div class="game-toolbar"><button class="button button-play" type="button" data-arcade-run aria-label="Run program"><x-kody-art name="run" size="28"/> Run</button><button class="game-reset" type="button" data-arcade-reset aria-label="Reset" title="Reset"><x-action-icon name="refresh"/></button><button class="game-reset" type="button" data-arcade-hint aria-label="Hint" title="Hint"><x-action-icon name="help"/></button></div>
         <pre data-arcade-output class="arcade-output" role="status" aria-live="polite">Ready when you are.</pre>
         <noscript><p>Enable JavaScript to play this activity.</p></noscript>
     </div>

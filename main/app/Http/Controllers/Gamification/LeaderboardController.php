@@ -22,10 +22,20 @@ class LeaderboardController extends Controller
             ->whereIn('player.account_role', [Role::Learner->value, Role::Contributor->value, Role::Instructor->value])
             ->selectRaw('xp.user_id, player.username, xp.xp, rank() OVER (ORDER BY xp.xp DESC) as position');
         $players = DB::query()->fromSub($ranked, 'ranked')->orderBy('position')->orderBy('user_id')->paginate(25);
-        $events = DB::table('weekly_result_sets as results')->join('weekly_events as event', 'event.id', '=', 'results.event_id')
-            ->where('results.status', 'Published')->orderByDesc('event.starts_at')->limit(12)->get(['event.id', 'event.starts_at']);
 
-        return response()->view('weekly.leaderboards', compact('players', 'events'))->header('Cache-Control', 'no-store, private');
+        return response()->view('weekly.leaderboards', compact('players'))->header('Cache-Control', 'no-store, private');
+    }
+
+    public function weekly(): Response
+    {
+        $events = DB::table('weekly_result_sets as results')->join('weekly_events as event', 'event.id', '=', 'results.event_id')
+            ->join('coding_challenge_revisions as revision', 'revision.id', '=', 'event.revision_id')
+            ->where('results.status', 'Published')->orderByDesc('event.starts_at')
+            ->select(['event.id', 'event.starts_at', 'event.ends_at', 'revision.title', 'revision.language', 'results.published_at'])
+            ->selectSub(DB::table('weekly_results')->selectRaw('count(*)')->whereColumn('event_id', 'event.id'), 'participants')
+            ->paginate(12);
+
+        return response()->view('weekly.archive', compact('events'))->header('Cache-Control', 'no-store, private');
     }
 
     public function show(int $event): Response
@@ -57,6 +67,6 @@ class LeaderboardController extends Controller
     private function rows(int $event): LengthAwarePaginator
     {
         return DB::table('weekly_results as result')->join('users as player', 'player.id', '=', 'result.user_id')->where('event_id', $event)
-            ->orderBy('rank')->orderBy('result.user_id')->paginate(25, ['rank', 'score', 'reward_kb', 'player.username', 'player.account_status']);
+            ->orderBy('rank')->orderBy('result.user_id')->paginate(25, ['rank', 'score', 'reward_kb', 'result.user_id', 'player.username', 'player.account_status']);
     }
 }

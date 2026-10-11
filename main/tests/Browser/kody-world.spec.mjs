@@ -104,7 +104,7 @@ test('contextual guides explain all five role workspaces without submitting form
         ['guideinstructor', '/create/modules/new', 'Give the idea a playground'],
         ['guidecontributor', '/create/challenges/new', 'Check the important cases'],
         ['guidemoderator', '/manage/accounts', 'Find the right account'],
-        ['guideadministrator', '/manage/accounts', 'Your staff workspace'],
+        ['guideadministrator', '/manage/accounts', 'Find the right account'],
     ]) {
         const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
         try {

@@ -1,3 +1,4 @@
+import { setIconLabel } from '../icons.js';
 import { mountGarden, validateInstance } from './command-garden.js';
 
 const same = (a, b) => a[0] === b[0] && a[1] === b[1];
@@ -57,7 +58,7 @@ export function mountGardenDesigner(form, presets) {
             const goal = same(point, layout.goal);
             const crystal = layout.crystals.some((p) => same(p, point));
             button.classList.toggle('designer-path', onPath);
-            button.textContent = start ? 'K' : goal ? '⚑' : crystal ? '◇' : onPath ? '·' : '';
+            button.replaceChildren(); if (start || goal || crystal) setIconLabel(button, start ? 'profile' : goal ? 'flag' : 'crystal');
             button.setAttribute('aria-label', `Column ${point[0] + 1}, row ${point[1] + 1}: ${start ? 'start' : goal ? 'goal' : crystal ? 'crystal' : onPath ? 'path' : 'grass'}. ${tool} tool.`);
         }
         root.querySelector('[data-designer-tool="crystal"]').disabled = preset.value !== 'conditions';

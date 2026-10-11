@@ -1,3 +1,4 @@
+import { setIconLabel } from './icons.js';
 export function mountResourceViewer(root, win) {
     const viewer = root.querySelector('[data-resource-viewer]');
     if (!viewer?.showModal) return; // Links retain the authorized resource page without JS/dialog support.
@@ -14,7 +15,7 @@ export function mountResourceViewer(root, win) {
         if (modal) viewer.showModal(); else viewer.show();
         changingMode = false;
         enlarge.hidden = !wide.matches;
-        enlarge.textContent = modal ? '↙ Return to lesson' : '⛶ Enlarge preview';
+        setIconLabel(enlarge, modal ? 'collapse' : 'expand', modal ? 'Return to lesson' : 'Enlarge preview');
         root.classList.toggle('has-resource', !modal);
     };
     root.querySelectorAll('[data-resource-open]').forEach(link => link.addEventListener('click', event => {

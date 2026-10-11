@@ -1,6 +1,6 @@
 <div class="app-header-shell" data-scroll-navigation>
 <span class="header-hover-edge" aria-hidden="true"></span>
-<button type="button" class="navigation-reveal" data-navigation-reveal hidden>Show navigation <span aria-hidden="true">⌄</span></button>
+<button type="button" class="navigation-reveal" data-navigation-reveal hidden>Show navigation <span aria-hidden="true"><x-action-icon name="chevron"/></span></button>
 <header class="app-header {{ auth()->check() ? 'is-signed-in' : '' }}">
     @auth<details class="mobile-workspace"><summary aria-label="Explore your workspace"><svg width="22" height="22" aria-hidden="true"><use href="{{ asset('images/navigation.svg') }}#menu"/></svg><span class="sr-only">Explore your workspace</span></summary><div class="mobile-workspace-panel"><h2>Your workspace</h2>@include('layouts.workspace-nav', ['mobile' => true])</div></details>@endauth
     @include('layouts.brand')
@@ -18,7 +18,7 @@
         @auth
         <a class="header-updates" href="{{ route('notifications.index') }}" aria-label="Updates, {{ $chrome['unread'] }} unread"><svg width="20" height="20" aria-hidden="true"><use href="{{ asset('images/navigation.svg') }}#bell"/></svg><span class="updates-label">Updates</span> @if($chrome['unread'])<span class="unread-badge">{{ $chrome['unread'] }}</span>@endif</a>
         <details class="account-menu">
-            <summary aria-label="Account menu">@include('layouts.avatar', ['avatarUser' => auth()->user(), 'avatarClass' => 'header-avatar'])<span class="header-username">{{ auth()->user()->username }}</span><span aria-hidden="true">⌄</span></summary>
+            <summary aria-label="Account menu">@include('layouts.avatar', ['avatarUser' => auth()->user(), 'avatarClass' => 'header-avatar'])<span class="header-username">{{ auth()->user()->username }}</span><span aria-hidden="true"><x-action-icon name="chevron"/></span></summary>
             <nav aria-label="Account navigation">
                 <span class="menu-role">{{ auth()->user()->account_role->name }}</span>
                 <a href="{{ route('dashboard') }}">Dashboard</a>

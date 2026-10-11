@@ -85,6 +85,7 @@ Route::middleware(['auth', 'account.session'])->group(function (): void {
     Route::post('/manage/finance/{kind}/{operation}', [FinanceController::class, 'review'])->whereIn('kind', ['payout', 'refund'])->whereUuid('operation')->middleware('throttle:10,1,finance-review:')->name('finance.review');
 });
 Route::get('/leaderboards', [LeaderboardController::class, 'index'])->middleware(['auth', 'account.session'])->name('leaderboards.index');
+Route::get('/weekly/leaderboard', [LeaderboardController::class, 'weekly'])->middleware(['auth', 'account.session'])->name('weekly-leaderboards.index');
 Route::get('/weekly-results/{event}', [LeaderboardController::class, 'show'])->whereNumber('event')->middleware(['auth', 'account.session'])->name('weekly-results.show');
 Route::get('/manage/weekly-results/{weeklyEvent}', [LeaderboardController::class, 'review'])->middleware(['auth', 'account.session'])->name('weekly-results.review');
 Route::post('/manage/weekly-results/{weeklyEvent}', [LeaderboardController::class, 'publish'])->middleware(['auth', 'account.session', 'throttle:5,1,weekly-results:'])->name('weekly-results.publish');

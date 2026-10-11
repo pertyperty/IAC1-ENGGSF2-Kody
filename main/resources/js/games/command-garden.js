@@ -1,3 +1,4 @@
+import { createIcon } from '../icons.js';
 import { publishFeedback } from '../feedback.js';
 import { saveCompletion } from './save-completion.js';
 
@@ -50,8 +51,6 @@ export function runProgram(instance, program, { repeat = false, conditional = fa
     return result(true, 'You reached the flag! Your code brought this little world to life.');
 }
 
-const arrows = Object.freeze({ up: '↑', down: '↓', left: '←', right: '→' });
-
 export function mountGarden(root) {
     const feedback = root.querySelector('[data-game-feedback]');
     let instance;
@@ -77,7 +76,7 @@ export function mountGarden(root) {
             tile.className = path.has(key([x, y])) ? 'garden-tile path-tile' : 'garden-tile grass-tile';
             const decoration = document.createElement('span');
             decoration.className = 'tile-decoration';
-            decoration.textContent = path.has(key([x, y])) ? '' : ((x + y * 3) % 4 === 0 ? '✿' : '·');
+            if (!path.has(key([x, y])) && (x + y * 3) % 4 === 0) decoration.append(createIcon(document, 'flower'));
             const actor = document.createElement('span');
             actor.className = 'tile-actor';
             tile.append(decoration, actor);
@@ -89,7 +88,7 @@ export function mountGarden(root) {
         for (const { tile, actor, point } of tiles) {
             const isKody = key(point) === key(position);
             actor.className = `tile-actor${isKody ? ' garden-kody' : ''}`;
-            actor.textContent = isKody ? '••' : key(point) === key(instance.goal) ? '⚑' : crystals.includes(key(point)) ? '◆' : '';
+            actor.replaceChildren(); if (!isKody && (key(point) === key(instance.goal) || crystals.includes(key(point)))) actor.append(createIcon(document, key(point) === key(instance.goal) ? 'flag' : 'crystal'));
             tile.classList.toggle('goal-tile', key(point) === key(instance.goal));
             tile.classList.toggle('crystal-tile', crystals.includes(key(point)));
             tile.classList.toggle('occupied-tile', isKody);
@@ -112,7 +111,7 @@ export function mountGarden(root) {
             const step = document.createElement('button');
             step.type = 'button'; step.className = 'program-step';
             const number = document.createElement('small'); number.textContent = index + 1;
-            const arrow = document.createElement('span'); arrow.textContent = arrows[command]; step.append(number, arrow);
+            const arrow = document.createElement('span'); arrow.append(createIcon(document, command)); step.append(number, arrow);
             step.setAttribute('aria-label', `Step ${index + 1}: ${command}`);
             step.setAttribute('aria-pressed', String(index === selected)); step.disabled = running;
             step.addEventListener('click', () => { selected = index; renderProgram(); programTrack.children[index]?.focus(); });
@@ -188,7 +187,7 @@ export function mountGarden(root) {
                 const saved = await saveCompletion(root, { program, repeat: !!root.querySelector('[data-game-repeat]')?.checked, conditional: !!root.querySelector('[data-game-conditional]')?.checked });
                 if (saved) feedback.textContent = `${result.message} ${saved}`;
             }
-            progress.textContent = result.success ? 'Adventure complete ✦' : 'Try another idea';
+            progress.textContent = result.success ? 'Adventure complete' : 'Try another idea';
         } finally {
             running = false;
             root.setAttribute('aria-busy', 'false');

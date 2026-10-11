@@ -11,6 +11,18 @@ Animation lives in `resources/css/kody-world.css` and the companion/scenery JS.
 
 ## Exact built-in generation prompts
 
+### head-source.png → head.webp and favicons (mascot reference edit)
+
+Use case: precise-object-edit. Asset type: Kody website logo and favicon. Input image: edit target, the existing blue axolotl Kody mascot. Create a standalone head-only brand mark from this same character, preserving the blue/cyan face, friendly large navy eyes, smiling mouth and three rounded blue gill fronds on each side. Remove the entire body, backpack, hands, tail and star. Straight-on symmetrical close-up, centered within a square, broad readable silhouette filling about 90 percent of the canvas with a little transparent edge padding. Simplify tiny spots and highlights, retain a strong clean navy outline and crisp cel-shaded cartoon colors so the face remains recognizable at 16 and 32 pixels. True transparent background, no text, no frame, no extra objects. This is an adaptation of the same character, not a new mascot.
+
+Generated with the built-in imagegen tool using `mascot-source.png` as reference.
+`head-source.png` retains the transparent original. PHP GD creates `head.webp`
+(256 × 256, quality 90), transparent PNG favicon sizes 16/32, and the 180 × 180
+Apple icon on a pale blue background. Root `public/favicon.ico` contains PNG
+images at 16/32/48 pixels. `config/branding.php` owns all delivery paths.
+Full-body mascot poses remain unchanged. Cabinet illustrations and additional
+Tower scenery symbols are original editable SVG in Blade/navigation.svg.
+
 ### celebration-source.png → celebration.webp (mascot reference edit)
 
 Edit the referenced Kody mascot into a celebration pose as a standalone transparent website game-result asset. Preserve exactly the same original cute blue axolotl identity, round proportions, blue spotted gill fronds, large dark eyes, cyan belly, mint backpack straps and yellow star badge, clean cel-shaded cartoon and navy outlines. Change only pose/expression: cheerful eyes and smiling mouth, both small hands raised in celebration, one small mint and yellow star sparkle either side. One full-body character only, centered with generous transparent padding, no text, no watermark, no background. Do not add other characters, props or badges. Actual transparency.

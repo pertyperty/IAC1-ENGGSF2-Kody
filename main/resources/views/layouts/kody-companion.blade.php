@@ -2,7 +2,7 @@
     <div class="companion-bubble" data-companion-bubble hidden><b>Your little coding companion</b><p>Drag me somewhere comfortable, or use arrow keys while my button is focused.</p><button type="button" class="button button-secondary button-small" data-tour-open>Show me around</button><button type="button" class="button button-secondary button-small" data-companion-hide>Hide companion</button></div>
     <button class="companion-handle" type="button" data-companion-handle aria-label="Kody companion: drag to move, click for help" aria-expanded="false"><x-kody-art size="80"/></button>
 </div>
-<dialog class="kody-tour" data-kody-tour data-guest="{{ auth()->guest() ? 'true' : 'false' }}" aria-labelledby="tour-title" aria-describedby="tour-message">
+<dialog class="kody-tour" data-kody-tour data-tour-page="{{ request()->route()?->getName() ?? 'error' }}" data-guest="{{ auth()->guest() ? 'true' : 'false' }}" aria-labelledby="tour-title" aria-describedby="tour-message">
     <svg class="tour-shade" aria-hidden="true"><defs><mask id="tour-window"><rect width="100%" height="100%" fill="white"/><circle data-tour-hole fill="black" r="0"/></mask></defs><rect width="100%" height="100%" fill="rgba(6,15,32,.78)" mask="url(#tour-window)"/></svg>
     <button type="button" class="tour-spot" data-tour-spot aria-label="Continue this tour tip" hidden></button>
     <section class="tour-card" data-tour-card>

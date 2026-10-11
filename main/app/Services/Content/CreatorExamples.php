@@ -2,6 +2,8 @@
 
 namespace App\Services\Content;
 
+use App\Services\Games\QuizAuthoring;
+
 class CreatorExamples
 {
     public function fields(string $slug): array
@@ -11,6 +13,10 @@ class CreatorExamples
             return $lesson + ['type' => 'Article'];
         }
         if (($lesson['template'] ?? $slug) === 'choice-quiz') {
+            if (isset($lesson['quiz_template'])) {
+                return $lesson + ['type' => 'Interactive', 'assessment_kind' => 'quiz', 'quiz_title' => $lesson['title'],
+                    'quiz_questions' => app(QuizAuthoring::class)->questions(config('practice-quizzes.'.$lesson['quiz_template']))];
+            }
             if (isset($lesson['quiz_questions'])) {
                 return $lesson + ['type' => 'Interactive', 'assessment_kind' => 'quiz', 'quiz_title' => $lesson['title']];
             }

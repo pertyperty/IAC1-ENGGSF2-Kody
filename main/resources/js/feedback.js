@@ -1,3 +1,5 @@
+import { createIcon } from './icons.js';
+
 export function publishFeedback(root, message, kind = 'info', progressSaved = false, journey = null, action = null, result = false) {
     const doc = root.ownerDocument ?? globalThis.document;
     if (!doc?.dispatchEvent) return;
@@ -33,7 +35,7 @@ export function mountFeedback(doc, win) {
         const text = doc.createElement('span');
         text.textContent = message;
         const button = doc.createElement('button');
-        button.type = 'button'; button.textContent = '×';
+        button.type = 'button'; button.append(createIcon(doc, 'close'));
         button.setAttribute('data-toast-dismiss', '');
         button.setAttribute('aria-label', 'Dismiss notification');
         toast.append(text);

@@ -232,7 +232,7 @@ test('disabled Judge0 still allows weekly configuration and previews without con
     $event = weeklyFixture();
     moduleSignIn($this, User::factory()->create());
     $this->get(route('dashboard'))->assertOk()->assertSee('THIS WEEK')->assertSee('Picnic sums');
-    $this->get(route('weekly-events.show', $event))->assertOk()->assertSee('Code evaluation is not available yet')->assertSee('25 bonus XP')->assertSee('monthly reward budget');
+    $this->get(route('weekly-events.show', $event))->assertOk()->assertSee('Live code execution: setup pending')->assertSee('25 bonus XP')->assertSee('monthly reward budget');
     $this->postJson(route('weekly-events.attempt', $event), attemptData(CodingChallenge::find($event->challenge_id)))->assertUnprocessable();
     $this->assertDatabaseCount('challenge_participations', 0);
     Http::assertNothingSent();

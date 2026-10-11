@@ -19,9 +19,10 @@ class LearningController extends Controller
 
     public function arcade(Request $request): Response
     {
-        $selected = $request->validate(['game' => ['sometimes', 'string', Rule::in(array_keys(config('arcade')))]])['game'] ?? 'pixel-studio';
+        $cabinets = config('arcade') + config('practice-quizzes');
+        $selected = $request->validate(['game' => ['sometimes', 'string', Rule::in(array_keys($cabinets))]])['game'] ?? 'pixel-studio';
 
-        return response()->view('learning.arcade', ['selected' => $selected, 'game' => config('arcade')[$selected]]);
+        return response()->view('learning.arcade', ['selected' => $selected, 'game' => $cabinets[$selected], 'cabinets' => $cabinets]);
     }
 
     public function catalog(BrowseModulesRequest $request): Response
