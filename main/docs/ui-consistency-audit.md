@@ -26,6 +26,10 @@ unjoined-course progress include. Browse Courses now uses readable separated
 directives for enrolled and unjoined cards. The same adjacency pattern was
 removed elsewhere. Revision-aware progress and policy-filtered destinations
 remain server-owned. Card labels use SVG arrows instead of Unicode variants.
+Direct catalog headings have a display-size baseline. Catalog cards now use
+content-driven spacing rather than applying a 65px minimum to every paragraph,
+which had created empty space under prices. Flex columns keep the final action
+aligned across a row while shorter price/status text stays compact.
 
 The progress strip centers its three groups across the viewport, with rounded,
 quiet hover surfaces and a Tower icon. Narrow-screen wrapping, hidden secondary

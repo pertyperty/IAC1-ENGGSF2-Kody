@@ -21,6 +21,8 @@ test('course cards render unjoined progress and shared actions have aligned icon
     await page.goto('/learn/courses');
     const cards = page.locator('.module-card');
     expect(await cards.count()).toBeGreaterThan(0);
+    expect(await page.locator('main h1').evaluate(element => parseFloat(getComputedStyle(element).fontSize))).toBeGreaterThanOrEqual(28);
+    expect((await cards.first().locator('.content-price').boundingBox()).height).toBeLessThan(40);
     await expect(cards.first().locator('.saved-progress')).toContainText('Not joined');
     expect(await page.locator('main').textContent()).not.toMatch(/@(include|endif|else|if)\b/);
     expect(await page.locator('main').textContent()).not.toMatch(/[←-⇿\uFE0E\uFE0F]/);
