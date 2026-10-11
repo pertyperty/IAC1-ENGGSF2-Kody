@@ -57,7 +57,7 @@ export function mountTowerGrid(root, win) {
         context.setTransform(scale, 0, 0, scale, 0, 0);
         const spacing = Math.max(36, Math.sqrt(width * height / 4000));
         points = [];
-        for (let y = 12; y < height; y += spacing) for (let x = 12; x < width; x += spacing) points.push({ x, y, dx: 0, dy: 0 });
+        for (let y = 12; y < height && points.length < 4000; y += spacing) for (let x = 12; x < width && points.length < 4000; x += spacing) points.push({ x, y, dx: 0, dy: 0 });
         root.classList.toggle('has-interactive-grid', !reduced.matches);
         schedule();
     };

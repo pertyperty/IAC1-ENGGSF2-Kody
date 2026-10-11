@@ -12,7 +12,7 @@ export function mountTowerScenery(root, win) {
         const height = Math.max(0, Math.min(1, 1 - viewport.scrollTop / maximum));
         root.style.setProperty('--ascent', String(height));
         const zone = Math.min(4, Math.floor(height * 5));
-        root.dataset.ascentZone = String(zone);
+        if (root.dataset.ascentZone !== String(zone)) root.dataset.ascentZone = String(zone);
         caption.textContent = `${zones[zone]} · floors ${zone * 10 + 1}–${zone * 10 + 10}`;
         // Pan a bounded backdrop, rather than laying out a huge image for every floor.
         art.style.transform = reduced.matches ? 'none' : `translateY(${-Math.max(0, art.clientHeight - root.clientHeight) * (1 - height)}px)`;
