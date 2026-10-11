@@ -1,3 +1,4 @@
+import { validateQuestion, renderQuizForm } from './quiz-types.js';
 import { mountQuiz, validateQuiz } from './choice-quiz.js';
 import { readQuizQuestions } from './quiz-editor.js';
 
@@ -16,14 +17,10 @@ export function quizFromFields(fields) {
 
 export function quizFromQuestions(title, questions) {
     if (!title?.trim() || [...title].length > 100 || !Array.isArray(questions) || questions.length < 1 || questions.length > 10) throw new Error('Invalid quiz.');
-    questions.forEach((question) => {
-        quizFromFields({ quiz_title: title, quiz_question: question.question, quiz_a: question.options?.[0]?.label,
-            quiz_b: question.options?.[1]?.label, quiz_answer: 'a', quiz_explanation: question.explanation });
-        if (question.options.some((option) => !option.label?.trim() || [...option.label].length > 300)
-            || new Set(question.options.map((option) => option.label.trim())).size !== question.options.length) throw new Error('Invalid choices.');
-    });
-    return validateQuiz(questions.length === 1 ? { ...questions[0], template: 'choice-quiz', version: 1, title }
-        : { template: 'choice-quiz', version: 2, title, questions });
+    questions.forEach(validateQuestion);
+    const mixed = questions.some(question => (question.type ?? 'choice') !== 'choice');
+    return validateQuiz(!mixed && questions.length === 1 ? { ...questions[0], template: 'choice-quiz', version: 1, title }
+        : { template: 'choice-quiz', version: mixed ? 3 : 2, title, questions });
 }
 
 export function mountQuizDesigner(form) {
@@ -49,33 +46,13 @@ export function mountQuizDesigner(form) {
             const preview = fragment.querySelector('[data-practice-quiz]');
             preview.dataset.practiceQuiz = JSON.stringify(quiz);
             preview.querySelector('h2').textContent = quiz.title;
-            const formShell = preview.querySelector('form');
-            const button = formShell.querySelector('button');
-            formShell.replaceChildren();
-            const questions = quiz.version === 1 ? [{ ...quiz, id: 'q1' }] : quiz.questions;
-            questions.forEach((question, index) => {
-                const fieldset = form.ownerDocument.createElement('fieldset');
-                fieldset.dataset.quizQuestion = question.id;
-                const legend = form.ownerDocument.createElement('legend');
-                legend.textContent = `${questions.length > 1 ? `${index + 1}. ` : ''}${question.question}`;
-                fieldset.append(legend);
-                question.options.forEach((option) => {
-                    const label = form.ownerDocument.createElement('label');
-                    const input = form.ownerDocument.createElement('input');
-                    input.type = 'radio'; input.name = `practice_answer_${question.id}`; input.value = option.id;
-                    label.append(input, form.ownerDocument.createTextNode(option.label)); fieldset.append(label);
-                });
-                const note = form.ownerDocument.createElement('p');
-                note.dataset.questionFeedback = ''; note.setAttribute('role', 'status'); fieldset.append(note);
-                formShell.append(fieldset);
-            });
-            formShell.append(button);
+            renderQuizForm(preview, quiz);
             output.replaceChildren(fragment);
             mountQuiz(preview);
             status.textContent = 'This is your unsaved quiz. Answer it below, or edit a prompt and try again.';
         } catch {
             output.replaceChildren();
-            status.textContent = 'Complete the title and each question, with two to six different choices, a correct answer and feedback within their character limits.';
+            status.textContent = 'Complete the title and each question, with valid choices, accepted short answers or matching pairs, and feedback within their limits.';
         }
     });
     clear();

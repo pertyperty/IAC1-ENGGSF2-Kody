@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'quiz-lab' => ['title' => 'Choose, recall and connect', 'template' => 'choice-quiz', 'quiz_template' => 'quiz-lab', 'description' => 'Check your programming ideas with multiple choice, short blanks and matching.', 'content' => 'A loop repeats instructions. A variable names a stored value. A condition checks whether a statement is true. Read the prompts, recall an idea, then connect each concept to its purpose.'],
     'welcome-code' => ['assessment_kind' => 'none', 'title' => 'What is a program?', 'description' => 'A gentle first lesson for people who have never written code.',
         'content' => "A program is a set of instructions that a computer follows. Think of a recipe: each step says what to do, and the order matters. Computers need clear instructions rather than guesses.\n\nTry this away from the screen: describe how to move from your door to your chair using one small action per step. Which details would a robot need?\n\nIn the next adventures, you will guide a robot. Plan a few steps, run them and compare the result with your prediction. Getting an unexpected result is useful information: change one instruction and try again.\n\nYour goal: explain a program as a sequence of precise instructions. When you are ready, mark this lesson as read."],
     'data-introduction' => ['assessment_kind' => 'none', 'title' => 'Meet the data your code uses', 'description' => 'Connect values, positions and files to familiar objects.',

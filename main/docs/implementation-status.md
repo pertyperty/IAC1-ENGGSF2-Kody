@@ -4,6 +4,10 @@ Start here for current scope, detailed evidence and the next useful improvements
 This index consolidates the feature summaries previously repeated in README.
 It does not replace approved requirements, decisions or the implementation records.
 Last reviewed: 2026-10-11.
+The [page guides and game lobbies](page-guides-and-game-lobbies.md) follow-up owns
+head-only branding/favicons, current-page tutorials, the cabinet Arcade, illustrated
+weekly quests and their separate archive, icon controls and mixed automatically
+graded quizzes with creator/preset authoring and immutable version-3 instances.
 The [Kody world follow-up](kody-world-implementation.md) owns original reusable art,
 mascot tours/companion, ascending scenery, icon Tower controls and Help/profile polish.
 The [learning workspace polish](learning-workspace-polish.md) record owns centered

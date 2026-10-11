@@ -1,5 +1,14 @@
 # Kody Engineering Agent Guidelines
 
+The owner's 2026-10-11 follow-up adds head-only branding/favicons, route-specific
+guides, Arcade cabinets, illustrated weekly quests and their published-result
+archive, plus mixed MCQ/blank/matching quizzes. See
+[page guides and game lobbies](docs/page-guides-and-game-lobbies.md). Preserve
+version-1/2 compatibility and immutable version-3 snapshots, exact bounded server
+grading, no open-ended/manual grading, preview isolation and existing rewards.
+Weekly archives expose Published sets only; disabled execution must explain setup
+without consuming attempts. Tutorials use the current page and never submit actions.
+
 The owner's 2026-10-11 asset/tour amendment adds a reusable mascot/coin/world set,
 contextual native-modal tutorials and a locally positioned cosmetic companion.
 See [Kody world implementation](docs/kody-world-implementation.md). Keep art under

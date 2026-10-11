@@ -1,0 +1,65 @@
+/* Shared illustrated quest lobby and game cabinets; all scenery is decorative. */
+.quest-page, .arcade-page { padding-block: 28px 56px; }
+.quest-navigation { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+.quest-navigation [aria-current] { background: var(--accent-soft); border-color: var(--accent-line); color: var(--accent-text); }
+.quest-hero { position: relative; isolation: isolate; overflow: hidden; border: 1px solid var(--border); border-radius: 20px; background: var(--surface-soft); padding: clamp(24px, 4vw, 48px); display: grid; grid-template-columns: minmax(0, 1fr) 180px; gap: 24px; align-items: center; margin-bottom: 28px; }
+.quest-hero h1 { margin: 8px 0 16px; font-size: clamp(30px, 4vw, 48px); }
+.quest-hero p { max-width: 650px; line-height: 1.7; }
+.quest-hero > .kody-art { justify-self: center; width: 160px; height: 180px; }
+.quest-scenery { position: absolute; z-index: -1; inset: 0; pointer-events: none; opacity: .22; }
+.quest-scenery img { width: 100%; height: 450%; object-fit: cover; position: absolute; bottom: 0; }
+.quest-scenery::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, var(--surface) 5%, transparent 90%); }
+.quest-orbit { position: absolute; border: 1px solid var(--accent); border-radius: 50%; width: 260px; height: 260px; right: 3%; top: -90px; }
+.quest-orbit-two { width: 380px; height: 380px; top: -150px; right: -30px; }
+.quest-pills { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px; }
+.quest-pills > span, .attempt-state { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; }
+.quest-lobby-columns, .quest-play-columns { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(280px, .85fr); gap: 24px; align-items: start; }
+.quest-current { min-height: 260px; display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
+.quest-current h2, .quest-current p { margin: 0; }.quest-current .button { margin-top: auto; }
+.quest-weekly-scores h2 { font-size: 22px; margin-top: 12px; }
+.quest-weekly-scores p, .quest-page .content-panel p { line-height: 1.7; }
+.weekly-attempts { margin-top: 36px; }
+.weekly-archive-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 20px; }
+.weekly-event-card { display: flex; flex-direction: column; gap: 12px; }.weekly-event-card p, .weekly-event-card h3 { margin: 0; }.weekly-event-card .button { margin-top: auto; align-self: flex-start; }
+.attempt-state-passed { color: var(--accent-text); }
+.weekly-score-row { display: grid; grid-template-columns: 80px minmax(0, 1fr) auto; align-items: center; gap: 16px; padding: 18px 12px; border-bottom: 1px solid var(--border); }.weekly-score-row > p { text-align: right; margin: 0; font-weight: 700; }.weekly-score-row .field-hint { display: block; font-weight: 400; font-size: 12px; }
+.ascent-details { position: absolute; inset: 0; opacity: 0; transition: opacity .65s ease; transform: translateY(calc(var(--ascent, 0) * -28px)); }
+.ascent-details .ascent-detail { position: absolute; width: 70px; height: 70px; color: var(--accent-text); opacity: .18; left: 10%; top: 40%; }
+.ascent-details .ascent-detail-1 { left: auto; right: 9%; top: 64%; width: 90px; height: 90px; transform: rotate(16deg); }
+.ascent-details .ascent-detail-2 { left: 16%; top: 78%; width: 42px; height: 42px; transform: rotate(-12deg); }
+[data-ascent-zone="0"] .ascent-details-0, [data-ascent-zone="1"] .ascent-details-1, [data-ascent-zone="2"] .ascent-details-2, [data-ascent-zone="3"] .ascent-details-3, [data-ascent-zone="4"] .ascent-details-4 { opacity: 1; }
+.workspace-icon .action-icon, .mission-icon .action-icon { width: 28px; height: 28px; }.module-symbol .action-icon { width: 72px; height: 72px; }.boss-crown .action-icon { width: 28px; height: 28px; }.profile-edit-icon .action-icon { width: 32px; height: 32px; }.action-icon { flex-shrink: 0; vertical-align: middle; }
+.peach .module-symbol { background: var(--warm-soft); border-color: var(--warm-text); }.lavender .module-symbol { background: var(--violet-soft); border-color: var(--violet-text); }
+.quest-play-columns > aside { position: sticky; top: calc(var(--navigation-offset, 128px) + 16px); }
+.execution-pending { padding: 20px; border: 1px solid var(--border); border-inline-start: 4px solid var(--accent); border-radius: 12px; background: var(--surface-soft); }
+.execution-pending h3 { display: flex; align-items: center; gap: 8px; font-size: 18px; }.execution-pending p { line-height: 1.7; }
+.arcade-lobby-header { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 16px 0 28px; border-bottom: 1px solid var(--border); }
+.arcade-lobby-header h1 { margin: 6px 0 12px; font-size: clamp(30px, 4vw, 48px); }.arcade-lobby-header p { line-height: 1.7; max-width: 680px; }
+.arcade-lobby-header > img { width: 120px; height: 140px; }.arcade-lobby-header .step-pill { display: inline-flex; align-items: center; gap: 8px; }
+.arcade-cabinets { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; margin-block: 28px 36px; }
+.arcade-cabinet { display: flex; flex-direction: column; padding: 12px; border: 1px solid var(--border); border-bottom-width: 4px; border-radius: 16px 16px 8px 8px; background: var(--surface); color: var(--text); text-decoration: none; transition: transform .2s, border-color .2s, background .2s; }
+.arcade-cabinet:hover, .arcade-cabinet:focus-visible { transform: translateY(-4px); border-color: var(--accent); }.arcade-cabinet[aria-current] { background: var(--accent-soft); border-color: var(--accent); }
+.cabinet-screen { display: block; position: relative; border: 4px solid var(--border); border-radius: 10px; overflow: hidden; background: var(--surface-soft); color: var(--accent-text); }
+.cabinet-screen::after { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, transparent 0 4px, color-mix(in srgb, var(--accent) 4%, transparent) 4px 5px); pointer-events: none; }
+.cabinet-art { display: block; width: 100%; height: 112px; transition: transform .2s; }.arcade-cabinet:hover .cabinet-art { transform: scale(1.04); }
+.cabinet-copy { display: flex; flex-direction: column; gap: 6px; padding: 16px 4px; }.cabinet-copy b { font-size: 16px; }.cabinet-copy > span { font-size: 12px; color: var(--muted); }
+.cabinet-action { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: auto; padding: 10px; border-radius: 8px; background: var(--surface-soft); font-size: 12px; font-weight: 700; color: var(--accent-text); }
+.arcade-station { scroll-margin-top: calc(var(--navigation-offset, 128px) + 20px); }.arcade-station > .panel-heading { flex-wrap: wrap; gap: 16px; margin-bottom: 20px; }.arcade-station .game-card { border-radius: 16px; }
+.arcade-station .arcade-scene { background: var(--surface-soft); }.arcade-station .arcade-mission { padding: 12px 16px; border-inline-start: 3px solid var(--accent); background: var(--surface); border-radius: 6px; }
+.practice-quiz .game-heading { gap: 16px; flex-wrap: wrap; padding: 0 0 18px; margin-bottom: 24px; border-bottom: 1px solid var(--border); }
+.practice-quiz .game-heading h2 { margin-bottom: 0; }.practice-quiz form { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 20px; align-items: start; }
+.practice-quiz form > fieldset { padding: 20px; margin: 0; border: 1px solid var(--border); border-radius: 12px; background: var(--surface-soft); min-width: 0; }
+.practice-quiz form > button { grid-column: 1 / -1; justify-self: start; }
+.practice-quiz label { background: var(--surface); transition: background .18s, border-color .18s; }.practice-quiz label:has(input:checked) { background: var(--accent-soft); border-color: var(--accent); }.practice-quiz label:hover { border-color: var(--accent-line); }
+.practice-quiz label:has([data-blank-answer]) { display: grid; gap: 8px; }.practice-quiz [data-blank-answer], .practice-quiz select { width: 100%; min-width: 0; min-height: 44px; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font: inherit; }
+.practice-quiz .quiz-match-row { display: grid; grid-template-columns: minmax(90px, .7fr) minmax(0, 1fr); align-items: center; gap: 12px; }
+.quiz-type-fields { border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-block: 16px; }.quiz-type-fields legend { font-size: 14px; }.quiz-pair-editor { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }.quiz-pair-editor button { grid-column: 1 / -1; justify-self: start; }
+.garden-game .tile-actor .action-icon { width: 32px; height: 32px; }.garden-game .tile-decoration .action-icon { width: 20px; height: 20px; }
+@media (max-width: 800px) {
+    .quest-lobby-columns, .quest-play-columns { grid-template-columns: 1fr; }.quest-play-columns > aside { position: static; }
+    .quest-hero { grid-template-columns: minmax(0, 1fr) 90px; padding: 24px; gap: 12px; }.quest-hero > .kody-art { width: 90px; height: 110px; }
+    .arcade-cabinets { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }.cabinet-copy b { font-size: 14px; }.cabinet-art { height: 90px; }
+    .arcade-lobby-header > img { width: 80px; height: 100px; }
+}
+@media (max-width: 480px) { .quest-hero { grid-template-columns: 1fr; }.quest-hero > .kody-art { display: none; }.arcade-lobby-header > img { display: none; }.cabinet-action { font-size: 11px; padding: 8px 4px; }.cabinet-copy { padding: 12px 0; }.weekly-score-row { grid-template-columns: 48px minmax(0, 1fr) auto; gap: 8px; padding-inline: 0; }.weekly-score-row b { overflow-wrap: anywhere; }.weekly-score-row .rank-number { font-size: 12px; flex-wrap: wrap; }.quiz-pair-editor { grid-template-columns: 1fr; }.practice-quiz .quiz-match-row { grid-template-columns: 1fr; }.practice-quiz form > fieldset { padding: 12px; } }
+@media (prefers-reduced-motion: reduce) { .arcade-cabinet, .cabinet-art, .ascent-details { transition: none; }.ascent-details, .arcade-cabinet:hover, .arcade-cabinet:focus-visible, .arcade-cabinet:hover .cabinet-art { transform: none; } }

@@ -93,3 +93,18 @@ test('E06 ties crossing the prize cutoff share the complete occupied pool withou
         (object) ['user_id' => 3, 'rank' => 2, 'score' => 10000], (object) ['user_id' => 4, 'rank' => 2, 'score' => 10000]];
     expect(app(WeeklyResults::class)->shares($rows))->toBe([1 => 10, 2 => 3, 3 => 3, 4 => 3]);
 });
+
+test('E05 separate weekly leaderboard exposes published events only and retains shared weekly ranks', function () {
+    Queue::fake();
+    [$event, $players] = closedEconomyWeek();
+    app(WeeklyResults::class)->prepare($event->id);
+    $this->get(route('weekly-leaderboards.index'))->assertRedirect(route('login'));
+    moduleSignIn($this, $players[0]);
+    $this->get(route('weekly-leaderboards.index'))->assertOk()->assertSee('The first weekly podium is waiting')->assertDontSee($event->revision->title);
+    $this->get(route('weekly-results.show', $event->id))->assertNotFound();
+    app(WeeklyResults::class)->publish(moduleAccount(Role::Moderator), 'module-test-session', $event->id, $event->record_version, true);
+    $this->get(route('weekly-leaderboards.index'))->assertOk()->assertSee($event->revision->title)->assertSee(route('weekly-results.show', $event->id), false)
+        ->assertHeader('Cache-Control', 'no-store, private');
+    $this->get(route('weekly-results.show', $event->id))->assertOk()->assertSee('#1')->assertSee('#3')->assertSee('You');
+    expect(DB::table('xp_totals')->whereIn('user_id', array_column($players, 'id'))->count())->toBe(0);
+});

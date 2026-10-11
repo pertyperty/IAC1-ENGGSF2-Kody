@@ -1,0 +1,1 @@
+<div class="quest-scenery" aria-hidden="true"><img src="{{ asset(config('branding.assets.tower')) }}" alt=""><span class="quest-orbit quest-orbit-one"></span><span class="quest-orbit quest-orbit-two"></span></div>

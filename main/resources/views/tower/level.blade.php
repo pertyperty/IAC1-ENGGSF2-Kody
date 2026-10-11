@@ -15,7 +15,7 @@
         </section>
     @endforeach
     </div>
-    <div class="tower-victory" data-tower-victory hidden><span aria-hidden="true">✦</span><div><h2>Another step up!</h2><p data-tower-result></p></div><a class="button button-play" data-tower-next href="{{ route('home') }}">Continue climbing →</a></div>
+    <div class="tower-victory" data-tower-victory hidden><span aria-hidden="true"><x-action-icon name="spark"/></span><div><h2>Another step up!</h2><p data-tower-result></p></div><a class="button button-play" data-tower-next href="{{ route('home') }}">Continue climbing →</a></div>
     <aside class="tower-study"><div><b>Want to understand the idea?</b><p>Explore creator lessons about {{ $revision->concept }}. Learning is always another way forward.</p></div><a class="button button-secondary" href="{{ route('learning.catalog', ['q' => $revision->concept]) }}">Explore lessons →</a></aside>
     <p class="field-hint">@guest These trials stay in this browser and grant no saved progress or rewards. @else Kody validates each stage before saving the clearance. Complete the final stage for daily streak credit; tower clears grant no additional XP or KodeBits. @endguest</p>
 </section>

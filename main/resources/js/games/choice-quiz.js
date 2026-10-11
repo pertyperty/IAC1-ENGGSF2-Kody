@@ -1,14 +1,15 @@
+import { validateQuestion, checkQuestion, readQuestionAnswer } from './quiz-types.js';
 import { publishFeedback } from '../feedback.js';
 import { saveCompletion } from './save-completion.js';
 
 export function validateQuiz(quiz) {
-    if (!quiz || quiz.template !== 'choice-quiz' || ![1, 2].includes(quiz.version)) throw new Error('Unsupported quiz template.');
-    if (quiz.version === 2) {
+    if (!quiz || quiz.template !== 'choice-quiz' || ![1, 2, 3].includes(quiz.version)) throw new Error('Unsupported quiz template.');
+    if (quiz.version !== 1) {
         if (typeof quiz.title !== 'string' || [...quiz.title].length > 1000 || !Array.isArray(quiz.questions)
-            || quiz.questions.length < 2 || quiz.questions.length > 10) throw new Error('Invalid quiz questions.');
+            || quiz.questions.length < (quiz.version === 3 ? 1 : 2) || quiz.questions.length > 10) throw new Error('Invalid quiz questions.');
         for (const question of quiz.questions) {
             if (!question || typeof question.id !== 'string' || !/^[a-z0-9_-]{1,30}$/.test(question.id)) throw new Error('Invalid question identifier.');
-            validateQuiz({ ...question, template: 'choice-quiz', version: 1, title: quiz.title });
+            if (quiz.version === 3) validateQuestion(question); else validateQuiz({ ...question, template: 'choice-quiz', version: 1, title: quiz.title });
         }
         if (new Set(quiz.questions.map((question) => question.id)).size !== quiz.questions.length) throw new Error('Duplicate questions.');
         return quiz;
@@ -29,8 +30,8 @@ export function validateQuiz(quiz) {
 // Practice answer keys are intentionally public. Graded quizzes need server evaluation.
 export function checkPracticeAnswer(quiz, answer) {
     validateQuiz(quiz);
-    if (quiz.version === 2) {
-        const results = quiz.questions.map((question) => ({ id: question.id, ...checkPracticeAnswer({ ...question, template: 'choice-quiz', version: 1, title: quiz.title }, answer?.[question.id]) }));
+    if (quiz.version !== 1) {
+        const results = quiz.questions.map((question) => ({ id: question.id, ...(quiz.version === 3 ? checkQuestion(question, answer?.[question.id]) : checkPracticeAnswer({ ...question, template: 'choice-quiz', version: 1, title: quiz.title }, answer?.[question.id])) }));
         const correct = results.every((result) => result.correct) && answer && Object.keys(answer).length === quiz.questions.length;
         return { correct: Boolean(correct), results, message: correct ? 'Every idea checked! You completed this practice quiz.' : 'Check the feedback below each question and try again.' };
     }
@@ -48,7 +49,7 @@ export function mountQuiz(root) {
         event.preventDefault();
         if (busy) return;
         const answer = quiz.version === 1 ? root.querySelector('input:checked')?.value
-            : Object.fromEntries(quiz.questions.map((question) => [question.id, root.querySelector(`[data-quiz-question="${question.id}"]`).querySelector('input:checked')?.value]));
+            : Object.fromEntries(quiz.questions.map((question) => [question.id, readQuestionAnswer(root.querySelector(`[data-quiz-question="${question.id}"]`), question)]));
         const result = checkPracticeAnswer(quiz, answer);
         feedback.textContent = result.message;
         if (result.results) result.results.forEach((item) => { root.querySelector(`[data-quiz-question="${item.id}"] [data-question-feedback]`).textContent = item.message; });
@@ -56,7 +57,7 @@ export function mountQuiz(root) {
         if (!result.correct) publishFeedback(root, result.message, 'info', false, null, null, true);
         if (result.correct) {
             busy = true;
-            const controls = root.querySelectorAll('button, input');
+            const controls = root.querySelectorAll('button, input, select');
             controls.forEach((control) => { control.disabled = true; });
             root.setAttribute('aria-busy', 'true');
             try {

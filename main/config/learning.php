@@ -3,9 +3,9 @@
 return [
     // Built-in practice instances. Creator publication will own persisted instances.
     'modules' => [
-        'sequences' => ['title' => 'First steps', 'concept' => 'Sequences', 'description' => 'Give your little explorer instructions. Discover why their order matters.', 'icon' => '↗', 'color' => 'mint', 'duration' => '3 min'],
-        'loops' => ['title' => 'The loop trail', 'concept' => 'Loops', 'description' => 'Spot a pattern. Build it once, repeat it, and take the clever way home.', 'icon' => '↻', 'color' => 'peach', 'duration' => '5 min'],
-        'conditions' => ['title' => 'Crystal collector', 'concept' => 'Conditions', 'description' => 'If there’s a crystal, collect it. Make your program respond to its world.', 'icon' => '◇', 'color' => 'lavender', 'duration' => '5 min'],
+        'sequences' => ['title' => 'First steps', 'concept' => 'Sequences', 'description' => 'Give your little explorer instructions. Discover why their order matters.', 'icon' => 'journey', 'color' => 'mint', 'duration' => '3 min'],
+        'loops' => ['title' => 'The loop trail', 'concept' => 'Loops', 'description' => 'Spot a pattern. Build it once, repeat it, and take the clever way home.', 'icon' => 'refresh', 'color' => 'peach', 'duration' => '5 min'],
+        'conditions' => ['title' => 'Crystal collector', 'concept' => 'Conditions', 'description' => 'If there’s a crystal, collect it. Make your program respond to its world.', 'icon' => 'crystal', 'color' => 'lavender', 'duration' => '5 min'],
     ],
     'quizzes' => [
         'sequences' => ['template' => 'choice-quiz', 'version' => 1, 'title' => 'A quick idea check', 'question' => 'What happens when you change the order of a program’s instructions?', 'options' => [['id' => 'order', 'label' => 'It can change what the program does.'], ['id' => 'same', 'label' => 'The result is always the same.']], 'answer' => 'order', 'explanation' => 'A sequence runs in order. Move first and turn second can lead somewhere different from turn first and move second.'],

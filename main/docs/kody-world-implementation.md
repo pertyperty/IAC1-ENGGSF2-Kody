@@ -3,6 +3,9 @@
 This owner-approved presentation amendment covers B01/B02/B05, B11, A06 and
 shared interface NFRs. It changes no account, access, completion, reward or
 financial rules. No migrations, provider calls or new dependencies are required.
+The later [page guides/game lobbies amendment](page-guides-and-game-lobbies.md)
+adds head-only logo/favicons, explicit route-based tips and expanded quiz templates;
+its preset constraint migration is documented separately.
 
 ## Reusable art
 

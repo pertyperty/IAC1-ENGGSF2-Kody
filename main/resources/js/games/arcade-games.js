@@ -1,3 +1,4 @@
+import { createIcon } from '../icons.js';
 import { publishFeedback } from '../feedback.js';
 import { puzzleTemplates, validPuzzle, evaluatePuzzle, renderPuzzle } from './puzzle-games.js';
 import { saveCompletion } from './save-completion.js';
@@ -175,11 +176,11 @@ export function mountArcade(root) {
         program.slice(0, 12).forEach((command, index) => {
             const row = node('li', '');
             row.append(node('small', String(index + 1)), node('code', command));
-            row.append(button('×', 'instruction-remove', `Remove step ${index + 1}`, () => {
+            const remove = button('', 'instruction-remove', `Remove step ${index + 1}`, () => {
                 const updated = lines(); updated.splice(index, 1); code.value = updated.join('\n'); preview();
                 programList.querySelectorAll('button')[Math.min(index, updated.length - 1)]?.focus({ preventScroll: true });
                 if (!updated.length) root.querySelector('[data-arcade-run]').focus();
-            }));
+            }); remove.append(createIcon(root.ownerDocument, 'close')); row.append(remove);
             programList.append(row);
         });
         root.dataset.playState = 'ready';

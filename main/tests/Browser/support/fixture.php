@@ -9,11 +9,13 @@ use App\Models\LearningCourse;
 use App\Models\User;
 use App\Models\VerificationDelivery;
 use App\Services\Administration\FaqManagement;
+use App\Services\Challenges\ChallengePublishing;
 use App\Services\Content\CourseLearning;
 use App\Services\Content\CoursePublishing;
 use App\Services\Content\CreatorExamples;
 use App\Services\Content\ModulePublishing;
 use App\Services\Gamification\LearningProgression;
+use App\Services\Gamification\WeeklyEvents;
 use App\Services\Transactions\WalletLedger;
 use Database\Seeders\TowerLevelSeeder;
 use Illuminate\Contracts\Console\Kernel;
@@ -74,7 +76,8 @@ try {
             'navmoderator' => Role::Moderator, 'navadministrator' => Role::Administrator, 'interactive' => Role::Learner,
             'towerlearner' => Role::Learner, 'toweradmin' => Role::Administrator, 'stickylearner' => Role::Learner, 'usabilitylearner' => Role::Learner, 'picturelearner' => Role::Learner, 'librarylearner' => Role::Learner, 'guidelearner' => Role::Learner,
             'guidewallet' => Role::Learner, 'guideinstructor' => Role::Instructor, 'guidecontributor' => Role::Contributor,
-            'guidemoderator' => Role::Moderator, 'guideadministrator' => Role::Administrator] as $name => $role) {
+            'guidemoderator' => Role::Moderator, 'guideadministrator' => Role::Administrator,
+            'questlearner' => Role::Learner, 'quizlearner' => Role::Learner, 'quizcreator' => Role::Instructor, 'questcreator' => Role::Contributor] as $name => $role) {
             $accounts[$name] = User::factory()->create(['username' => 'browser_'.$name, 'email' => $name.'@browser.example.test',
                 'password' => Hash::make('BrowserStrong12!'), 'account_role' => $role,
                 'active_session_hash' => hash('sha256', 'browser-seed-session'), 'active_session_expires_at' => now()->addHour()]);
@@ -101,6 +104,24 @@ try {
             $courses->submit($accounts['instructor'], 'browser-seed-session', $course, 1);
             $courses->review($accounts['moderator'], 'browser-seed-session', $course->fresh(), 2, 'Approved', null);
             $manifest['courses'][$slug] = ['id' => $course->id, 'slots' => $course->fresh()->publishedRevision->modules->pluck('id')->all()];
+        }
+        if (Schema::hasColumn('users', 'profile_picture')) {
+            $module = $publishing->save($accounts['instructor'], 'browser-seed-session', app(CreatorExamples::class)->fields('quiz-lab'));
+            $publishing->submit($accounts['instructor'], 'browser-seed-session', $module, 1);
+            $publishing->review($accounts['moderator'], 'browser-seed-session', $module->fresh(), 2, 'Approved', null);
+            $manifest['modules']['quiz-lab'] = $module->id;
+            $challenges = app(ChallengePublishing::class);
+            $challenge = $challenges->save($accounts['questcreator'], 'browser-seed-session', config('challenge-examples')[array_key_first(config('challenge-examples'))]
+                + ['language' => 'python', 'difficulty' => 'Easy', 'cpu_time_ms' => 1000, 'memory_kib' => 262144]);
+            $challenges->submit($accounts['questcreator'], 'browser-seed-session', $challenge, 1);
+            $challenges->review($accounts['moderator'], 'browser-seed-session', $challenge->fresh(), 2, 'Approved', null);
+            $event = app(WeeklyEvents::class)->configure($accounts['moderator'], 'browser-seed-session', [
+                'week' => app(WeeklyEvents::class)->weekStart()->toDateString(),
+                'challenge_id' => $challenge->id, 'revision_id' => $challenge->fresh()->published_revision_id, 'record_version' => 0,
+                'rules' => 'Three independent attempts for this isolated weekly quest.', 'confirmed' => true,
+            ]);
+            $manifest['weekly'] = $event->id;
+            $manifest['challenge'] = $challenge->id;
         }
         User::query()->update(['active_session_hash' => null, 'active_session_expires_at' => null]);
         echo json_encode($manifest, JSON_THROW_ON_ERROR);

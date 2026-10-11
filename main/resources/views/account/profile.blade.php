@@ -4,7 +4,7 @@
 @section('content')
     <p class="eyebrow">YOUR KODY ACCOUNT</p>
     <div class="profile-overview"><section class="profile-identity">
-    <a class="profile-picture-link" href="{{ route('account.edit') }}#profile-picture" aria-label="Edit your profile picture">@include('layouts.avatar', ['avatarUser' => auth()->user(), 'avatarClass' => 'profile-avatar'])<span class="profile-edit-icon" aria-hidden="true">✎</span></a><span class="profile-edit-cue">Edit picture</span>
+    <a class="profile-picture-link" href="{{ route('account.edit') }}#profile-picture" aria-label="Edit your profile picture">@include('layouts.avatar', ['avatarUser' => auth()->user(), 'avatarClass' => 'profile-avatar'])<span class="profile-edit-icon" aria-hidden="true"><x-action-icon name="pencil"/></span></a><span class="profile-edit-cue">Edit picture</span>
     <h1>Your profile</h1><b>{{ $profile['username'] ?? 'Kody player' }}</b><p>{{ $profile['role'] }} · {{ $profile['status'] }}</p>
     <div class="profile-tools"><a class="button button-play" href="{{ route('account.edit') }}">Edit your player profile</a><a class="button button-secondary" href="{{ route('account.google') }}">Manage Google sign-in</a><a class="button button-secondary" href="{{ route('wallet.index') }}"><x-kody-art name="kodebit" size="28"/> Your KodeBits and earnings</a></div>
     </section><section><h2>Account details</h2><p class="field-hint">Your email is masked for privacy.</p>

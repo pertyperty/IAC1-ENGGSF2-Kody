@@ -14,8 +14,8 @@ class TowerAuthoring
 
         return array_map(function (array $stage): array {
             if (($stage['template'] ?? null) === 'choice-quiz') {
-                Validator::make($stage, ['version' => ['required', 'integer', 'in:1,2'], 'title' => ['required', 'string', 'max:100']])->validate();
-                if ($stage['version'] === 2) {
+                Validator::make($stage, ['version' => ['required', 'integer', 'in:1,2,3'], 'title' => ['required', 'string', 'max:100']])->validate();
+                if (in_array($stage['version'], [2, 3], true)) {
                     Validator::make(['quiz_questions' => $stage['questions'] ?? null], app(QuizAuthoring::class)->rules())->validate();
                 } else {
                     Validator::make($stage, ['question' => ['required', 'string'], 'options' => ['required', 'array'], 'answer' => ['required', 'string'], 'explanation' => ['required', 'string']])->validate();

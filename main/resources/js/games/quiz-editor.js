@@ -1,11 +1,13 @@
 export function readQuizQuestions(root) {
-    return [...root.querySelectorAll('[data-quiz-question-editor]')].map((question) => ({
-        ...Object.fromEntries(['id', 'question', 'answer', 'explanation'].map((field) => [field, question.querySelector(`[data-question-field="${field}"]`).value])),
-        options: [...question.querySelectorAll('[data-quiz-option-editor]')].map((option) => Object.fromEntries(['id', 'label']
-            .map((field) => [field, option.querySelector(`[data-option-field="${field}"]`).value]))),
-    }));
+    return [...root.querySelectorAll('[data-quiz-question-editor]')].map(question => {
+        const common = Object.fromEntries(['id', 'question', 'explanation'].map(field => [field, question.querySelector(`[data-question-field="${field}"]`).value]));
+        const type = question.querySelector('[data-question-field="type"]').value;
+        if (type === 'blank') return { ...common, type, accepted: [...question.querySelectorAll('[data-accepted-answer]')].map(input => input.value), case_sensitive: question.querySelector('[data-case-sensitive]').checked };
+        if (type === 'matching') return { ...common, type, pairs: [...question.querySelectorAll('[data-matching-pair]')].map(pair => Object.fromEntries(['id', 'left', 'right'].map(field => [field, pair.querySelector(`[data-pair-field="${field}"]`).value]))) };
+        return { ...common, answer: question.querySelector('[data-question-field="answer"]').value,
+            options: [...question.querySelectorAll('[data-quiz-option-editor]')].map(option => Object.fromEntries(['id', 'label'].map(field => [field, option.querySelector(`[data-option-field="${field}"]`).value]))) };
+    });
 }
-
 export function firstUnusedId(ids, prefix = 'q') {
     for (let i = 1; i <= 100; i++) if (!ids.includes(`${prefix}${i}`)) return `${prefix}${i}`;
     throw new Error('No available identifier.');
@@ -18,6 +20,17 @@ export function mountQuizEditor(root) {
     const update = () => {
         const rows = [...questions.children];
         rows.forEach((question, index) => {
+            const type = question.querySelector('[data-question-field="type"]').value;
+            question.querySelectorAll('[data-question-type]').forEach(group => { group.hidden = group.dataset.questionType !== type; group.disabled = group.hidden; });
+            question.querySelectorAll('[data-accepted-answer]').forEach((input, answerIndex) => { input.name = `quiz_questions[${index}][accepted][${answerIndex}]`; });
+            question.querySelectorAll('[data-case-default], [data-case-sensitive]').forEach(input => { input.name = `quiz_questions[${index}][case_sensitive]`; });
+            question.querySelectorAll('[data-remove-accepted]').forEach(button => { button.disabled = question.querySelectorAll('[data-accepted-answer]').length <= 1; });
+            question.querySelector('[data-add-accepted]').disabled = question.querySelectorAll('[data-accepted-answer]').length >= 6;
+            question.querySelectorAll('[data-matching-pair]').forEach((pair, pairIndex) => {
+                pair.querySelectorAll('[data-pair-field]').forEach(input => { input.name = `quiz_questions[${index}][pairs][${pairIndex}][${input.dataset.pairField}]`; });
+                pair.querySelector('[data-remove-pair]').disabled = question.querySelectorAll('[data-matching-pair]').length <= 2;
+            });
+            question.querySelector('[data-add-pair]').disabled = question.querySelectorAll('[data-matching-pair]').length >= 6;
             question.querySelector('[data-question-heading]').textContent = `Question ${index + 1}`;
             question.querySelectorAll('[data-question-field]').forEach((field) => { field.name = `quiz_questions[${index}][${field.dataset.questionField}]`; });
             const options = [...question.querySelector('[data-quiz-options]').children];
@@ -45,11 +58,21 @@ export function mountQuizEditor(root) {
         });
         root.querySelector('[data-add-question]').disabled = rows.length >= 10;
     };
+    root.addEventListener('change', event => { if (event.target.matches('[data-question-field="type"]')) { update(); announce('Question type changed. Complete its answer settings before saving.'); } });
     root.addEventListener('click', (event) => {
         const button = event.target.closest('button');
         if (!button || button.disabled) return;
         const question = button.closest('[data-quiz-question-editor]');
         const option = button.closest('[data-quiz-option-editor]');
+        if (button.hasAttribute('data-add-accepted') && question.querySelectorAll('[data-accepted-answer]').length < 6) {
+            const row = question.querySelector('[data-accepted-answer]').closest('label').cloneNode(true); row.querySelector('input').value = ''; question.querySelector('[data-accepted-list]').append(row); update(); row.querySelector('input').focus(); announce('Accepted answer added.');
+        } else if (button.hasAttribute('data-remove-accepted') && question.querySelectorAll('[data-accepted-answer]').length > 1) {
+            button.closest('label').remove(); update(); question.querySelector('[data-add-accepted]').focus(); announce('Accepted answer removed.');
+        } else if (button.hasAttribute('data-add-pair') && question.querySelectorAll('[data-matching-pair]').length < 6) {
+            const row = root.querySelector('[data-pair-template]').content.firstElementChild.cloneNode(true); row.querySelector('[data-pair-field="id"]').value = firstUnusedId([...question.querySelectorAll('[data-pair-field="id"]')].map(input => input.value), 'p'); question.querySelector('[data-matching-pairs]').append(row); update(); row.querySelector('[data-pair-field="left"]').focus(); announce('Matching pair added.');
+        } else if (button.hasAttribute('data-remove-pair') && question.querySelectorAll('[data-matching-pair]').length > 2) {
+            button.closest('[data-matching-pair]').remove(); update(); question.querySelector('[data-add-pair]').focus(); announce('Matching pair removed.');
+        } else
         if (button.hasAttribute('data-add-question') && questions.children.length < 10) {
             const row = root.querySelector('[data-question-template]').content.firstElementChild.cloneNode(true);
             row.querySelector('[data-question-field="id"]').value = firstUnusedId(readQuizQuestions(root).map((question) => question.id));

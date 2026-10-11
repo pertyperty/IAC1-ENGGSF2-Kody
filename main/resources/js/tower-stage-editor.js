@@ -1,6 +1,8 @@
+import { setIconLabel } from './icons.js';
 import { mountGarden, validateInstance } from './games/command-garden.js';
 import { mountArcade, validScenario } from './games/arcade-games.js';
 import { mountQuiz, validateQuiz } from './games/choice-quiz.js';
+import { renderQuizForm } from './games/quiz-types.js';
 import { gardenLayout, paintGarden } from './games/garden-designer.js';
 
 // Only typed data reaches the existing interpreters. Draft previews have no save endpoint.
@@ -19,11 +21,18 @@ export function editTowerStage(root, stage, index, changed, previewHost) {
     details.append(heading); root.append(details);
     field(details, 'Stage title', stage.title, value => stage.title = value, { max: 100 });
     if (stage.template === 'choice-quiz') {
-        const questions = stage.version === 2 ? stage.questions : [stage];
+        const questions = stage.version !== 1 ? stage.questions : [stage];
         if (Array.isArray(questions)) questions.forEach((question, position) => {
             const group = doc.createElement('fieldset');
             const legend = doc.createElement('legend'); legend.textContent = `Question ${position + 1}`; group.append(legend);
             field(group, 'Question', question.question, value => question.question = value, { area: true, max: 500 });
+            if (question.type === 'blank') {
+                field(group, 'Accepted answers · one per line', question.accepted.join('\n'), value => question.accepted = value.split('\n'), { area: true, max: 605 });
+                const label = doc.createElement('label'), checkbox = doc.createElement('input'); checkbox.type = 'checkbox'; checkbox.checked = question.case_sensitive;
+                checkbox.addEventListener('change', () => { question.case_sensitive = checkbox.checked; changed(); previewHost.replaceChildren(); }); label.append(checkbox, doc.createTextNode(' Letter case must match')); group.append(label);
+            } else if (question.type === 'matching') {
+                question.pairs.forEach((pair, index) => { field(group, `Pair ${index + 1} prompt`, pair.left, value => pair.left = value, { max: 300 }); field(group, `Pair ${index + 1} match`, pair.right, value => pair.right = value, { max: 300 }); });
+            } else {
             (question.options ?? []).forEach((option, choice) => field(group, `Choice ${choice + 1}`, option.label, value => option.label = value, { max: 300 }));
             const answerLabel = doc.createElement('label'); answerLabel.textContent = 'Correct choice';
             const select = doc.createElement('select');
@@ -31,6 +40,7 @@ export function editTowerStage(root, stage, index, changed, previewHost) {
             select.value = question.answer;
             select.addEventListener('change', () => { question.answer = select.value; changed(); previewHost.replaceChildren(); });
             answerLabel.append(select); group.append(answerLabel);
+            }
             field(group, 'Explanation', question.explanation, value => question.explanation = value, { area: true }); details.append(group);
         });
     } else {
@@ -51,9 +61,9 @@ export function editTowerStage(root, stage, index, changed, previewHost) {
             const same = (a, b) => a?.[0] === b[0] && a?.[1] === b[1];
             const paint = () => [...board.children].forEach(cell => {
                 const point = JSON.parse(cell.dataset.point);
-                cell.textContent = same(stage.start, point) ? 'S' : same(stage.goal, point) ? '⚑' : stage.crystals.some(p => same(p, point)) ? '◇' : '';
+                const marker = same(stage.start, point) ? 'profile' : same(stage.goal, point) ? 'flag' : stage.crystals.some(p => same(p, point)) ? 'crystal' : null; cell.replaceChildren(); if (marker) setIconLabel(cell, marker);
                 cell.classList.toggle('is-path', stage.path.some(p => same(p, point)));
-                cell.setAttribute('aria-label', `Column ${point[0] + 1}, row ${point[1] + 1}: ${cell.textContent || (cell.classList.contains('is-path') ? 'path' : 'empty')}`);
+                cell.setAttribute('aria-label', `Column ${point[0] + 1}, row ${point[1] + 1}: ${marker || (cell.classList.contains('is-path') ? 'path' : 'empty')}`);
             });
             for (let y = 0; y < Math.min(12, stage.height); y++) for (let x = 0; x < Math.min(12, stage.width); x++) {
                 const point = [x, y]; const cell = doc.createElement('button'); cell.type = 'button'; cell.dataset.point = JSON.stringify(point);
@@ -95,16 +105,10 @@ export function previewTowerStage(editor, stage, host) {
         const root = doc.createElement('section'); root.className = 'practice-quiz'; root.dataset.practiceQuiz = JSON.stringify(stage);
         const title = doc.createElement('h2'); title.textContent = stage.title; root.append(title);
         const form = doc.createElement('form');
-        const questions = stage.version === 2 ? stage.questions : [{ ...stage, id: 'q1' }];
-        questions.forEach(question => {
-            const group = doc.createElement('fieldset'); group.dataset.quizQuestion = question.id;
-            const legend = doc.createElement('legend'); legend.textContent = question.question; group.append(legend);
-            question.options.forEach(option => { const label = doc.createElement('label'); const radio = doc.createElement('input'); radio.type = 'radio'; radio.name = `practice_answer_${question.id}`; radio.value = option.id; label.append(radio, doc.createTextNode(option.label)); group.append(label); });
-            const feedback = doc.createElement('p'); feedback.dataset.questionFeedback = ''; feedback.setAttribute('role', 'status'); group.append(feedback); form.append(group);
-        });
+        root.append(form);
         const button = doc.createElement('button'); button.type = 'submit'; button.className = 'button button-play'; button.textContent = 'Check my idea'; form.append(button);
         const feedback = doc.createElement('p'); feedback.dataset.quizFeedback = ''; feedback.setAttribute('role', 'status'); feedback.textContent = 'Unsaved preview. No progress or rewards.';
-        root.append(form, feedback); host.replaceChildren(root); mountQuiz(root); return;
+        root.append(feedback); renderQuizForm(root, stage); host.replaceChildren(root); mountQuiz(root); return;
     }
     const garden = stage.template === 'command-garden';
     if (garden) validateInstance(stage);
