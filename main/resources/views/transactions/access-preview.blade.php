@@ -10,7 +10,7 @@
     <form method="post" action="{{ route('content-access.store', [$kind, $target->id]) }}" class="account-form">@csrf
         <input type="hidden" name="revision_id" value="{{ $revision->id }}">
         <label class="checkbox-label"><input type="checkbox" name="confirmed" value="1" required> I confirm {{ $price === 0 ? 'free access' : 'spending '.$price.' KodeBits' }} for this {{ $kind }}.</label>
-        <button class="button button-play">Unlock adventure →</button>
+        <button class="button button-play">Unlock adventure <x-action-icon name="right"/></button>
     </form>@endif
     <p><a class="quiet-link" href="{{ route('wallet.index') }}">View your wallet</a></p>
 </section>

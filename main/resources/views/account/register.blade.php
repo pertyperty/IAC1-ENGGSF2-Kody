@@ -25,7 +25,7 @@
             <label>Specialization<input name="specialization" value="{{ old('specialization') }}" maxlength="100"></label>
             <label>Teaching credentials<input type="file" name="credential_document" accept=".pdf,.png,.jpg,.jpeg"><small>PDF, PNG or JPEG; up to {{ number_format(config('account.credentials.max_kilobytes') / 1024, 1) }} MB. Stored privately.</small></label>
         </fieldset>
-        <button type="submit" class="primary-button">Create account <span aria-hidden="true">↗</span></button>
+        <button type="submit" class="primary-button">Create account <span aria-hidden="true"><x-action-icon name="right"/></span></button>
         <p class="form-note">We’ll email you a verification link before you can sign in.</p>
     </form>
     <p class="secondary-link"><a href="{{ route('verification.notice') }}">Already registered? Request a verification link.</a></p>

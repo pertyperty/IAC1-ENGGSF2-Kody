@@ -2,7 +2,7 @@
 <nav class="pagination-toolbar" aria-label="Pagination navigation">
     <p>Showing {{ $paginator->firstItem() }}–{{ $paginator->lastItem() }} of {{ number_format($paginator->total()) }}</p>
     <div class="pagination-links">
-        @if($paginator->onFirstPage())<span class="pagination-disabled" aria-disabled="true">← Previous</span>@else<a class="button button-secondary button-small" href="{{ $paginator->previousPageUrl() }}" rel="prev">← Previous</a>@endif
+        @if($paginator->onFirstPage())<span class="pagination-disabled" aria-disabled="true"><x-action-icon name="left"/> Previous</span>@else<a class="button button-secondary button-small" href="{{ $paginator->previousPageUrl() }}" rel="prev"><x-action-icon name="left"/> Previous</a>@endif
         @foreach($elements as $element)
             @if(is_string($element))<span class="pagination-gap" aria-hidden="true">{{ $element }}</span>@endif
             @if(is_array($element))
@@ -11,7 +11,7 @@
                 @endforeach
             @endif
         @endforeach
-        @if($paginator->hasMorePages())<a class="button button-secondary button-small" href="{{ $paginator->nextPageUrl() }}" rel="next">Next →</a>@else<span class="pagination-disabled" aria-disabled="true">Next →</span>@endif
+        @if($paginator->hasMorePages())<a class="button button-secondary button-small" href="{{ $paginator->nextPageUrl() }}" rel="next">Next <x-action-icon name="right"/></a>@else<span class="pagination-disabled" aria-disabled="true">Next <x-action-icon name="right"/></span>@endif
     </div>
 </nav>
 @endif

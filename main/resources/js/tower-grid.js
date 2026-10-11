@@ -29,8 +29,8 @@ export function mountTowerGrid(root, win) {
             point.dy += (targetY - point.dy) * .22;
             moving ||= Math.abs(targetX - point.dx) + Math.abs(targetY - point.dy) > .05;
             const x = point.x + point.dx, y = point.y + point.dy;
-            context.moveTo(x + 1.3, y);
-            context.arc(x, y, 1.3, 0, Math.PI * 2);
+            context.moveTo(x + 2, y);
+            context.arc(x, y, 2, 0, Math.PI * 2);
         }
         context.fill();
         // Stop at rest; no perpetual animation loop on a static page.
@@ -55,9 +55,9 @@ export function mountTowerGrid(root, win) {
         const scale = Math.min(win.devicePixelRatio || 1, 2, Math.sqrt(4_000_000 / Math.max(1, width * height)));
         canvas.width = Math.round(width * scale); canvas.height = Math.round(height * scale);
         context.setTransform(scale, 0, 0, scale, 0, 0);
-        const spacing = Math.max(24, Math.sqrt(width * height / 6000));
+        const spacing = Math.max(36, Math.sqrt(width * height / 4000));
         points = [];
-        for (let y = 12; y < height; y += spacing) for (let x = 12; x < width; x += spacing) points.push({ x, y, dx: 0, dy: 0 });
+        for (let y = 12; y < height && points.length < 4000; y += spacing) for (let x = 12; x < width && points.length < 4000; x += spacing) points.push({ x, y, dx: 0, dy: 0 });
         root.classList.toggle('has-interactive-grid', !reduced.matches);
         schedule();
     };
@@ -83,5 +83,6 @@ export function mountTowerGrid(root, win) {
     win.addEventListener('pageshow', release);
     new win.ResizeObserver(resize).observe(canvas);
     new win.MutationObserver(schedule).observe(doc.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    new win.MutationObserver(schedule).observe(root, { attributes: true, attributeFilter: ['data-ascent-zone'] });
     resize();
 }

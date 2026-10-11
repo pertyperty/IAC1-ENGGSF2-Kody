@@ -6,6 +6,11 @@ html { scroll-padding-top: calc(var(--header-height, 128px) + 60px); }
 body :is(h1, h2, h3, h4) { font-family: var(--font-display); font-weight: 600; line-height: 1.2; text-wrap: balance; }
 body :is(h1, h2) { letter-spacing: -.035em; }
 .play-brand { font-family: var(--font-display); font-weight: 700; letter-spacing: -1.5px; }
+.action-icon { display: inline-block; width: 18px; height: 18px; flex: 0 0 18px; vertical-align: -.2em; }
+.button, .primary-button, .module-link, .pagination-disabled, .site-footer > a { gap: 8px; align-items: center; }
+.primary-button, .module-link, .pagination-disabled, .site-footer > a { display: inline-flex; }
+.button > span:has(> .action-icon) { display: inline-flex; align-items: center; }
+.button .action-icon, .primary-button .action-icon { vertical-align: middle; }
 .app-header .brand-mark { display: block; width: 36px; height: 36px; padding: 0; margin: 0; background: none; border-radius: 0; transform: none; }
 .app-header :is(.app-primary-nav a, .header-login), .workspace-nav a { letter-spacing: -.01em; }
 .page-width { max-width: 1400px; padding-inline: 32px; }
@@ -49,9 +54,14 @@ body :is(h1, h2) { letter-spacing: -.035em; }
 .module-grid { gap: 16px; }
 .module-card:hover { transform: none; box-shadow: none; border-color: var(--accent-line); }
 .module-card:hover .module-link { color: var(--accent-text); }
-.module-copy { padding: 20px; }
-.module-copy p { font-size: 14px; line-height: 1.65; }
-.module-link { font-size: 13px; }
+.module-section { padding-top: 28px; }
+.module-section > h1 { font-size: clamp(28px, 3vw, 38px); margin-block: 8px 12px; }
+.module-card { display: flex; flex-direction: column; }
+.module-art { flex: 0 0 165px; }
+.module-copy { padding: 20px; display: flex; flex-direction: column; flex: 1; gap: 12px; }
+.module-copy h2 { margin: 0; }
+.module-copy p { font-size: 14px; line-height: 1.65; min-height: 0; margin: 0; }
+.module-link { font-size: 13px; margin-top: auto; padding-top: 8px; }
 .review-list > a { padding: 16px 18px; margin-block: 8px; }
 .studio-form > fieldset { border-radius: 12px; }
 .report-table th { font-size: 12px; letter-spacing: .02em; }

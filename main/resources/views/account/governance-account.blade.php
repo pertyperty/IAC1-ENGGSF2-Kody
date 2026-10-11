@@ -24,7 +24,7 @@
 <label>Your current Administrator password<input type="password" name="current_password" maxlength="1024" autocomplete="current-password" required></label>
 <label><input type="checkbox" name="confirmed" value="1" required> I confirm this Moderator role action.</label><button class="primary-button">Confirm role action</button></form>
 @endcan
-<h2>Moderator appointment history</h2>@forelse($roleHistory as $change)<p>{{ $change->action }} · {{ $change->previous_role }} → {{ $change->resulting_role }} · Staff account #{{ $change->actor_id }} · {{ \Carbon\CarbonImmutable::parse($change->created_at)->setTimezone('Asia/Manila')->format('M j, Y g:i A') }} Asia/Manila</p>@empty<p>No recorded Moderator appointments.</p>@endforelse
+<h2>Moderator appointment history</h2>@forelse($roleHistory as $change)<p>{{ $change->action }} · {{ $change->previous_role }} <x-action-icon name="right"/> {{ $change->resulting_role }} · Staff account #{{ $change->actor_id }} · {{ \Carbon\CarbonImmutable::parse($change->created_at)->setTimezone('Asia/Manila')->format('M j, Y g:i A') }} Asia/Manila</p>@empty<p>No recorded Moderator appointments.</p>@endforelse
 {{ $roleHistory->links() }}
 @can('correctProfile', $account)
 <h2>Help with profile details</h2>

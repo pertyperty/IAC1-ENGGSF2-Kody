@@ -4,7 +4,7 @@
         <article class="mission-card {{ $mission['done'] ? 'mission-done' : '' }}"><div class="mission-top"><span class="mission-icon" aria-hidden="true"><x-action-icon :name="$mission['icon']"/></span><span class="mission-state">{{ $mission['done'] ? 'Cleared' : 'Ready to play' }}</span></div>
             <h3>{{ $mission['title'] }}</h3><p>{{ $mission['description'] }}</p>
             <progress aria-label="{{ $mission['title'] }} progress" value="{{ $mission['value'] }}" max="{{ $mission['max'] }}"></progress>
-            <a class="button {{ $loop->first && !$mission['done'] ? 'button-play' : 'button-secondary' }} button-small" href="{{ $mission['url'] }}">{{ $mission['label'] }} →</a>
+            <a class="button {{ $loop->first && !$mission['done'] ? 'button-play' : 'button-secondary' }} button-small" href="{{ $mission['url'] }}">{{ $mission['label'] }} <x-action-icon name="right"/></a>
         </article>
     @endforeach</div>
     <p class="field-hint">These goals reflect saved progress. Reading and local previews do not save a daily win or award XP; replays do not repeat first-clear XP.</p>

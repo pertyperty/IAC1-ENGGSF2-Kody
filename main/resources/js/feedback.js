@@ -43,7 +43,7 @@ export function mountFeedback(doc, win) {
             try {
                 const url = new URL(action.href, win.location.origin);
                 if (url.origin === win.location.origin && url.protocol === win.location.protocol) {
-                    const link = doc.createElement('a'); link.className = 'toast-action button button-secondary button-small'; link.href = url.href; link.textContent = action.label.slice(0, 100); toast.append(link);
+                    const link = doc.createElement('a'); link.className = 'toast-action button button-secondary button-small'; link.href = url.href; link.append(createIcon(doc, 'right'), doc.createTextNode(action.label.slice(0, 100))); toast.append(link);
                 }
             } catch {}
         }

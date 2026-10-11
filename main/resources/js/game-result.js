@@ -1,4 +1,5 @@
 import { journeyValues } from './course-journey.js';
+import { setIconLabel } from './icons.js';
 
 export function mountGameResult(doc, win) {
     const dialog = doc.querySelector('[data-game-result]');
@@ -30,12 +31,12 @@ export function mountGameResult(doc, win) {
         if (artwork) artwork.src = detail.kind === 'success' ? artwork.dataset.celebration : artwork.dataset.thinking;
         next.hidden = true; next.removeAttribute('href');
         const trail = detail.journey && journeyValues(detail.journey, Number(detail.journey.course_id), win.location.origin);
-        let action = trail?.next ? { href: trail.next.url, label: 'Next lesson →' } : detail.action;
+        let action = trail?.next ? { href: trail.next.url, label: 'Next lesson' } : detail.action;
         if (action && typeof action.href === 'string' && typeof action.label === 'string') {
             try {
                 const url = new URL(action.href, win.location.origin);
                 if (url.origin === win.location.origin && url.protocol === win.location.protocol && !url.username && !url.password) {
-                    next.href = url.href; next.textContent = action.label.slice(0, 100); next.hidden = false;
+                    next.href = url.href; setIconLabel(next, 'right', action.label.slice(0, 100)); next.hidden = false;
                 }
             } catch {}
         }

@@ -20,7 +20,7 @@ export function mountTower(doc, win) {
         if (!map || !guest) return;
         const cleared = guestClearance(win);
         const resume = map.querySelector('[data-tower-continue]');
-        if (resume) { resume.href = cleared === 3 ? map.dataset.welcomeUrl : map.querySelector(`[data-tower-stop="${cleared + 1}"] a`).href; resume.textContent = cleared === 3 ? 'Join to save your climb →' : `${cleared ? 'Continue' : 'Start'} level ${cleared + 1} →`; }
+        if (resume) { resume.href = cleared === 3 ? map.dataset.welcomeUrl : map.querySelector(`[data-tower-stop="${cleared + 1}"] a`).href; setIconLabel(resume, 'right', cleared === 3 ? 'Join to save your climb' : `${cleared ? 'Continue' : 'Start'} level ${cleared + 1}`); }
         map.querySelectorAll('[data-tower-stop]').forEach(stop => {
             const position = Number(stop.dataset.towerStop);
             // Level 4 is always an invitation; later trial nodes stay locked.
@@ -87,7 +87,7 @@ export function mountTower(doc, win) {
             try { win.localStorage.setItem(KEY, String(Math.min(3, cleared))); } catch {}
             victory.querySelector('[data-tower-result]').textContent = position === 3 ? 'Your first three trials are complete. Join Kody to start saving your climb.' : 'Trial complete. Your next level is ready on the map.';
             link.href = position === 3 ? level.dataset.welcomeUrl : level.dataset.mapUrl;
-            link.textContent = position === 3 ? 'Discover Kody →' : 'Next level →';
+            setIconLabel(link, 'right', position === 3 ? 'Discover Kody' : 'Next level');
         } else if (event.detail.tower.cleared) {
             victory.querySelector('[data-tower-result]').textContent = event.detail.message;
             const next = new URL(event.detail.tower.next ?? '/', win.location.origin);

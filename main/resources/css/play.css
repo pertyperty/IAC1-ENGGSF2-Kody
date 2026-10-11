@@ -6,7 +6,6 @@
 .learning-page :focus-visible { outline: 3px solid var(--focus); outline-offset: 4px; }
 .page-width { max-width: 1240px; padding: 0 36px; margin: auto; }
 .play-brand { display: inline-flex; align-items: center; gap: 9px; font-size: 32px; font-weight: 800; letter-spacing: -1.5px; color: var(--text); }
-.brand-dot { color: var(--accent-text); margin-left: -9px; }
 .brand-mark { background: var(--accent-soft); width: 35px; height: 35px; display: grid; place-items: center; font-size: 27px; transform: rotate(-10deg); border-radius: 10px; margin-right: 3px; }
 .button { display: inline-flex; align-items: center; justify-content: center; gap: 24px; padding: 16px 22px; border-radius: 12px; font-size: 14px; font-weight: 650; border: 0; }
 .button-dark { color: var(--on-accent); background: var(--accent); box-shadow: none; }

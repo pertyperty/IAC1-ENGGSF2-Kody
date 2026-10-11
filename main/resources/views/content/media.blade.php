@@ -7,5 +7,5 @@
 @if($revision->video_url)
     @php($embedUrl = app(\App\Services\Content\VideoEmbed::class)->url($revision->video_url))
     @if($embedUrl)<div class="lesson-video"><iframe src="{{ $embedUrl }}" title="{{ $revision->title }} lesson video" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="fullscreen; picture-in-picture" allowfullscreen sandbox="allow-scripts allow-same-origin allow-presentation"></iframe></div>
-    @else<p><a class="button button-secondary" href="{{ $revision->video_url }}" target="_blank" rel="noopener noreferrer">Open lesson video ↗</a></p>@endif
+    @else<p><a class="button button-secondary" href="{{ $revision->video_url }}" target="_blank" rel="noopener noreferrer">Open lesson video <x-action-icon name="right"/></a></p>@endif
 @endif

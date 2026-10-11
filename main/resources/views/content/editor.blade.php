@@ -6,7 +6,7 @@
 <section class="review-page page-width">
 @if($module?->isWithdrawn())<p class="lesson-note">Staff withdrawal is active. Learner access is blocked. Draft corrections, publication review and creator archival do not lift this block; only staff restoration can do that.</p>@endif
 
-    <a class="quiet-link" href="{{ route('studio.index') }}">← Your studio</a><h1>{{ $module ? 'Shape your adventure.' : 'Start with a spark.' }}</h1>
+    <a class="quiet-link" href="{{ route('studio.index') }}"><x-action-icon name="left"/> Your studio</a><h1>{{ $module ? 'Shape your adventure.' : 'Start with a spark.' }}</h1>
     <p>Teach a small idea with a lesson and a playful activity. Save a draft, try it out, then submit it for review.</p>
     <nav class="editor-jumps" aria-label="Adventure setup"><a href="#lesson-edit"><span>01</span> Lesson</a><a href="#assessment-edit"><span>02</span> Activity</a><a href="#access-settings"><span>03</span> Access</a><a href="#draft-save"><span>04</span> Save & review</a></nav>
     @if(!empty($starter))<p class="lesson-note">Your example is ready to customize. It has not been saved or published yet.</p>@endif
@@ -89,14 +89,14 @@
     <section class="studio-preview" data-quiz-preview hidden aria-label="Unsaved quiz preview">
         <h2>Try your current quiz</h2>
         <p class="field-hint" data-quiz-preview-status role="status">Preview wins stay here.</p>
-        <button type="button" class="button button-dark" data-quiz-preview-button>Preview my quiz →</button>
+        <button type="button" class="button button-dark" data-quiz-preview-button>Preview my quiz <x-action-icon name="right"/></button>
         <div data-quiz-preview-host></div>
         <template>@include('learning.quiz', ['quiz' => ['template' => 'choice-quiz', 'version' => 1, 'title' => '', 'question' => '', 'explanation' => '', 'options' => [['id' => 'a', 'label' => ''], ['id' => 'b', 'label' => '']], 'answer' => 'a'], 'module' => null])</template>
     </section>
-    @if($revision?->review_status === 'Draft' && $module?->status !== 'Archived')<form method="post" action="{{ route('studio.submit', $module) }}" class="studio-actions">@csrf<input type="hidden" name="record_version" value="{{ $module->record_version }}"><button class="button button-dark" type="submit">Submit saved draft for review →</button></form>@endif
+    @if($revision?->review_status === 'Draft' && $module?->status !== 'Archived')<form method="post" action="{{ route('studio.submit', $module) }}" class="studio-actions">@csrf<input type="hidden" name="record_version" value="{{ $module->record_version }}"><button class="button button-dark" type="submit">Submit saved draft for review <x-action-icon name="right"/></button></form>@endif
     @if($module?->status === 'Published')<p><a class="quiet-link" href="{{ route('studio.archive-confirmation', $module) }}">Archive this adventure</a></p>@endif
     @if($revision)<section class="studio-preview"><h2>Try your saved adventure</h2><p class="field-hint">This preview uses your last saved draft. Preview wins stay here.</p>@include('content.lesson', ['module' => null, 'preview' => true])</section>@endif
-@if($module)@can('delete', $module)<p><a class="quiet-link" href="{{ route('content-deletion.show', ['module', $module->id]) }}">Delete this module →</a></p>@endcan
+@if($module)@can('delete', $module)<p><a class="quiet-link" href="{{ route('content-deletion.show', ['module', $module->id]) }}">Delete this module <x-action-icon name="right"/></a></p>@endcan
 @endif
 </section>
 @endsection

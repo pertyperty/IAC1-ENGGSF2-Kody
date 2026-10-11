@@ -13,7 +13,7 @@ Output: {{ $revision?->output_format }}</pre><h2>Approved revision test cases ·
 Input: {{ $case->input }}
 Expected: {{ $case->expected_output }}</pre>@endforeach
 @endif
-<p><a class="quiet-link" href="{{ match($kind) { 'module' => route('module-reviews.show', $item), 'course' => route('course-reviews.show', $item), 'challenge' => route('challenge-reviews.show', $item) } }}">Inspect revision details and existing publication review →</a></p>
+<p><a class="quiet-link" href="{{ match($kind) { 'module' => route('module-reviews.show', $item), 'course' => route('course-reviews.show', $item), 'challenge' => route('challenge-reviews.show', $item) } }}">Inspect revision details and existing publication review <x-action-icon name="right"/></a></p>
 <p>Withdrawal stops learner access, including enrolled course access and pinned lessons. Content, revisions, progress, audit and committed coding evaluations remain intact. Restoration removes only the staff block; existing lifecycle rules still apply.</p>
 <form method="POST" action="{{ route('content-moderation.change', [$kind, $item->id]) }}" class="account-form">@csrf
 <input type="hidden" name="record_version" value="{{ $item->record_version }}"><input type="hidden" name="action" value="{{ $item->isWithdrawn() ? 'Restored' : 'Withdrawn' }}">
