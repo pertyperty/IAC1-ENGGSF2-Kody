@@ -30,6 +30,11 @@
 .asset-heading { display: flex; align-items: center; gap: 12px; }
 .package-art { display: block; margin: 0 auto 12px; }
 .package-art:hover { animation: coin-turn .7s ease; }
+.progress-strip a:is(:hover, :focus-visible) .kody-art-xp,
+.header-tour:is(:hover, :focus-visible) .kody-art,
+.button:is(:hover, :focus-visible) .kody-art { animation: kody-hello .6s ease; }
+.leaderboard-row:is(:hover, :focus-within) .kody-art-rank { animation: coin-turn .6s ease; }
+.kody-error > .kody-art-thinking { animation: kody-hello .8s ease both; }
 .leaderboard-row .kody-art { width: 28px; height: 32px; margin-right: 6px; }
 .rank-number { display: flex; align-items: center; gap: 4px; }
 .rank-place-2 img { filter: grayscale(.85); }.rank-place-3 img { filter: sepia(.55) saturate(.7); }
