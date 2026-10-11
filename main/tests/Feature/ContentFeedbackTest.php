@@ -37,7 +37,7 @@ test('B10 weekly delivery qualifies its source challenge without revealing hidde
     $this->travelTo(CarbonImmutable::parse('2026-10-04 00:00:00', 'Asia/Manila')->utc());
     $event = weeklyFixture();
     moduleSignIn($this, moduleAccount(Role::Learner));
-    $this->get(route('weekly-events.show', $event))->assertOk()->assertSee('A little encouragement?')->assertDontSee('HIDDEN_INPUT_SECRET');
+    $this->get(route('weekly-events.show', $event))->assertOk()->assertSee('aria-label="Content feedback"', false)->assertDontSee('HIDDEN_INPUT_SECRET');
     $this->postJson(route('content-reactions.store', ['challenge', $event->challenge_id]), ['record_version' => 0, 'reaction' => 'Like'])->assertOk();
     $this->assertDatabaseCount('content_accesses', 1);
 });
@@ -91,7 +91,7 @@ test('B10 participant roles may react after an authorized content opening', func
         'module' => 'modules.show', 'course' => 'course-learning.show', 'challenge' => 'challenges.show'
     };
     $this->postJson(route('content-reactions.store', [$kind, $item->id]), ['record_version' => 0, 'reaction' => 'Like'])->assertForbidden();
-    $this->get(route($route, $item))->assertOk()->assertSee('A little encouragement?')->assertHeader('Cache-Control', 'no-store, private');
+    $this->get(route($route, $item))->assertOk()->assertSee('aria-label="Content feedback"', false)->assertHeader('Cache-Control', 'no-store, private');
     $this->postJson(route('content-reactions.store', [$kind, $item->id]), ['record_version' => 0, 'reaction' => 'Favorite'])
         ->assertOk()->assertJsonPath('reaction', 'Favorite')->assertJsonPath('counts.Favorite', 1)->assertHeader('Cache-Control', 'no-store, private');
     $this->post(route('content-reactions.store', [$kind, $item->id]), ['record_version' => 1, 'reaction' => ''])
