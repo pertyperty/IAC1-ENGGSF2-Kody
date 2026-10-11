@@ -1,8 +1,8 @@
-export function publishFeedback(root, message, kind = 'info', progressSaved = false, journey = null, action = null) {
+export function publishFeedback(root, message, kind = 'info', progressSaved = false, journey = null, action = null, result = false) {
     const doc = root.ownerDocument ?? globalThis.document;
     if (!doc?.dispatchEvent) return;
     const Event = doc.defaultView?.CustomEvent ?? globalThis.CustomEvent;
-    doc.dispatchEvent(new Event('kody:feedback', { detail: { message, kind, progressSaved, journey, action } }));
+    doc.dispatchEvent(new Event('kody:feedback', { detail: { message, kind, progressSaved, journey, action, result, source: root } }));
 }
 
 export function mountFeedback(doc, win) {
@@ -17,6 +17,7 @@ export function mountFeedback(doc, win) {
     };
     region.querySelectorAll('[data-flash-toast]').forEach(prepare);
     doc.addEventListener('kody:feedback', event => {
+        if (event.detail?.result && doc.querySelector('[data-game-result]')?.showModal) return;
         const { message, kind = 'info', action } = event.detail ?? {};
         if (typeof message !== 'string' || !message.trim()) return;
         if ([...region.children].some(toast => toast.querySelector('span')?.textContent === message)) return;

@@ -50,6 +50,7 @@ test('D01 module files stay private and preserve published media during draft ed
     $preview = $this->get($url)->assertOk()->assertHeader('Cache-Control', 'no-store, private');
     if ($extension !== 'pdf') {
         $preview->assertSee('&lt;script&gt;', false)->assertDontSee('<script>unsafe()', false);
+        $this->get($url.'?pane=1')->assertOk()->assertSee('&lt;script&gt;', false)->assertDontSee('<script>unsafe()', false)->assertDontSee('data-progress-strip', false)->assertHeader('Cache-Control', 'no-store, private');
     }
     $this->get($url.'?download=1')->assertOk()->assertHeader('X-Content-Type-Options', 'nosniff');
     $this->get(route('module-media.show', [$module, $module->fresh()->latestRevision->id, 0]))->assertForbidden();
@@ -62,6 +63,7 @@ test('D01 draft resources reject guest and unrelated learner access', function (
     $this->get($url)->assertRedirect(route('login'));
     moduleSignIn($this, moduleAccount(Role::Learner));
     $this->get($url)->assertNotFound();
+    $this->get($url.'?pane=1')->assertNotFound();
     moduleSignIn($this, User::find($module->created_by));
     $this->get($url)->assertOk();
 });

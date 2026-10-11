@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Services\Account\CurrentAccountSession;
 use App\Services\Challenges\Judge0\ProviderReadiness;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
@@ -29,6 +30,14 @@ class ContentAccess
         $row = DB::table('content_entitlements')->where('user_id', $userId)->where('content_type', $type)->where('content_id', $id)->first();
 
         return $row !== null && $row->revoked_at === null;
+    }
+
+    /** Read-only admission states; missing entries differ from revoked admissions. */
+    public function states(int $userId, string $type, array $ids): Collection
+    {
+        return DB::table('content_entitlements')->where('user_id', $userId)->where('content_type', $type)
+            ->whereIn('content_id', $ids)->get(['content_id', 'revoked_at'])
+            ->mapWithKeys(fn ($row) => [$row->content_id => $row->revoked_at === null]);
     }
 
     public function price(Model $revision, int $creatorId): int

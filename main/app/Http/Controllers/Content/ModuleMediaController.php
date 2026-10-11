@@ -17,7 +17,7 @@ class ModuleMediaController extends Controller
 {
     public function show(Request $request, LearningModule $module, int $revision, int $asset): Response|StreamedResponse
     {
-        $data = $request->validate(['course' => ['nullable', 'integer', 'min:1'], 'slot' => ['required_with:course', 'integer', 'min:1'], 'download' => ['sometimes', 'boolean'], 'inline' => ['sometimes', 'boolean']]);
+        $data = $request->validate(['course' => ['nullable', 'integer', 'min:1'], 'slot' => ['required_with:course', 'integer', 'min:1'], 'download' => ['sometimes', 'boolean'], 'inline' => ['sometimes', 'boolean'], 'pane' => ['sometimes', 'boolean']]);
         $snapshot = ModuleRevision::where('module_id', $module->id)->findOrFail($revision);
         if (Gate::allows('viewOwned', $module) || Gate::allows('viewAny', LearningModule::class)) {
             // Owners and reviewers can inspect all preserved media versions.
@@ -46,6 +46,6 @@ class ModuleMediaController extends Controller
             return $response;
         }
 
-        return response()->view('content.media-preview', compact('attachment', 'url'))->withHeaders($headers);
+        return response()->view($request->boolean('pane') ? 'content.media-pane' : 'content.media-preview', compact('attachment', 'url'))->withHeaders($headers);
     }
 }

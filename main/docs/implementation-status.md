@@ -4,6 +4,9 @@ Start here for current scope, detailed evidence and the next useful improvements
 This index consolidates the feature summaries previously repeated in README.
 It does not replace approved requirements, decisions or the implementation records.
 Last reviewed: 2026-10-11.
+The [learning workspace polish](learning-workspace-polish.md) record owns centered
+reading/media panes, fullscreen previews, rich journey history, revision-aware
+catalog progress, compact icon actions and focused game result dialogs.
 The [platform polish and fixtures](platform-polish-and-fixtures.md) record owns
 private profile pictures, four extra Learners, reviewed local learning showcases,
 three new games, the 50-floor ascent and responsive header/layout refinements.

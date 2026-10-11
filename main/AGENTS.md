@@ -1,5 +1,12 @@
 # Kody Engineering Agent Guidelines
 
+The owner's 2026-10-11 learning polish connects catalog completion to owned,
+revision-aware course/standalone history and adds centered game result dialogs.
+See [learning workspace polish](docs/learning-workspace-polish.md). Reading stays
+outside play rewards; summaries must not create admissions. Keep withdrawn or
+revoked lessons out of continuation links, resource panes privately authorized,
+and icon reactions accessible with serialized toggles and return focus.
+
 The owner requested the 2026-10-11 platform polish and local learning showcase.
 See [current follow-up](docs/platform-polish-and-fixtures.md). Preserve exact current
 username sign-in and renamed fixture identities; never reset owner passwords.

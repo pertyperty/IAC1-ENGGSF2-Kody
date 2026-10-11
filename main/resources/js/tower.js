@@ -72,7 +72,7 @@ export function mountTower(doc, win) {
             nextStage.hidden = false;
             const tab = level.querySelector(`[data-tower-stage-link="${index + 1}"]`);
             tab?.removeAttribute('aria-disabled'); tab?.removeAttribute('tabindex');
-            publishFeedback(level, `Stage ${index + 1} complete. Stage ${index + 2} is ready below.`, 'success', false, null, { label: `Continue to stage ${index + 2}`, href: `${win.location.href.split('#')[0]}#tower-stage-${index + 1}` });
+            publishFeedback(event.target, `Stage ${index + 1} complete. Stage ${index + 2} is ready below.`, 'success', false, null, { label: `Continue to stage ${index + 2}`, href: `${win.location.href.split('#')[0]}#tower-stage-${index + 1}` }, true);
             return;
         }
         const victory = level.querySelector('[data-tower-victory]');
@@ -89,7 +89,7 @@ export function mountTower(doc, win) {
             const next = new URL(event.detail.tower.next ?? '/', win.location.origin);
             if (next.origin === win.location.origin && (/^\/tower\/\d+$/.test(next.pathname) || next.pathname === '/')) link.href = next.href;
         }
-        publishFeedback(level, victory.querySelector('[data-tower-result]').textContent, 'success', false, null, { label: link.textContent, href: link.href });
+        publishFeedback(event.target, victory.querySelector('[data-tower-result]').textContent, 'success', false, null, { label: link.textContent, href: link.href }, true);
     });
 }
 

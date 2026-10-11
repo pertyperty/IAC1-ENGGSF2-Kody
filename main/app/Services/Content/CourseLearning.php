@@ -12,6 +12,7 @@ use App\Services\Account\CurrentAccountSession;
 use App\Services\Administration\AuditRecorder;
 use App\Services\Gamification\LearningProgression;
 use App\Services\Transactions\ContentAccess;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
@@ -121,10 +122,33 @@ class CourseLearning
         });
     }
 
-    private function pathState(CourseRevision $revision, ?CourseEnrollment $enrollment): array
+    /** Saved history and authorized continuation for a bounded page of owned enrollments. */
+    public function summaries(User $user, Collection $enrollments): Collection
+    {
+        abort_if($enrollments->contains(fn ($enrollment) => $enrollment->user_id !== $user->id), 403);
+        (new \Illuminate\Database\Eloquent\Collection($enrollments->all()))->loadMissing('course', 'revision.modules.revision', 'revision.modules.module');
+        $rows = DB::table('course_module_progress')->whereIn('enrollment_id', $enrollments->pluck('id'))->get()->groupBy('enrollment_id');
+        $admissions = app(ContentAccess::class)->states($user->id, 'course', $enrollments->pluck('course_id')->all());
+
+        return $enrollments->mapWithKeys(function ($enrollment) use ($rows, $admissions): array {
+            [$progress, $unlocked] = $this->pathState($enrollment->revision, $enrollment, $rows->get($enrollment->id, collect()));
+            $accessible = ! $enrollment->course->isWithdrawn() && in_array($enrollment->course->status, ['Published', 'Archived'], true)
+                && $enrollment->revision->review_status === 'Approved'
+                && ($admissions->has($enrollment->course_id) ? $admissions->get($enrollment->course_id) : $enrollment->revision->price_kb === 0);
+            $trail = app(CourseTrail::class)->snapshot($enrollment->course, $enrollment->revision, $progress, $unlocked, $accessible);
+            $complete = $trail['total'] > 0 && $trail['completed'] === $trail['total'];
+
+            return [$enrollment->id => $trail + ['state' => $complete ? 'complete' : ($progress->isNotEmpty() ? 'started' : 'new'),
+                'label' => $complete ? 'Completed' : ($progress->isNotEmpty() ? 'In progress' : 'Not started'),
+                'completed_at' => $complete ? $progress->max('completed_at') : null,
+                'last_activity' => $progress->max('last_accessed_at'), 'accessible' => $accessible]];
+        });
+    }
+
+    private function pathState(CourseRevision $revision, ?CourseEnrollment $enrollment, ?Collection $saved = null): array
     {
         $revision->loadMissing('modules.revision', 'modules.module');
-        $progress = $enrollment === null ? collect() : DB::table('course_module_progress')->where('enrollment_id', $enrollment->id)->get()->keyBy('assignment_id');
+        $progress = ($saved ?? ($enrollment === null ? collect() : DB::table('course_module_progress')->where('enrollment_id', $enrollment->id)->get()))->keyBy('assignment_id');
         $previousComplete = true;
         $unlocked = $revision->modules->mapWithKeys(function ($slot) use ($enrollment, $progress, &$previousComplete): array {
             $available = ! $enrollment?->sequential || $previousComplete;
