@@ -87,6 +87,7 @@ test('tower dot grid responds to the mouse and respects reduced motion', async (
     await expect(page.locator('[data-tower-map]')).toHaveClass(/has-interactive-grid/);
     const canvas = page.locator('[data-tower-grid]');
     const pixels = () => canvas.evaluate(element => element.toDataURL());
+    await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
     const before = await pixels();
     const box = await canvas.boundingBox();
     await page.mouse.move(48, box.y + box.height / 2);
@@ -105,6 +106,7 @@ test.describe('touch tower grid', () => {
         const canvas = page.locator('[data-tower-grid]');
         await expect(page.locator('[data-tower-map]')).toHaveClass(/has-interactive-grid/);
         const pixels = () => canvas.evaluate(element => element.toDataURL());
+        await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
         const before = await pixels();
         const box = await canvas.boundingBox();
         await page.touchscreen.tap(36, box.y + box.height * .5);
