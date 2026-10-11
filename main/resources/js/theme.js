@@ -11,6 +11,11 @@ export function mountTheme(document, window) {
             button.hidden = false;
             button.setAttribute('aria-pressed', String(dark));
             button.title = dark ? 'Switch to light mode' : 'Switch to dark mode';
+            button.setAttribute('aria-label', dark ? 'Light mode' : 'Dark mode');
+            const label = button.querySelector?.('[data-theme-label]');
+            if (label) label.textContent = dark ? 'Light mode' : 'Dark mode';
+            const icon = button.querySelector?.('[data-theme-icon]');
+            if (icon) icon.setAttribute('href', `${icon.getAttribute('href').split('#')[0]}#${dark ? 'sun' : 'moon'}`);
         });
     };
     buttons.forEach((button) => button.addEventListener('click', () => {

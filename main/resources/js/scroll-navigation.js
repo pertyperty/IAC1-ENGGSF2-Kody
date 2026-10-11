@@ -25,7 +25,10 @@ export function mountScrollNavigation(doc, win) {
         setHidden(shell.classList.contains('navigation-hidden'));
     };
     const show = () => { distance = 0; setHidden(false); };
-    shell.addEventListener('pointerenter', show);
+    shell.addEventListener('pointerenter', event => {
+        // Let the reveal receive its click; hovering it must not remove its own hit target.
+        if (event.pointerType !== 'touch' && !reveal.contains(doc.elementFromPoint(event.clientX, event.clientY))) show();
+    });
     header.addEventListener('focusin', show);
     header.addEventListener('toggle', event => { if (event.target.open) show(); }, true);
     const activate = () => {

@@ -1,5 +1,15 @@
 # Kody Engineering Agent Guidelines
 
+The owner requested the 2026-10-11 platform polish and local learning showcase.
+See [current follow-up](docs/platform-polish-and-fixtures.md). Preserve exact current
+username sign-in and renamed fixture identities; never reset owner passwords.
+Private profile pictures require GD, re-encoding, current-session authorization
+and durable erasure. The tower now has 50 append-only seed positions and three
+new typed templates; preserve original reward/access rules and saved clearances.
+Local showcase seeders never grant learner progress, rewards or financial state.
+Keep the header hamburger attached, keyboard/touch reveal available, and inline
+feedback after toast dismissal. Live providers remain deferred.
+
 The owner requested all five verified Active local role accounts in seeders on
 2026-10-07. `LocalRoleAccountsSeeder` is a removable development fixture with
 local/testing and loopback PostgreSQL guards; default seeds call it only locally.

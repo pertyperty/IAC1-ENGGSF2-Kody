@@ -18,6 +18,7 @@
         </form>
         <p>Already have Kody? Sign in with your password first to connect Google from your profile.</p>
     @endif
+    <p class="field-hint">Use your current username exactly, including capitals and spaces. If you renamed it, use the new username or your email.</p>
     <p class="secondary-link"><a href="{{ route('verification.notice') }}">Need to verify your email?</a></p>
     <p class="secondary-link"><a href="{{ route('recovery.request') }}">Forgot your password?</a></p>
     <p class="secondary-link"><a href="{{ route('register') }}">Create an account</a></p>

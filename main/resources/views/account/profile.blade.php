@@ -5,6 +5,7 @@
 @endcan
 @section('content')
     <p class="eyebrow">YOUR KODY ACCOUNT</p>
+    @include('layouts.avatar', ['avatarUser' => auth()->user(), 'avatarClass' => 'profile-avatar'])
     <h1>Your profile</h1>
     <p class="intro">Your account information. Your email is masked for privacy.</p>
     <p class="secondary-link"><a href="{{ route('account.edit') }}">Edit your player profile</a></p>

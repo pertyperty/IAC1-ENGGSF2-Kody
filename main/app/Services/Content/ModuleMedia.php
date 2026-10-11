@@ -2,13 +2,11 @@
 
 namespace App\Services\Content;
 
-use App\Jobs\Account\EraseAccountFile;
-use App\Models\AccountFileErasure;
 use App\Models\ModuleRevision;
+use App\Services\Account\PrivateFileRemoval;
 use DOMDocument;
 use DOMXPath;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use ZipArchive;
@@ -128,15 +126,7 @@ class ModuleMedia
 
     public function queueRemoval(int $ownerId, array $asset): void
     {
-        if ((config('queue.connections.database.connection') ?? config('database.default')) !== config('database.default')) {
-            throw new \LogicException('Media erasure requires the application database queue.');
-        }
-        $erasure = AccountFileErasure::firstOrCreate(['user_id' => $ownerId, 'disk' => $asset['disk'], 'path_digest' => hash('sha256', $asset['path'])],
-            ['id' => (string) Str::uuid(), 'path' => $asset['path'], 'last_queued_at' => now()]);
-        if ($erasure->wasRecentlyCreated) {
-            $id = Queue::connection('database')->push((new EraseAccountFile($erasure->id))->beforeCommit());
-            $erasure->update(['queued_job_id' => $id]);
-        }
+        app(PrivateFileRemoval::class)->queue($ownerId, $asset['disk'], $asset['path']);
     }
 
     private function invalid(): never

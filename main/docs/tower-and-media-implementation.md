@@ -6,6 +6,9 @@ explicit tower decisions received on 2026-10-10. Start with the
 It supplements B01/B02/B05, A01/A03/A06, D01/D02 and Administration game authoring;
 it does not claim the original SRS or SDD files have been rewritten.
 
+The [2026-10-11 follow-up](platform-polish-and-fixtures.md) expands this original
+slice to 50 floors and supersedes its map/chrome presentation.
+
 ## Delivered journey
 
 `/` is a numbered, chaptered 25-level tower for guests and Learners. Successful

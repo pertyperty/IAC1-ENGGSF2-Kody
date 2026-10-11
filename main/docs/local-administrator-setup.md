@@ -111,3 +111,12 @@ role and the existing removal safeguard. Normal server authorization still appli
 `LocalRoleAccountsSeederTest` covers all five roles, private generated credentials,
 hashing, idempotency, nonlocal defaults, explicit deployment/remote refusal, identity
 conflicts and transactional rollback on audit/storage failure.
+
+## Additional Learners and reviewed showcases
+
+The 2026-10-11 [fixture follow-up](platform-polish-and-fixtures.md) adds four Learners
+and optional local reviewed learning content. Default local seeds call all three
+fixture seeders; production/staging defaults do not. Existing accounts identified
+by their fixture email and role preserve a renamed username. Another account
+owning a reserved fixture username still blocks the batch. Do not use old username
+or generated password records as proof of the current profile/password.

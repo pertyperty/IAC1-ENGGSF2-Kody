@@ -52,7 +52,7 @@ try {
         $options = ['--force' => true];
         if ($operation === 'migrate-baseline') {
             $options += ['--realpath' => true, '--path' => array_values(array_filter(glob(database_path('migrations/*.php')),
-                fn (string $path) => ! str_ends_with($path, '2026_10_05_000038_add_challenge_discovery_metadata.php') && ! str_contains(basename($path), '2026_10_10_')))];
+                fn (string $path) => ! str_ends_with($path, '2026_10_05_000038_add_challenge_discovery_metadata.php') && ! str_contains(basename($path), '2026_10_10_') && ! str_contains(basename($path), '2026_10_11_')))];
         }
         if (Artisan::call('migrate', $options) !== 0) {
             throw new RuntimeException('Browser migrations failed.');
@@ -71,7 +71,7 @@ try {
         foreach (['instructor' => Role::Instructor, 'moderator' => Role::Moderator, 'administrator' => Role::Administrator, 'learner' => Role::Learner, 'arcadelearner' => Role::Learner,
             'navlearner' => Role::Learner, 'navcontributor' => Role::Contributor, 'navinstructor' => Role::Instructor,
             'navmoderator' => Role::Moderator, 'navadministrator' => Role::Administrator, 'interactive' => Role::Learner,
-            'towerlearner' => Role::Learner, 'toweradmin' => Role::Administrator, 'stickylearner' => Role::Learner, 'usabilitylearner' => Role::Learner] as $name => $role) {
+            'towerlearner' => Role::Learner, 'toweradmin' => Role::Administrator, 'stickylearner' => Role::Learner, 'usabilitylearner' => Role::Learner, 'picturelearner' => Role::Learner] as $name => $role) {
             $accounts[$name] = User::factory()->create(['username' => 'browser_'.$name, 'email' => $name.'@browser.example.test',
                 'password' => Hash::make('BrowserStrong12!'), 'account_role' => $role,
                 'active_session_hash' => hash('sha256', 'browser-seed-session'), 'active_session_expires_at' => now()->addHour()]);
@@ -119,7 +119,7 @@ try {
         $revision = CodingChallengeRevision::where('title', 'Upgrade history quest')->sole();
         $learner = User::where('email', 'learner@browser.example.test')->sole();
         if ($revision->category !== 'foundations' || $revision->tags !== []
-            || DB::table('tower_levels')->count() !== 25 || DB::table('tower_revisions')->count() !== 25
+            || DB::table('tower_levels')->count() !== 50 || DB::table('tower_revisions')->count() !== 50
             || DB::table('module_revisions')->where('attachments', '!=', '[]')->exists()
             || VerificationDelivery::where('user_id', $learner->id)->sole()->token !== str_repeat('a', 64)
             || app(WalletLedger::class)->snapshot($learner->id)['balance'] !== 50
@@ -137,7 +137,7 @@ try {
             $row = 'to_jsonb(t)';
             if ($operation === 'fingerprint-legacy') {
                 $row .= match ($table->tablename) {
-                    'module_revisions' => " - 'attachments'", 'coding_challenge_revisions' => " - 'category' - 'tags'", default => '',
+                    'users' => " - 'profile_picture'", 'module_revisions' => " - 'attachments'", 'coding_challenge_revisions' => " - 'category' - 'tags'", default => '',
                 };
             }
             $fingerprints[$table->tablename] = DB::selectOne('SELECT count(*) AS rows, md5(coalesce(string_agg(row_data, \'\' ORDER BY row_data), \'\')) AS digest FROM (SELECT ('.$row.')::text AS row_data FROM "'.$table->tablename.'" t) records');

@@ -1,6 +1,6 @@
 <div class="lesson-reader">@unless($headingShown ?? false)@if($preview ?? false)<h2>{{ $revision->title }}</h2>@else<h1>{{ $revision->title }}</h1>@endif @endunless<p>{{ $revision->description }}</p>
     @if($revision->assessment)<details class="lesson-reading"><summary>Read the lesson before you play</summary>@endif
-    <div class="lesson-text">{{ $revision->content }}</div>
+    <div class="lesson-text lesson-copy">{{ $revision->content }}</div>
     @include('content.media')
     @if($revision->assessment)</details>@endif
 </div>

@@ -9,3 +9,8 @@
 /.github export-ignore
 CHANGELOG.md export-ignore
 .styleci.yml export-ignore
+
+# Office and PDF lesson resources retain their original bytes.
+*.pdf binary
+*.docx binary
+*.pptx binary

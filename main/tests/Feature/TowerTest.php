@@ -12,6 +12,49 @@ use Illuminate\Support\Facades\DB;
 
 uses(RefreshDatabase::class);
 
+function towerCircuitSolution(array $scenario): array
+{
+    $desired = array_fill(0, count($scenario['inputs']), false);
+    if ($scenario['target']) {
+        $desired = $scenario['gate'] === 'and' ? array_fill(0, count($desired), true) : array_replace($desired, [0 => true]);
+    }
+    $program = [];
+    foreach ($desired as $index => $value) {
+        if ($value !== $scenario['inputs'][$index]) {
+            $program[] = 'flip '.($index + 1);
+        }
+    }
+
+    return $program ?: ['flip 1', 'flip 1'];
+}
+
+function towerTextSolution(array $scenario): array
+{
+    $queue = [[$scenario['start'], []]];
+    $visited = [];
+    while ($queue !== []) {
+        [$text, $program] = array_shift($queue);
+        if (str_starts_with($scenario['target'], $text)) {
+            $suffix = substr($scenario['target'], strlen($text));
+            if (preg_match('/^[A-Za-z0-9_-]*$/D', $suffix)) {
+                $append = array_map(fn ($chunk) => 'append '.$chunk, str_split($suffix, 12));
+
+                return [...$program, ...$append] ?: ['upper', 'lower'];
+            }
+        }
+        if (count($program) >= 4) {
+            continue;
+        }
+        foreach (['trim' => trim($text), 'upper' => strtoupper($text), 'lower' => strtolower($text), 'reverse' => strrev($text)] as $command => $result) {
+            if (! isset($visited[$result])) {
+                $visited[$result] = true;
+                $queue[] = [$result, [...$program, $command]];
+            }
+        }
+    }
+    throw new RuntimeException('No text solution found.');
+}
+
 function towerSolution(array $stage): array
 {
     if ($stage['template'] === 'choice-quiz') {
@@ -23,6 +66,9 @@ function towerSolution(array $stage): array
     }
     $scenario = $stage['scenario'];
     $program = match ($stage['template']) {
+        'logic-switchboard' => towerCircuitSolution($scenario),
+        'string-forge' => towerTextSolution($scenario),
+        'memory-trail' => [...array_fill(0, count($scenario['start']), 'pop'), ...array_map(fn ($value) => 'push '.$value, $scenario['target'])],
         'pixel-studio' => array_map(fn ($pixel) => 'paint '.$pixel, $scenario['pixels']),
         'number-machine' => ['add '.($scenario['target'] - $scenario['start'])],
         'terminal-quest' => ['cp '.collect($scenario['files'])->firstWhere('content', $scenario['content'])['name'].' '.$scenario['destination'], 'cat '.$scenario['destination']],
@@ -44,18 +90,18 @@ function towerSolution(array $stage): array
     return ['program' => $program];
 }
 
-test('tower installs 25 editable levels without overwriting revisions on reseed', function () {
+test('tower installs 50 editable levels without overwriting revisions on reseed', function () {
     $this->seed(TowerLevelSeeder::class);
     $this->seed(TowerLevelSeeder::class);
-    $this->assertDatabaseCount('tower_levels', 25);
-    $this->assertDatabaseCount('tower_revisions', 25);
-    $this->get(route('home'))->assertOk()->assertSee('The Kody Tower')->assertSee('data-tower-stop="25"', false)->assertSee('BOSS');
+    $this->assertDatabaseCount('tower_levels', 50);
+    $this->assertDatabaseCount('tower_revisions', 50);
+    $this->get(route('home'))->assertOk()->assertSee('The Kody Tower')->assertSee('data-tower-stop="50"', false)->assertSee('BOSS');
     $this->get(route('tower.show', TowerLevel::where('position', 4)->sole()))->assertRedirect(route('welcome'));
     $this->get(route('welcome'))->assertOk()->assertSee('data-coding-game', false);
     $this->assertDatabaseCount('tower_clearances', 0);
 });
 
-test('all 25 tower levels have typed working solutions and only final boss stages grant streak credit', function () {
+test('all 50 tower levels have typed working solutions and only final boss stages grant streak credit', function () {
     $this->seed(TowerLevelSeeder::class);
     $user = moduleAccount(Role::Learner);
     foreach (TowerLevel::with('currentRevision')->orderBy('position')->get() as $level) {
@@ -65,11 +111,11 @@ test('all 25 tower levels have typed working solutions and only final boss stage
             expect($result['tower']['cleared'])->toBe($index === count($stages) - 1);
         }
     }
-    $this->assertDatabaseCount('tower_clearances', 25);
-    $this->assertDatabaseCount('learning_activity_days', 25);
+    $this->assertDatabaseCount('tower_clearances', 50);
+    $this->assertDatabaseCount('learning_activity_days', 50);
     $this->assertDatabaseCount('xp_awards', 0);
     $this->assertDatabaseCount('learning_level_completions', 0);
-    expect(app(TowerProgression::class)->snapshot($user->id)['completed_count'])->toBe(25);
+    expect(app(TowerProgression::class)->snapshot($user->id)['completed_count'])->toBe(50);
 });
 
 test('tower cannot skip levels or boss stages or clear a game with a forged empty attempt', function () {
@@ -116,7 +162,7 @@ test('only Administrators edit tower revisions and old clearances survive edits'
         'source_notes' => 'Original Kody scenario.', 'stages_json' => json_encode($level->currentRevision->stages)];
     $this->get(route('tower-studio.edit', $level))->assertOk()->assertDontSee('@include(', false);
     $this->put(route('tower-studio.update', $level), $data)->assertRedirect();
-    $this->assertDatabaseCount('tower_revisions', 26);
+    $this->assertDatabaseCount('tower_revisions', 51);
     expect(app(TowerProgression::class)->snapshot($learner->id)['completed_count'])->toBe(1);
     $this->putJson(route('tower-studio.update', $level), $data)->assertUnprocessable()->assertJsonValidationErrors('record_version');
     moduleSignIn($this, $learner);
@@ -131,7 +177,7 @@ test('tower studio rejects malformed quizzes and unsupported executable stages',
     $level = TowerLevel::where('position', 1)->sole();
     $this->putJson(route('tower-studio.update', $level), ['record_version' => 1, 'title' => 'Bad level', 'concept' => 'Bad', 'description' => 'Invalid stage.',
         'source_notes' => 'Original.', 'stages_json' => json_encode([$stage])])->assertUnprocessable();
-    $this->assertDatabaseCount('tower_revisions', 25);
+    $this->assertDatabaseCount('tower_revisions', 50);
 })->with([[['template' => 'javascript', 'source' => 'alert(1)']], [['template' => 'choice-quiz', 'version' => 2, 'title' => 'Empty']]]);
 
 test('creator and staff dashboards omit learner missions and show only their relevant workspace', function (Role $role) {
@@ -153,5 +199,5 @@ test('tower studio bounds nested configuration and account erasure removes saved
     $json = str_repeat('[', 20).'0'.str_repeat(']', 20);
     $this->putJson(route('tower-studio.update', $level), ['record_version' => 1, 'title' => 'Nested configuration', 'concept' => 'Validation', 'description' => 'Invalid nesting.',
         'source_notes' => 'Original.', 'stages_json' => $json])->assertUnprocessable()->assertJsonValidationErrors('stages_json');
-    $this->assertDatabaseCount('tower_revisions', 25);
+    $this->assertDatabaseCount('tower_revisions', 50);
 });

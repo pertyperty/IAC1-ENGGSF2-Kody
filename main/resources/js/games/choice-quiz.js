@@ -1,3 +1,4 @@
+import { publishFeedback } from '../feedback.js';
 import { saveCompletion } from './save-completion.js';
 
 export function validateQuiz(quiz) {
@@ -52,6 +53,7 @@ export function mountQuiz(root) {
         feedback.textContent = result.message;
         if (result.results) result.results.forEach((item) => { root.querySelector(`[data-quiz-question="${item.id}"] [data-question-feedback]`).textContent = item.message; });
         root.classList.toggle('quiz-correct', result.correct);
+        if (!result.correct) publishFeedback(root, result.message);
         if (result.correct) {
             busy = true;
             const controls = root.querySelectorAll('button, input');

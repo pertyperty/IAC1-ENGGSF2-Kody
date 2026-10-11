@@ -1,8 +1,10 @@
 <div class="app-header-shell" data-scroll-navigation>
 <span class="header-hover-edge" aria-hidden="true"></span>
 <button type="button" class="navigation-reveal" data-navigation-reveal hidden>Show navigation <span aria-hidden="true">⌄</span></button>
-<header class="app-header">
+<header class="app-header {{ auth()->check() ? 'is-signed-in' : '' }}">
+    @auth<details class="mobile-workspace"><summary aria-label="Explore your workspace"><svg width="22" height="22" aria-hidden="true"><use href="{{ asset('images/navigation.svg') }}#menu"/></svg><span class="sr-only">Explore your workspace</span></summary><div class="mobile-workspace-panel"><h2>Your workspace</h2>@include('layouts.workspace-nav', ['mobile' => true])</div></details>@endauth
     @include('layouts.brand')
+    <div class="header-page-context">@auth<span class="mobile-player-name">{{ auth()->user()->username }}</span>@endauth<span data-page-context></span></div>
     <nav class="app-primary-nav" aria-label="Main navigation">
         <a href="{{ auth()->check() && auth()->user()->account_role !== \App\Enums\Role::Learner ? route('dashboard') : route('home') }}" @if(request()->routeIs('home', 'dashboard', 'tower.*', 'learning.show', 'arcade')) aria-current="page" @endif>@can('viewAny', \App\Models\User::class)Workspace @else Play @endcan</a>
         <a href="{{ route('learning.catalog') }}" @if(request()->routeIs('learning.catalog', 'course-learning.mine', 'course-learning.show', 'course-learning.lesson', 'challenges.catalog', 'challenges.show', 'modules.*')) aria-current="page" @endif>Learn</a>
@@ -14,9 +16,9 @@
     </nav>
     <div class="app-header-actions">
         @auth
-        <a class="header-updates" href="{{ route('notifications.index') }}" aria-label="Updates, {{ $chrome['unread'] }} unread">Updates @if($chrome['unread'])<span class="unread-badge">{{ $chrome['unread'] }}</span>@endif</a>
+        <a class="header-updates" href="{{ route('notifications.index') }}" aria-label="Updates, {{ $chrome['unread'] }} unread"><svg width="20" height="20" aria-hidden="true"><use href="{{ asset('images/navigation.svg') }}#bell"/></svg><span class="updates-label">Updates</span> @if($chrome['unread'])<span class="unread-badge">{{ $chrome['unread'] }}</span>@endif</a>
         <details class="account-menu">
-            <summary aria-label="Account menu"><span class="header-avatar" aria-hidden="true">{{ mb_strtoupper(mb_substr(auth()->user()->username ?? 'K', 0, 1)) }}</span><span class="header-username">{{ auth()->user()->username }}</span><span aria-hidden="true">⌄</span></summary>
+            <summary aria-label="Account menu">@include('layouts.avatar', ['avatarUser' => auth()->user(), 'avatarClass' => 'header-avatar'])<span class="header-username">{{ auth()->user()->username }}</span><span aria-hidden="true">⌄</span></summary>
             <nav aria-label="Account navigation">
                 <span class="menu-role">{{ auth()->user()->account_role->name }}</span>
                 <a href="{{ route('dashboard') }}">Dashboard</a>

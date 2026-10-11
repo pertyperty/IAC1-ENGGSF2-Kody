@@ -1,8 +1,11 @@
+import { publishFeedback } from '../feedback.js';
+import { puzzleTemplates, validPuzzle, evaluatePuzzle, renderPuzzle } from './puzzle-games.js';
 import { saveCompletion } from './save-completion.js';
 
-export const arcadeTemplates = ['pixel-studio', 'number-machine', 'sort-lab', 'terminal-quest'];
+export const arcadeTemplates = ['pixel-studio', 'number-machine', 'sort-lab', 'terminal-quest', ...puzzleTemplates];
 
 export function validScenario(template, scenario) {
+    if (puzzleTemplates.includes(template)) return validPuzzle(template, scenario);
     if (!scenario || typeof scenario !== 'object' || Array.isArray(scenario)) return false;
     const keys = { 'pixel-studio': ['pixels'], 'number-machine': ['start', 'target'], 'sort-lab': ['items'], 'terminal-quest': ['files', 'destination', 'content'] }[template];
     if (!keys || Object.keys(scenario).length !== keys.length || keys.some((key) => !Object.hasOwn(scenario, key))) return false;
@@ -24,6 +27,7 @@ export function validScenario(template, scenario) {
 }
 
 export function evaluateArcade(game, program) {
+    if (puzzleTemplates.includes(game.template)) return evaluatePuzzle(game, program);
     const scenario = game.scenario;
     const state = { number: scenario.start ?? 0, items: [...(scenario.items ?? [])], pixels: {}, files: Object.fromEntries((scenario.files ?? []).map((file) => [file.name, file.content])) };
     const output = [];
@@ -111,7 +115,9 @@ export function mountArcade(root) {
     }
     function render(state) {
         world.replaceChildren();
-        if (game.template === 'pixel-studio') {
+        if (puzzleTemplates.includes(game.template)) {
+            renderPuzzle(game, state, world, node, button, add);
+        } else if (game.template === 'pixel-studio') {
             const target = Object.fromEntries(game.scenario.pixels.map((pixel) => { const [x, y, color] = pixel.split(' '); return [`${x} ${y}`, color]; }));
             for (const [label, pixels] of [['Target picture', target], ['Your canvas', state.pixels]]) {
                 const panel = node('div', '', 'pixel-panel');
@@ -226,6 +232,13 @@ export function mountArcade(root) {
         const indexes = game.scenario.items.map((_, index) => index + 1);
         const a = select('First position', indexes); const b = select('Second position', indexes);
         build = () => `swap ${a.value} ${b.value}`;
+    } else if (puzzleTemplates.includes(game.template)) {
+        const operations = game.template === 'logic-switchboard' ? game.scenario.inputs.map((_, index) => `flip ${index + 1}`) : game.template === 'string-forge' ? ['upper', 'lower', 'reverse', 'trim', 'append'] : ['push', 'pop', 'duplicate', 'swap'];
+        const operation = select('Operation', operations);
+        const wrapper = node('label', game.template === 'memory-trail' ? 'Value (0–9 for push)' : 'Text (for append)');
+        const value = document.createElement('input'); value.type = 'text'; value.maxLength = 12; value.value = game.template === 'memory-trail' ? '2' : 'Code'; wrapper.append(value);
+        if (game.template !== 'logic-switchboard') controls.append(wrapper);
+        build = () => `${operation.value}${['push', 'append'].includes(operation.value) ? ` ${value.value}` : ''}`;
     } else {
         root.classList.add('terminal-game');
         const wrapper = node('label', 'kody@workspace $', 'terminal-prompt'); terminalInput = document.createElement('input'); terminalInput.type = 'text'; terminalInput.maxLength = 100; terminalInput.placeholder = 'ls'; terminalInput.autocomplete = 'off'; terminalInput.spellcheck = false; wrapper.append(terminalInput); controls.append(wrapper);
@@ -251,7 +264,7 @@ export function mountArcade(root) {
         const program = lines(); program.pop(); code.value = program.join('\n'); preview(); output.textContent = 'Instruction removed. Run the program to see the updated state.';
     }));
     code.addEventListener('input', () => { if (!busy) preview(); });
-    root.querySelector('[data-arcade-help]').textContent = { 'pixel-studio': 'Syntax: paint 1 1 mint. Blank cells must stay blank.', 'number-machine': 'Syntax: add 3, subtract 2, multiply 2. One instruction per line.', 'sort-lab': 'Syntax: swap 1 2. Sort smallest to largest.', 'terminal-quest': 'Commands: ls · cat filename · cp source destination. Up/Down recalls commands. No pipes, scripts or host shell access.' }[game.template];
+    root.querySelector('[data-arcade-help]').textContent = { 'pixel-studio': 'Syntax: paint 1 1 mint. Blank cells must stay blank.', 'number-machine': 'Syntax: add 3, subtract 2, multiply 2. One instruction per line.', 'sort-lab': 'Syntax: swap 1 2. Sort smallest to largest.', 'logic-switchboard': 'Tap the switches or use flip 1. AND: all on · OR: any on · XOR: odd number on.', 'string-forge': 'Commands: upper · lower · reverse · trim · append Code. One transformation per line.', 'memory-trail': 'Commands: push 2 · pop · duplicate · swap. The rightmost value is the top.', 'terminal-quest': 'Commands: ls · cat filename · cp source destination. Up/Down recalls commands. No pipes, scripts or host shell access.' }[game.template];
     async function run() {
         if (busy) return;
         busy = true; selectedPosition = null; root.dataset.playState = 'running'; root.setAttribute('aria-busy', 'true');
@@ -269,6 +282,7 @@ export function mountArcade(root) {
             output.textContent = [...result.output, result.error ?? (result.success ? `Objective complete! ${game.learningIdea}` : 'Keep experimenting. The objective is not complete yet.')].join('\n');
             root.dataset.playState = result.success ? 'success' : 'retry';
             previewStatus.textContent = result.success ? 'Objective complete. You made that happen!' : 'Try changing a step, then run it again.';
+            if (!result.success) publishFeedback(root, result.error ?? 'Your objective is not complete yet. Change a step and run again.', result.error ? 'error' : 'info');
             if (result.success) {
                 const message = await saveCompletion(root, { program });
                 if (message) output.textContent += `\n${message}`;
@@ -279,7 +293,7 @@ export function mountArcade(root) {
         }
     }
     root.querySelector('[data-arcade-run]').addEventListener('click', run);
-    root.querySelector('[data-arcade-hint]').addEventListener('click', () => { output.textContent = game.hint; });
+    root.querySelector('[data-arcade-hint]').addEventListener('click', () => { output.textContent = game.hint; publishFeedback(root, game.hint); });
     root.querySelector('[data-arcade-reset]').addEventListener('click', () => {
         if (!busy) { code.value = ''; history.length = 0; historyIndex = 0; if (terminalInput) terminalInput.value = ''; preview(); output.textContent = 'Ready when you are.'; }
     });

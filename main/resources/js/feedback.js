@@ -1,8 +1,8 @@
-export function publishFeedback(root, message, kind = 'info', progressSaved = false, journey = null) {
+export function publishFeedback(root, message, kind = 'info', progressSaved = false, journey = null, action = null) {
     const doc = root.ownerDocument ?? globalThis.document;
     if (!doc?.dispatchEvent) return;
     const Event = doc.defaultView?.CustomEvent ?? globalThis.CustomEvent;
-    doc.dispatchEvent(new Event('kody:feedback', { detail: { message, kind, progressSaved, journey } }));
+    doc.dispatchEvent(new Event('kody:feedback', { detail: { message, kind, progressSaved, journey, action } }));
 }
 
 export function mountFeedback(doc, win) {
@@ -17,7 +17,7 @@ export function mountFeedback(doc, win) {
     };
     region.querySelectorAll('[data-flash-toast]').forEach(prepare);
     doc.addEventListener('kody:feedback', event => {
-        const { message, kind = 'info' } = event.detail ?? {};
+        const { message, kind = 'info', action } = event.detail ?? {};
         if (typeof message !== 'string' || !message.trim()) return;
         if ([...region.children].some(toast => toast.querySelector('span')?.textContent === message)) return;
         // Bound the stack without removing a notification whose controls hold keyboard focus.
@@ -35,7 +35,16 @@ export function mountFeedback(doc, win) {
         button.type = 'button'; button.textContent = '×';
         button.setAttribute('data-toast-dismiss', '');
         button.setAttribute('aria-label', 'Dismiss notification');
-        toast.append(text, button); region.append(toast); prepare(toast);
+        toast.append(text);
+        if (action && typeof action.href === 'string' && typeof action.label === 'string') {
+            try {
+                const url = new URL(action.href, win.location.origin);
+                if (url.origin === win.location.origin && url.protocol === win.location.protocol) {
+                    const link = doc.createElement('a'); link.className = 'toast-action button button-secondary button-small'; link.href = url.href; link.textContent = action.label.slice(0, 100); toast.append(link);
+                }
+            } catch {}
+        }
+        toast.append(button); region.append(toast); prepare(toast);
     });
     // Keep field-specific errors near their inputs; announce async network/action results as toasts.
     const selectors = '[data-reaction-status], [data-attempt-status]';

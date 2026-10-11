@@ -12,4 +12,9 @@ return [
         'description' => 'Use coordinates, stored values, ordered lists and a virtual terminal. Discover how programs act on data, then connect the ideas in a practice quiz.',
         'lessons' => ['data-introduction', 'pixel-studio', 'number-machine', 'sort-lab', 'terminal-quest', 'data-check'],
     ],
+    'logic-text-memory' => [
+        'title' => 'Circuits messages and memory', 'category' => 'Programming foundations', 'difficulty' => 'Beginner', 'estimated_duration' => 2,
+        'description' => 'Combine Boolean decisions, transform text and reason about a stack. Each lesson contains a playable typed assessment and a worked example.',
+        'lessons' => ['logic-switchboard', 'string-forge', 'memory-trail'],
+    ],
 ];

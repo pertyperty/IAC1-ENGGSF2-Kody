@@ -1,0 +1,1 @@
+<span class="player-avatar {{ $avatarClass ?? '' }}" aria-hidden="true">@if($avatarUser->profile_picture)<img src="{{ route('account.picture', ['user' => $avatarUser->id, 'v' => $avatarUser->profile_version]) }}" alt="" width="40" height="40">@else{{ mb_strtoupper(mb_substr($avatarUser->username ?? 'K', 0, 1)) }}@endif</span>
