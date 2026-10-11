@@ -110,4 +110,9 @@ test('custom errors have a safe exit and slow navigation loader releases on brow
     await page.getByRole('link', { name: 'Delayed journey' }).click(); await page.waitForURL(/\/welcome$/);
     expect(await page.evaluate(() => sessionStorage.getItem('loader-was-visible'))).toBe('yes');
     await expect(page.locator('[data-page-loader]')).toBeHidden(); await page.goBack(); await expect(page.locator('[data-page-loader]')).toBeHidden();
+    await page.clock.install();
+    await page.evaluate(() => { const link = document.createElement('a'); link.href = '/images/kody/mascot.webp'; link.download = ''; link.textContent = 'Download mascot'; document.querySelector('main').append(link); });
+    const download = page.waitForEvent('download');
+    await page.getByRole('link', { name: 'Download mascot' }).click(); await download;
+    await page.clock.runFor(500); await expect(page.locator('[data-page-loader]')).toBeHidden();
 });

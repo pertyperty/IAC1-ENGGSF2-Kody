@@ -88,7 +88,12 @@ real Administrator management service only in a guarded isolated database.
 
 Local verification passed 87 focused account/FAQ/Tower PostgreSQL tests with
 805 assertions, all 54 frontend tests, the production build and Pint. Full PR CI
-also runs the complete backend, cached-route, browser and upgrade/restore suites.
+passed all 32 browser journeys and the 79-table PostgreSQL upgrade/restore
+rehearsal. The backend run reports 1,030 passed and 177 risky tests (8,921
+assertions); cached configuration/routes report 644 passed and 131 risky tests
+(5,865 assertions). These Pest warnings remain visible; a green workflow does
+not mean the suite is warning-free. Download regression coverage confirms native
+resource/credential downloads bypass the navigation loader.
 Browser evidence is Chromium desktop and
 emulated mobile only; physical touch devices and other engines still need staging
 verification. Live integrations, cloud deployment and production launch stay in
