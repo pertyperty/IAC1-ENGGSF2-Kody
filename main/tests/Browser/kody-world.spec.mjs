@@ -56,6 +56,8 @@ test('tower pans from land to space and the icon target restores the present flo
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await viewport.evaluate(element => { element.scrollTop = 0; });
     await expect(art).toHaveCSS('transform', 'none');
+    await expect(page.locator('.ascent-satellite')).toHaveCSS('transform', 'none');
+    await expect(page.locator('.ascent-glow')).toHaveCSS('transform', 'none');
     await page.setViewportSize({ width: 320, height: 740 }); await audit(page);
 });
 
