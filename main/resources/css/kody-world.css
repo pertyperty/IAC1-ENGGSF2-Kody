@@ -137,5 +137,5 @@ body:has(.kody-tour[open]) { overflow: hidden; }
     .kody-art, .page-loader img, .loading-dots i, .tour-card, .result-mascot, .package-art, .help-grid .faq-answer { animation: none !important; }
     .button, .profile-edit-icon, .companion-handle img { transition: none; }
     .tower-scenery > [data-ascent-art] { will-change: auto; height: 100%; object-fit: cover; object-position: bottom; }
-    .ascent-satellite, .ascent-glow { transform: none; transition: none; }
+    .tower-scenery .ascent-satellite, .tower-scenery .ascent-glow { transform: none; transition: none; }
 }
