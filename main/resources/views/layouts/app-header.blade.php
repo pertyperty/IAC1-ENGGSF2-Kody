@@ -34,6 +34,7 @@
         <a class="button button-dark button-small header-join" href="{{ route('register') }}">Join Kody</a>
         @endauth
         @include('layouts.theme-toggle')
+        <button type="button" class="header-tour" data-tour-open hidden aria-label="Kody guide and companion" title="Kody guide and companion"><x-kody-art size="32"/></button>
     </div>
 </header>
 @include('layouts.progress-strip')

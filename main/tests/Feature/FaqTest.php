@@ -23,6 +23,10 @@ function faqFixture(array $data = []): FaqEntry
     return app(FaqManagement::class)->save(moduleAccount(Role::Administrator), 'module-test-session', faqData($data));
 }
 
+test('B11 empty Help search renders a safe reset action and replayable guide', function () {
+    $this->get(route('help.index'))->assertOk()->assertSee('No answers here yet')->assertSee('Reset search')->assertSee('Take a guided tour');
+});
+
 test('G11 G12 administrator publishes validated plain text FAQ and audited updates', function () {
     $admin = User::factory()->create(['account_role' => Role::Administrator]);
     moduleSignIn($this, $admin);

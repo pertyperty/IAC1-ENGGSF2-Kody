@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 import { audit } from './support/audit.mjs';
 
 test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => { localStorage.setItem('kody-tour-v1', 'dismissed'); localStorage.setItem('kody-companion-v1', JSON.stringify({ hidden: true })); });
     await page.route('**/*', route => new URL(route.request().url()).origin === process.env.KODY_BROWSER_BASE_URL ? route.continue() : route.abort());
 });
 
@@ -206,4 +207,8 @@ test('practice arcade fills wide layouts and result dialogs remain usable on mob
     await dialog.locator('[data-result-return]').click();
     await expect(game.locator('[data-arcade-run]')).toBeFocused();
     await expect(game.locator('[data-arcade-output]')).toContainText(/objective complete/i);
+    await game.locator('[data-arcade-code]').fill('subtract 1');
+    await game.locator('[data-arcade-run]').click();
+    await expect(dialog.locator('[data-result-art]')).toHaveAttribute('src', /thinking\.webp$/);
+    await dialog.locator('[data-result-return]').click();
 });

@@ -3,6 +3,11 @@ import { audit } from './support/audit.mjs';
 import { readFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 
+// These returning-user journeys opt out of cosmetic onboarding; its first-visit flow has dedicated coverage.
+test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => { localStorage.setItem('kody-tour-v1', 'dismissed'); localStorage.setItem('kody-companion-v1', JSON.stringify({ hidden: true })); });
+});
+
 const manifest = JSON.parse(readFileSync(process.env.KODY_BROWSER_MANIFEST, 'utf8'));
 function fixture(operation, email) {
     const result = spawnSync(process.env.KODY_TEST_PHP, ['tests/Browser/support/fixture.php', operation, email], { encoding: 'utf8', windowsHide: true, timeout: 30_000 });
@@ -537,6 +542,7 @@ test('interactive games edit and preview locally; confirmed runs save through th
     await page.goto('/learn/sequences');
     const garden = page.locator('[data-coding-game]');
     await expect(garden.locator('[data-game-board]')).toHaveAttribute('aria-label', /Path tiles/);
+    await expect(garden.locator('.garden-kody')).toHaveCSS('background-image', /mascot\.webp/);
     let saves = 0;
     const completion = await garden.getAttribute('data-completion-url');
     page.on('request', request => { if (request.method() === 'POST' && request.url() === completion) saves++; });

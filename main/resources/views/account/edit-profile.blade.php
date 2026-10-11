@@ -1,10 +1,11 @@
 @extends('layouts.account')
 @section('title', 'Edit your profile — Kody')
+@section('shell-class', 'account-shell-wide')
 @section('content')
 <p class="eyebrow">MAKE IT YOURS</p><h1>Your player profile</h1>
 <p class="intro">Update your name and username. Changing your email or password requires your current password and ends your signed-in sessions.</p>
 @if($errors->any())<div class="notice" role="alert">@foreach($errors->all() as $error)<p>{{ $error }}</p>@endforeach</div>@endif
-<section class="profile-picture-editor lesson-note">
+<div class="profile-editor-grid"><section id="profile-picture" class="profile-picture-editor lesson-note">
 <h2>Your profile picture</h2>
 @include('layouts.avatar', ['avatarUser' => auth()->user(), 'avatarClass' => 'profile-avatar'])
 <p>Choose a JPEG or PNG. We crop it to a square and remove image metadata. Your picture is visible to signed-in Kody members.</p>
@@ -27,5 +28,6 @@
 <p>12–32 characters with uppercase, lowercase, a number and a symbol.</p>
 <label for="password_confirmation">Confirm new password</label><input id="password_confirmation" type="password" name="password_confirmation" maxlength="32" autocomplete="new-password">
 <button class="primary-button" type="submit">Save your profile</button></form>
+</div>
 <p class="secondary-link"><a href="{{ route('account.show') }}">Back to your profile</a></p>
 @endsection

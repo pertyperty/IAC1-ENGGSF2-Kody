@@ -1,5 +1,5 @@
 <section class="mission-board" aria-labelledby="missions-heading">
-    <div class="mission-heading"><div><p class="overline">SMALL WINS. REAL PROGRESS.</p><h2 id="missions-heading">Your mission board</h2><p>Pick one next step. Make a little progress at your pace.</p></div><img src="{{ asset('images/kody-explorer.svg') }}" width="120" height="100" alt="" aria-hidden="true"></div>
+    <div class="mission-heading"><div><p class="overline">SMALL WINS. REAL PROGRESS.</p><h2 id="missions-heading">Your mission board</h2><p>Pick one next step. Make a little progress at your pace.</p></div><x-kody-art size="120"/></div>
     <div class="mission-grid">@foreach($missions as $mission)
         <article class="mission-card {{ $mission['done'] ? 'mission-done' : '' }}"><div class="mission-top"><span class="mission-icon" aria-hidden="true">{{ $mission['icon'] }}</span><span class="mission-state">{{ $mission['done'] ? 'Cleared ✓' : 'Ready to play' }}</span></div>
             <h3>{{ $mission['title'] }}</h3><p>{{ $mission['description'] }}</p>

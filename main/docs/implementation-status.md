@@ -4,6 +4,8 @@ Start here for current scope, detailed evidence and the next useful improvements
 This index consolidates the feature summaries previously repeated in README.
 It does not replace approved requirements, decisions or the implementation records.
 Last reviewed: 2026-10-11.
+The [Kody world follow-up](kody-world-implementation.md) owns original reusable art,
+mascot tours/companion, ascending scenery, icon Tower controls and Help/profile polish.
 The [learning workspace polish](learning-workspace-polish.md) record owns centered
 reading/media panes, fullscreen previews, rich journey history, revision-aware
 catalog progress, compact icon actions and focused game result dialogs.
@@ -61,7 +63,7 @@ existing accounts; default seeding provisions them only in local mode.
 
 | Area / use cases | Current implementation | Detailed records |
 | --- | --- | --- |
-| Main tower / approved B01/B02/B05 amendment | 25 free editable levels, sequential server clears, local guest trials 1–3, multi-stage bosses 10/20, final-win streak credit with no additional XP/KB. Learners land on the map; other roles land on their workspace. | [Tower/media](tower-and-media-implementation.md), [content guide](tower-content-guide.md) |
+| Main tower / approved B01/B02/B05 amendment | 50 free editable levels, sequential server clears, local guest trials 1–3, boss checkpoints every 10 levels, final-win streak credit with no additional XP/KB. Learners land on the map; other roles land on their workspace. | [Tower/media](tower-and-media-implementation.md), [current follow-up](platform-polish-and-fixtures.md), [content guide](tower-content-guide.md) |
 | Private lesson media / D01–D02, B04 | Revision-pinned PDF/DOCX/PPTX uploads, authorized view/download, text-only office previews, canonical YouTube/Vimeo embeds and quizzes alongside media. | [Tower/media](tower-and-media-implementation.md) |
 | Account registration / A01–A02 | Validated registration, private Instructor credentials, Unverified activation, bounded resend and transactional delivery. | [Registration and verification](account-implementation-plan.md) |
 | Sign-in and recovery / A03–A05 | Progressive lockouts, replacement-session consent, POST logout and generic recovery; approved Archived reactivation. | [Login](login-implementation.md), [recovery/profile](recovery-profile-implementation.md) |
@@ -108,7 +110,7 @@ provider-fake verification is not live delivery/execution evidence.
 - Variable-length quiz authoring, multi-question server completion, sequential
   creator paths, reading completion and dashboards are implemented in
   [the completion milestone](platform-completion-implementation.md).
-- Fifteen isolated Chromium browser workflows now exercise real registration, play,
+- Thirty-three isolated Chromium browser workflows now exercise real registration, play,
   creator/staff publication, all five role workspaces, direct/mobile game interactions,
   themes, save-failure retry and axe checks. Exercise
   long content, keyboard authoring and error/retry paths across actual

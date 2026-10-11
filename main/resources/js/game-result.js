@@ -7,9 +7,14 @@ export function mountGameResult(doc, win) {
     const next = dialog.querySelector('[data-result-next]');
     let reactions = null, placeholder = null, focus = null;
     const restore = () => {
+        // Native close events are queued. Do not steal focus from the next control
+        // or restore an earlier result after another result has already opened.
+        if (dialog.open) return;
+        const needsFocus = doc.activeElement === doc.body || dialog.contains(doc.activeElement);
         if (reactions && placeholder) placeholder.replaceWith(reactions);
         reactions = placeholder = null;
-        focus?.focus?.({ preventScroll: true });
+        if (needsFocus && focus?.isConnected) focus.focus({ preventScroll: true });
+        focus = null;
     };
     dialog.addEventListener('close', restore);
     dialog.querySelector('[data-result-return]').addEventListener('click', () => dialog.close());
@@ -21,6 +26,8 @@ export function mountGameResult(doc, win) {
         dialog.querySelector('[data-result-message]').textContent = detail.message;
         dialog.querySelector('[data-result-saved]').textContent = detail.progressSaved ? 'Saved to your account' : detail.kind === 'success' ? 'Practice result' : 'Your program is still here';
         dialog.classList.toggle('result-success', detail.kind === 'success');
+        const artwork = dialog.querySelector('[data-result-art]');
+        if (artwork) artwork.src = detail.kind === 'success' ? artwork.dataset.celebration : artwork.dataset.thinking;
         next.hidden = true; next.removeAttribute('href');
         const trail = detail.journey && journeyValues(detail.journey, Number(detail.journey.course_id), win.location.origin);
         let action = trail?.next ? { href: trail.next.url, label: 'Next lesson →' } : detail.action;
