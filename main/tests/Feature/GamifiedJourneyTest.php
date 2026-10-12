@@ -51,13 +51,15 @@ test('course trail continuation comes from committed reading and game progress a
     $this->post(route('course-learning.read', [$course, $reading->id]), ['confirmed' => true])->assertRedirect();
     $trail = $learning->outline($user, session()->getId(), $course->id)['trail'];
     expect($trail['completed'])->toBe(1)->and($trail['next']['url'])->toBe(route('course-learning.lesson', [$course, $game->id]));
-    $this->assertDatabaseCount('xp_awards', 0);
+    $this->assertDatabaseCount('xp_awards', 1);
+    expect(app(Achievements::class)->snapshot($user->id)['xp'])->toBe(40);
+    $this->assertDatabaseCount('learning_activity_days', 0);
     $this->postJson(route('course-learning.game', [$course, $game->id]), ['program' => ['right']])->assertUnprocessable()->assertJsonMissingPath('journey');
     $this->postJson(route('course-learning.game', [$course, $game->id]), courseWin())->assertOk()
         ->assertJsonPath('journey.course_id', $course->id)->assertJsonPath('journey.completed', 2)
         ->assertJsonPath('journey.finished', true)->assertJsonPath('journey.next', null);
     $this->get(route('course-learning.lesson', [$course, $game->id]))->assertOk()->assertSee('Journey cleared!')->assertSee('Find another journey');
-    $this->assertDatabaseCount('xp_awards', 1);
+    $this->assertDatabaseCount('xp_awards', 2);
 });
 
 test('unavailable course steps retain progress but do not expose withdrawn titles or recommend locked lessons', function () {
