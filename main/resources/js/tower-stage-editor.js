@@ -4,6 +4,7 @@ import { mountArcade, validScenario } from './games/arcade-games.js';
 import { mountQuiz, validateQuiz } from './games/choice-quiz.js';
 import { renderQuizForm } from './games/quiz-types.js';
 import { gardenLayout, paintGarden } from './games/garden-designer.js';
+import { scenarioCanvas } from './games/scenario-canvas.js';
 
 // Only typed data reaches the existing interpreters. Draft previews have no save endpoint.
 export function editTowerStage(root, stage, index, changed, previewHost) {
@@ -75,24 +76,48 @@ export function editTowerStage(root, stage, index, changed, previewHost) {
             details.append(board); paint();
         } else if (stage.scenario) {
             const scenario = stage.scenario;
-            if (stage.template === 'pixel-studio') field(details, 'Target pixels · one column row color per line (1–3; mint, peach, lavender)', scenario.pixels.join('\n'), value => scenario.pixels = value.split('\n').filter(Boolean), { area: true });
-            if (stage.template === 'number-machine') for (const key of ['start', 'target']) field(details, `${key === 'start' ? 'Starting' : 'Target'} number (−100 to 100)`, scenario[key], value => scenario[key] = value.trim() === '' ? null : Number(value));
-            if (stage.template === 'sort-lab') field(details, 'Array · 2–6 numbers separated by commas (0–99)', scenario.items.join(', '), value => scenario.items = value.split(',').map(item => item.trim() === '' ? null : Number(item.trim())));
+            const visual = doc.createElement('div');
+            const advanced = doc.createElement('details'); advanced.className = 'scenario-advanced';
+            const summary = doc.createElement('summary'); summary.textContent = 'Advanced scenario fields'; advanced.append(summary);
+            const draw = () => {
+                visual.inert = !validScenario(stage.template, scenario);
+                if (visual.inert) return;
+                visual.replaceChildren(scenarioCanvas(doc, stage.template, scenario, (next, redraw = true) => {
+                    Object.assign(scenario, next); changed(); previewHost.replaceChildren();
+                    const values = {
+                        'pixel-studio': () => [scenario.pixels.join('\n')],
+                        'number-machine': () => [scenario.start, scenario.target],
+                        'sort-lab': () => [scenario.items.join(', ')],
+                        'logic-switchboard': () => [scenario.inputs.join(', '), scenario.gate, String(scenario.target)],
+                        'string-forge': () => [scenario.start, scenario.target],
+                        'memory-trail': () => [scenario.start.join(', '), scenario.target.join(', ')],
+                        'terminal-quest': () => [scenario.files.map(file => `${file.name} | ${file.content}`).join('\n'), scenario.destination, scenario.content],
+                    };
+                    const current = values[stage.template]?.() ?? [];
+                    advanced.querySelectorAll('input, textarea').forEach((input, index) => { input.value = current[index] ?? ''; });
+                    if (redraw) draw();
+                }));
+            };
+            details.append(visual, advanced); draw();
+            advanced.addEventListener('input', draw);
+            if (stage.template === 'pixel-studio') field(advanced, 'Target pixels · one column row color per line (1–3; mint, peach, lavender)', scenario.pixels.join('\n'), value => scenario.pixels = value.split('\n').filter(Boolean), { area: true });
+            if (stage.template === 'number-machine') for (const key of ['start', 'target']) field(advanced, `${key === 'start' ? 'Starting' : 'Target'} number (−100 to 100)`, scenario[key], value => scenario[key] = value.trim() === '' ? null : Number(value));
+            if (stage.template === 'sort-lab') field(advanced, 'Array · 2–6 numbers separated by commas (0–99)', scenario.items.join(', '), value => scenario.items = value.split(',').map(item => item.trim() === '' ? null : Number(item.trim())));
             if (['logic-switchboard', 'string-forge', 'memory-trail'].includes(stage.template)) {
                 if (stage.template === 'logic-switchboard') {
-                    field(details, 'Inputs · true/false separated by commas (2–4)', scenario.inputs.join(', '), value => scenario.inputs = value.split(',').map(item => item.trim() === 'true' ? true : item.trim() === 'false' ? false : null));
-                    field(details, 'Gate · and, or or xor', scenario.gate, value => scenario.gate = value);
-                    field(details, 'Target output · true or false', String(scenario.target), value => scenario.target = value === 'true' ? true : value === 'false' ? false : null);
+                    field(advanced, 'Inputs · true/false separated by commas (2–4)', scenario.inputs.join(', '), value => scenario.inputs = value.split(',').map(item => item.trim() === 'true' ? true : item.trim() === 'false' ? false : null));
+                    field(advanced, 'Gate · and, or or xor', scenario.gate, value => scenario.gate = value);
+                    field(advanced, 'Target output · true or false', String(scenario.target), value => scenario.target = value === 'true' ? true : value === 'false' ? false : null);
                 } else for (const key of ['start', 'target']) {
-                    field(details, `${key} ${stage.template === 'memory-trail' ? 'stack · 0–9 separated by commas' : 'text · up to 40 characters'}`, Array.isArray(scenario[key]) ? scenario[key].join(', ') : scenario[key], value => scenario[key] = stage.template === 'memory-trail' ? (value.trim() === '' ? [] : value.split(',').map(item => item.trim() === '' ? null : Number(item.trim()))) : value);
+                    field(advanced, `${key} ${stage.template === 'memory-trail' ? 'stack · 0–9 separated by commas' : 'text · up to 40 characters'}`, Array.isArray(scenario[key]) ? scenario[key].join(', ') : scenario[key], value => scenario[key] = stage.template === 'memory-trail' ? (value.trim() === '' ? [] : value.split(',').map(item => item.trim() === '' ? null : Number(item.trim()))) : value);
                 }
             }
             if (stage.template === 'terminal-quest') {
-                field(details, 'Virtual files · one filename | content per line (up to 8)', scenario.files.map(file => `${file.name} | ${file.content}`).join('\n'), value => scenario.files = value.split('\n').filter(Boolean).map(line => {
+                field(advanced, 'Virtual files · one filename | content per line (up to 8)', scenario.files.map(file => `${file.name} | ${file.content}`).join('\n'), value => scenario.files = value.split('\n').filter(Boolean).map(line => {
                     const divider = line.indexOf('|'); return { name: divider < 0 ? '' : line.slice(0, divider).trim(), content: divider < 0 ? '' : line.slice(divider + 1).replace(/^ /, '') };
                 }), { area: true, max: 3000 });
-                field(details, 'Destination filename', scenario.destination, value => scenario.destination = value);
-                field(details, 'Required destination content', scenario.content, value => scenario.content = value, { max: 300 });
+                field(advanced, 'Destination filename', scenario.destination, value => scenario.destination = value);
+                field(advanced, 'Required destination content', scenario.content, value => scenario.content = value, { max: 300 });
             }
         }
     }

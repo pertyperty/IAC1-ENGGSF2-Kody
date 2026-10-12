@@ -3,7 +3,11 @@
 Start here for current scope, detailed evidence and the next useful improvements.
 This index consolidates the feature summaries previously repeated in README.
 It does not replace approved requirements, decisions or the implementation records.
-Last reviewed: 2026-10-11.
+Last reviewed: 2026-10-12.
+The [studio/media/provider readiness record](studios-media-and-integration-readiness.md)
+owns visual scenario editing, private Office rendering, adjustable/fullscreen
+resources, Wallet/HUD polish, recent-account limits, aggregate report exports,
+approved first-article XP, verification OTP and payment receipts/status preparation.
 The [UI consistency audit](ui-consistency-audit.md) owns shared SVG action arrows,
 inline-link styling, rendered course-card progress, centered learner HUD and the
 larger theme/altitude-aware Tower grid without the floating satellite overlay.

@@ -51,7 +51,10 @@ export function runProgram(instance, program, { repeat = false, conditional = fa
     return result(true, 'You reached the flag! Your code brought this little world to life.');
 }
 
+const mountedGardens = new WeakSet();
 export function mountGarden(root) {
+    if (mountedGardens.has(root)) return;
+    mountedGardens.add(root);
     const feedback = root.querySelector('[data-game-feedback]');
     let instance;
     try { instance = validateInstance(JSON.parse(root.dataset.codingGame)); }

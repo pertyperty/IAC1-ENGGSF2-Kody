@@ -51,4 +51,15 @@ class EmailVerificationController extends Controller
         return response()->view('account.verification-result', compact('verified', 'message'), $verified ? 200 : 422)
             ->header('Cache-Control', 'no-store')->header('Referrer-Policy', 'no-referrer');
     }
+
+    public function code(Request $request, EmailVerificationService $verification): JsonResponse|Response
+    {
+        $data = $request->validate(['email' => ['required', 'email', 'max:100'], 'code' => ['required', 'string', 'regex:/\A[0-9]{6}\z/']]);
+        $verified = $verification->verifyCode($data['email'], $data['code']);
+        $message = $verified ? 'Your email is verified. Your account is now active.' : 'This code is invalid, expired or unavailable. Request another email if needed.';
+
+        return $request->expectsJson()
+            ? response()->json(compact('message'), $verified ? 200 : 422)->header('Cache-Control', 'no-store')->header('Referrer-Policy', 'no-referrer')
+            : response()->view('account.verification-result', compact('verified', 'message'), $verified ? 200 : 422)->header('Cache-Control', 'no-store')->header('Referrer-Policy', 'no-referrer');
+    }
 }

@@ -1,5 +1,14 @@
 # Kody Engineering Agent Guidelines
 
+The owner's 2026-10-12 studio/media/integration request is recorded in
+[studio and provider readiness](docs/studios-media-and-integration-readiness.md).
+Article-only completion now grants 40 XP once per module after an authorized
+opening and explicit Mark as read, across standalone/course use. This supersedes
+earlier no-reading-XP guidance; reading still grants no streak, level clear,
+assessment prerequisite or Contributor credit. Preserve opaque Office previews,
+aggregate private report exports, callback-owned receipts and server admission
+limits. Live SendGrid/Xendit/Judge0 and staging remain deferred.
+
 The owner's 2026-10-11 consistency audit replaces action glyphs with the shared
 SVG icon component, keeps sentence links underlined and centers the learner HUD.
 See [UI consistency](docs/ui-consistency-audit.md). Course-card directives must
@@ -75,7 +84,7 @@ and apostrophes without weakening existing status/session/lockout policies.
 The owner's continued 2026-10-09 game-first polish adds a saved-goal mission board
 and revision-pinned course trails with direct continuation after confirmed wins.
 See [gamified journeys](docs/gamified-journey-flow.md). These are progress displays,
-not a new reward or daily quest policy. Keep reading outside streak/XP qualification,
+not a new reward or daily quest policy. Keep reading outside streak qualification,
 never recommend locked/withdrawn lessons, and reauthorize the next lesson on GET.
 
 The owner's 2026-10-09 workflow audit consolidates both shells under
@@ -110,14 +119,14 @@ of the remaining economy, reward, creator-deletion and launch policies. See
 [the adopted decisions](docs/economy-and-launch-decisions.md); they supersede
 earlier business-rule deferrals below. Live providers/staging remain deferred.
 Financial state must use the Transaction-owned ledger and verified callbacks;
-XP never comes from browser practice, payment or reading. Retain the SRS F04
+XP never comes from browser practice or payment; explicit first article completion is approved. Retain the SRS F04
 Instructor-cash / Contributor-KodeBit distinction and existing attempt limits.
 
 The owner approved optional sequential creator course paths on 2026-10-04.
 New enrollments snapshot the approved path policy; existing enrollments keep open
 access. Assessment-free course lessons require an authorized opening and explicit
-Mark as read action. Reading advances course progress only: never daily streaks,
-XP, starter levels or Contributor assessment eligibility. See
+Mark as read action. Reading advances course progress without daily streaks,
+starter levels or Contributor eligibility; the later article-XP amendment applies. See
 [completion implementation](docs/platform-completion-implementation.md).
 Practice quizzes now support 1–10 questions with 2–6 choices; version 1 remains
 single-question compatible, and version 2 requires every answer to be correct.

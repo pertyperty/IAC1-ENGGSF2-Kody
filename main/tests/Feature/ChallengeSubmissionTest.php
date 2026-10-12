@@ -90,7 +90,7 @@ test('C03 verified participants confirm free durable encrypted attempts queued a
     $job = DB::table('jobs')->sole();
     expect($job->queue)->toBe('code-execution')->and($job->payload)->toContain($submission->id)->not->toContain('hello');
     $this->get(route('challenge-attempts.show', $submission))->assertOk()->assertSee('Your code is saved')->assertSee('hello')->assertHeader('Cache-Control', 'no-store, private');
-    $this->getJson(route('challenge-attempts.status', $submission))->assertExactJson(['status' => 'Queued', 'passed_cases' => 0, 'total_cases' => 2, 'feedback' => null, 'completed' => false]);
+    $this->getJson(route('challenge-attempts.status', $submission))->assertExactJson(['status' => 'Queued', 'passed_cases' => 0, 'evaluated_cases' => 0, 'total_cases' => 2, 'feedback' => null, 'completed' => false]);
     Http::assertNothingSent();
 })->with([Role::Learner, Role::Contributor, Role::Instructor]);
 

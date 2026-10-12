@@ -39,7 +39,10 @@ export function checkPracticeAnswer(quiz, answer) {
     return { correct: answer === quiz.answer, message: answer === quiz.answer ? `You got it! ${quiz.explanation}` : `Try another idea. ${quiz.explanation}` };
 }
 
+const mountedQuizzes = new WeakSet();
 export function mountQuiz(root) {
+    if (mountedQuizzes.has(root)) return;
+    mountedQuizzes.add(root);
     const feedback = root.querySelector('[data-quiz-feedback]');
     let quiz;
     try { quiz = validateQuiz(JSON.parse(root.dataset.practiceQuiz)); }

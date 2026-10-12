@@ -108,7 +108,8 @@ class Payments
                     DB::table('payment_purchases')->where('id', $row->id)->update(['state' => 'Succeeded', 'lot_id' => $lot->id,
                         'provider_request_id' => $proof->id, 'provider_payment_id' => $proof->paymentId, 'updated_at' => now()]);
                     app(AuditRecorder::class)->record(null, $row->user_id, 'payment.succeeded', 'payment_purchase', $row->id, ['gross_minor' => $row->gross_minor, 'fee_minor' => $row->fee_minor, 'kodebits' => $row->kodebits]);
-                    app(FinancialNotices::class)->queue($row->user_id, 'purchase:'.$row->id, 'KodeBit purchase confirmed', ['kodebits' => $row->kodebits, 'amount_minor' => $row->gross_minor, 'fee_minor' => $row->fee_minor]);
+                    app(FinancialNotices::class)->queue($row->user_id, 'purchase:'.$row->id, 'KodeBit purchase confirmed', ['kodebits' => $row->kodebits, 'amount_minor' => $row->gross_minor, 'fee_minor' => $row->fee_minor,
+                        'purchase_reference' => $row->id, 'package' => $row->package, 'confirmed_at' => now()->toIso8601String()]);
                 }
             } elseif ($row->lot_id === null && in_array($proof->status, ['FAILED', 'EXPIRED', 'CANCELED'], true)) {
                 DB::table('payment_purchases')->where('id', $row->id)->update(['state' => 'Failed', 'provider_request_id' => $proof->id, 'updated_at' => now()]);

@@ -69,6 +69,9 @@ Route::middleware(['auth', 'account.session'])->prefix('manage/tower')->name('to
 Route::middleware(['auth', 'account.session'])->group(function (): void {
     Route::post('/wallet/purchases', [PaymentController::class, 'purchase'])->middleware('throttle:5,1,purchase:')->name('wallet.purchase');
     Route::get('/wallet/purchases/{purchase}/checkout', [PaymentController::class, 'checkout'])->whereUuid('purchase')->name('wallet.checkout');
+    Route::get('/wallet/purchases/{purchase}', [PaymentController::class, 'show'])->whereUuid('purchase')->name('wallet.purchase.show');
+    Route::get('/wallet/purchases/{purchase}/status', [PaymentController::class, 'status'])->whereUuid('purchase')->middleware('throttle:40,1,purchase-status:')->name('wallet.purchase.status');
+    Route::get('/wallet/purchases/{purchase}/receipt', [PaymentController::class, 'receipt'])->whereUuid('purchase')->middleware('throttle:10,1,purchase-receipt:')->name('wallet.receipt');
     Route::get('/wallet/earnings', [EarningsController::class, 'index'])->name('earnings.index');
     Route::post('/wallet/earnings/claim', [EarningsController::class, 'claim'])->middleware('throttle:5,1,earnings-claim:')->name('earnings.claim');
     Route::post('/wallet/earnings/payout', [EarningsController::class, 'payout'])->middleware('throttle:5,1,payout:')->name('earnings.payout');
@@ -134,6 +137,7 @@ Route::middleware(['auth', 'account.session'])->group(function (): void {
     Route::get('/learn/modules/{module}', [PublishedModuleController::class, 'show'])->name('modules.show');
     Route::post('/learn/modules/{module}/revisions/{revision}/game', [PublishedModuleController::class, 'game'])->whereNumber('revision')->middleware('throttle:20,1,module-game:')->name('modules.game');
     Route::post('/learn/modules/{module}/revisions/{revision}/quiz', [PublishedModuleController::class, 'quiz'])->whereNumber('revision')->middleware('throttle:20,1,module-quiz:')->name('modules.quiz');
+    Route::post('/learn/modules/{module}/revisions/{revision}/read', [PublishedModuleController::class, 'read'])->whereNumber('revision')->middleware('throttle:20,1,module-read:')->name('modules.read');
     Route::get('/create', [ModuleStudioController::class, 'index'])->name('studio.index');
     Route::get('/create/curriculum', CurriculumController::class)->name('curriculum.index');
     Route::get('/create/courses', [CourseStudioController::class, 'index'])->name('courses.index');
@@ -177,6 +181,7 @@ Route::middleware('guest')->group(function (): void {
     Route::post('/email/verification-link', [EmailVerificationController::class, 'resend'])->middleware('throttle:6,1')->name('verification.resend');
 });
 Route::post('/email/verify', [EmailVerificationController::class, 'verify'])->middleware('throttle:30,1')->name('verification.verify');
+Route::post('/email/verify/code', [EmailVerificationController::class, 'code'])->middleware('throttle:10,1,verification-code:')->name('verification.code');
 Route::get('/dashboard', [PlayController::class, 'hub'])->middleware(['auth', 'account.session'])->name('dashboard');
 Route::get('/play/progress', [PlayController::class, 'progress'])->middleware(['auth', 'account.session', 'throttle:60,1,progress:'])->name('play.progress');
 Route::post('/play/{level}/game', [PlayController::class, 'game'])->middleware(['auth', 'account.session', 'throttle:20,1,play-game:'])->name('play.game');

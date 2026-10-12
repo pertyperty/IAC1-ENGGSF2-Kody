@@ -119,6 +119,9 @@ class CourseLearning
                 app(AuditRecorder::class)->record($user->id, $user->id, 'course.lesson_read', 'course_enrollment', (string) $enrollment->id,
                     ['assignment_id' => $slot->id, 'revision_id' => $slot->module_revision_id]);
             }
+            if ($slot->revision->type === 'Article') {
+                app(ModuleReading::class)->recordAuthorized($user, $sessionId, $slot->module_id, $slot->module_revision_id);
+            }
         });
     }
 

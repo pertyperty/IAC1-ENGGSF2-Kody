@@ -3,6 +3,7 @@
     <a href="{{ route('dashboard') }}#daily-progress" class="progress-streak"><span aria-hidden="true"><x-action-icon name="spark"/></span><b data-progress-streak>{{ $chrome['progress']['current_streak'] }}</b><span>day streak</span><span class="progress-today" data-progress-today>{{ $chrome['progress']['active_today'] ? 'Today saved' : 'Play today' }}</span></a>
     <a href="{{ route('leaderboards.index') }}"><x-kody-art name="xp" size="24"/><b data-progress-xp>{{ number_format($chrome['achievements']['xp']) }}</b><span>XP</span><span class="progress-rank" data-progress-rank>{{ $chrome['achievements']['rank'] }}</span></a>
     <a href="{{ route('home') }}"><x-action-icon name="tower"/><b data-progress-level>{{ $chrome['tower']['completed_count'] }} / {{ $chrome['tower']['total'] }}</b><span>tower levels</span></a>
+    <a href="{{ route('wallet.index') }}" aria-label="Wallet, {{ number_format($chrome['wallet']['available']) }} KodeBits available"><x-kody-art name="kodebit" size="24"/><b data-wallet-available>{{ number_format($chrome['wallet']['available']) }}</b><span>KB</span></a>
     <button type="button" data-progress-retry hidden>Refresh progress</button>
 </nav>
 @endif

@@ -13,6 +13,7 @@ use App\Services\Administration\ModeratorAppointments;
 use App\Services\Administration\SupportProfileCorrections;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 
@@ -21,7 +22,10 @@ class AccountGovernanceController extends Controller
     public function index(BrowseAccountsRequest $request): Response
     {
         $filters = $request->validated();
-        if ($request->hasAny(['q', 'role', 'status'])) {
+        if ($request->boolean('reset')) {
+            $request->session()->forget('account_governance_filters');
+            $filters = [];
+        } elseif ($request->hasAny(['q', 'role', 'status', 'scope', 'per_page'])) {
             $request->session()->put('account_governance_filters', $filters);
         } else {
             $filters = $request->session()->get('account_governance_filters', []);
@@ -36,9 +40,17 @@ class AccountGovernanceController extends Controller
                 $query->where($column, $filters[$parameter]);
             }
         }
-        $accounts = $query->orderBy('id')->paginate(20)->appends($filters);
+        $expanded = ($filters['scope'] ?? 'recent') === 'all' || ($filters['q'] ?? '') !== ''
+            || ($filters['role'] ?? '') !== '' || ($filters['status'] ?? '') !== '';
+        $query->orderByDesc('created_at')->orderByDesc('id');
+        if ($expanded) {
+            $accounts = $query->paginate((int) ($filters['per_page'] ?? 10))->appends($filters);
+        } else {
+            $recent = $query->limit(10)->get();
+            $accounts = new LengthAwarePaginator($recent, $recent->count(), 10, 1, ['path' => $request->url()]);
+        }
 
-        return response()->view('account.governance-index', compact('accounts', 'filters'))->header('Cache-Control', 'no-store, private');
+        return response()->view('account.governance-index', compact('accounts', 'filters', 'expanded'))->header('Cache-Control', 'no-store, private');
     }
 
     public function show(User $account): Response

@@ -22,9 +22,9 @@ class AccountSecurity
         $user->forceFill(['remember_token' => Str::random(60), 'active_session_hash' => null, 'active_session_expires_at' => null]);
         AccountRecovery::where('user_id', $user->id)->update(['token_hash' => null, 'expires_at' => null]);
         DB::table('google_auth_attempts')->where('user_id', $user->id)->whereNull('consumed_at')->update(['consumed_at' => now()]);
-        EmailVerification::where('user_id', $user->id)->update(['token_hash' => null, 'expires_at' => null]);
+        EmailVerification::where('user_id', $user->id)->update(['token_hash' => null, 'expires_at' => null, 'otp_hash' => null, 'otp_expires_at' => null]);
         VerificationDelivery::where('user_id', $user->id)->whereNull('sent_at')->whereNull('cancelled_at')
-            ->update(['token' => null, 'cancelled_at' => now()]);
+            ->update(['token' => null, 'otp' => null, 'cancelled_at' => now()]);
         if (config('session.driver') === 'database') {
             DB::connection(config('session.connection'))->table(config('session.table'))->where('user_id', $user->id)->delete();
         }

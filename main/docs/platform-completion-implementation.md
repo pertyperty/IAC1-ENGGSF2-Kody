@@ -1,5 +1,11 @@
 # Completion roadmap implementation
 
+The owner-approved 2026-10-12 [article completion amendment](studios-media-and-integration-readiness.md#explicit-article-completion-and-xp)
+supersedes this record's earlier no-reading-XP rule for assessment-free Articles:
+40 XP once per module after authorized opening and explicit completion, without
+streaks or assessment eligibility. Other assessment-free formats retain course
+progress only. The same follow-up records newer resource/report/provider surfaces.
+
 Use cases: B01, B03–B05, C01–C02, D01–D02, D05–D07 and G08–G10;
 cross-cutting authoring, accessibility and integration preparation.
 

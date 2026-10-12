@@ -77,7 +77,7 @@ test('F01 browser purchase requires password confirmation and participant author
     $data = economyConfirm(['package' => 'starter']);
     $this->post(route('wallet.purchase'), array_replace($data, ['current_password' => 'incorrect']))->assertSessionHasErrors('current_password');
     $this->assertDatabaseCount('payment_purchases', 0);
-    $this->post(route('wallet.purchase'), $data)->assertRedirect(route('wallet.index'));
+    $this->post(route('wallet.purchase'), $data)->assertRedirect(route('wallet.purchase.show', DB::table('payment_purchases')->where('user_id', $user->id)->value('id')));
     $this->assertDatabaseHas('payment_purchases', ['user_id' => $user->id, 'state' => 'Queued', 'gross_minor' => 10000]);
     expect(app(WalletLedger::class)->snapshot($user->id)['balance'])->toBe(0);
     moduleSignIn($this, moduleAccount(Role::Moderator));

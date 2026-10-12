@@ -50,7 +50,8 @@ test('D01 module files stay private and preserve published media during draft ed
     $preview = $this->get($url)->assertOk()->assertHeader('Cache-Control', 'no-store, private');
     if ($extension !== 'pdf') {
         $preview->assertSee('&lt;script&gt;', false)->assertDontSee('<script>unsafe()', false);
-        $this->get($url.'?pane=1')->assertOk()->assertSee('&lt;script&gt;', false)->assertDontSee('<script>unsafe()', false)->assertDontSee('data-progress-strip', false)->assertHeader('Cache-Control', 'no-store, private');
+        $pane = $this->get($url.'?pane=1')->assertOk()->assertSee('data-office-source', false)->assertDontSee('<script>unsafe()', false)->assertDontSee('data-progress-strip', false)->assertHeader('Cache-Control', 'no-store, private');
+        expect($pane->headers->get('Content-Security-Policy'))->toContain('sandbox allow-scripts', "connect-src 'none'")->not->toContain('allow-same-origin');
     }
     $this->get($url.'?download=1')->assertOk()->assertHeader('X-Content-Type-Options', 'nosniff');
     $this->get(route('module-media.show', [$module, $module->fresh()->latestRevision->id, 0]))->assertForbidden();

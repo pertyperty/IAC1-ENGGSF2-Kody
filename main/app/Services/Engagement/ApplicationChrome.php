@@ -2,12 +2,14 @@
 
 namespace App\Services\Engagement;
 
+use App\Enums\AccountStatus;
 use App\Enums\Role;
 use App\Models\LearningCourse;
 use App\Models\LearningModule;
 use App\Services\Gamification\Achievements;
 use App\Services\Gamification\LearningProgression;
 use App\Services\Gamification\TowerProgression;
+use App\Services\Transactions\WalletLedger;
 use Illuminate\Http\Request;
 
 class ApplicationChrome
@@ -17,7 +19,7 @@ class ApplicationChrome
         $user = $request->user();
         $focused = $request->routeIs('account.edit', 'account.google', 'account.archive', 'account.delete',
             'studio.create', 'studio.edit', 'courses.create', 'courses.edit', 'challenges.create', 'challenges.edit',
-            'game-presets.create', 'game-presets.edit');
+            'game-presets.create', 'game-presets.edit', 'module-media.show');
         // Only the dashboard controller supplies these owned, already-computed snapshots.
         $dashboard = $request->routeIs('dashboard') ? ($viewData['dashboard'] ?? null) : null;
         $progress = null;
@@ -69,6 +71,9 @@ class ApplicationChrome
 
         $tower = $progress === null ? null : app(TowerProgression::class)->counts($user->id);
 
-        return compact('focused', 'progress', 'achievements', 'back', 'tower') + ['unread' => $dashboard['unread'] ?? $user?->unreadNotifications()->count() ?? 0];
+        $wallet = $user !== null && $user->account_status === AccountStatus::Active && $user->email_verified_at !== null && ! $focused
+            ? ($request->routeIs('wallet.index') && isset($viewData['wallet']) ? $viewData['wallet'] : app(WalletLedger::class)->snapshot($user->id)) : null;
+
+        return compact('focused', 'progress', 'achievements', 'back', 'tower', 'wallet') + ['unread' => $dashboard['unread'] ?? $user?->unreadNotifications()->count() ?? 0];
     }
 }

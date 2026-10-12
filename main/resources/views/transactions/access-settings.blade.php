@@ -4,4 +4,4 @@
 <label for="minimum_xp">Minimum achievement rank</label><select id="minimum_xp" name="minimum_xp">@foreach(config('economy.ranks') as $xp => $rank)<option value="{{ $xp }}" @selected((string)old('minimum_xp', $revision?->minimum_xp ?? 0) === (string)$xp)>{{ $rank }} · {{ number_format($xp) }} XP</option>@endforeach</select>
 <input type="hidden" name="prerequisite_modules[]" value="">
 <label for="prerequisite_modules">Required modules · choose up to five</label><select id="prerequisite_modules" name="prerequisite_modules[]" multiple size="4">@foreach($accessModules as $option)@continue($accessKind === 'module' && $option->id === ($module?->id ?? null))<option value="{{ $option->id }}" @selected(in_array($option->id, old('prerequisite_modules', $revision?->prerequisite_modules ?? [])))>{{ $option->publishedRevision->title }}</option>@endforeach</select>
-<p class="field-hint">Only validated assessment completions qualify. Reading alone earns no XP or prerequisite credit.</p></section>
+<p class="field-hint">Only validated assessment completions qualify. Article reading may earn its first-completion XP, but never satisfies assessment prerequisites.</p></section>

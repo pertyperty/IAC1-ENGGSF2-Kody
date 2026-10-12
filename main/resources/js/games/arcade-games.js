@@ -82,7 +82,10 @@ export function evaluateArcade(game, program) {
     return { state, output, success: success[game.template], error: null };
 }
 
+const mountedArcades = new WeakSet();
 export function mountArcade(root) {
+    if (mountedArcades.has(root)) return;
+    mountedArcades.add(root);
     const game = JSON.parse(root.dataset.arcadeGame);
     if (!arcadeTemplates.includes(game.template) || game.version !== 1 || !validScenario(game.template, game.scenario)) throw new Error('Invalid activity scenario.');
     const world = root.querySelector('[data-arcade-world]');
