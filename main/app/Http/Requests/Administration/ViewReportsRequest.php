@@ -18,14 +18,14 @@ class ViewReportsRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
-        $defaults = ['type' => 'accounts', 'from' => CarbonImmutable::now('Asia/Manila')->subDays(29)->toDateString(),
+        $defaults = ['format' => 'html', 'type' => 'accounts', 'from' => CarbonImmutable::now('Asia/Manila')->subDays(29)->toDateString(),
             'to' => CarbonImmutable::now('Asia/Manila')->toDateString()];
         $this->merge(array_replace($defaults, $this->session()->get('system_report_filters', []), $this->query->all()));
     }
 
     public function rules(): array
     {
-        return ['type' => ['required', Rule::in(['accounts', 'content', 'learning', 'execution', 'economy', 'rewards'])],
+        return ['format' => ['required', Rule::in(['html', 'pdf', 'csv', 'xlsx'])], 'type' => ['required', Rule::in(['overview', 'accounts', 'content', 'learning', 'execution', 'economy', 'rewards', 'engagement', 'governance', 'operations'])],
             'from' => ['required', 'date_format:Y-m-d'], 'to' => ['required', 'date_format:Y-m-d', 'after_or_equal:from']];
     }
 

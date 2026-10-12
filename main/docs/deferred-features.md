@@ -7,6 +7,12 @@ fake-provider evidence belong in [economy implementation](economy-implementation
 This register owns remaining activation/verification deferrals; do not ask for
 these private keys again.
 
+The 2026-10-12 [preparation follow-up](studios-media-and-integration-readiness.md)
+adds verification OTP, owned checkout status, PDF purchase receipts and queued
+receipt attachments, plus cross-context execution admission limits and result
+progress. These are fake-tested supporting paths; live inbox delivery, merchant
+callback contracts, execution-provider drills and staging remain deferred below.
+
 | Deferred scope | Current preparation | Needed before activation/completion |
 | --- | --- | --- |
 | AWS / staging / production operations | Worker/log examples, private RDS/versioned S3 template, budgets, responder configuration, launch/ledger checks and local restore evidence. | Regional quote, named humans, staged HTTPS/IAM/encryption/PITR/version erasure, managed restore, alerts, measured load and rollback. No resources purchased or deployed. |

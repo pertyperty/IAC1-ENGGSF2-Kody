@@ -74,6 +74,12 @@ class ChallengeSubmissions
                 throw ValidationException::withMessages(['challenge' => 'This quest is unavailable. No attempt was used.']);
             }
             app(BudgetAdmission::class)->assert('challenge');
+            $userSubmissions = ChallengeSubmission::whereIn('participation_id', DB::table('challenge_participations')->where('user_id', $user->id)->select('id'));
+            // The locked user row serializes admissions across all challenge contexts.
+            if ((clone $userSubmissions)->whereIn('status', ['Queued', 'Evaluating'])->count() >= config('judge0.pending_per_user')
+                || (clone $userSubmissions)->where('submitted_at', '>=', now()->subDay())->count() >= config('judge0.confirmations_per_24h')) {
+                throw ValidationException::withMessages(['challenge' => 'Your evaluation queue or rolling 24-hour limit is full. Wait before confirming another submission. No attempt was used.']);
+            }
             if ($event === null) {
                 app(ContentAccess::class)->assertAccessible($user, 'challenge', $current, $revision);
             }

@@ -45,6 +45,7 @@
 .creator-media-panel h3 { font-size: 17px; }
 .editor-jumps, .studio-wayfinding { position: sticky; top: calc(var(--navigation-offset, 72px) + 8px); z-index: 20; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; }
 .editor-jumps { margin: 20px 0; padding: 6px; }
+.learning-page:has(.editor-jumps, .studio-wayfinding, [data-tower-editor]) .page-navigation { position: static; margin-bottom: 12px; }
 .editor-jumps a { flex-basis: 120px; padding: 8px; }
 :is(.creator-editor, .tower-authoring) :is(input, select, textarea) { border-radius: 8px; padding: 10px 12px; font-size: 14px; }
 .studio-form textarea { resize: vertical; }

@@ -7,5 +7,5 @@
             <a class="button {{ $loop->first && !$mission['done'] ? 'button-play' : 'button-secondary' }} button-small" href="{{ $mission['url'] }}">{{ $mission['label'] }} <x-action-icon name="right"/></a>
         </article>
     @endforeach</div>
-    <p class="field-hint">These goals reflect saved progress. Reading and local previews do not save a daily win or award XP; replays do not repeat first-clear XP.</p>
+    <p class="field-hint">These goals reflect saved progress. Reading and local previews do not save a daily win. First article completion may earn XP; previews and replays grant no repeated XP.</p>
 </section>

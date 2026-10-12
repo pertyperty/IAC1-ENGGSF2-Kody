@@ -29,6 +29,12 @@ class SystemReports
             $start = CarbonImmutable::parse($filters['from'], 'Asia/Manila')->startOfDay()->utc();
             $end = CarbonImmutable::parse($filters['to'], 'Asia/Manila')->addDay()->startOfDay()->utc();
             $rows = match ($filters['type']) {
+                'overview' => [...$this->accounts($start, $end), ...$this->content($start, $end), ...$this->learning($start, $end),
+                    ...$this->groups('challenge_submissions', 'submitted_at', 'status', ['Queued', 'Evaluating', 'Passed', 'Failed', 'Unavailable'], 'Attempts submitted', $start, $end),
+                    ...$this->economy($start, $end), ...$this->rewards($start, $end), ...$this->engagement($start, $end), ...$this->governance($start, $end), ...$this->operations($start, $end)],
+                'engagement' => $this->engagement($start, $end),
+                'governance' => $this->governance($start, $end),
+                'operations' => $this->operations($start, $end),
                 'accounts' => $this->accounts($start, $end),
                 'content' => $this->content($start, $end),
                 'learning' => $this->learning($start, $end),
@@ -39,7 +45,7 @@ class SystemReports
                 default => throw new LogicException('Unsupported system report.'),
             };
 
-            return ['rows' => $rows, 'generated_at' => CarbonImmutable::now('Asia/Manila'), 'filters' => $filters];
+            return ['rows' => $rows, 'insights' => $this->insights($start, $end), 'generated_at' => CarbonImmutable::now('Asia/Manila'), 'filters' => $filters];
         });
     }
 
@@ -102,5 +108,53 @@ class SystemReports
     {
         // Identifiers come only from the fixed report definitions above; values are bound.
         return DB::table($table)->where($time, '>=', $start)->where($time, '<', $end);
+    }
+
+    private function insights(CarbonImmutable $start, CarbonImmutable $end): array
+    {
+        $priorStart = $start->subSeconds($start->diffInSeconds($end));
+        $registrations = $this->window('users', 'created_at', $start, $end)->count();
+        $previous = $this->window('users', 'created_at', $priorStart, $start)->count();
+        $active = $this->window('learning_activity_days', 'completed_at', $start, $end)->distinct()->count('user_id');
+        $attempts = $this->window('challenge_submissions', 'submitted_at', $start, $end);
+        $passed = (clone $attempts)->where('status', 'Passed')->count();
+        $evaluated = (clone $attempts)->whereIn('status', ['Passed', 'Failed'])->count();
+        $pending = (clone $attempts)->whereIn('status', ['Queued', 'Evaluating'])->count();
+
+        return [
+            ['title' => 'Account growth', 'value' => $registrations, 'detail' => $registrations.' registrations; '.$previous.' in the preceding equal-length window. Difference: '.($registrations - $previous).'.'],
+            ['title' => 'Active assessed learners', 'value' => $active, 'detail' => $active.' distinct participants recorded validated game or quiz activity. Reading and browsing are excluded.'],
+            ['title' => 'Coding pass rate', 'value' => $evaluated ? round($passed * 100 / $evaluated).'%' : 'No results', 'detail' => $passed.' passed out of '.$evaluated.' terminal Passed/Failed attempts submitted in this window. Pending and unavailable results are excluded.'],
+            ['title' => 'Evaluation backlog', 'value' => $pending, 'detail' => $pending.' submitted attempts are currently queued or evaluating. Check worker/provider readiness if this persists.'],
+        ];
+    }
+
+    private function engagement(CarbonImmutable $start, CarbonImmutable $end): array
+    {
+        return [
+            ['metric' => 'Current reactions updated in window', 'count' => $this->window('content_reactions', 'updated_at', $start, $end)->count()],
+            ['metric' => 'Help entries created', 'count' => $this->window('faq_entries', 'created_at', $start, $end)->count()],
+            ['metric' => 'First article module completions', 'count' => $this->window('module_read_completions', 'completed_at', $start, $end)->count()],
+        ];
+    }
+
+    private function governance(CarbonImmutable $start, CarbonImmutable $end): array
+    {
+        return [
+            ['metric' => 'Instructor application versions submitted', 'count' => $this->window('instructor_application_versions', 'created_at', $start, $end)->count()],
+            ['metric' => 'Contributor applications submitted', 'count' => $this->window('contributor_applications', 'created_at', $start, $end)->count()],
+            ['metric' => 'Recorded account enforcement actions', 'count' => $this->window('account_enforcements', 'created_at', $start, $end)->count()],
+            ['metric' => 'Recorded Moderator role changes', 'count' => $this->window('account_role_changes', 'created_at', $start, $end)->count()],
+            ['metric' => 'Recorded content moderation actions', 'count' => $this->window('content_moderation_actions', 'created_at', $start, $end)->count()],
+        ];
+    }
+
+    private function operations(CarbonImmutable $start, CarbonImmutable $end): array
+    {
+        return [
+            ['metric' => 'Verification emails sent', 'count' => $this->window('verification_deliveries', 'sent_at', $start, $end)->where('purpose', 'verification')->count()],
+            ['metric' => 'Financial emails sent', 'count' => $this->window('financial_deliveries', 'sent_at', $start, $end)->where('state', 'Sent')->count()],
+            ['metric' => 'Background job failures recorded', 'count' => $this->window('failed_jobs', 'failed_at', $start, $end)->count()],
+        ];
     }
 }

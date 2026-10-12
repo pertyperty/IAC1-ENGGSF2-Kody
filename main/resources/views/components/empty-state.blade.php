@@ -1,6 +1,6 @@
-@props(['title', 'description', 'actionUrl', 'actionLabel'])
+@props(['title', 'description', 'actionUrl' => null, 'actionLabel' => null])
 <section class="empty-state catalog-empty">
     <h2>{{ $title }}</h2>
     <p>{{ $description }}</p>
-    <a class="button button-secondary" href="{{ $actionUrl }}">{{ $actionLabel }}</a>
+    @if($actionUrl && $actionLabel)<a class="button button-secondary" href="{{ $actionUrl }}">{{ $actionLabel }}</a>@endif
 </section>

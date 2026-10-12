@@ -4,7 +4,7 @@
 <header class="app-header {{ auth()->check() ? 'is-signed-in' : '' }}">
     @auth<details class="mobile-workspace"><summary aria-label="Explore your workspace"><svg width="22" height="22" aria-hidden="true"><use href="{{ asset('images/navigation.svg') }}#menu"/></svg><span class="sr-only">Explore your workspace</span></summary><div class="mobile-workspace-panel"><h2>Your workspace</h2>@include('layouts.workspace-nav', ['mobile' => true])</div></details>@endauth
     @include('layouts.brand')
-    <div class="header-page-context">@auth<span class="mobile-player-name">{{ auth()->user()->username }}</span>@endauth<span data-page-context></span></div>
+    <div class="header-page-context">@auth<span class="mobile-player-name">{{ auth()->user()->username }}</span>@endauth<span data-page-context></span>@if(!$chrome['progress'] && $chrome['wallet'])<a class="header-wallet" href="{{ route('wallet.index') }}" aria-label="Wallet, {{ number_format($chrome['wallet']['available']) }} KodeBits available"><x-kody-art name="kodebit" size="20"/>{{ number_format($chrome['wallet']['available']) }} KB</a>@endif</div>
     <nav class="app-primary-nav" aria-label="Main navigation">
         <a href="{{ auth()->check() && auth()->user()->account_role !== \App\Enums\Role::Learner ? route('dashboard') : route('home') }}" @if(request()->routeIs('home', 'dashboard', 'tower.*', 'learning.show', 'arcade')) aria-current="page" @endif>@can('viewAny', \App\Models\User::class)Workspace @else Play @endcan</a>
         <a href="{{ route('learning.catalog') }}" @if(request()->routeIs('learning.catalog', 'course-learning.mine', 'course-learning.show', 'course-learning.lesson', 'challenges.catalog', 'challenges.show', 'modules.*')) aria-current="page" @endif>Learn</a>

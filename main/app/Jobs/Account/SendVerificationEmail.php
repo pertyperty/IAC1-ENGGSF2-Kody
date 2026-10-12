@@ -48,7 +48,7 @@ class SendVerificationEmail implements ShouldQueue
             if ($user === null || $user->account_status !== AccountStatus::Unverified || $verification === null
                 || $verification->email !== $user->email || $verification->token_hash !== $delivery->token_hash
                 || $verification->expires_at === null || $verification->expires_at->lessThanOrEqualTo(now())) {
-                $delivery->update(['token' => null, 'cancelled_at' => now()]);
+                $delivery->update(['token' => null, 'otp' => null, 'cancelled_at' => now()]);
 
                 return false;
             }
@@ -56,8 +56,8 @@ class SendVerificationEmail implements ShouldQueue
             try {
                 // Use the trusted application URL, never a request's Host header.
                 $url = rtrim(config('app.url'), '/').route('verification.notice', absolute: false).'#token='.$delivery->token;
-                app(SecureAccountMailer::class)->send('verification', $user->email, new VerificationLink($url, $delivery->token));
-                $delivery->update(['token' => null, 'sent_at' => now(), 'failed_at' => null]);
+                app(SecureAccountMailer::class)->send('verification', $user->email, new VerificationLink($url, $delivery->token, $verification->otp_expires_at?->isFuture() ? $delivery->otp : null));
+                $delivery->update(['token' => null, 'otp' => null, 'sent_at' => now(), 'failed_at' => null]);
 
                 return false;
             } catch (Throwable) {

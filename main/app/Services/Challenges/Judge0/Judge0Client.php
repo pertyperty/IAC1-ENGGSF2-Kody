@@ -2,6 +2,7 @@
 
 namespace App\Services\Challenges\Judge0;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Throwable;
@@ -10,7 +11,8 @@ class Judge0Client
 {
     public function fingerprint(): string
     {
-        return hash('sha256', json_encode(config('judge0'), JSON_THROW_ON_ERROR));
+        // Local admission policy does not change the provider's compiler or execution contract.
+        return hash('sha256', json_encode(Arr::except(config('judge0'), ['pending_per_user', 'confirmations_per_24h']), JSON_THROW_ON_ERROR));
     }
 
     public function configured(): bool

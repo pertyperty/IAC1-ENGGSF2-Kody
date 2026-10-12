@@ -31,6 +31,7 @@ class ContentDeletion extends OwnedContentDeletion
             'Pinned course revisions' => DB::table('course_revision_modules')->where('module_id', $content->id)->exists(),
             'Validated learner activity' => DB::table('learning_activity_days')->where('level', 'module-'.$content->id)->exists(),
             'Learner completion history' => DB::table('learning_level_completions')->where('level', 'module-'.$content->id)->exists(),
+            'Article reading history' => DB::table('module_read_completions')->where('module_id', $content->id)->exists(),
         ];
     }
 

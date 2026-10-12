@@ -11,6 +11,10 @@
 .header-updates, .theme-toggle { display: inline-flex; align-items: center; gap: 7px; }
 :is(.header-updates, .theme-toggle, .mobile-workspace) svg { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
 .player-avatar { display: inline-flex; width: 36px; height: 36px; flex-shrink: 0; justify-content: center; align-items: center; overflow: hidden; border-radius: 50%; background: var(--accent-soft); color: var(--accent-text); font-weight: 700; }
+.header-wallet { display: inline-flex; align-items: center; gap: 4px; flex-shrink: 0; margin-left: 8px; color: var(--accent-text); font-weight: 700; white-space: nowrap; text-decoration: none; }
+.header-wallet:hover { text-decoration: underline; text-underline-offset: 3px; }
+.header-page-context:has(.header-wallet) { display: flex; align-items: center; }
+.header-page-context [data-page-context] { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .player-avatar img { width: 100%; height: 100%; object-fit: cover; }
 .profile-avatar { width: 88px; height: 88px; margin-block: 12px; font-size: 32px; }
 .profile-picture-editor { margin-block: 24px; }

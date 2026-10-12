@@ -1,29 +1,32 @@
 {
-    "$schema": "https://www.schemastore.org/package.json",
-    "private": true,
-    "type": "module",
-    "scripts": {
-        "test:games": "node --test tests/Frontend/*.test.mjs",
-        "test:browser": "node tests/Browser/run.mjs",
-        "test:restore": "node tests/Browser/run.mjs --rehearse",
-        "build": "vite build",
-        "dev": "vite"
-    },
-    "devDependencies": {
-        "@axe-core/playwright": "4.13.0",
-        "@playwright/test": "1.63.0",
-        "@tailwindcss/vite": "^4.0.0",
-        "concurrently": "^10.0.3",
-        "laravel-vite-plugin": "^3.1",
-        "tailwindcss": "^4.0.0",
-        "vite": "^8.0.0"
-    },
-    "optionalDependencies": {
-        "@laravel/multiplex": "^0.4.1"
-    },
-    "overrides": {
-        "concurrently": {
-            "shell-quote": "1.11.0"
-        }
+  "$schema": "https://www.schemastore.org/package.json",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test:games": "node --test tests/Frontend/*.test.mjs",
+    "test:browser": "node tests/Browser/run.mjs",
+    "test:restore": "node tests/Browser/run.mjs --rehearse",
+    "build": "vite build && vite build --config vite.office.config.js",
+    "dev": "vite"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
+    "@office-kit/pptx": "0.24.0",
+    "@office-kit/pptx-preview": "0.15.0",
+    "@playwright/test": "1.63.0",
+    "@tailwindcss/vite": "^4.0.0",
+    "concurrently": "^10.0.3",
+    "docx-preview": "0.4.1",
+    "laravel-vite-plugin": "^3.1",
+    "tailwindcss": "^4.0.0",
+    "vite": "^8.0.0"
+  },
+  "optionalDependencies": {
+    "@laravel/multiplex": "^0.4.1"
+  },
+  "overrides": {
+    "concurrently": {
+      "shell-quote": "1.11.0"
     }
+  }
 }

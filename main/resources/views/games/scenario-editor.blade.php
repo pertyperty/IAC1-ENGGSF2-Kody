@@ -1,6 +1,8 @@
 <section data-scenario-editor data-arcade-defaults="{{ json_encode(config('arcade'), JSON_THROW_ON_ERROR) }}">
     <h3>Shape the challenge</h3><p class="field-hint">Your scenario is saved with this revision. Learners play the approved version. Enable JavaScript to edit scenario fields and try a preview.</p>
     <input type="hidden" name="{{ $scenarioName }}" value="{{ old($scenarioName, isset($scenarioInstance['scenario']) ? json_encode($scenarioInstance['scenario'], JSON_THROW_ON_ERROR) : '') }}">
+    <div data-scenario-canvas></div>
+    <details class="scenario-advanced"><summary>Advanced scenario fields</summary>
     <div data-scenario-panel="pixel-studio"><label>Target pixels<textarea data-scenario-pixels rows="4" maxlength="250" placeholder="1 1 mint"></textarea></label><p class="field-hint">One pixel per line: column row color. Coordinates 1–3. Colors mint, peach, lavender. Use 1–9 different cells.</p></div>
     <div data-scenario-panel="number-machine"><label>Starting number<input data-scenario-start type="number" min="-100" max="100" step="1"></label><label>Target number<input data-scenario-target type="number" min="-100" max="100" step="1"></label></div>
     <div data-scenario-panel="sort-lab"><label>Numbers to sort<input data-scenario-items maxlength="30" placeholder="3, 1, 2"></label><p class="field-hint">2–6 comma-separated integers, each 0–99. The objective is ascending order.</p></div>
@@ -8,7 +10,7 @@
     <div data-scenario-panel="logic-switchboard"><label>Input switches (true or false, separated by commas)<input data-scenario-inputs maxlength="30" placeholder="false, false"></label><label>Gate<select data-scenario-gate><option value="and">AND · all inputs on</option><option value="or">OR · any input on</option><option value="xor">XOR · odd number on</option></select></label><label>Target output<select data-scenario-signal><option value="true">True · on</option><option value="false">False · off</option></select></label></div>
     <div data-scenario-panel="string-forge"><label>Starting text<input data-scenario-text-start maxlength="40"></label><label>Target text<input data-scenario-text-target maxlength="40"></label><p class="field-hint">Letters, digits, spaces, underscores and hyphens. Targets must be reachable through case changes, reversal, trimming and appending.</p></div>
     <div data-scenario-panel="memory-trail"><label>Starting stack (0–9, separated by commas; empty allowed)<input data-scenario-stack-start maxlength="30"></label><label>Target stack (up to six values)<input data-scenario-stack-target maxlength="30"></label><p class="field-hint">Rightmost value is on top. The learner can push, pop, duplicate and swap the top two values.</p></div>
-    <button type="button" class="game-reset" data-scenario-reset>Reset to example</button>
+    </details><button type="button" class="game-reset" data-scenario-reset>Reset to example</button>
     <button type="button" class="button button-dark" data-scenario-preview>Try your scenario</button>
     <p data-scenario-status class="field-hint" role="status"></p><div data-scenario-preview-host></div>
     <template>@include('learning.arcade-game', ['game' => config('arcade.pixel-studio'), 'completionUrl' => null])</template>

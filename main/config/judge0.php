@@ -12,4 +12,6 @@ return [
     'source_bytes' => 65536,
     'response_bytes' => 262144,
     'evaluation_seconds' => 900,
+    'pending_per_user' => max(1, (int) env('JUDGE0_PENDING_PER_USER', 3)),
+    'confirmations_per_24h' => max(3, (int) env('JUDGE0_CONFIRMATIONS_PER_24H', 20)),
 ];

@@ -11,6 +11,12 @@ work. Existing `/up` and `/ready` remain public liveness/database probes only.
 
 ## SendGrid
 
+The 2026-10-12 [readiness follow-up](studios-media-and-integration-readiness.md)
+adds ten-minute six-digit verification codes with five guesses per issuance and
+the existing link fallback, plus PDF attachments for verified purchase receipts.
+Staging must verify code expiry/resend, PDF receipt delivery and email failure
+reconciliation. Code preparation is not live inbox verification.
+
 Authenticate the sender/domain with SendGrid, configure SPF/DKIM and review DMARC.
 Create a restricted Mail Send API key and save `SENDGRID_API_KEY` privately.
 Set `MAIL_FROM_ADDRESS` to the authenticated sender and choose `sendgrid` for:
@@ -37,6 +43,11 @@ worker/array test is not inbox delivery evidence. SMTP acceptance alone also doe
 not prove inbox delivery. No live messages are sent by `kody:setup-status`.
 
 ## Judge0
+
+Operational admission defaults are `JUDGE0_PENDING_PER_USER=3` and
+`JUDGE0_CONFIRMATIONS_PER_24H=20`, across an account's challenge contexts.
+Keep the existing three-attempt budgets and verify progress/result polling,
+concurrent admission, backoff and billing during the sandbox drill.
 
 Use the owner-selected CE endpoint `https://judge0-ce.p.rapidapi.com` and configure
 the RapidAPI key/host privately. Discover compiler IDs using that provider's

@@ -19,12 +19,16 @@ import { mountTower, mountTowerEditor } from './tower.js';
 import { mountNavigationRail } from './navigation-rail.js';
 import { mountResourceViewer } from './resource-viewer.js';
 import { mountGameResult } from './game-result.js';
+import { mountPaymentStatus } from './payment-status.js';
+import { mountDocumentStage } from './document-stage.js';
 import { mountKodyCompanion, mountPageLoader } from './kody-companion.js';
 
 mountTheme(document, window);
 mountNavigationRail(document, window);
 mountTower(document, window);
 document.querySelectorAll('[data-resource-workspace]').forEach(root => mountResourceViewer(root, window));
+document.querySelectorAll('[data-payment-status]').forEach(root => mountPaymentStatus(root, window));
+document.querySelectorAll('[data-document-stage]').forEach(root => mountDocumentStage(root, window));
 document.querySelectorAll('[data-tower-editor]').forEach(mountTowerEditor);
 mountAccountLinks(document, window);
 mountPasswordFields(document);

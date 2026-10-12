@@ -24,7 +24,8 @@ test('saved catalogs reflect course reading and assessment completions without c
     $this->get(route('course-learning.catalog'))->assertOk()->assertSee('1 / 2 lessons')->assertSee('50%');
     $this->get(route('course-learning.mine'))->assertOk()->assertSee('Last activity')->assertSee('Continue lesson')->assertSee(route('course-learning.lesson', [$course, $gameSlot->id]));
     $this->assertDatabaseCount('learning_activity_days', 0);
-    $this->assertDatabaseCount('xp_awards', 0);
+    $this->assertDatabaseCount('xp_awards', 1);
+    expect((int) DB::table('xp_totals')->where('user_id', $user->id)->value('xp'))->toBe(40);
     $this->postJson(route('course-learning.game', [$course, $gameSlot->id]), courseWin())->assertOk();
     $this->get(route('learning.catalog'))->assertOk()->assertSee('Completed · assessment cleared');
     $this->get(route('course-learning.catalog'))->assertOk()->assertSee('2 / 2 lessons')->assertSee('100%');

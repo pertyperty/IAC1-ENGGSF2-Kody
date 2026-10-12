@@ -7,6 +7,11 @@ export function mountResourceViewer(root, win) {
     const status = viewer.querySelector('[data-resource-status]');
     const enlarge = viewer.querySelector('[data-resource-enlarge]');
     const wide = win.matchMedia('(min-width: 1200px)');
+    const width = viewer.querySelector('[data-resource-width]');
+    width?.addEventListener('input', () => {
+        root.style.setProperty('--resource-width', `${width.value}%`);
+        viewer.querySelector('[data-resource-width-value]').textContent = `${width.value}%`;
+    });
     let trigger = null, changingMode = false, expanded = false;
     const mode = modal => {
         changingMode = true;
@@ -14,8 +19,9 @@ export function mountResourceViewer(root, win) {
         expanded = modal;
         if (modal) viewer.showModal(); else viewer.show();
         changingMode = false;
-        enlarge.hidden = !wide.matches;
-        setIconLabel(enlarge, modal ? 'collapse' : 'expand', modal ? 'Return to lesson' : 'Enlarge preview');
+        enlarge.hidden = false;
+        viewer.querySelector('[data-resource-width-control]').hidden = modal || !wide.matches;
+        setIconLabel(enlarge, modal && wide.matches ? 'collapse' : 'expand', modal && wide.matches ? 'Return to lesson' : wide.matches ? 'Enlarge preview' : 'Fullscreen');
         root.classList.toggle('has-resource', !modal);
     };
     root.querySelectorAll('[data-resource-open]').forEach(link => link.addEventListener('click', event => {
@@ -39,14 +45,19 @@ export function mountResourceViewer(root, win) {
     frame.addEventListener('load', () => {
         if (!viewer.open) return;
         frame.removeAttribute('aria-busy');
-        status.textContent = trigger?.dataset.resourceType === 'pdf' ? 'PDF preview. Use Download original if your browser cannot display it.' : 'Text preview. Download the original for its complete layout, images and diagrams.';
+        status.textContent = trigger?.dataset.resourceType === 'pdf' ? 'PDF preview. Use Download original if your browser cannot display it.' : 'Document preview. Complex formatting may differ; the original file remains available.';
     });
     viewer.querySelector('[data-resource-close]').addEventListener('click', () => viewer.close());
-    enlarge.addEventListener('click', () => mode(!expanded));
+    enlarge.addEventListener('click', async () => {
+        if (wide.matches) mode(!expanded);
+        else if (root.ownerDocument.fullscreenElement === viewer) await root.ownerDocument.exitFullscreen?.();
+        else await viewer.requestFullscreen?.().catch(() => {});
+    });
     viewer.addEventListener('close', () => {
         // Native close events are queued; reopening during a mode switch must preserve the pane.
         if (changingMode || viewer.open) return;
         root.classList.remove('has-resource');
+        if (root.ownerDocument.fullscreenElement === viewer) root.ownerDocument.exitFullscreen?.().catch(() => {});
         frame.removeAttribute('src');
         trigger?.focus({ preventScroll: true });
     });

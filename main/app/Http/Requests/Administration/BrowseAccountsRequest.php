@@ -19,6 +19,7 @@ class BrowseAccountsRequest extends FormRequest
     public function rules(): array
     {
         return ['q' => ['nullable', 'string', 'max:80', 'not_regex:/\x00/'], 'role' => ['nullable', Rule::enum(Role::class)],
-            'status' => ['nullable', Rule::enum(AccountStatus::class)]];
+            'status' => ['nullable', Rule::enum(AccountStatus::class)], 'scope' => ['nullable', Rule::in(['recent', 'all'])],
+            'per_page' => ['nullable', Rule::in([10, 20, 50])], 'reset' => ['sometimes', 'boolean']];
     }
 }

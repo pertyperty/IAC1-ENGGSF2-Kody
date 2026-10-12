@@ -232,7 +232,7 @@ test('A01 A02 B03 B05: guest trial, registration, verified play, reading and cou
     await page.getByRole('button', { name: 'Join this journey' }).click();
     await page.goto(`/learn/courses/${course.id}/modules/${course.slots[0]}`);
     await page.getByRole('button', { name: 'Mark as read' }).click();
-    expect(JSON.parse(fixture('snapshot', email))).toMatchObject({ xp: 20, completed_lessons: 1 });
+    expect(JSON.parse(fixture('snapshot', email))).toMatchObject({ xp: 60, completed_lessons: 1 });
     await page.locator('[data-journey-next]').click();
     await expect(page).toHaveURL(new RegExp(`/modules/${course.slots[1]}$`));
     expect((await page.locator('[data-coding-game]').boundingBox()).width).toBeGreaterThan(800);
@@ -243,7 +243,7 @@ test('A01 A02 B03 B05: guest trial, registration, verified play, reading and cou
     await page.screenshot({ path: 'storage/app/browser-results/saved-course-next-step.png' });
     await page.reload();
     await solveGarden(page);
-    expect(JSON.parse(fixture('snapshot', email))).toMatchObject({ xp: 60, xp_awards: 2, completed_lessons: 2, streak: 1 });
+    expect(JSON.parse(fixture('snapshot', email))).toMatchObject({ xp: 100, xp_awards: 3, completed_lessons: 2, streak: 1 });
     await audit(page);
 });
 
@@ -461,7 +461,7 @@ test('Shared interface: keyboard navigation, light/dark themes, narrow layouts a
     }
     await login(page, 'administrator');
     await page.goto('/wallet');
-    await expect(page.getByText('105 KB', { exact: false })).toBeVisible();
+    await expect(page.getByText('105 KodeBits', { exact: true })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Continue to GCash' })).toHaveCount(0);
     await audit(page);
 });

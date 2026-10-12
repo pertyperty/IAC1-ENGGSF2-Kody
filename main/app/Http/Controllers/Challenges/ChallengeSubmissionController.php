@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Challenges;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Challenges\SubmitCodeRequest;
+use App\Models\ChallengeCaseEvaluation;
 use App\Models\ChallengeSubmission;
 use App\Models\CodingChallenge;
 use App\Models\CodingChallengeRevision;
@@ -38,6 +39,7 @@ class ChallengeSubmissionController extends Controller
         Gate::authorize('view', $submission);
 
         return response()->json(['status' => $submission->status, 'passed_cases' => $submission->passed_cases,
+            'evaluated_cases' => ChallengeCaseEvaluation::where('submission_id', $submission->id)->whereIn('status', ['Passed', 'Failed'])->count(),
             'total_cases' => $submission->total_cases, 'feedback' => $submission->feedback,
             'completed' => $submission->completed_at !== null])->header('Cache-Control', 'no-store, private');
     }

@@ -53,7 +53,7 @@ class ProfileEditing
                 $user->forceFill(['profile_version' => $user->profile_version + 1])->save();
                 if ($emailChanged) {
                     EmailVerification::updateOrCreate(['user_id' => $user->id], ['email' => $user->email,
-                        'token_hash' => null, 'expires_at' => null, 'request_count' => 0, 'last_requested_at' => null]);
+                        'token_hash' => null, 'expires_at' => null, 'otp_hash' => null, 'otp_expires_at' => null, 'otp_attempts' => 0, 'request_count' => 0, 'last_requested_at' => null]);
                     if (! app(EmailVerificationService::class)->request($user)) {
                         throw new RuntimeException('Verification delivery could not be queued.');
                     }

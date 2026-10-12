@@ -19,6 +19,7 @@ use App\Services\Gamification\WeeklyEvents;
 use App\Services\Transactions\WalletLedger;
 use Database\Seeders\TowerLevelSeeder;
 use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -55,7 +56,7 @@ try {
         $options = ['--force' => true];
         if ($operation === 'migrate-baseline') {
             $options += ['--realpath' => true, '--path' => array_values(array_filter(glob(database_path('migrations/*.php')),
-                fn (string $path) => ! str_ends_with($path, '2026_10_05_000038_add_challenge_discovery_metadata.php') && ! str_contains(basename($path), '2026_10_10_') && ! str_contains(basename($path), '2026_10_11_')))];
+                fn (string $path) => ! str_ends_with($path, '2026_10_05_000038_add_challenge_discovery_metadata.php') && ! str_contains(basename($path), '2026_10_10_') && ! str_contains(basename($path), '2026_10_11_') && ! str_contains(basename($path), '2026_10_12_')))];
         }
         if (Artisan::call('migrate', $options) !== 0) {
             throw new RuntimeException('Browser migrations failed.');
@@ -77,7 +78,8 @@ try {
             'towerlearner' => Role::Learner, 'toweradmin' => Role::Administrator, 'stickylearner' => Role::Learner, 'usabilitylearner' => Role::Learner, 'picturelearner' => Role::Learner, 'librarylearner' => Role::Learner, 'guidelearner' => Role::Learner,
             'guidewallet' => Role::Learner, 'guideinstructor' => Role::Instructor, 'guidecontributor' => Role::Contributor,
             'guidemoderator' => Role::Moderator, 'guideadministrator' => Role::Administrator,
-            'questlearner' => Role::Learner, 'quizlearner' => Role::Learner, 'quizcreator' => Role::Instructor, 'questcreator' => Role::Contributor] as $name => $role) {
+            'questlearner' => Role::Learner, 'quizlearner' => Role::Learner, 'quizcreator' => Role::Instructor, 'questcreator' => Role::Contributor,
+            'polishcreator' => Role::Instructor, 'polishlearner' => Role::Learner, 'polishadmin' => Role::Administrator] as $name => $role) {
             $accounts[$name] = User::factory()->create(['username' => 'browser_'.$name, 'email' => $name.'@browser.example.test',
                 'password' => Hash::make('BrowserStrong12!'), 'account_role' => $role,
                 'active_session_hash' => hash('sha256', 'browser-seed-session'), 'active_session_expires_at' => now()->addHour()]);
@@ -94,7 +96,11 @@ try {
         foreach (config('curriculum') as $slug => $plan) {
             $ids = [];
             foreach ($plan['lessons'] as $example) {
-                $module = $publishing->save($accounts['instructor'], 'browser-seed-session', app(CreatorExamples::class)->fields($example));
+                $fields = app(CreatorExamples::class)->fields($example);
+                if (($fields['assessment_kind'] ?? '') === 'none' && Schema::hasColumn('module_revisions', 'attachments')) {
+                    $fields['attachments'] = array_map(fn ($extension) => new UploadedFile(database_path('fixtures/lesson-resources/programming-foundations.'.$extension), 'programming-foundations.'.$extension, null, null, true), ['pdf', 'docx', 'pptx']);
+                }
+                $module = $publishing->save($accounts['instructor'], 'browser-seed-session', $fields);
                 $publishing->submit($accounts['instructor'], 'browser-seed-session', $module, 1);
                 $publishing->review($accounts['moderator'], 'browser-seed-session', $module->fresh(), 2, 'Approved', null);
                 $ids[] = $module->id;
@@ -135,7 +141,13 @@ try {
         app(LearningProgression::class)->record($learner, 'browser-history-session', 'sequences', 'game', $solution);
         $learning->enroll($learner, 'browser-history-session', $course->id, $course->published_revision_id);
         $learning->lesson($learner, 'browser-history-session', $course->id, $slots[0]->id);
-        $learning->markRead($learner, 'browser-history-session', $course->id, $slots[0]->id);
+        if (Schema::hasTable('module_read_completions')) {
+            $learning->markRead($learner, 'browser-history-session', $course->id, $slots[0]->id);
+        } else {
+            // Reproduce the approved pre-amendment reading record without backfilling XP.
+            DB::table('course_module_progress')->where('enrollment_id', DB::table('course_enrollments')->where('user_id', $learner->id)->value('id'))->where('assignment_id', $slots[0]->id)
+                ->update(['completed_at' => now(), 'validated_input' => json_encode(['kind' => 'reading'])]);
+        }
         $learning->complete($learner, 'browser-history-session', $course->id, $slots[1]->id, 'game', $solution);
         // Synthetic conserved test funding only; no provider purchase or launch readiness is enabled.
         DB::transaction(fn () => app(WalletLedger::class)->credit($learner->id, 'browser-drill-funding', 'Purchase', 50, 10000));
@@ -154,6 +166,7 @@ try {
             || VerificationDelivery::where('user_id', $learner->id)->sole()->token !== str_repeat('a', 64)
             || app(WalletLedger::class)->snapshot($learner->id)['balance'] !== 50
             || (int) DB::table('xp_totals')->where('user_id', $learner->id)->value('xp') !== 60
+            || DB::table('module_read_completions')->exists()
             || Artisan::call('kody:ledger-check') !== 0) {
             throw new RuntimeException('Upgrade/restore integrity check failed.');
         }
@@ -167,7 +180,8 @@ try {
             $row = 'to_jsonb(t)';
             if ($operation === 'fingerprint-legacy') {
                 $row .= match ($table->tablename) {
-                    'users' => " - 'profile_picture'", 'module_revisions' => " - 'attachments'", 'coding_challenge_revisions' => " - 'category' - 'tags'", default => '',
+                    'users' => " - 'profile_picture'", 'module_revisions' => " - 'attachments'", 'coding_challenge_revisions' => " - 'category' - 'tags'",
+                    'email_verifications' => " - 'otp_hash' - 'otp_expires_at' - 'otp_attempts'", 'verification_deliveries' => " - 'otp'", default => '',
                 };
             }
             $fingerprints[$table->tablename] = DB::selectOne('SELECT count(*) AS rows, md5(coalesce(string_agg(row_data, \'\' ORDER BY row_data), \'\')) AS digest FROM (SELECT ('.$row.')::text AS row_data FROM "'.$table->tablename.'" t) records');

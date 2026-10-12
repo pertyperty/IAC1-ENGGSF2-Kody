@@ -36,14 +36,16 @@ class LearningHistory
             ->selectRaw("SUBSTRING(level FROM 8)::bigint AS module_id, validated_input->>'revision_id' AS revision_id, MIN(completed_at) AS completed_at, MAX(completed_at) AS last_activity, false AS reading")
             ->groupBy('level')->groupByRaw("validated_input->>'revision_id'")->get();
         $opened = DB::table('content_accesses')->where('user_id', $user->id)->where('kind', 'module')->whereIn('module_id', $ids)->get()->keyBy('module_id');
-        $records = $course->concat($wins)->groupBy('module_id');
+        $read = DB::table('module_read_completions')->where('user_id', $user->id)->whereIn('module_id', $ids)
+            ->selectRaw('module_id, revision_id, completed_at, completed_at AS last_activity, true AS reading, true AS standalone')->get();
+        $records = $course->concat($wins)->concat($read)->groupBy('module_id');
 
         return $revisions->mapWithKeys(function ($revision) use ($records, $opened): array {
             $history = $records->get($revision->module_id, collect());
             $completed = $history->filter(fn ($row) => $row->completed_at !== null);
             $current = $completed->first(fn ($row) => (int) $row->revision_id === $revision->id);
             $state = $completed->isNotEmpty() ? 'complete' : ($history->isNotEmpty() || $opened->has($revision->module_id) ? 'started' : 'new');
-            $label = $state === 'complete' ? ($current === null ? 'Completed · earlier edition' : ($current->reading ? 'Completed · read in course' : 'Completed · assessment cleared')) : ($state === 'started' ? 'In progress' : 'Not started');
+            $label = $state === 'complete' ? ($current === null ? 'Completed · earlier edition' : ($current->reading ? (($current->standalone ?? false) ? 'Completed · article read' : 'Completed · read in course') : 'Completed · assessment cleared')) : ($state === 'started' ? 'In progress' : 'Not started');
 
             return [$revision->module_id => ['state' => $state, 'label' => $label, 'completed_at' => $completed->min('completed_at'),
                 'last_activity' => $history->max('last_activity') ?? $opened->get($revision->module_id)?->first_opened_at]];

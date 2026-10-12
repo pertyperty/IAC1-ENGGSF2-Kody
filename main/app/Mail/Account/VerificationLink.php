@@ -8,7 +8,7 @@ use Illuminate\Mail\Mailables\Envelope;
 
 class VerificationLink extends Mailable
 {
-    public function __construct(public readonly string $verificationUrl, public readonly string $verificationToken) {}
+    public function __construct(public readonly string $verificationUrl, public readonly string $verificationToken, public readonly ?string $verificationCode = null) {}
 
     public function envelope(): Envelope
     {

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Model;
 
 #[Guarded([])]
-#[Hidden(['token', 'token_hash'])]
+#[Hidden(['token', 'token_hash', 'otp'])]
 class VerificationDelivery extends Model
 {
     public $incrementing = false;
@@ -18,6 +18,7 @@ class VerificationDelivery extends Model
     {
         return [
             'token' => 'encrypted',
+            'otp' => 'encrypted',
             'sent_at' => 'immutable_datetime',
             'failed_at' => 'immutable_datetime',
             'cancelled_at' => 'immutable_datetime',
