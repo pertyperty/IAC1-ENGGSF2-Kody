@@ -67,22 +67,33 @@ export function mountKodyCompanion(doc, win) {
         y = Math.max(0, Math.min(1, y + (event.key === 'ArrowUp' ? -.05 : event.key === 'ArrowDown' ? .05 : 0)));
         positionPet(); savePet();
     });
-    pet.querySelector('[data-companion-hide]').addEventListener('click', () => {
-        pet.hidden = true; setBubble(false); savePet(); doc.querySelector('.header-tour')?.focus();
+    let petAnimation = null;
+    const revealPet = () => {
+        petAnimation?.cancel(); pet.hidden = false;
+        if (!win.matchMedia('(prefers-reduced-motion: reduce)').matches) petAnimation = pet.animate?.([{ opacity: 0, transform: 'translateY(16px) scale(.85)' }, { opacity: 1, transform: 'none' }], { duration: 240, easing: 'ease-out' });
+        savePet();
+    };
+    pet.querySelector('[data-companion-hide]').addEventListener('click', async () => {
+        setBubble(false); petAnimation?.cancel();
+        if (!win.matchMedia('(prefers-reduced-motion: reduce)').matches && pet.animate) {
+            petAnimation = pet.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateY(16px) scale(.85)' }], { duration: 180, easing: 'ease-in' });
+            try { await petAnimation.finished; } catch { return; }
+        }
+        pet.hidden = true; savePet(); doc.querySelector('.header-tour')?.focus({ preventScroll: true });
     });
     let pageName = "this page";
     const positionTip = () => {
         if (!dialog.open || index < 0) return;
         const target = steps[index]?.target;
-        if (!visible(target)) { spot.hidden = true; hole.setAttribute('r', '0'); return; }
+        if (!visible(target)) { spot.hidden = true; hole.setAttribute('width', '0'); return; }
         const box = target.getBoundingClientRect();
-        const cx = Math.max(24, Math.min(win.innerWidth - 24, box.left + box.width / 2));
-        const cy = Math.max(24, Math.min(win.innerHeight - 24, box.top + box.height / 2));
-        const radius = Math.min(Math.max(34, Math.hypot(box.width, box.height) / 2 + 12), win.innerWidth * .48, win.innerHeight * .37);
-        hole.setAttribute('cx', String(cx)); hole.setAttribute('cy', String(cy)); hole.setAttribute('r', String(radius));
-        spot.hidden = false; spot.style.left = `${cx - radius}px`; spot.style.top = `${cy - radius}px`; spot.style.width = spot.style.height = `${radius * 2}px`;
+        const left = Math.max(6, box.left - 6), top = Math.max(6, box.top - 6);
+        const right = Math.min(win.innerWidth - 6, box.right + 6), bottom = Math.min(win.innerHeight - 6, box.bottom + 6);
+        if (right <= left || bottom <= top) { spot.hidden = true; hole.setAttribute('width', '0'); return; }
+        for (const [key, value] of Object.entries({ x: left, y: top, width: right - left, height: bottom - top })) hole.setAttribute(key, String(value));
+        spot.hidden = false; spot.style.left = `${left}px`; spot.style.top = `${top}px`; spot.style.width = `${right - left}px`; spot.style.height = `${bottom - top}px`;
         // Put the readable card on the opposite half, never over the highlighted control.
-        card.classList.toggle('tour-card-top', cy > win.innerHeight * .5);
+        card.classList.toggle('tour-card-top', (top + bottom) / 2 > win.innerHeight * .5);
     };
     const renderTip = () => {
         dialog.classList.toggle('tour-intro', index < 0);
@@ -91,7 +102,7 @@ export function mountKodyCompanion(doc, win) {
         dialog.querySelector('#tour-message').textContent = current?.message ?? 'I’m Kody, your coding companion. This guide explains the page you are on. You can skip it or replay it whenever you like.';
         dialog.querySelector('[data-tour-count]').textContent = index < 0 ? 'WELCOME TO KODY' : `YOUR GUIDE · ${index + 1} / ${steps.length}`;
         setIconLabel(next, 'right', index < 0 ? 'Click to begin' : index === steps.length - 1 ? 'Let’s explore' : 'Next tip');
-        back.hidden = index <= 0; spot.hidden = index < 0; hole.setAttribute('r', '0');
+        back.hidden = index <= 0; spot.hidden = index < 0; hole.setAttribute('width', '0');
         current?.target.scrollIntoView({ block: 'center', behavior: 'instant' });
         positionTip(); next.focus({ preventScroll: true });
     };
@@ -102,13 +113,13 @@ export function mountKodyCompanion(doc, win) {
         previousFocus = doc.activeElement; index = -1;
         doc.dispatchEvent(new win.Event('kody:tour-start'));
         ({ name: pageName, steps } = buildPageGuide(doc, dialog.dataset.tourPage ?? ''));
-        setBubble(false); pet.hidden = false; savePet(); dialog.showModal(); renderTip();
+        setBubble(false); revealPet(); dialog.showModal(); renderTip();
     };
     next.addEventListener('click', advance); spot.addEventListener('click', advance);
     back.addEventListener('click', () => { index = Math.max(0, index - 1); renderTip(); });
     dialog.querySelector('[data-tour-skip]').addEventListener('click', finish);
     dialog.addEventListener('cancel', () => write(win, TOUR_KEY, 'dismissed'));
-    dialog.addEventListener('close', () => { previousFocus?.focus?.({ preventScroll: true }); });
+    dialog.addEventListener('close', () => { revealPet(); previousFocus?.focus?.({ preventScroll: true }); });
     doc.querySelectorAll('[data-tour-open]').forEach(button => { button.hidden = false; button.addEventListener('click', open); });
     win.addEventListener('resize', () => { positionPet(); positionTip(); });
     doc.addEventListener('scroll', positionTip, { capture: true, passive: true });

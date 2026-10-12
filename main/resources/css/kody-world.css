@@ -143,3 +143,9 @@ body:has(.kody-tour[open]) { overflow: hidden; }
     .tower-scenery > [data-ascent-art] { will-change: auto; height: 100%; object-fit: cover; object-position: bottom; }
     .tower-scenery .ascent-glow { transform: none; transition: none; }
 }
+.tour-spot { border-radius: 10px; border-width: 2px; box-shadow: 0 0 0 3px rgba(166,220,255,.16); }
+.tour-intro .tour-card { width: min(500px, calc(100% - 32px)); padding: 28px; gap: 16px; }
+.tour-intro .tour-mascot { margin: auto; width: 88px; height: 104px; }
+.tour-intro .tour-actions { justify-content: center; }
+.tour-card { border-radius: 16px; }.tour-card .tour-actions { padding-top: 8px; }
+@media(max-width:480px) { .tour-card, .tour-intro .tour-card { padding: 18px; }.tour-card .tour-mascot { width: 64px; height: 80px; }.tour-intro .tour-copy h2 { font-size: 25px; }.tour-intro .tour-actions .button { flex: 1 1 160px; } }

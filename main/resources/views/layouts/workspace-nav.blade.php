@@ -1,6 +1,6 @@
 <nav class="workspace-nav" aria-label="{{ ($mobile ?? false) ? 'Mobile workspace' : 'Your workspace' }}">
     <p class="rail-label">@can('viewAny', \App\Models\User::class)Explore Kody @else Your playground @endcan</p>
-    @if(auth()->user()->account_role === \App\Enums\Role::Learner)<a href="{{ route('home') }}" @if(request()->routeIs('home', 'tower.*')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'tower', 'label' => 'The Tower'])</a>@endif
+    @if(in_array(auth()->user()->account_role, [\App\Enums\Role::Learner, \App\Enums\Role::Instructor], true))<a href="{{ route('home') }}" @if(request()->routeIs('home', 'tower.*')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'tower', 'label' => 'The Tower'])</a>@endif
     <a href="{{ route('dashboard') }}" @if(request()->routeIs('dashboard', 'learning.show')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'panel', 'label' => 'Overview'])</a>
     <a href="{{ route('learning.catalog') }}" @if(request()->routeIs('learning.catalog', 'modules.*', 'course-learning.show', 'course-learning.lesson')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'book', 'label' => 'Learning catalog'])</a>
     <a href="{{ route('course-learning.catalog') }}" @if(request()->routeIs('course-learning.catalog')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'book', 'label' => 'Browse courses'])</a>
@@ -26,6 +26,7 @@
     @can('viewReports', \App\Models\User::class)<a href="{{ route('system-reports') }}" @if(request()->routeIs('system-reports')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'chart', 'label' => 'Platform reports'])</a><a href="{{ route('finance.index') }}" @if(request()->routeIs('finance.*')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'wallet', 'label' => 'Accounting'])</a>@endcan
     @endcan
     @can('manage', \App\Models\TowerLevel::class)<a href="{{ route('tower-studio.index') }}" @if(request()->routeIs('tower-studio.*')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'tower', 'label' => 'Tower studio'])</a>@endcan
+    @can('manageSite', \App\Models\User::class)<a href="{{ route('site-management.index') }}" @if(request()->routeIs('site-management.*')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'settings', 'label' => 'Site management'])</a>@endcan
     <p class="rail-label">A little support</p>
     @can('viewAny', \App\Models\GamePreset::class)<a href="{{ route('game-presets.index') }}" @if(request()->routeIs('game-presets.*')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'game', 'label' => 'Game presets'])</a>@endcan
     @can('viewAny', \App\Models\FaqEntry::class)<a href="{{ route('faq-management.index') }}" @if(request()->routeIs('faq-management.*')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'help', 'label' => 'FAQ management'])</a>@endcan
@@ -34,4 +35,7 @@
     <a href="{{ route('wallet.index') }}" @if(request()->routeIs('wallet.*', 'earnings.*')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'wallet', 'label' => 'Wallet'])</a>
     <a href="{{ route('account.show') }}" @if(request()->routeIs('account.*')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'profile', 'label' => 'Profile & security'])</a>
     <a href="{{ route('help.index') }}" @if(request()->routeIs('help.*')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'help', 'label' => 'Help center'])</a>
+
+    <a href="{{ route('contact') }}" @if(request()->routeIs('contact')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'mail', 'label' => 'Contact Kody'])</a>
+
 </nav>

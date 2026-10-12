@@ -7,6 +7,7 @@ use App\Http\Requests\Learning\CompleteGameRequest;
 use App\Http\Requests\Learning\CompleteQuizRequest;
 use App\Models\LearningCourse;
 use App\Models\WeeklyEvent;
+use App\Services\Engagement\CreatorInsights;
 use App\Services\Engagement\LearnerMissions;
 use App\Services\Engagement\PlatformDashboard;
 use App\Services\Gamification\Achievements;
@@ -16,6 +17,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\Rule;
 
 class PlayController extends Controller
 {
@@ -30,12 +32,15 @@ class PlayController extends Controller
 
     public function hub(Request $request, LearningProgression $progression, PlatformDashboard $dashboard): Response
     {
+        $days = (int) ($request->validate(['insight_days' => ['sometimes', Rule::in([7, 30, 90])]])['insight_days'] ?? 30);
         $participant = $request->user()->account_role === Role::Learner && Gate::allows('viewLearning', LearningCourse::class);
         $progress = $participant ? $progression->snapshot($request->user()->id) : null;
         $dashboard = $dashboard->snapshot($request->user());
         $missions = $participant ? app(LearnerMissions::class)->snapshot($progress, $dashboard['achievements']) : [];
+        $insights = in_array($request->user()->account_role, [Role::Instructor, Role::Contributor], true)
+            ? app(CreatorInsights::class)->snapshot($request->user(), $request->session()->getId(), $days) : null;
 
-        return response()->view('learning.hub', ['progress' => $progress, 'dashboard' => $dashboard, 'missions' => $missions,
+        return response()->view('learning.hub', ['progress' => $progress, 'dashboard' => $dashboard, 'missions' => $missions, 'insights' => $insights,
             'weekly' => $participant ? WeeklyEvent::open()->with('revision:id,title,language,difficulty')->first() : null])->header('Cache-Control', 'no-store, private');
     }
 

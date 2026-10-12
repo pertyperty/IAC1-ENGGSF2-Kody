@@ -16,7 +16,7 @@ class TowerController extends Controller
 {
     public function index(Request $request, TowerProgression $tower): Response|RedirectResponse
     {
-        if ($request->user() && $request->user()->account_role !== Role::Learner) {
+        if ($request->user() && ! in_array($request->user()->account_role, [Role::Learner, Role::Instructor], true)) {
             return redirect()->route('dashboard');
         }
 

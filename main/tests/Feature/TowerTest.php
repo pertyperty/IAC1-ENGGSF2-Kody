@@ -184,8 +184,28 @@ test('creator and staff dashboards omit learner missions and show only their rel
     moduleSignIn($this, moduleAccount($role));
     $this->get(route('dashboard'))->assertOk()->assertDontSee('data-progress-strip', false)->assertDontSee('daily-progress', false)
         ->assertDontSee('Your learning journeys')->assertDontSee('level-trail', false);
-    $this->get(route('home'))->assertRedirect(route('dashboard'));
+    if ($role === Role::Instructor) {
+        $this->get(route('home'))->assertOk()->assertSee('Kody Tower')->assertSee('data-progress-strip', false);
+    } else {
+        $this->get(route('home'))->assertRedirect(route('dashboard'));
+    }
 })->with([Role::Contributor, Role::Instructor, Role::Moderator, Role::Administrator]);
+
+test('Instructors play the Tower with owned sequential progress and streaks while keeping their creator dashboard', function () {
+    $this->seed(TowerLevelSeeder::class);
+    $user = moduleAccount(Role::Instructor);
+    moduleSignIn($this, $user);
+    $first = TowerLevel::where('position', 1)->sole();
+    $second = TowerLevel::where('position', 2)->sole();
+    $this->get(route('dashboard'))->assertOk()->assertSee('Play the Tower')->assertDontSee('daily-progress', false);
+    $this->get(route('tower.show', $second))->assertForbidden();
+    $this->get(route('tower.show', $first))->assertOk();
+    $this->postJson(route('tower.complete', [$first, $first->current_revision_id, 0]), towerSolution($first->currentRevision->stages[0]))->assertOk()->assertJsonPath('tower.cleared', true);
+    $this->assertDatabaseHas('tower_clearances', ['user_id' => $user->id, 'level_id' => $first->id]);
+    $this->get(route('tower.show', $second))->assertOk();
+    $this->assertDatabaseCount('xp_awards', 0);
+    $this->assertDatabaseCount('learning_activity_days', 1);
+});
 
 test('tower studio bounds nested configuration and account erasure removes saved tower activity', function () {
     $this->seed(TowerLevelSeeder::class);

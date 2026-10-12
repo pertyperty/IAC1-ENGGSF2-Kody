@@ -4,6 +4,10 @@ Start here for current scope, detailed evidence and the next useful improvements
 This index consolidates the feature summaries previously repeated in README.
 It does not replace approved requirements, decisions or the implementation records.
 Last reviewed: 2026-10-12.
+The [creator insights and support record](creator-insights-and-support.md) owns
+private creator charts, instructor Tower access, audited Administrator notices,
+secret-free operations summaries, public email-app support/appeals, bounded quiz
+editing, rectangular page guides and Wallet/Welcome/workspace polish.
 The [studio/media/provider readiness record](studios-media-and-integration-readiness.md)
 owns visual scenario editing, private Office rendering, adjustable/fullscreen
 resources, Wallet/HUD polish, recent-account limits, aggregate report exports,

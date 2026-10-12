@@ -20,7 +20,7 @@ test('first guest gets a keyboard accessible mascot welcome and spotlight tour t
     await page.screenshot({ path: 'storage/app/browser-results/kody-welcome-mobile.png' });
     await page.keyboard.press('Enter');
     await expect(tour.locator('[data-tour-count]')).toContainText('1 /');
-    expect(Number(await tour.locator('[data-tour-hole]').getAttribute('r'))).toBeGreaterThan(30);
+    expect(Number(await tour.locator('[data-tour-hole]').getAttribute('width'))).toBeGreaterThan(30);
     await audit(page);
     await page.screenshot({ path: 'storage/app/browser-results/kody-spotlight-mobile.png' });
     await tour.getByRole('button', { name: 'Next tip' }).click();
@@ -122,7 +122,7 @@ test('contextual guides explain all five role workspaces without submitting form
                 await tour.locator('[data-tour-next]').click();
             }
             expect(found, `${role} should have a relevant page guide`).toBe(true);
-            expect(Number(await tour.locator('[data-tour-hole]').getAttribute('r'))).toBeGreaterThan(30);
+            expect(Number(await tour.locator('[data-tour-hole]').getAttribute('width'))).toBeGreaterThan(30);
             await audit(page); await page.screenshot({ path: `storage/app/browser-results/kody-guide-${role}.png` });
             await page.setViewportSize({ width: 320, height: 740 }); await audit(page);
             await tour.getByRole('button', { name: 'Skip tutorial' }).click();

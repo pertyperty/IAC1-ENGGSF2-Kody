@@ -3,6 +3,7 @@
 @section('content')
     <section class="play-hub page-width"><div class="section-heading"><div>@if(auth()->user()->can('viewAny', \App\Models\User::class))<p class="overline">YOUR COMMUNITY WORKSPACE</p><h1>Everything you need to help.</h1>@elseif(!$progress)<p class="overline">YOUR CREATOR WORKSPACE</p><h1>Make learning worth playing.</h1>@else<p class="overline">A LITTLE BETTER, EVERY DAY</p><h1>Your next little win.</h1>@endif</div><a class="quiet-link" href="{{ route('account.show') }}">View your profile <x-action-icon name="right"/></a></div>
         @include('layouts.staff-tools')
+        @if(auth()->user()->account_role === \App\Enums\Role::Instructor)<div class="creator-play-link"><div><h2>A little play inspires great lessons</h2><p>Explore the Tower as a learner. Your confirmed clears save your own progress and daily streak.</p></div><a class="button button-play" href="{{ route('home') }}"><x-action-icon name="tower"/> Play the Tower</a></div>@endif
         @if($progress)
         <a class="button button-play" href="{{ route('home') }}">Continue climbing the tower <x-action-icon name="right"/></a>
         @include('learning.mission-board')
@@ -19,6 +20,7 @@
         <p class="catalog-note">Clear a level to save your progress and keep your streak growing. Your first verified game clear and quiz win on each starter level earn 20 XP each. Local practice earns no rewards.</p>
         @endif
         @include('learning.dashboard-panels')
+        @if($insights)@include('learning.creator-insights')@endif
         <form method="post" action="{{ route('logout') }}">@csrf<button type="submit" class="quiet-link hub-logout">Sign out</button></form>
     </section>
     @if($progress)<section class="page-width"><h2>Try another kind of puzzle.</h2><p>Explore four practice templates, including a command-line mission.</p><a class="button button-dark" href="{{ route('arcade') }}">Open the playground <x-action-icon name="right"/></a></section>@endif

@@ -1,6 +1,7 @@
 <?php
 
 // CLI-only fixtures: never loaded by the application or exposed as an HTTP route.
+use App\Enums\AccountStatus;
 use App\Enums\Role;
 use App\Models\ChallengeTestCase;
 use App\Models\CodingChallenge;
@@ -14,8 +15,10 @@ use App\Services\Content\CourseLearning;
 use App\Services\Content\CoursePublishing;
 use App\Services\Content\CreatorExamples;
 use App\Services\Content\ModulePublishing;
+use App\Services\Engagement\ContentFeedback;
 use App\Services\Gamification\LearningProgression;
 use App\Services\Gamification\WeeklyEvents;
+use App\Services\Transactions\ContentAccess;
 use App\Services\Transactions\WalletLedger;
 use Database\Seeders\TowerLevelSeeder;
 use Illuminate\Contracts\Console\Kernel;
@@ -79,7 +82,8 @@ try {
             'guidewallet' => Role::Learner, 'guideinstructor' => Role::Instructor, 'guidecontributor' => Role::Contributor,
             'guidemoderator' => Role::Moderator, 'guideadministrator' => Role::Administrator,
             'questlearner' => Role::Learner, 'quizlearner' => Role::Learner, 'quizcreator' => Role::Instructor, 'questcreator' => Role::Contributor,
-            'polishcreator' => Role::Instructor, 'polishlearner' => Role::Learner, 'polishadmin' => Role::Administrator] as $name => $role) {
+            'polishcreator' => Role::Instructor, 'polishlearner' => Role::Learner, 'polishadmin' => Role::Administrator,
+            'insightcreator' => Role::Instructor, 'insightreader' => Role::Learner, 'siteadmin' => Role::Administrator, 'appeallearner' => Role::Learner] as $name => $role) {
             $accounts[$name] = User::factory()->create(['username' => 'browser_'.$name, 'email' => $name.'@browser.example.test',
                 'password' => Hash::make('BrowserStrong12!'), 'account_role' => $role,
                 'active_session_hash' => hash('sha256', 'browser-seed-session'), 'active_session_expires_at' => now()->addHour()]);
@@ -129,6 +133,15 @@ try {
             $manifest['weekly'] = $event->id;
             $manifest['challenge'] = $challenge->id;
         }
+        if (Schema::hasTable('site_announcements')) {
+            $module = $publishing->save($accounts['insightcreator'], 'browser-seed-session', app(CreatorExamples::class)->fields('sequences'));
+            $publishing->submit($accounts['insightcreator'], 'browser-seed-session', $module, 1);
+            $publishing->review($accounts['moderator'], 'browser-seed-session', $module->fresh(), 2, 'Approved', null);
+            app(ContentAccess::class)->open($accounts['insightreader'], 'browser-seed-session', 'module', $module->id);
+            app(ContentFeedback::class)->read($accounts['insightreader'], 'browser-seed-session', 'module', $module->id, true);
+            app(LearningProgression::class)->recordModule($accounts['insightreader'], 'browser-seed-session', $module->id, $module->fresh()->published_revision_id, 'game', ['program' => ['right', 'right', 'up', 'right', 'right']]);
+            $accounts['appeallearner']->forceFill(['account_status' => AccountStatus::Suspended])->save();
+        }
         User::query()->update(['active_session_hash' => null, 'active_session_expires_at' => null]);
         echo json_encode($manifest, JSON_THROW_ON_ERROR);
     } elseif ($operation === 'seed-history') {
@@ -167,6 +180,8 @@ try {
             || app(WalletLedger::class)->snapshot($learner->id)['balance'] !== 50
             || (int) DB::table('xp_totals')->where('user_id', $learner->id)->value('xp') !== 60
             || DB::table('module_read_completions')->exists()
+            || DB::table('site_announcements')->count() !== 1
+            || DB::table('site_announcements')->where('id', 1)->where('active', false)->where('record_version', 1)->count() !== 1
             || Artisan::call('kody:ledger-check') !== 0) {
             throw new RuntimeException('Upgrade/restore integrity check failed.');
         }

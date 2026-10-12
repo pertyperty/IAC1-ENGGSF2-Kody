@@ -2,6 +2,7 @@
 <section class="staff-workspace" aria-labelledby="staff-workspace-heading">
     <div class="section-heading"><div><p class="overline">YOUR STAFF WORKSPACE</p><h2 id="staff-workspace-heading">Help good learning happen.</h2></div><p>Review, support and manage your community.</p></div>
     <div class="workspace-grid">
+        @can('manageSite', \App\Models\User::class)<a href="{{ route('site-management.index') }}"><span class="workspace-icon" aria-hidden="true"><x-action-icon name="settings"/></span><strong>Site management</strong><span>Publish audited notices and inspect background work.</span></a>@endcan
         @can('manage', \App\Models\TowerLevel::class)<a href="{{ route('tower-studio.index') }}"><span class="workspace-icon" aria-hidden="true"><x-action-icon name="tower"/></span><strong>Tower studio</strong><span>Shape levels, bosses and learning checkpoints.</span></a>@endcan
         <a href="{{ route('account-governance.index') }}"><span class="workspace-icon" aria-hidden="true"><x-action-icon name="people"/></span><strong>Community accounts</strong><span>Find accounts and review their history.</span></a>
         <a href="{{ route('content-moderation.index') }}"><span class="workspace-icon" aria-hidden="true"><x-action-icon name="shield"/></span><strong>Content moderation</strong><span>Manage learner availability and staff withdrawals.</span></a>

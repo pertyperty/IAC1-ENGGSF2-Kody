@@ -3,5 +3,5 @@
 @section('content')
 <section class="review-page page-width">
 @include('layouts.review-nav')
-<a class="quiet-link" href="{{ route('module-reviews.index') }}"><x-action-icon name="left"/> Adventure reviews</a><h1>A bigger journey, ready for review.</h1><p>Check the course details, lesson order and each saved adventure.</p><div class="review-list">@forelse($revisions as $revision)<a href="{{ route('course-reviews.show', $revision->course) }}"><b>{{ $revision->title }}</b><span>Revision {{ $revision->number }}</span></a>@empty<p>No courses are waiting for review.</p>@endforelse</div>{{ $revisions->links() }}</section>
+<a class="quiet-link" href="{{ route('module-reviews.index') }}"><x-action-icon name="left"/> Adventure reviews</a><h1>A bigger journey, ready for review.</h1><p>Check the course details, lesson order and each saved adventure.</p><div class="review-list">@forelse($revisions as $revision)<a href="{{ route('course-reviews.show', $revision->course) }}"><b>{{ $revision->title }}</b><span>Revision {{ $revision->number }}</span></a>@empty<x-empty-state title="No courses are waiting for review." description="Submitted course revisions will appear here with their pinned lesson order."/>@endforelse</div>{{ $revisions->links() }}</section>
 @endsection
