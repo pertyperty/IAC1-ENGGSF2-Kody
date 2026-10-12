@@ -52,6 +52,11 @@ class UserPolicy
         return $this->viewAny($actor) && $actor->account_role === Role::Administrator;
     }
 
+    public function manageSite(User $actor): bool
+    {
+        return $this->viewReports($actor);
+    }
+
     public function archive(User $actor, User $account): bool
     {
         return $this->update($actor, $account) && in_array($actor->account_role, [Role::Learner, Role::Contributor, Role::Instructor], true);

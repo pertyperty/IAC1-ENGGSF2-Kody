@@ -25,7 +25,7 @@ async function guide(page, title) {
         await tour.locator('[data-tour-next]').click();
     }
     expect(titles).toContain(title); expect(titles).not.toContain('Your way home'); expect(titles).not.toContain('One discovery at a time');
-    expect(Number(await tour.locator('[data-tour-hole]').getAttribute('r'))).toBeGreaterThan(30);
+    expect(Number(await tour.locator('[data-tour-hole]').getAttribute('width'))).toBeGreaterThan(30);
     await audit(page); await tour.locator('[data-tour-skip]').click();
 }
 
@@ -84,7 +84,7 @@ test('creator mixed quiz preview is editable and learner completion is saved by 
                 await expect(editor.locator('[data-question-field="type"]')).toHaveCount(3);
                 await expect(editor.locator('[data-question-field="type"]').nth(1)).toHaveValue('blank');
                 await expect(editor.locator('[data-question-field="type"]').nth(2)).toHaveValue('matching');
-                await editor.locator('[data-add-pair]').nth(2).click();
+                await editor.locator('[data-question-toggle]').nth(2).click(); await editor.locator('[data-add-pair]').nth(2).click();
                 const pair = editor.locator('[data-quiz-question-editor]').nth(2).locator('[data-matching-pair]').last();
                 await pair.locator('[data-pair-field="left"]').fill('Sequence'); await pair.locator('[data-pair-field="right"]').fill('Runs in order');
                 await page.locator('[data-quiz-preview-button]').click();

@@ -1,5 +1,5 @@
 <fieldset class="quiz-question-editor" data-quiz-question-editor>
-    <legend data-question-heading>Question {{ $questionIndex + 1 }}</legend>
+    <legend><span data-question-heading>Question {{ $questionIndex + 1 }}</span><button type="button" data-question-toggle aria-expanded="true" class="game-reset" hidden><x-action-icon name="chevron"/><span class="sr-only">Collapse question</span></button></legend>
     <input type="hidden" data-question-field="id" name="quiz_questions[{{ $questionIndex }}][id]" value="{{ is_string($question['id'] ?? null) ? $question['id'] : 'q'.($questionIndex + 1) }}">
     @php($questionType = in_array($question['type'] ?? 'choice', ['choice', 'blank', 'matching'], true) ? ($question['type'] ?? 'choice') : 'choice')
     <label>Question type<select data-question-field="type" name="quiz_questions[{{ $questionIndex }}][type]">@foreach(['choice' => 'Multiple choice (or True / False)', 'blank' => 'Fill in the blank', 'matching' => 'Match the pairs'] as $value => $label)<option value="{{ $value }}" @selected($questionType === $value)>{{ $label }}</option>@endforeach</select></label>

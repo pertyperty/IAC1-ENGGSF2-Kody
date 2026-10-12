@@ -18,7 +18,7 @@
             @if(!$paymentsReady)<p class="notice"><x-action-icon name="shield"/> Live checkout is being prepared. Free adventures remain available.</p>@endif
             <div class="wallet-packages">
                 @foreach(config('economy.packages') as $slug => $package)
-                    <article class="wallet-package"><x-kody-art name="kodebit" class="package-art" size="64"/><h3>{{ $package['label'] }}</h3><strong>{{ number_format($package['kodebits']) }} KodeBits</strong><p>PHP {{ \App\Support\ExactMoney::decimal($package['price_minor']) }}</p>
+                    <article class="wallet-package wallet-package-{{ $slug }}"><div class="package-identity"><span class="package-tier">{{ ['starter' => 'A small start', 'builder' => 'Keep exploring', 'explorer' => 'Build your library'][$slug] ?? 'Your next adventure' }}</span><div class="package-coins" aria-hidden="true">@for($coin = 0; $coin < min(3, $loop->iteration); $coin++)<x-kody-art name="kodebit" class="package-art" size="56"/>@endfor</div></div><h3>{{ $package['label'] }}</h3><strong><x-kodebits :amount="$package['kodebits']"/></strong><p class="package-price">PHP {{ \App\Support\ExactMoney::decimal($package['price_minor']) }}</p>
                         @if($paymentsReady)<form class="studio-form" method="post" action="{{ route('wallet.purchase') }}">@csrf<input type="hidden" name="package" value="{{ $slug }}"><input type="hidden" name="confirmation_id" value="{{ $confirmationId }}">@include('transactions.password-confirmation')<button class="button button-play">Continue to Xendit <x-action-icon name="right"/></button></form>
                         @else<span class="field-hint">Checkout setup pending</span>@endif
                     </article>

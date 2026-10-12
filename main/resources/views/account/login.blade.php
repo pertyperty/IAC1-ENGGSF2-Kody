@@ -22,4 +22,5 @@
     <p class="secondary-link"><a href="{{ route('verification.notice') }}">Need to verify your email?</a></p>
     <p class="secondary-link"><a href="{{ route('recovery.request') }}">Forgot your password?</a></p>
     <p class="secondary-link"><a href="{{ route('register') }}">Create an account</a></p>
+    <aside class="access-support"><h2>Think an account restriction was a mistake?</h2><p>You can ask the support team to review it.</p><a class="quiet-link" href="{{ route('contact') }}#appeals"><x-action-icon name="mail"/> Contact Kody or appeal a suspension</a></aside>
 @endsection

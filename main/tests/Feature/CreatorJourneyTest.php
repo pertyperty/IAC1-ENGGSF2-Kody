@@ -48,7 +48,7 @@ test('B05 next adventure and daily feedback follow persisted validated progress'
 test('B01 landing trial invites guests to save and signed in players to continue', function () {
     $this->get(route('welcome'))->assertOk()->assertSee('This trial stays here')->assertSee('Start your saved adventure');
     signInForLearning($this);
-    $this->get(route('welcome'))->assertOk()->assertSee('Continue your saved adventure')->assertSee('Continue your saved trail');
+    $this->get(route('welcome'))->assertOk()->assertSee('Open your workspace')->assertSee(route('dashboard'))->assertSee('Continue your saved trail');
     $this->get(route('learning.show', 'sequences'))->assertOk()->assertSee('Continue playing');
 });
 

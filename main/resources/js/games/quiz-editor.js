@@ -14,6 +14,12 @@ export function firstUnusedId(ids, prefix = 'q') {
 }
 
 export function mountQuizEditor(root) {
+    const openQuestion = (question, open) => {
+        question.classList.toggle('is-collapsed', !open);
+        const toggle = question.querySelector('[data-question-toggle]');
+        toggle.hidden = false; toggle.setAttribute('aria-expanded', String(open));
+        toggle.querySelector('.sr-only').textContent = open ? 'Collapse question' : 'Expand question';
+    };
     const questions = root.querySelector('[data-quiz-questions]');
     const status = root.querySelector('[data-quiz-editor-status]');
     const announce = (message) => { status.textContent = message; root.dispatchEvent(new Event('input', { bubbles: true })); };
@@ -64,7 +70,9 @@ export function mountQuizEditor(root) {
         if (!button || button.disabled) return;
         const question = button.closest('[data-quiz-question-editor]');
         const option = button.closest('[data-quiz-option-editor]');
-        if (button.hasAttribute('data-add-accepted') && question.querySelectorAll('[data-accepted-answer]').length < 6) {
+        if (button.hasAttribute('data-question-toggle')) {
+            openQuestion(question, question.classList.contains('is-collapsed'));
+        } else if (button.hasAttribute('data-add-accepted') && question.querySelectorAll('[data-accepted-answer]').length < 6) {
             const row = question.querySelector('[data-accepted-answer]').closest('label').cloneNode(true); row.querySelector('input').value = ''; question.querySelector('[data-accepted-list]').append(row); update(); row.querySelector('input').focus(); announce('Accepted answer added.');
         } else if (button.hasAttribute('data-remove-accepted') && question.querySelectorAll('[data-accepted-answer]').length > 1) {
             button.closest('label').remove(); update(); question.querySelector('[data-add-accepted]').focus(); announce('Accepted answer removed.');
@@ -76,7 +84,8 @@ export function mountQuizEditor(root) {
         if (button.hasAttribute('data-add-question') && questions.children.length < 10) {
             const row = root.querySelector('[data-question-template]').content.firstElementChild.cloneNode(true);
             row.querySelector('[data-question-field="id"]').value = firstUnusedId(readQuizQuestions(root).map((question) => question.id));
-            questions.append(row); update(); row.querySelector('textarea').focus(); announce('Question added.');
+            questions.querySelectorAll('[data-quiz-question-editor]').forEach(item => openQuestion(item, false));
+            questions.append(row); update(); openQuestion(row, true); row.querySelector('textarea').focus({ preventScroll: true }); row.scrollIntoView({ block: 'nearest' }); announce('Question added.');
         } else if (button.hasAttribute('data-add-option') && question.querySelectorAll('[data-quiz-option-editor]').length < 6) {
             const row = root.querySelector('[data-option-template]').content.firstElementChild.cloneNode(true);
             const ids = [...question.querySelectorAll('[data-option-field="id"]')].map((input) => input.value);
@@ -98,4 +107,5 @@ export function mountQuizEditor(root) {
         }
     });
     update();
+    questions.querySelectorAll('[data-quiz-question-editor]').forEach((question, index) => openQuestion(question, index === 0 || Boolean(root.closest('form')?.querySelector('.form-errors'))));
 }

@@ -6,7 +6,7 @@ const game = [
     guide('[data-arcade-run], [data-game-run], [data-practice-quiz] button[type="submit"]', 'Try, adjust, then run', 'Run checks your answer. Published lessons save eligible results only after server validation; arcade practice stays local.'),
 ];
 const lesson = [
-    guide('.lesson-reading, .lesson-text', 'A place to learn', 'Read the explanation at your own pace. Reading and opening resources do not award play rewards.'),
+    guide('.lesson-reading, .lesson-text', 'A place to learn', 'Read the explanation at your own pace. An explicit first article completion can earn XP; opening a resource alone never does.'),
     guide('[data-resource-open]', 'Keep your resources beside you', 'View opens a private resource alongside your lesson. Enlarge it for more room, or download a copy when permitted.'),
     ...game,
 ];
@@ -22,6 +22,9 @@ const catalog = [
     guide('.module-card, .course-card, .journey-card', 'Choose a path that fits', 'Each card describes its topic and access. Completion reflects your saved lesson or course history; browsing grants no progress.'),
 ];
 const profiles = [
+    { match: /^welcome$/, steps: [guide('.welcome-actions', 'Choose your first adventure', 'Explore the Tower, create an account or open your saved workspace. Guest Tower trials stay in this browser.'), guide('.welcome-paths', 'Find a way to learn', 'Choose the Tower, a deeper learning course or creator guides. Each has a clear next step.'), guide('#try-it [data-game-run]', 'Try a tiny idea', 'This garden is local practice. Run an idea and adjust it; no account progress or XP is saved here.')] },
+    { match: /^contact$/, steps: [guide('a[href^="mailto:"]', 'Reach a human', 'This link opens your email app. You can also copy the support address into your preferred email service.'), guide('#appeals h2', 'Ask for an account review', 'Use the appeal email link and include your username and explanation. Do not send passwords or verification codes. An appeal never automatically restores access.')] },
+    { match: /^site-management\./, steps: [guide('[data-notice-title]', 'Write a short announcement', 'Use plain text and a permitted Kody destination. The preview is unsaved until you confirm your password and save.'), guide('.site-operations h2', 'Inspect stored operations', 'Queue totals and configuration switches are read-only snapshots. These controls expose no provider keys or job payloads.')] },
     { match: /^(home|tower\.index)$/, steps: [
         guide('[data-tower-stop="1"] .tower-node', 'One discovery at a time', 'Choose an unlocked floor to play. Guests can try floors 1–3; level 4 invites you to join.'),
         guide('[data-tower-present]', 'Find your next step', 'Jump to your current floor. The arrows explore higher and lower floors without changing your progress.'),
@@ -75,7 +78,14 @@ export function buildPageGuide(doc, route) {
     ];
     const seen = new Set();
     const steps = definitions.flatMap(([selector, title, message]) => {
-        const target = [...doc.querySelectorAll(selector)].find(isGuideTargetVisible);
+        let target = [...doc.querySelectorAll(selector)].find(isGuideTargetVisible);
+        if (target) {
+            const box = target.getBoundingClientRect();
+            // Long forms and lists should introduce their heading/control, not illuminate the entire screen.
+            if (box.height > (doc.defaultView?.innerHeight ?? 800) * .55) {
+                target = [...target.querySelectorAll('legend, h2, h3, summary, label, button, a')].find(isGuideTargetVisible) ?? target;
+            }
+        }
         if (!target || seen.has(target)) return [];
         seen.add(target); return [{ target, title, message }];
     });

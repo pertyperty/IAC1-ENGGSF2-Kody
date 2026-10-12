@@ -1,5 +1,15 @@
 # Kody Engineering Agent Guidelines
 
+The owner's 2026-10-12 workspace follow-up adds private creator aggregate charts,
+Instructor Tower access, an audited Administrator announcement and read-only
+operations summaries, and public support at `kody.support@gmail.com`. See
+[creator insights and support](docs/creator-insights-and-support.md). Reauthorize
+notice edits with current password/session and a locked version check; never
+expose provider keys or queued payloads. Email-app appeals cannot reinstate an
+account. Charts include only owned retained content and exclude creator activity;
+they grant no rewards. Preserve reduced motion, rectangular page-guide targeting,
+collapsed quiz serialization and the configured reusable currency art.
+
 The owner's 2026-10-12 studio/media/integration request is recorded in
 [studio and provider readiness](docs/studios-media-and-integration-readiness.md).
 Article-only completion now grants 40 XP once per module after an authorized

@@ -19,6 +19,7 @@ use App\Http\Controllers\Administration\AccountGovernanceController;
 use App\Http\Controllers\Administration\ContentModerationController;
 use App\Http\Controllers\Administration\FaqController;
 use App\Http\Controllers\Administration\GamePresetController;
+use App\Http\Controllers\Administration\SiteManagementController;
 use App\Http\Controllers\Administration\SystemReportController;
 use App\Http\Controllers\Administration\TowerStudioController;
 use App\Http\Controllers\Challenges\ChallengeReviewController;
@@ -57,7 +58,12 @@ Route::pattern('challenge', '[0-9]+');
 Route::pattern('weeklyEvent', '[0-9]+');
 
 Route::get('/', [TowerController::class, 'index'])->middleware(OptionalAccountSession::class)->name('home');
-Route::get('/welcome', [LearningController::class, 'home'])->name('welcome');
+Route::get('/welcome', [LearningController::class, 'home'])->middleware(OptionalAccountSession::class)->name('welcome');
+Route::view('/contact', 'contact')->middleware(OptionalAccountSession::class)->name('contact');
+Route::middleware(['auth', 'account.session'])->prefix('manage/site')->name('site-management.')->group(function (): void {
+    Route::get('/', [SiteManagementController::class, 'index'])->name('index');
+    Route::put('/announcement', [SiteManagementController::class, 'update'])->middleware('throttle:6,1,site-announcement:')->name('update');
+});
 Route::get('/tower/{level}', [TowerController::class, 'show'])->whereNumber('level')->middleware(OptionalAccountSession::class)->name('tower.show');
 Route::post('/tower/{level}/revisions/{revision}/stages/{stage}', [TowerController::class, 'complete'])
     ->whereNumber(['level', 'revision', 'stage'])->middleware(['auth', 'account.session', 'throttle:30,1,tower:'])->name('tower.complete');
