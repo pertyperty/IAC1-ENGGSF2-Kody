@@ -51,10 +51,14 @@ class SiteManagement
         Gate::forUser($user)->authorize('manageSite', User::class);
 
         return ['announcement' => DB::table('site_announcements')->where('id', 1)->firstOrFail(),
-            'queues' => DB::table('jobs')->select('queue')->selectRaw('count(*) as waiting, min(created_at) as oldest')->groupBy('queue')->orderBy('queue')->get(),
+            'queues' => DB::table('jobs')->select('queue')->selectRaw('count(*) as total, min(created_at) as oldest,
+                count(*) FILTER (WHERE reserved_at IS NOT NULL) as reserved,
+                count(*) FILTER (WHERE reserved_at IS NULL AND available_at <= ?) as ready,
+                count(*) FILTER (WHERE reserved_at IS NULL AND available_at > ?) as delayed', [now()->timestamp, now()->timestamp])
+                ->groupBy('queue')->orderBy('queue')->get(),
             'failed' => DB::table('failed_jobs')->where('failed_at', '>=', now()->subDays(7))->count(),
             'services' => ['Judge0 execution' => (bool) config('judge0.enabled'), 'Xendit payments' => (bool) config('xendit.enabled'), 'Google identity' => (bool) config('services.google.enabled'),
                 'SendGrid verification transport' => config('account.verification.mailer') === 'sendgrid'],
-            'changes' => DB::table('audit_events')->where('event', 'site.announcement_updated')->orderByDesc('created_at')->orderByDesc('id')->limit(5)->get(['actor_id', 'created_at', 'context'])];
+            'changes' => DB::table('audit_events')->where('event', 'site.announcement_updated')->orderByDesc('created_at')->orderByDesc('id')->limit(5)->get(['actor_id', 'created_at'])];
     }
 }

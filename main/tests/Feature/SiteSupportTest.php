@@ -41,12 +41,16 @@ test('Administrator notices require current credentials explicit confirmation an
 
 test('site controls escape notices and expose operation aggregates without provider secrets or job payloads', function () {
     config(['judge0.rapidapi_key' => 'PRIVATE_TEST_API_KEY']);
-    DB::table('jobs')->insert(['queue' => 'default', 'payload' => 'PRIVATE_TEST_JOB_PAYLOAD', 'attempts' => 0, 'available_at' => now()->timestamp, 'created_at' => now()->timestamp]);
+    foreach (['ready', 'delayed', 'reserved'] as $state) {
+        DB::table('jobs')->insert(['queue' => 'default', 'payload' => 'PRIVATE_TEST_JOB_PAYLOAD', 'attempts' => 0,
+            'available_at' => $state === 'delayed' ? now()->addHour()->timestamp : now()->timestamp,
+            'reserved_at' => $state === 'reserved' ? now()->timestamp : null, 'created_at' => now()->timestamp]);
+    }
     $admin = moduleAccount(Role::Administrator);
     moduleSignIn($this, $admin);
     $this->put(route('site-management.update'), noticeData(['title' => '<script>unsafe()</script>']))->assertRedirect();
     $this->get(route('contact'))->assertOk()->assertSee('&lt;script&gt;unsafe()', false)->assertDontSee('<script>unsafe()', false);
-    $this->get(route('site-management.index'))->assertOk()->assertSee('1 waiting')->assertDontSee('PRIVATE_TEST_API_KEY')->assertDontSee('PRIVATE_TEST_JOB_PAYLOAD');
+    $this->get(route('site-management.index'))->assertOk()->assertSee('3 stored')->assertSee('1 ready · 1 delayed · 1 reserved')->assertDontSee('PRIVATE_TEST_API_KEY')->assertDontSee('PRIVATE_TEST_JOB_PAYLOAD');
 });
 
 test('non Administrators cannot manage announcements', function (Role $role) {

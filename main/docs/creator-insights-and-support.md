@@ -44,7 +44,8 @@ An audit event preserves the before/after public fields. Title/message bounds ar
 URLs, uploaded markup and settings are unsupported. Blade escapes notice text.
 Notices are excluded from authentication, focused editing, errors and Tower play.
 
-The operational view shows stored queue counts/oldest timestamps, seven-day job
+The operational view separates ready, delayed and reserved queue records, with
+stored totals/oldest timestamps, seven-day job
 failure counts, four integration configuration switches and recent announcement
 changes. It exposes no job payloads, private error logs or provider credentials,
 and performs no provider calls. A switch is not proof of provider readiness;
@@ -101,6 +102,8 @@ replaced sessions, escaped notices, secret-free summaries, owned chart data,
 Manila date boundaries and instructor progression. Frontend replay checks and
 both application/Office builds pass. The upgrade/restore rehearsal preserves
 existing history and verifies the inactive notice default across 81 tables.
+The reviewed additive notice migration was applied to local `kody` at
+`127.0.0.1:5432`, preserving existing records; the announcement remains inactive.
 
 Browser regression coverage includes role workflows, desktop/mobile layouts,
 keyboard accessibility, both themes, instructor charts and Tower wins, mixed
