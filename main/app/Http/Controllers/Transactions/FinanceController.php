@@ -23,21 +23,21 @@ class FinanceController extends Controller
     public function index(Request $request): Response
     {
         abort_unless($request->user()->account_role === Role::Administrator, 403);
-        $payouts = DB::table('payout_requests')->whereIn('state', ['PendingReview', 'Review'])->orderBy('created_at')->paginate(15, ['id', 'user_id', 'gross_minor', 'state'], 'payouts');
-        $refunds = DB::table('refund_requests')->whereIn('state', ['PendingReview', 'Review'])->orderBy('created_at')->paginate(15, ['id', 'user_id', 'kind', 'state'], 'refunds');
+        $payouts = DB::table('payout_requests')->whereIn('state', ['PendingReview', 'Review'])->orderBy('created_at')->paginate(15, ['id', 'user_id', 'gross_minor', 'state'], 'payouts')->withQueryString();
+        $refunds = DB::table('refund_requests')->whereIn('state', ['PendingReview', 'Review'])->orderBy('created_at')->paginate(15, ['id', 'user_id', 'kind', 'state'], 'refunds')->withQueryString();
         $callbacks = DB::table('provider_webhooks')->where('state', 'Review')->orderBy('created_at')->limit(30)->get(['id', 'event', 'object_id']);
         $deliveries = DB::table('financial_deliveries')->where('state', 'Review')->orderBy('created_at')->limit(30)->get(['id', 'user_id', 'title']);
-        $remedies = DB::table('financial_remedy_cases')->whereIn('state', ['Open', 'Review'])->orderBy('created_at')->paginate(15, ['*'], 'remedies');
+        $remedies = DB::table('financial_remedy_cases')->whereIn('state', ['Open', 'Review'])->orderBy('created_at')->paginate(15, ['*'], 'remedies')->withQueryString();
         $cash = DB::table('economy_locks')->find(1);
         $month = CarbonImmutable::now('Asia/Manila')->startOfMonth()->toDateString();
         $budget = DB::table('operations_budget_reports')->where('month', $month)->first();
         $summary = [
             'wallet_backing' => (int) DB::table('wallet_lots')->sum('remaining_minor'),
-            'unclaimed_creator' => (int) DB::table('publisher_earnings')->where('status', 'Available')->selectRaw('coalesce(sum(amount_minor - claimed_minor),0) AS total')->value('total'),
+            'unclaimed_creator' => (int) DB::table('publisher_earnings')->where('kind', 'Cash')->where('status', 'Available')->selectRaw('coalesce(sum(amount_minor - claimed_minor),0) AS total')->value('total'),
             'confirmed_purchases' => (int) DB::table('payment_purchases')->whereIn('state', ['Succeeded', 'Refunding'])->sum('gross_minor'),
             'confirmed_refunds' => (int) DB::table('payment_purchases')->where('state', 'Refunded')->sum('gross_minor'),
         ];
-        $cashHistory = DB::table('platform_cash_entries')->orderByDesc('created_at')->orderByDesc('id')->paginate(15, ['*'], 'cash');
+        $cashHistory = DB::table('platform_cash_entries')->orderByDesc('created_at')->orderByDesc('id')->paginate(15, ['*'], 'cash')->withQueryString();
 
         return response()->view('transactions.finance', compact('payouts', 'refunds', 'callbacks', 'deliveries', 'remedies', 'cash', 'budget', 'summary', 'cashHistory'))->header('Cache-Control', 'no-store, private');
     }

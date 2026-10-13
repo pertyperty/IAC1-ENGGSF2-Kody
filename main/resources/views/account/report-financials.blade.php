@@ -1,0 +1,10 @@
+<section class="content-panel report-section" aria-labelledby="financial-heading">
+<div class="report-section-heading"><div><p class="overline">POSTED FINANCIAL HISTORY</p><h2 id="financial-heading">Cash, expenses and liabilities</h2></div><a class="button button-secondary button-small" href="{{ route('finance.index') }}"><x-action-icon name="wallet"/>Finance workspace</a></div>
+<p class="field-hint">Opening + inflows − outflows = closing posted platform cash. Paid expenses are part of outflows. Current liabilities and reserved cash are snapshot values, separate from this period’s cash movement.</p>
+<dl class="report-financial-grid">@foreach($report['financials']['totals'] as $row)<div><dt>{{ $row['metric'] }}</dt><dd>{{ $row['display'] }}</dd></div>@endforeach</dl>
+<p class="field-hint">Request states describe the current state of records created in this window. They are not settlement-date revenue. Cost estimates are reported commitments, separate from paid expenses. Reports omit personal identities, payment recipient details and provider payloads.</p>
+@foreach($report['financials']['registers'] as $register)
+<details class="report-detail"><summary>{{ $register['title'] }} <span class="status-pill">{{ $register['count'] }} records</span></summary><p class="field-hint">Showing {{ count($register['rows']) }} of {{ $register['count'] }} matching records. Latest first except monthly estimates. Narrow dates to inspect additional records.</p>
+<div class="report-table-scroll" tabindex="0" role="region" aria-label="{{ $register['title'] }} rows"><table class="report-table"><caption>{{ $register['title'] }}</caption><thead><tr>@foreach($register['headers'] as $header)<th scope="col">{{ $header }}</th>@endforeach</tr></thead><tbody>@forelse($register['rows'] as $row)<tr>@foreach($row as $value)<td>{{ $value }}</td>@endforeach</tr>@empty<tr><td colspan="{{ count($register['headers']) }}">No retained records in this window.</td></tr>@endforelse</tbody></table></div></details>
+@endforeach
+</section>

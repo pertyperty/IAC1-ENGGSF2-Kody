@@ -97,8 +97,43 @@ test('Administrator account browser defaults to ten and reports export formatted
     for (const [name, extension] of [['PDF', 'pdf'], ['CSV', 'csv'], ['Excel', 'xlsx']]) {
         const download = page.waitForEvent('download'); await page.getByRole('link', { name, exact: true }).click();
         const file = await download; expect(file.suggestedFilename()).toMatch(new RegExp(`\\.${extension}$`));
-        if (extension === 'pdf') await file.saveAs('storage/app/browser-results/platform-report.pdf');
+        if (['pdf', 'xlsx'].includes(extension)) await file.saveAs(`storage/app/browser-results/platform-report.${extension}`);
     }
     await audit(page); await page.screenshot({ path: 'storage/app/browser-results/admin-reports-desktop.png', fullPage: true });
     await page.setViewportSize({ width: 320, height: 740 }); await audit(page);
+});
+
+test('Administrator cash expenses reconcile in business reports and remain readable on mobile', async ({ page }) => {
+    await login(page, 'polishadmin'); await page.goto('/manage/finance');
+    for (const [label, amount, reference, button] of [
+        ['Record deposited platform funding', '100.50', 'browser-business-fund', 'Record attested deposit'],
+        ['Record an actual operating expense', '20.25', 'browser-business-expense', 'Record paid expense'],
+    ]) {
+        const panel = page.locator('details').filter({ has: page.getByText(label, { exact: true }) });
+        await panel.locator('summary').click();
+        await panel.locator('input[name="amount"]').fill(amount);
+        await panel.getByLabel(/Unique .* reference/).fill(reference);
+        await panel.getByLabel('Evidence reference').fill('Isolated browser demonstration statement.');
+        await panel.getByLabel('Current password').fill('BrowserStrong12!');
+        await panel.getByLabel('I confirm this action and the displayed terms.').check();
+        await panel.getByRole('button', { name: button, exact: true }).click();
+        await expect(page).toHaveURL(/\/manage\/finance$/);
+        await expect(page.locator('.action-receipt')).toContainText(/recorded/);
+    }
+    const ledger = page.locator('details').filter({ has: page.getByText('Platform cash ledger', { exact: true }) });
+    await ledger.locator('summary').click(); await expect(ledger).toContainText('-20.25');
+    await page.getByRole('link', { name: 'Cash, expenses and transaction reports' }).click();
+    await page.getByRole('link', { name: 'Today', exact: true }).click();
+    await expect(page.locator('.report-financial-grid')).toContainText('PHP 20.25');
+    const expenseRegister = page.locator('.report-detail').filter({ has: page.getByText('Cash register', { exact: true }) });
+    await expenseRegister.locator('summary').click(); await expect(expenseRegister).toContainText('Operating expense');
+    await expect(expenseRegister).toContainText('-20.25');
+    for (const width of [1920, 390, 320]) { await page.setViewportSize({ width, height: 900 }); await audit(page); }
+    await page.screenshot({ path: 'storage/app/browser-results/business-reports-mobile.png', fullPage: true });
+    await page.setViewportSize({ width: 1440, height: 1000 });
+    const download = page.waitForEvent('download'); await page.getByRole('link', { name: 'PDF', exact: true }).click();
+    await (await download).saveAs('storage/app/browser-results/business-cash-report.pdf');
+    await page.getByRole('combobox', { name: 'Group trends' }).selectOption('month');
+    await page.getByRole('button', { name: 'View report' }).click();
+    await expect(page.getByRole('heading', { name: 'Month activity trends' })).toBeVisible();
 });

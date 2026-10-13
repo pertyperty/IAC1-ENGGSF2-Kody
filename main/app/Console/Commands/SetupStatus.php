@@ -3,7 +3,9 @@
 namespace App\Console\Commands;
 
 use App\Services\Transactions\Xendit\Readiness;
+use Dompdf\Options;
 use Illuminate\Console\Command;
+use OpenSpout\Writer\XLSX\Writer;
 
 class SetupStatus extends Command
 {
@@ -23,6 +25,8 @@ class SetupStatus extends Command
             ['SendGrid SMTP', config('account.verification.mailer') === 'sendgrid' ? 'Selected for verification' : 'Not selected for verification',
                 $this->present(config('mail.mailers.sendgrid.password')) ? 'Key present; verify sender/domain and actual delivery' : 'Private SendGrid key and authenticated sender needed'],
             ['Private credentials', config('account.credentials.disk'), 'Verify private storage, staff-only downloads and backup restore'],
+            ['Document exports', class_exists(Options::class) && class_exists(Writer::class) ? 'PDF / Excel packages installed' : 'Composer dependencies missing',
+                'Run composer install from the committed lock; ensure writable private report storage'],
             ['Queue', config('queue.default'), 'Verify supervised worker, restart and failed-job alerts in staging'],
             ['Scheduler', 'Registered in Laravel', 'Verify minute trigger and task execution in staging'],
             ['Xendit economy', app(Readiness::class)->available() ? 'Configuration gate satisfied' : 'Disabled / activation gate incomplete', 'Sandbox callback/retrieval, contract fees, named responders, budget and staging evidence required'],

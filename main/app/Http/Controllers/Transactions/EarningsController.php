@@ -18,8 +18,8 @@ class EarningsController extends Controller
     public function index(Request $request): Response
     {
         $id = $request->user()->id;
-        $payouts = DB::table('payout_requests')->where('user_id', $id)->orderByDesc('created_at')->paginate(10, ['id', 'gross_minor', 'fee_minor', 'state', 'review_notes', 'created_at'], 'payouts');
-        $refunds = DB::table('refund_requests')->where('user_id', $id)->orderByDesc('created_at')->paginate(10, ['id', 'kind', 'state', 'reason', 'review_notes'], 'refunds');
+        $payouts = DB::table('payout_requests')->where('user_id', $id)->orderByDesc('created_at')->paginate(10, ['id', 'gross_minor', 'fee_minor', 'state', 'review_notes', 'created_at'], 'payouts')->withQueryString();
+        $refunds = DB::table('refund_requests')->where('user_id', $id)->orderByDesc('created_at')->paginate(10, ['id', 'kind', 'state', 'reason', 'review_notes'], 'refunds')->withQueryString();
         $confirmationId = (string) Str::uuid();
         $ready = app(Readiness::class)->available();
         $accessSales = DB::table('content_purchases')->where('user_id', $id)->where('status', 'Active')->where('created_at', '>=', now()->subDays(7))->orderByDesc('created_at')->limit(20)->get();

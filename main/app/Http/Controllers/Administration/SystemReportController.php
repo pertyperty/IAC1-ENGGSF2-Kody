@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Administration\ViewReportsRequest;
 use App\Services\Administration\ReportExports;
 use App\Services\Administration\SystemReports;
+use Carbon\CarbonImmutable;
 use Illuminate\Http\Response;
 
 class SystemReportController extends Controller
@@ -20,6 +21,14 @@ class SystemReportController extends Controller
             return app(ReportExports::class)->download($report, $format);
         }
 
-        return response()->view('account.system-reports', compact('report', 'filters'))->header('Cache-Control', 'no-store, private');
+        $today = CarbonImmutable::now('Asia/Manila');
+        $presets = [
+            'Today' => ['from' => $today->toDateString(), 'to' => $today->toDateString(), 'group' => 'day'],
+            'This month' => ['from' => $today->startOfMonth()->toDateString(), 'to' => $today->toDateString(), 'group' => 'day'],
+            'This year' => ['from' => $today->startOfYear()->toDateString(), 'to' => $today->toDateString(), 'group' => 'month'],
+            'Last year' => ['from' => $today->subYear()->startOfYear()->toDateString(), 'to' => $today->subYear()->endOfYear()->toDateString(), 'group' => 'month'],
+        ];
+
+        return response()->view('account.system-reports', compact('report', 'filters', 'presets'))->header('Cache-Control', 'no-store, private');
     }
 }

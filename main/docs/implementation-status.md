@@ -4,6 +4,11 @@ Start here for current scope, detailed evidence and the next useful improvements
 This index consolidates the feature summaries previously repeated in README.
 It does not replace approved requirements, decisions or the implementation records.
 Last reviewed: 2026-10-13.
+The [business reporting record](system-reports-implementation.md) owns daily,
+monthly and yearly period views, exact posted cash/expense reconciliation,
+bounded private transaction registers and separate business PDF/Excel exports.
+It also documents locked Composer installation, private temporary export storage,
+negative-cash rendering and independent history pagination fixes.
 The [role-application demonstration](role-application-demonstration.md) owns
 opt-in local eligibility fixtures, explicit Learner 5 reinstatement and durable
 mascot approval welcomes for Contributor/Instructor applicants.
@@ -95,7 +100,7 @@ existing accounts; default seeding provisions them only in local mode.
 | Weekly play / E02–E06 | Manila Sunday windows, future scheduling, immutable started events, separate three-attempt budgets and private verified-result history, best-score ties, immutable staff publication and cash/spend-capped KB rewards. Live execution depends on deferred Judge0 setup. | [Weekly events](weekly-challenge-plan.md) |
 | Reactions / B10 | One replaceable/removable Like, Helpful or Favorite after server-recorded authorized use and current access; courses additionally require enrollment. | [Feedback](content-feedback-implementation.md) |
 | Staff governance / G01–G06 | Protected account search/enforcement, Moderator appointments/removal, support corrections, content withdrawal/restoration, session revocation and durable audit/notice records. | [Accounts](account-governance-implementation.md), [appointments](moderator-appointments-implementation.md), [support corrections](support-profile-corrections-implementation.md), [withdrawal](content-withdrawal-implementation.md) |
-| Reports / G07 | Read-only account/content/learning/submission and dated accounting/XP/reward aggregates, plus separate Administrator-only cash/financial-liability summaries and private histories. | [Report definitions](system-reports-implementation.md) |
+| Reports / G07 | Administrator-only repeatable read snapshots, day/month/year trends, reconciled platform cash and paid expenses, separate current liabilities/monthly cost estimates, bounded transaction registers and formatted PDF/CSV/Excel management reports. | [Report definitions](system-reports-implementation.md) |
 | Help / B11, G11–G13 | Public Active FAQ search/categories and Administrator authoring with version checks/audit. | [Help](faq-implementation.md) |
 | Google identity / A03/A06 integration slice | Password-confirmed explicit linking of existing accounts; no email auto-linking/new Google accounts. Implemented but disabled pending owner-deferred live setup. | [Google identity](google-authentication-implementation.md) |
 | Economy / F01–F05, B03/B07 | Disabled GCash top-ups, exact FIFO ledger, reviewed pricing/gates, atomic access/earnings, mature claims/payout reservations, refunds and audited reconciliation. | [Economy implementation](economy-implementation.md) |

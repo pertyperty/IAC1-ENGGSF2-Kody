@@ -27,6 +27,10 @@ import { mountRoleUpdate } from './role-update.js';
 import { mountKodyCompanion, mountPageLoader } from './kody-companion.js';
 
 mountTheme(document, window);
+// On narrow reports, begin at the latest periods without scrolling the page.
+document.querySelectorAll('.report-trend-chart').forEach(chart => {
+    window.requestAnimationFrame(() => { chart.scrollLeft = chart.scrollWidth; });
+});
 mountNavigationRail(document, window);
 mountTower(document, window);
 document.querySelectorAll('[data-resource-workspace]').forEach(root => mountResourceViewer(root, window));

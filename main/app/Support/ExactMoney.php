@@ -6,6 +6,15 @@ use InvalidArgumentException;
 
 class ExactMoney
 {
+    /** Presentation for signed ledger postings and aggregates, never provider input. */
+    public static function signedDecimal(int $minor): string
+    {
+        $whole = intdiv($minor, 100);
+        $fraction = abs($minor % 100);
+
+        return ($minor < 0 ? '-' : '').ltrim((string) $whole, '-').'.'.str_pad((string) $fraction, 2, '0', STR_PAD_LEFT);
+    }
+
     public static function minor(mixed $value): int
     {
         // Reject decoded floats. Provider decoding preserves decimal tokens as

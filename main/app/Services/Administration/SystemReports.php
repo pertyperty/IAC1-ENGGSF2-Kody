@@ -45,7 +45,9 @@ class SystemReports
                 default => throw new LogicException('Unsupported system report.'),
             };
 
-            return ['rows' => $rows, 'insights' => $this->insights($start, $end), 'generated_at' => CarbonImmutable::now('Asia/Manila'), 'filters' => $filters];
+            return ['rows' => $rows, 'insights' => $this->insights($start, $end), 'generated_at' => CarbonImmutable::now('Asia/Manila'), 'filters' => $filters,
+                'trends' => app(ReportTrends::class)->generate($start, $end, $filters['group'] ?? 'day'),
+                'financials' => in_array($filters['type'], ['overview', 'economy'], true) ? app(ReportFinancials::class)->snapshot($start, $end) : null];
         });
     }
 
