@@ -102,6 +102,7 @@ class ContributorApplications
                 'reviewed_by' => $reviewer->id, 'reviewed_at' => now(), 'record_version' => $current->record_version + 1]);
             if ($decision === 'Approved') {
                 $applicant->forceFill(['account_role' => Role::Contributor])->save();
+                app(RoleChangeNotices::class)->record($applicant, $previousRole, 'contributor', $current->id);
             }
             app(AuditRecorder::class)->record($reviewer->id, $applicant->id, 'contributor_application.reviewed', 'contributor_application', (string) $current->id,
                 ['decision' => $decision, 'version' => $current->record_version, 'previous_role' => $previousRole->value, 'resulting_role' => $applicant->account_role->value]);

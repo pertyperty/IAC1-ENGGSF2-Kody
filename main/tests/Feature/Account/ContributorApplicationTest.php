@@ -203,7 +203,7 @@ test('G05 reviewers decide once and approval grants only Contributor while rejec
     expect(DB::table('audit_events')->where('event', 'contributor_application.reviewed')->count())->toBe(1);
     $delivery = DB::table('contributor_notice_deliveries')->where('kind', 'Approved')->sole();
     (new SendContributorNotice($delivery->id))->handle();
-    expect($user->notifications()->count())->toBe(1);
+    expect($user->notifications()->where('type', 'contributor.application')->count())->toBe(1);
 })->with([Role::Moderator, Role::Administrator]);
 
 test('A09 rejected resubmissions preserve each decision and block overlapping Instructor applications', function () {
@@ -287,11 +287,11 @@ test('G05 notification failure keeps approval durable and retries without duplic
     $delivery = DB::table('contributor_notice_deliveries')->where('kind', 'Approved')->sole();
     $this->mock(SecureAccountMailer::class)->shouldReceive('send')->once()->andThrow(new RuntimeException('secret transport diagnostics'));
     expect(fn () => (new SendContributorNotice($delivery->id))->handle())->toThrow(RuntimeException::class, 'Contributor application notice could not be delivered.');
-    expect($user->fresh()->account_role)->toBe(Role::Contributor)->and($user->notifications()->count())->toBe(1);
+    expect($user->fresh()->account_role)->toBe(Role::Contributor)->and($user->notifications()->where('type', 'contributor.application')->count())->toBe(1);
     $this->mock(SecureAccountMailer::class)->shouldReceive('send')->once();
     (new SendContributorNotice($delivery->id))->handle();
     (new SendContributorNotice($delivery->id))->handle();
-    expect($user->notifications()->count())->toBe(1);
+    expect($user->notifications()->where('type', 'contributor.application')->count())->toBe(1);
 });
 
 test('Delete Account removes Contributor history staff notices and queues all private supporting files', function () {

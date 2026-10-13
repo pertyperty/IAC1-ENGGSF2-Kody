@@ -9,6 +9,7 @@ use App\Models\CodingChallengeRevision;
 use App\Models\LearningCourse;
 use App\Models\User;
 use App\Models\VerificationDelivery;
+use App\Services\Administration\AuditRecorder;
 use App\Services\Administration\FaqManagement;
 use App\Services\Challenges\ChallengePublishing;
 use App\Services\Content\CourseLearning;
@@ -20,6 +21,8 @@ use App\Services\Gamification\LearningProgression;
 use App\Services\Gamification\WeeklyEvents;
 use App\Services\Transactions\ContentAccess;
 use App\Services\Transactions\WalletLedger;
+use Database\Seeders\LocalRoleAccountsSeeder;
+use Database\Seeders\LocalRoleApplicationDemoSeeder;
 use Database\Seeders\TowerLevelSeeder;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Http\UploadedFile;
@@ -141,6 +144,18 @@ try {
             app(ContentFeedback::class)->read($accounts['insightreader'], 'browser-seed-session', 'module', $module->id, true);
             app(LearningProgression::class)->recordModule($accounts['insightreader'], 'browser-seed-session', $module->id, $module->fresh()->published_revision_id, 'game', ['program' => ['right', 'right', 'up', 'right', 'right']]);
             $accounts['appeallearner']->forceFill(['account_status' => AccountStatus::Suspended])->save();
+            $originalStorage = storage_path();
+            $app->useStoragePath(dirname(getenv('KODY_BROWSER_MANIFEST')).'/role-fixture-storage');
+            try {
+                app(LocalRoleAccountsSeeder::class)->run(app(AuditRecorder::class));
+            } finally {
+                $app->useStoragePath($originalStorage);
+            }
+            app(LocalRoleApplicationDemoSeeder::class)->prepare();
+            // These are disposable, harness-owned identities only; real local passwords are never changed.
+            foreach (['learner4@kody.local', 'learner5@kody.local'] as $email) {
+                User::where('email', $email)->sole()->forceFill(['password' => Hash::make('BrowserStrong12!')])->save();
+            }
         }
         User::query()->update(['active_session_hash' => null, 'active_session_expires_at' => null]);
         echo json_encode($manifest, JSON_THROW_ON_ERROR);

@@ -75,7 +75,11 @@ php artisan db:seed --class=LocalRoleAccountsSeeder --env=testing
 
 | Role | Email | Username |
 | --- | --- | --- |
-| Learner | learner@kody.local | kody_learner |
+| Learner 1 | learner1@kody.local | kody_learner_1 |
+| Learner 2 | learner2@kody.local | kody_learner_2 |
+| Learner 3 | learner3@kody.local | kody_learner_3 |
+| Learner 4 | learner4@kody.local | kody_learner_4 |
+| Learner 5 | learner5@kody.local | kody_learner_5 |
 | Contributor | contributor@kody.local | kody_contributor |
 | Instructor | instructor@kody.local | kody_instructor |
 | Moderator | moderator@kody.local | kody_moderator |
@@ -113,6 +117,15 @@ hashing, idempotency, nonlocal defaults, explicit deployment/remote refusal, ide
 conflicts and transactional rollback on audit/storage failure.
 
 ## Additional Learners and reviewed showcases
+
+The owner's combined account seeder now creates nine identities: five Learners
+and the four other roles. Existing fixture identities retain renamed usernames
+and their original passwords. The older `learner@kody.local` account is not reset
+or renamed by these new definitions.
+
+For an opt-in role-change presentation with Learners 4/5, use the
+[role demonstration guide](role-application-demonstration.md). Its separately
+audited synthetic history is not part of ordinary/default seeding.
 
 The 2026-10-11 [fixture follow-up](platform-polish-and-fixtures.md) adds four Learners
 and optional local reviewed learning content. Default local seeds call all three

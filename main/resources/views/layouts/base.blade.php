@@ -28,5 +28,6 @@
     </div>
     @yield('footer')
     @include('layouts.kody-companion')
+    @include('layouts.role-update')
 </body>
 </html>

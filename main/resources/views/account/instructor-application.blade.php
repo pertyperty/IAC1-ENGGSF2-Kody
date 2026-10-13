@@ -1,6 +1,7 @@
 @extends('layouts.account')
 @section('title', 'Become a creator — Kody')
 @section('content')
+@include('layouts.local-role-demo')
 <p class="eyebrow">TURN KNOWLEDGE INTO ADVENTURES</p><h1>Become a learning creator</h1>
 <p class="intro">Share your teaching credentials for review. Keep learning while your application is checked.</p>
 @if($errors->any())<div class="form-errors" role="alert">@foreach($errors->all() as $error)<p>{{ $error }}</p>@endforeach</div>@endif

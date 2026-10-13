@@ -6,6 +6,7 @@ use App\Enums\AccountStatus;
 use App\Enums\Role;
 use App\Models\LearningCourse;
 use App\Models\LearningModule;
+use App\Services\Account\RoleChangeNotices;
 use App\Services\Gamification\Achievements;
 use App\Services\Gamification\LearningProgression;
 use App\Services\Gamification\TowerProgression;
@@ -80,6 +81,10 @@ class ApplicationChrome
             && ! $request->routeIs('home', 'tower.*', 'login*', 'register*', 'recovery.*', 'verification.*')
             ? DB::table('site_announcements')->where('id', 1)->where('active', true)->first(['title', 'message', 'destination']) : null;
 
-        return compact('focused', 'progress', 'achievements', 'back', 'tower', 'wallet', 'announcement') + ['unread' => $dashboard['unread'] ?? $user?->unreadNotifications()->count() ?? 0];
+        $roleChange = ! $focused && ! isset($viewData['exception']) && $user?->account_status === AccountStatus::Active
+            && $user->email_verified_at !== null && in_array($user->account_role, [Role::Learner, Role::Contributor, Role::Instructor], true)
+            ? app(RoleChangeNotices::class)->snapshot($user, $request->session()->getId()) : null;
+
+        return compact('focused', 'progress', 'achievements', 'back', 'tower', 'wallet', 'announcement', 'roleChange') + ['unread' => $dashboard['unread'] ?? $user?->unreadNotifications()->count() ?? 0];
     }
 }

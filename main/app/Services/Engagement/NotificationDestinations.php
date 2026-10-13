@@ -2,11 +2,13 @@
 
 namespace App\Services\Engagement;
 
+use App\Enums\Role;
 use App\Models\CodingChallenge;
 use App\Models\ContributorApplication;
 use App\Models\LearningCourse;
 use App\Models\LearningModule;
 use App\Models\User;
+use App\Services\Account\RoleChangeNotices;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
 
@@ -50,6 +52,12 @@ class NotificationDestinations
         }
         foreach ($notifications->where('type', 'financial.notice') as $notice) {
             $links[$notice->id] = route('wallet.index');
+        }
+        foreach ($notifications->where('type', RoleChangeNotices::TYPE) as $notice) {
+            $model = $user->account_role === Role::Instructor ? LearningModule::class : CodingChallenge::class;
+            if (($notice->data['role'] ?? null) === $user->account_role->value && $gate->allows('create', $model)) {
+                $links[$notice->id] = route($user->account_role === Role::Instructor ? 'studio.index' : 'challenges.index');
+            }
         }
 
         return $links;

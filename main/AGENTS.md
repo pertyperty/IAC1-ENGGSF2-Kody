@@ -1,5 +1,17 @@
 # Kody Engineering Agent Guidelines
 
+The owner's 2026-10-13 role demonstration uses the opt-in
+`kody:role-demo-prepare` command for local Learners 4/5. See
+[the role demonstration](docs/role-application-demonstration.md). Its audited,
+synthetic eligibility history is a specific development-fixture exception, not
+earned progress or a public eligibility bypass. It grants no rewards or provider
+readiness and submits/approves no applications. Preserve passwords, sessions,
+decisions and existing history. The owner explicitly approved audited Learner 5
+reinstatement; other inactive identities must not be silently reactivated.
+A09/A10 approval notices commit with the role change and work without email
+workers. Keep acknowledgments owned, current-role/policy checked and idempotent;
+defer celebration in focused edits or another dialog and respect reduced motion.
+
 The owner's 2026-10-12 workspace follow-up adds private creator aggregate charts,
 Instructor Tower access, an audited Administrator announcement and read-only
 operations summaries, and public support at `kody.support@gmail.com`. See

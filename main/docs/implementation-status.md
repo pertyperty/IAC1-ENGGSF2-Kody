@@ -3,7 +3,10 @@
 Start here for current scope, detailed evidence and the next useful improvements.
 This index consolidates the feature summaries previously repeated in README.
 It does not replace approved requirements, decisions or the implementation records.
-Last reviewed: 2026-10-12.
+Last reviewed: 2026-10-13.
+The [role-application demonstration](role-application-demonstration.md) owns
+opt-in local eligibility fixtures, explicit Learner 5 reinstatement and durable
+mascot approval welcomes for Contributor/Instructor applicants.
 The [creator insights and support record](creator-insights-and-support.md) owns
 private creator charts, instructor Tower access, audited Administrator notices,
 secret-free operations summaries, public email-app support/appeals, bounded quiz

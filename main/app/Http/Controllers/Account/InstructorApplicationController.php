@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Account\ApplyInstructorRequest;
 use App\Models\InstructorApplication;
 use App\Services\Account\InstructorApplications;
+use App\Services\Account\RoleChangeNotices;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -23,7 +24,9 @@ class InstructorApplicationController extends Controller
             ->where('instructor_application_id', $application->id)->orderByDesc('application_version')
             ->paginate(10, ['application_version', 'verification_status', 'verification_notes', 'created_at']);
 
-        return response()->view('account.instructor-application', compact('application', 'history', 'pendingContributor'))->header('Cache-Control', 'no-store, private');
+        $localRoleDemo = app(RoleChangeNotices::class)->isLocalDemo($request->user());
+
+        return response()->view('account.instructor-application', compact('application', 'history', 'pendingContributor', 'localRoleDemo'))->header('Cache-Control', 'no-store, private');
     }
 
     public function store(ApplyInstructorRequest $request, InstructorApplications $applications): RedirectResponse
