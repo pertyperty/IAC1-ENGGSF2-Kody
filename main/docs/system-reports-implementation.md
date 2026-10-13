@@ -151,6 +151,9 @@ SendGrid, Judge0, Google and Xendit verification remains deferred.
   retain other page selections instead of resetting them on every next-page link.
 - Shared report trends/financial partials keep accessible bounded table surfaces
   and responsive layouts consistent.
+- The removable showcase Help seed now describes current DOCX/PPTX page previews,
+  adjustable split viewing, fullscreen and original downloads. Seed reruns still
+  preserve existing Administrator-edited Help entries.
 
 No schema migration, role promotion, demo account reset or live provider activation
 is part of this change.
