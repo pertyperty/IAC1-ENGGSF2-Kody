@@ -54,4 +54,3 @@ test('ready Learner 5 can become an Instructor with an Administrator decision an
         await expect(dialog).not.toBeVisible(); await page.goto('/dashboard'); await expect(page.locator('.creator-insights')).toBeVisible();
     } finally { await context.close(); }
 });
-
