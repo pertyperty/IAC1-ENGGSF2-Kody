@@ -8,6 +8,7 @@ use App\Jobs\Account\SendCreatorDecision;
 use App\Models\InstructorApplication;
 use App\Models\User;
 use App\Services\Account\InstructorApplications;
+use App\Services\Account\RoleChangeNotices;
 use App\Services\Administration\AuditRecorder;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\DB;
@@ -50,6 +51,7 @@ class ReviewInstructorApplication
                 'reviewed_by' => $reviewer->id, 'verified_at' => now(), 'record_version' => $version + 1]);
             if ($decision === 'Approved') {
                 $applicant->forceFill(['account_role' => Role::Instructor])->save();
+                app(RoleChangeNotices::class)->record($applicant, Role::from($previousRole), 'instructor', $current->id);
             }
             app(AuditRecorder::class)->record($reviewer->id, $applicant->id, 'instructor_application.reviewed', 'instructor_application', (string) $current->id,
                 ['decision' => $decision, 'version' => $version + 1, 'previous_role' => $previousRole, 'resulting_role' => $applicant->account_role->value]);

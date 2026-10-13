@@ -15,6 +15,7 @@ use App\Http\Controllers\Account\ProfileEditingController;
 use App\Http\Controllers\Account\ProfilePictureController;
 use App\Http\Controllers\Account\RecoveryController;
 use App\Http\Controllers\Account\RegistrationController;
+use App\Http\Controllers\Account\RoleUpdateController;
 use App\Http\Controllers\Administration\AccountGovernanceController;
 use App\Http\Controllers\Administration\ContentModerationController;
 use App\Http\Controllers\Administration\FaqController;
@@ -59,6 +60,11 @@ Route::pattern('weeklyEvent', '[0-9]+');
 
 Route::get('/', [TowerController::class, 'index'])->middleware(OptionalAccountSession::class)->name('home');
 Route::get('/welcome', [LearningController::class, 'home'])->middleware(OptionalAccountSession::class)->name('welcome');
+Route::middleware(['auth', 'account.session'])->group(function (): void {
+    Route::get('/account/role-update', [RoleUpdateController::class, 'show'])->middleware('throttle:30,1,role-update:')->name('account.role-update');
+    Route::post('/account/role-update/{notification}', [RoleUpdateController::class, 'acknowledge'])->whereUuid('notification')
+        ->middleware('throttle:30,1,role-update-ack:')->name('account.role-update.acknowledge');
+});
 Route::view('/contact', 'contact')->middleware(OptionalAccountSession::class)->name('contact');
 Route::middleware(['auth', 'account.session'])->prefix('manage/site')->name('site-management.')->group(function (): void {
     Route::get('/', [SiteManagementController::class, 'index'])->name('index');

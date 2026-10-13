@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Account\ApplyInstructorRequest;
 use App\Models\InstructorApplication;
 use App\Services\Account\InstructorApplications;
+use App\Services\Account\RoleChangeNotices;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -14,8 +15,12 @@ use Illuminate\Support\Facades\DB;
 
 class InstructorApplicationController extends Controller
 {
-    public function create(Request $request): Response
+    public function create(Request $request): Response|RedirectResponse
     {
+        if ($request->user()->account_role === Role::Instructor
+            && InstructorApplication::where('user_id', $request->user()->id)->where('verification_status', 'Approved')->exists()) {
+            return redirect()->route('dashboard');
+        }
         abort_unless(in_array($request->user()->account_role, [Role::Learner, Role::Contributor], true), 403);
         $application = InstructorApplication::where('user_id', $request->user()->id)->first(['id', 'verification_status', 'verification_notes', 'record_version']);
         $pendingContributor = DB::table('contributor_applications')->where('user_id', $request->user()->id)->where('approval_status', 'Pending')->exists();
@@ -23,7 +28,9 @@ class InstructorApplicationController extends Controller
             ->where('instructor_application_id', $application->id)->orderByDesc('application_version')
             ->paginate(10, ['application_version', 'verification_status', 'verification_notes', 'created_at']);
 
-        return response()->view('account.instructor-application', compact('application', 'history', 'pendingContributor'))->header('Cache-Control', 'no-store, private');
+        $localRoleDemo = app(RoleChangeNotices::class)->isLocalDemo($request->user());
+
+        return response()->view('account.instructor-application', compact('application', 'history', 'pendingContributor', 'localRoleDemo'))->header('Cache-Control', 'no-store, private');
     }
 
     public function store(ApplyInstructorRequest $request, InstructorApplications $applications): RedirectResponse

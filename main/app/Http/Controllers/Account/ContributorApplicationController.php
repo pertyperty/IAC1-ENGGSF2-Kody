@@ -7,6 +7,7 @@ use App\Http\Requests\Account\ApplyContributorRequest;
 use App\Models\ContributorApplication;
 use App\Services\Account\ContributorApplications;
 use App\Services\Account\ContributorEligibility;
+use App\Services\Account\RoleChangeNotices;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -25,7 +26,9 @@ class ContributorApplicationController extends Controller
         $pendingInstructor = DB::table('instructor_applications')->where('user_id', $user->id)->where('verification_status', 'Pending')->exists();
         $canApply = $progress['eligible'] && ! $pendingInstructor && ($latest === null || $latest->approval_status === 'Rejected');
 
-        return response()->view('account.contributor-application', compact('progress', 'history', 'latest', 'pendingInstructor', 'canApply'))->header('Cache-Control', 'no-store, private');
+        $localRoleDemo = app(RoleChangeNotices::class)->isLocalDemo($user);
+
+        return response()->view('account.contributor-application', compact('progress', 'history', 'latest', 'pendingInstructor', 'canApply', 'localRoleDemo'))->header('Cache-Control', 'no-store, private');
     }
 
     public function store(ApplyContributorRequest $request, ContributorApplications $applications): RedirectResponse

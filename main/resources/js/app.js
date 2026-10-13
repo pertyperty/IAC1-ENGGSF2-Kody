@@ -23,6 +23,7 @@ import { mountPaymentStatus } from './payment-status.js';
 import { mountDocumentStage } from './document-stage.js';
 import { mountNoticeEditor } from './site-notice.js';
 import { decorateCurrency } from './currency-icons.js';
+import { mountRoleUpdate } from './role-update.js';
 import { mountKodyCompanion, mountPageLoader } from './kody-companion.js';
 
 mountTheme(document, window);
@@ -84,6 +85,7 @@ if (cooldown) {
 const pageContext = document.querySelector('[data-page-context]');
 if (pageContext) pageContext.textContent = document.querySelector('main h1')?.textContent?.trim() ?? '';
 mountKodyCompanion(document, window);
+document.querySelectorAll('[data-role-update]').forEach(dialog => mountRoleUpdate(dialog, document, window));
 mountPageLoader(document, window);
 decorateCurrency(document);
 document.addEventListener('kody:feedback', () => requestAnimationFrame(() => decorateCurrency(document, document.querySelector('[data-toast-region]'))));

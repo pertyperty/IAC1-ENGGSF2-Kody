@@ -30,10 +30,10 @@ test('local role seeds create verified Active accounts for every role with priva
     app()['env'] = 'local';
     $this->seed(LocalRoleAccountsSeeder::class);
     $files = File::glob(storage_path('app/private/local-role-credentials-*.txt'));
-    expect($files)->toHaveCount(1)->and(User::count())->toBe(5);
+    expect($files)->toHaveCount(1)->and(User::count())->toBe(9);
     $credentials = File::get($files[0]);
     preg_match_all('/Email: (.+)\nUsername: (.+)\nPassword: (.+)/', $credentials, $matches, PREG_SET_ORDER);
-    expect($matches)->toHaveCount(5)->and(array_unique(array_column($matches, 3)))->toHaveCount(5);
+    expect($matches)->toHaveCount(9)->and(array_unique(array_column($matches, 3)))->toHaveCount(9);
     foreach ($matches as [, $email, $username, $password]) {
         $user = User::where('email', $email)->sole();
         expect($user->username)->toBe($username)->and($user->account_status)->toBe(AccountStatus::Active)
@@ -42,33 +42,33 @@ test('local role seeds create verified Active accounts for every role with priva
         $this->assertDatabaseHas('audit_events', ['event' => 'local_role_account_created', 'subject_user_id' => $user->id]);
         expect(DB::table('audit_events')->where('subject_user_id', $user->id)->sole()->context)->not->toContain($password);
     }
-    expect(User::pluck('account_role')->map(fn ($role) => $role->value)->sort()->values()->all())
+    expect(User::pluck('account_role')->unique()->map(fn ($role) => $role->value)->sort()->values()->all())
         ->toBe(collect(Role::cases())->map(fn ($role) => $role->value)->sort()->values()->all());
-    $this->assertDatabaseCount('audit_events', 5);
+    $this->assertDatabaseCount('audit_events', 9);
 });
 
 test('role seeder reruns preserve existing passwords status verification sessions and audits', function () {
     $this->seed(LocalRoleAccountsSeeder::class);
-    User::where('email', 'learner@kody.local')->update(['account_status' => AccountStatus::Suspended->value]);
+    User::where('email', 'learner1@kody.local')->update(['account_status' => AccountStatus::Suspended->value]);
     $before = User::orderBy('id')->get()->map->getRawOriginal()->all();
     $files = File::glob(storage_path('app/private/local-role-credentials-*.txt'));
     $this->seed(LocalRoleAccountsSeeder::class);
     expect(User::orderBy('id')->get()->map->getRawOriginal()->all())->toBe($before)
         ->and(File::glob(storage_path('app/private/local-role-credentials-*.txt')))->toBe($files);
-    $this->assertDatabaseCount('audit_events', 5);
+    $this->assertDatabaseCount('audit_events', 9);
 });
 
 test('partial fixtures add only missing identities and leave the original Administrator intact', function () {
     $admin = User::factory()->create(['email' => 'admin@kody.local', 'username' => 'kody_admin', 'account_role' => Role::Administrator]);
-    $learner = User::factory()->create(['email' => 'learner@kody.local', 'username' => 'kody_learner']);
+    $learner = User::factory()->create(['email' => 'learner1@kody.local', 'username' => 'kody_learner_1']);
     $beforeAdmin = $admin->fresh()->getRawOriginal();
     $beforeLearner = $learner->fresh()->getRawOriginal();
     $this->seed(LocalRoleAccountsSeeder::class);
-    expect(User::count())->toBe(6)->and($admin->fresh()->getRawOriginal())->toBe($beforeAdmin)
+    expect(User::count())->toBe(10)->and($admin->fresh()->getRawOriginal())->toBe($beforeAdmin)
         ->and($learner->fresh()->getRawOriginal())->toBe($beforeLearner);
     $credentials = File::get(File::glob(storage_path('app/private/local-role-credentials-*.txt'))[0]);
-    expect($credentials)->not->toContain('Email: learner@kody.local')->not->toContain('Email: admin@kody.local');
-    $this->assertDatabaseCount('audit_events', 4);
+    expect($credentials)->not->toContain('Email: learner1@kody.local')->not->toContain('Email: admin@kody.local');
+    $this->assertDatabaseCount('audit_events', 8);
 });
 
 test('default testing seeds remain empty unless the role fixture seeder is explicitly requested', function () {
@@ -127,7 +127,7 @@ test('audit or private storage failure rolls back all seeded accounts', function
 
 test('renamed role fixtures preserve their owner profile and four extra learners are repeatable', function () {
     $this->seed(LocalRoleAccountsSeeder::class);
-    $learner = User::where('email', 'learner@kody.local')->sole();
+    $learner = User::where('email', 'learner1@kody.local')->sole();
     $learner->update(['username' => 'Learner 1']);
     $before = $learner->fresh()->getRawOriginal();
     $this->seed(LocalRoleAccountsSeeder::class);
