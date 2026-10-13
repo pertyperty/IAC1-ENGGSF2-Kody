@@ -98,7 +98,11 @@ class LocalRoleAccountsSeeder extends Seeder
     protected function accounts(): array
     {
         return [
-            ['learner@kody.local', 'kody_learner', Role::Learner],
+            ['learner1@kody.local', 'kody_learner_1', Role::Learner],
+            ['learner2@kody.local', 'kody_learner_2', Role::Learner],
+            ['learner3@kody.local', 'kody_learner_3', Role::Learner],
+            ['learner4@kody.local', 'kody_learner_4', Role::Learner],
+            ['learner5@kody.local', 'kody_learner_5', Role::Learner],
             ['contributor@kody.local', 'kody_contributor', Role::Contributor],
             ['instructor@kody.local', 'kody_instructor', Role::Instructor],
             ['moderator@kody.local', 'kody_moderator', Role::Moderator],
