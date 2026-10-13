@@ -89,6 +89,8 @@ tutorial or game-result dialog takes precedence. A server acknowledgment marks
 the notice read, making repeated acknowledgment harmless and preventing replay.
 Overview navigation avoids reloading an application form that the new role can
 no longer access. A failed acknowledgment offers a safe account refresh.
+Refreshing an approved Instructor application also redirects its owner to the
+current Overview, where the pending welcome can be displayed.
 
 Polling runs only for a pending application/unacknowledged update, pauses in
 hidden tabs, backs off after errors and stops after authorization loss. Browser

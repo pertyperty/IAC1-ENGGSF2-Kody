@@ -21,6 +21,7 @@ test('approved Instructor application produces a durable mascot transition witho
     expect(app(RoleChangeNotices::class)->snapshot($learner, 'module-test-session')['update'])->toMatchArray(['role' => 'Instructor', 'previous' => 'Learner', 'workspace' => route('studio.index')]);
     expect(DB::table('creator_decision_deliveries')->sole()->sent_at)->toBeNull();
     moduleSignIn($this, $learner->fresh());
+    $this->get(route('instructor-application.create'))->assertRedirect(route('dashboard'));
     $this->get(route('dashboard'))->assertOk()->assertSee('data-role-update', false)->assertSee('celebration.webp');
     $this->get(route('account.edit'))->assertOk()->assertDontSee('data-role-update', false);
     $payload = $this->getJson(route('account.role-update'))->assertOk()->json('update');
