@@ -26,7 +26,8 @@ class ViewReportsRequest extends FormRequest
     public function rules(): array
     {
         return ['format' => ['required', Rule::in(['html', 'pdf', 'csv', 'xlsx'])], 'type' => ['required', Rule::in(['overview', 'accounts', 'content', 'learning', 'execution', 'economy', 'rewards', 'engagement', 'governance', 'operations'])],
-            'from' => ['required', 'date_format:Y-m-d'], 'to' => ['required', 'date_format:Y-m-d', 'after_or_equal:from']];
+            'from' => ['required', 'date_format:Y-m-d'], 'to' => ['required', 'date_format:Y-m-d', 'after_or_equal:from'],
+            'group' => ['sometimes', Rule::in(['day', 'month', 'year'])]];
     }
 
     public function after(): array

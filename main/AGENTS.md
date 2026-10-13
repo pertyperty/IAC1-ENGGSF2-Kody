@@ -1,5 +1,15 @@
 # Kody Engineering Agent Guidelines
 
+The owner's 2026-10-13 G07 reporting follow-up adds day/month/year calendar views,
+posted cash reconciliation, operating expenses, monthly cost estimates and bounded
+private transaction registers. See [business reporting](docs/system-reports-implementation.md).
+Keep estimates separate from paid expenses and liabilities separate from platform
+cash. Request creation/current states are not settlement-date revenue. Use exact
+signed presentation for negative ledger entries; do not loosen provider amount
+validation. Export PDFs/workbooks use dedicated business layouts and private,
+per-request temporary storage. Install Composer packages from the lock in every
+checkout; never substitute browser payment success or enable deferred providers.
+
 The owner's 2026-10-13 role demonstration uses the opt-in
 `kody:role-demo-prepare` command for local Learners 4/5. See
 [the role demonstration](docs/role-application-demonstration.md). Its audited,

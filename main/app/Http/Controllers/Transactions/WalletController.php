@@ -19,8 +19,8 @@ class WalletController extends Controller
         $id = $request->user()->id;
         $wallet = $ledger->snapshot($id);
         $rank = $achievements->snapshot($id);
-        $operations = DB::table('wallet_operations')->where('user_id', $id)->orderByDesc('created_at')->orderByDesc('id')->paginate(15, ['*'], 'history');
-        $earnings = DB::table('publisher_earnings')->where('user_id', $id)->orderByDesc('created_at')->orderByDesc('id')->paginate(15, ['*'], 'earnings');
+        $operations = DB::table('wallet_operations')->where('user_id', $id)->orderByDesc('created_at')->orderByDesc('id')->paginate(15, ['*'], 'history')->withQueryString();
+        $earnings = DB::table('publisher_earnings')->where('user_id', $id)->orderByDesc('created_at')->orderByDesc('id')->paginate(15, ['*'], 'earnings')->withQueryString();
         $purchases = DB::table('payment_purchases')->where('user_id', $id)->orderByDesc('created_at')->limit(10)->get(['id', 'package', 'gross_minor', 'state', 'checkout_url', 'lot_id']);
         $confirmationId = (string) Str::uuid();
         $paymentsReady = app(Readiness::class)->available() && $request->user()->can('viewLearning', LearningCourse::class);

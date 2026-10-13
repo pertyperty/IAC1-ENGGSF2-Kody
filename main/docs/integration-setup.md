@@ -9,6 +9,18 @@ Run `php artisan kody:setup-status` to see sanitized **local configuration** che
 It contacts no provider and does not prove that credentials, workers or storage
 work. Existing `/up` and `/ready` remain public liveness/database probes only.
 
+## Local document dependencies
+
+After pulling a release, run `composer install` in **that checkout's `main/`**
+using PHP 8.4.1+. Report/receipt PDFs require the locked `dompdf/dompdf` package;
+Excel reports require the locked `openspout/openspout` package. A successful npm
+build does not install PHP packages. Do not externalize or remove these imports.
+`kody:setup-status` now checks package availability without provider calls.
+Reports use writable private `storage/app/private/report-exports/` directories
+with per-request cleanup; PDF font/cache files use `storage/framework/cache/pdf/`.
+Deployment must grant the application user write access to these storage paths.
+See [reporting verification](system-reports-implementation.md).
+
 ## SendGrid
 
 The 2026-10-12 [readiness follow-up](studios-media-and-integration-readiness.md)

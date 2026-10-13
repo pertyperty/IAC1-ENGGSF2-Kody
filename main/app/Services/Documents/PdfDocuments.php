@@ -11,6 +11,7 @@ class PdfDocuments
     public function render(string $view, array $data): string
     {
         abort_unless(in_array($view, ['reports.pdf', 'transactions.receipt-pdf'], true), 500);
+        abort_unless(class_exists(Options::class) && class_exists(Dompdf::class), 503, 'PDF export is unavailable until the server Composer dependencies are installed.');
         $cache = storage_path('framework/cache/pdf');
         File::ensureDirectoryExists($cache);
         $options = new Options;

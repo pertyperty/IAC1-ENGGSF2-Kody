@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\Role;
+use App\Services\Documents\ExportFiles;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 
 uses(DatabaseMigrations::class);
@@ -17,16 +18,27 @@ test('G07 report exports are private formatted PDF CSV and XLSX with platform in
     } elseif ($format === 'csv') {
         expect($bytes)->toContain('Account growth', 'Evaluation backlog', 'Registered accounts by current status');
     } else {
-        $path = tempnam(sys_get_temp_dir(), 'kody-xlsx-test-');
-        file_put_contents($path, $bytes);
-        try {
+        app(ExportFiles::class)->within(function (string $directory) use ($bytes): string {
+            $path = $directory.'/test.xlsx';
+            file_put_contents($path, $bytes);
             $zip = new ZipArchive;
             expect($zip->open($path))->toBeTrue();
-            expect($zip->getFromName('xl/worksheets/sheet1.xml'))->toContain('Account growth')->not->toContain('<f>');
-            $zip->close();
-        } finally {
-            unlink($path);
-        }
+            try {
+                expect($zip->getFromName('xl/worksheets/sheet1.xml'))->toContain('Account growth')->not->toContain('<f>');
+                expect($zip->getFromName('xl/workbook.xml'))->toContain('Executive summary', 'Recorded metrics', 'Activity trends', 'Financial position', 'Cash register', 'Monthly cost estimates');
+                expect($zip->getFromName('xl/worksheets/sheet3.xml'))->toContain('ySplit="4"', 'autoFilter', 'pageSetup', 'orientation="landscape"');
+                for ($index = 0; $index < $zip->numFiles; $index++) {
+                    $name = $zip->getNameIndex($index);
+                    if (str_ends_with($name, '.xml')) {
+                        expect((new DOMDocument)->loadXML($zip->getFromIndex($index)), $name)->toBeTrue();
+                    }
+                }
+            } finally {
+                $zip->close();
+            }
+
+            return '';
+        });
     }
 })->with(['pdf', 'csv', 'xlsx']);
 
