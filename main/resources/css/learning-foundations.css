@@ -1,9 +1,6 @@
 .lesson-briefing { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px 24px; padding: 18px 24px; background: var(--surface-soft); border-bottom: 1px solid var(--border); }
 .lesson-briefing > details { grid-column: 1 / -1; }
 .lesson-briefing p { margin: 6px 0 12px; max-width: 90ch; }
-.lesson-briefing dl { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px 24px; margin: 12px 0; }
-.lesson-briefing dt { color: var(--accent-text); font-weight: 700; }
-.lesson-briefing dd { margin: 4px 0 0; }
 .lesson-briefing summary, .learning-trace summary { cursor: pointer; font-weight: 700; padding-block: 8px; }
 .lesson-briefing pre { white-space: pre-wrap; overflow-wrap: anywhere; font: inherit; border-left: 3px solid var(--accent-line); padding: 12px; }
 .learning-trace { margin-top: 16px; border-top: 1px solid var(--border); padding-top: 8px; min-width: 0; }
@@ -21,4 +18,4 @@
 .tower-track-picker a small { display: block; margin-top: 4px; color: var(--muted); }
 .field-guide { display: block; color: var(--muted); font-size: 12px; margin: 4px 0 12px; line-height: 1.6; }
 @media (min-width: 900px) { .tower-level .garden-workbench { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(320px, 1fr); } }
-@media (max-width: 680px) { .lesson-briefing { padding: 14px 16px; grid-template-columns: 1fr; } .lesson-briefing dl { grid-template-columns: 1fr; } .tower-map-tools .tower-track-picker { width: auto; } .tower-track-picker > summary { font-size: 11px; padding: 10px; } }
+@media (max-width: 680px) { .lesson-briefing { padding: 14px 16px; grid-template-columns: 1fr; } .tower-map-tools .tower-track-picker { width: auto; } .tower-track-picker > summary { font-size: 11px; padding: 10px; } }

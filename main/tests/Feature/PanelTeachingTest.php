@@ -4,6 +4,7 @@ use App\Enums\Role;
 use App\Models\TowerLevel;
 use App\Models\TowerRevision;
 use App\Models\User;
+use App\Services\Games\GameAssessment;
 use App\Services\Games\TowerCurriculumAudit;
 use App\Services\Games\TowerEditorialUpgrade;
 use App\Services\Gamification\TowerProgression;
@@ -55,6 +56,16 @@ test('all fifty teaching proposals have bounded server-verified reference soluti
     expect($seed->curriculum()[9]['stages'][0]['instructions'])->toContain('3 crystals')->not->toContain('both');
     expect($seed->curriculum()[49]['concept'])->toBe('Foundation synthesis');
     $this->artisan('kody:tower-curriculum-audit', ['--seed-only' => true])->assertSuccessful();
+});
+
+test('editorial references handle valid duplicate sorted identity empty and boundary scenarios', function () {
+    foreach ([['sort-lab', ['items' => [1, 2, 1]]], ['sort-lab', ['items' => [2, 2]]],
+        ['memory-trail', ['start' => [], 'target' => []]], ['string-forge', ['start' => 'MiXeD', 'target' => 'MiXeD']],
+        ['number-machine', ['start' => -100, 'target' => 100]]] as [$template, $scenario]) {
+        $game = array_replace(config('arcade.'.$template), ['scenario' => $scenario]);
+        $submission = app(TowerCurriculumAudit::class)->solution($game);
+        expect(app(GameAssessment::class)->succeeds($game, $submission))->toBeTrue();
+    }
 });
 
 test('guarded teaching rollout preserves old revisions custom edits clears and idempotency', function () {

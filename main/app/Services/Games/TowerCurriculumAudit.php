@@ -33,7 +33,7 @@ class TowerCurriculumAudit
                 if (preg_match('/^[A-Za-z0-9_-]*$/D', $suffix)) {
                     $append = array_map(fn ($chunk) => 'append '.$chunk, str_split($suffix, 12));
 
-                    return [...$program, ...$append] ?: ['upper', 'lower'];
+                    return [...$program, ...$append] ?: ['reverse', 'reverse'];
                 }
             }
             if (count($program) >= 4) {
@@ -76,11 +76,15 @@ class TowerCurriculumAudit
             sort($sorted);
             foreach ($sorted as $index => $value) {
                 if ($items[$index] !== $value) {
-                    $position = array_search($value, $items, true);
+                    $position = $index + array_search($value, array_slice($items, $index), true);
                     $program[] = 'swap '.($index + 1).' '.($position + 1);
                     [$items[$index], $items[$position]] = [$items[$position], $items[$index]];
                 }
             }
+        }
+
+        if ($program === []) {
+            $program = $stage['template'] === 'memory-trail' ? ['push 0', 'pop'] : ['swap 1 1'];
         }
 
         return ['program' => $program];
