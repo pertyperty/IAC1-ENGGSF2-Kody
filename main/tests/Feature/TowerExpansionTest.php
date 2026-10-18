@@ -78,6 +78,11 @@ test('track boundaries continue to their appended floors and a finished track re
     $this->get(route('home', ['track' => 'expert']))->assertOk()->assertSee('Track cleared. Choose another adventure.');
 });
 
+test('a track without published floors is described as unavailable rather than completed', function () {
+    moduleSignIn($this, moduleAccount(Role::Learner));
+    $this->get(route('home', ['track' => 'expert']))->assertOk()->assertSee('This track is being prepared.')->assertDontSee('Track cleared.');
+});
+
 test('new mixed quizzes preserve teaching notes through editing and reject every plausible wrong answer', function () {
     $entries = array_slice((new TowerLevelSeeder)->curriculum(), 50);
     foreach ($entries as $entry) {

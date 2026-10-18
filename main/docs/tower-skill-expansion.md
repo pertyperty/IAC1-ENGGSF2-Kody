@@ -114,9 +114,16 @@ practice answers and belongs in private editorial storage, not a public endpoint
 
 The isolated populated upgrade/81-table restore passed. All 80 seeded floors
 passed typed server replay, and focused progression/authoring checks, frontend
-tests and both production bundles passed. Final full regression and browser
-results are recorded below after completion. Live providers and production
-operations remain deferred.
+tests and both production bundles passed. Desktop/mobile checks cover track
+continuation, mixed-quiz saving, notes add/remove, isolated preview and
+Administrator publication. The final backend, cached-route, complete browser and
+restore gates are tracked in [PR #33 checks](https://github.com/pertyperty/IAC1-ENGGSF2-Kody/pull/33/checks).
+Live providers and production operations remain deferred. An empty/uninstalled
+track is shown as being prepared, rather than falsely marked cleared.
+
+The complete local browser pass finished with **63 passing workflows**, including
+all five role workspaces, reports, Office previews, registration, role approvals,
+game interactions and the new Expert path. Frontend tests passed 62 cases.
 
 ### Local installation
 
