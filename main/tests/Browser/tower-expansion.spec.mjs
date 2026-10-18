@@ -29,6 +29,7 @@ test('Expert map resumes the chosen track and a mixed quiz saves exactly the ver
     await expect(page.locator('.tower-track-status')).toContainText('Expert');
     await expect(page.locator('[data-tower-continue]')).toContainText('Start level 71');
     await expect(page.locator('[data-tower-stop="71"] .tower-node')).toBeInViewport();
+    await expect(page.locator('[data-tower-altitude]')).toContainText('65–80');
     for (const width of [1440, 390]) {
         await page.setViewportSize({ width, height: 1000 });
         await page.getByText('Choose a skill track', { exact: true }).click();

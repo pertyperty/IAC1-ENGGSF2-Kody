@@ -32,6 +32,10 @@ position, never replaces revisions or reclassifies a custom floor. Rollback
 refuses to discard explicit metadata because that would change progression gates.
 Administrator revisions keep the level's track and stable position.
 
+Decorative altitude captions now derive their floor ranges from installed map
+nodes instead of assuming fifty levels, including custom/gapped installations.
+The five scenery zones and reduced-motion behavior remain cosmetic.
+
 Track choice is cosmetic session state. Continue, Jump to current level and
 returning from an authorized lesson use the chosen track. Completed tracks show
 a finished state; each track shows its own saved count. Studio filters help
@@ -123,7 +127,8 @@ track is shown as being prepared, rather than falsely marked cleared.
 
 The complete local browser pass finished with **63 passing workflows**, including
 all five role workspaces, reports, Office previews, registration, role approvals,
-game interactions and the new Expert path. Frontend tests passed 62 cases.
+game interactions and the new Expert path. Frontend tests passed 62 cases, with
+an additional installed-floor altitude regression added afterward.
 
 ### Shared error-page repair
 
