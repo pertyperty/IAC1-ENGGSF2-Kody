@@ -1,7 +1,9 @@
 <section class="game-card arcade-game" data-arcade-game="{{ json_encode($game, JSON_THROW_ON_ERROR) }}" @if(isset($completionUrl)) data-completion-url="{{ $completionUrl }}" @endif aria-label="{{ $game['title'] }}">
     <div class="game-heading"><div><span class="game-kicker">KODY ARCADE · {{ $game['concept'] }}</span><h2>{{ $game['title'] }}</h2></div><span class="game-badge">{{ isset($completionUrl) ? 'SAVED PLAY' : 'LOCAL PRACTICE' }}</span></div>
+    @php($briefing = app(\App\Services\Games\LessonBriefings::class)->for($game))
+    @include('learning.briefing')
     <div class="arcade-workbench">
-    <div class="arcade-scene"><p class="arcade-mission">{{ $game['instructions'] }}</p><div data-arcade-world class="arcade-world" role="group" aria-label="Activity state"></div><p class="scene-caption" data-arcade-preview-status role="status">Build your idea, then run it to check the objective.</p></div>
+    <div class="arcade-scene">@if($game['instructions'] !== $briefing['task'])<p class="arcade-mission">{{ $game['instructions'] }}</p>@endif<div data-arcade-world class="arcade-world" role="group" aria-label="Activity state"></div><p class="scene-caption" data-arcade-preview-status role="status">Build your idea, then run it to check the objective.</p></div>
     <div class="game-controls">
         <div class="program-heading"><b>Build your program</b><span data-arcade-count>0 / 12 steps</span></div>
         <div data-arcade-controls class="arcade-controls"></div>

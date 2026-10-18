@@ -1,4 +1,5 @@
 import { mountModuleEditor } from './module-editor.js';
+import { mountFormGuidance } from './form-guidance.js';
 import { mountPresetEditor } from './preset-editor.js';
 import { mountCourseComposer } from './course-composer.js';
 import { mountTestCaseEditor } from './test-case-editor.js';
@@ -27,6 +28,7 @@ import { mountRoleUpdate } from './role-update.js';
 import { mountKodyCompanion, mountPageLoader } from './kody-companion.js';
 
 mountTheme(document, window);
+mountFormGuidance(document);
 // On narrow reports, begin at the latest periods without scrolling the page.
 document.querySelectorAll('.report-trend-chart').forEach(chart => {
     window.requestAnimationFrame(() => { chart.scrollLeft = chart.scrollWidth; });

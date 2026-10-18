@@ -62,7 +62,7 @@ try {
         $options = ['--force' => true];
         if ($operation === 'migrate-baseline') {
             $options += ['--realpath' => true, '--path' => array_values(array_filter(glob(database_path('migrations/*.php')),
-                fn (string $path) => ! str_ends_with($path, '2026_10_05_000038_add_challenge_discovery_metadata.php') && ! str_contains(basename($path), '2026_10_10_') && ! str_contains(basename($path), '2026_10_11_') && ! str_contains(basename($path), '2026_10_12_')))];
+                fn (string $path) => ! str_ends_with($path, '2026_10_05_000038_add_challenge_discovery_metadata.php') && ! str_contains(basename($path), '2026_10_10_') && ! str_contains(basename($path), '2026_10_11_') && ! str_contains(basename($path), '2026_10_12_') && ! str_contains(basename($path), '2026_10_18_')))];
         }
         if (Artisan::call('migrate', $options) !== 0) {
             throw new RuntimeException('Browser migrations failed.');
@@ -78,7 +78,7 @@ try {
             (new TowerLevelSeeder)->run();
         }
         $accounts = [];
-        foreach (['instructor' => Role::Instructor, 'moderator' => Role::Moderator, 'administrator' => Role::Administrator, 'learner' => Role::Learner, 'arcadelearner' => Role::Learner,
+        foreach (['instructor' => Role::Instructor, 'moderator' => Role::Moderator, 'administrator' => Role::Administrator, 'learner' => Role::Learner, 'arcadelearner' => Role::Learner, 'tracklearner' => Role::Learner,
             'navlearner' => Role::Learner, 'navcontributor' => Role::Contributor, 'navinstructor' => Role::Instructor,
             'navmoderator' => Role::Moderator, 'navadministrator' => Role::Administrator, 'interactive' => Role::Learner,
             'towerlearner' => Role::Learner, 'toweradmin' => Role::Administrator, 'stickylearner' => Role::Learner, 'usabilitylearner' => Role::Learner, 'picturelearner' => Role::Learner, 'librarylearner' => Role::Learner, 'guidelearner' => Role::Learner,

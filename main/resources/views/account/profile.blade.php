@@ -6,6 +6,7 @@
     <div class="profile-overview"><section class="profile-identity">
     <a class="profile-picture-link" href="{{ route('account.edit') }}#profile-picture" aria-label="Edit your profile picture">@include('layouts.avatar', ['avatarUser' => auth()->user(), 'avatarClass' => 'profile-avatar'])<span class="profile-edit-icon" aria-hidden="true"><x-action-icon name="pencil"/></span></a><span class="profile-edit-cue">Edit picture</span>
     <h1>Your profile</h1><b>{{ $profile['username'] ?? 'Kody player' }}</b><p>{{ $profile['role'] }} · {{ $profile['status'] }}</p>
+    @if(!$profile['first_name'] && !$profile['last_name'])<p class="field-hint">You can play with just your username. Adding personal names is optional; skip this step or add them later in Edit your player profile.</p>@endif
     <div class="profile-tools"><a class="button button-play" href="{{ route('account.edit') }}">Edit your player profile</a><a class="button button-secondary" href="{{ route('account.google') }}">Manage Google sign-in</a><a class="button button-secondary" href="{{ route('wallet.index') }}"><x-kody-art name="kodebit" size="28"/> Your KodeBits and earnings</a></div>
     </section><section><h2>Account details</h2><p class="field-hint">Your email is masked for privacy.</p>
     <dl class="profile-details">

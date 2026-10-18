@@ -18,7 +18,7 @@ class RegistrationController extends Controller
 
     public function store(RegisterAccountRequest $request, RegisterAccount $register): JsonResponse|RedirectResponse
     {
-        $register->handle($request->validated(), $request->file('credential_document'));
+        $register->handle($request->validated());
 
         $message = 'Your account was created. Check your email for a verification link. Delivery may take a moment; you can request another link later.';
 

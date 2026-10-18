@@ -196,12 +196,10 @@ test('A01 A02 B03 B05: guest trial, registration, verified play, reading and cou
     await audit(page);
     await solveGarden(page, false);
     await page.goto('/register');
-    await page.getByLabel('First name').fill('Browser');
-    await page.getByLabel('Last name').fill('Player');
     await page.getByLabel('Username').fill('browser_newplayer');
     await page.getByLabel('Email address').fill(email);
     await page.getByLabel(/^Password/).fill('BrowserStrong12!');
-    await page.getByLabel('Confirm password', { exact: true }).fill('BrowserStrong12!');
+    await page.getByLabel(/^Confirm password/).fill('BrowserStrong12!');
     await audit(page);
     await page.getByRole('button', { name: 'Create account' }).click();
     await expect(page).toHaveURL(/\/email\/verify/);
@@ -595,6 +593,9 @@ test('interactive games edit and preview locally; confirmed runs save through th
         await prompt.fill(command); await prompt.press('Enter');
         await expect(prompt).toBeEnabled();
     }
+    await expect(page.locator('[data-arcade-preview-status]')).toContainText('Preview only');
+    expect(JSON.parse(fixture('snapshot', 'interactive@browser.example.test'))).toMatchObject({ xp: 100 });
+    await page.getByRole('button', { name: 'Run program' }).click();
     await expect(page.locator('[data-arcade-output]')).toContainText('saved');
     await expect(page.locator('[data-game-result]')).toBeVisible(); await page.locator('[data-result-return]').click();
     await prompt.press('ArrowUp'); await expect(prompt).toHaveValue('cat release.txt');

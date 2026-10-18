@@ -1,5 +1,17 @@
 # Kody Engineering Agent Guidelines
 
+The owner's 2026-10-18 panel follow-up delegates product recommendations. See
+[learning and onboarding](docs/panel-learning-and-onboarding.md). Signup collects
+username/email/password only; optional private names move to A06 and Instructor
+credentials to the existing verified-account A10 flow. Preserve current identity,
+hashing, verification, lockout, session and review safeguards. Beginner (1–25) and
+Intermediate practice (26+) are independently enterable, sequential inside each;
+no fabricated earlier clears or Expert/mastery claims. Readable programs and
+Step/Replay/Restart are local interpreter previews; only explicit Run saves.
+Seed teaching updates are immutable, audited, explicit and exact-original guarded;
+never reseed over custom edits. Short Terms/Privacy drafts remain unpublished
+until operator facts and text are reviewed; no draft acceptance or retention purge.
+
 The owner's 2026-10-13 G07 reporting follow-up adds day/month/year calendar views,
 posted cash reconciliation, operating expenses, monthly cost estimates and bounded
 private transaction registers. See [business reporting](docs/system-reports-implementation.md).

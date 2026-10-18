@@ -16,7 +16,7 @@ alternate flow or NFR. See [browser verification](acceptance-verification.md).
 
 | SRS use case | Acceptance state | Implementation / coverage | Scope and remaining boundary |
 | --- | --- | --- | --- |
-| A01 Register Account | Local slice / content gap | [account-implementation-plan](account-implementation-plan.md) · [tests](../tests/Feature/Account/RegistrationTest.php) | Terms content/version missing; no recorded acceptance. |
+| A01 Register Account | Local slice / content gap | [account-implementation-plan](account-implementation-plan.md) · [tests](../tests/Feature/Account/RegistrationTest.php) | Username-first signup and optional profile names adopted; short Terms/Privacy are unpublished drafts, with no recorded acceptance. See [panel amendment](panel-learning-and-onboarding.md). |
 | A02 Verify Email | Local slice / live unverified | [account-implementation-plan](account-implementation-plan.md) · [tests](../tests/Feature/Account/EmailVerificationTest.php) | Unverified activation; real mail deferred. |
 | A03 User Login | Local slice / amended / live unverified | [login-implementation](login-implementation.md) · [tests](../tests/Feature/Account/LoginTest.php) | Approved lockouts/single session; linked Google disabled. |
 | A04 Recover Account | Local slice / live unverified | [recovery-profile-implementation](recovery-profile-implementation.md) · [tests](../tests/Feature/Account/RecoveryTest.php) | Generic response and approved role/status eligibility; live delivery deferred. |
@@ -84,7 +84,7 @@ alternate flow or NFR. See [browser verification](acceptance-verification.md).
   A01 omits it and no approved Terms content/version has been supplied.
   Registration currently does not record acceptance. Reviewed Terms/privacy
   notices and server-enforced versioned consent are required before public launch.
-  Do not substitute invented legal text.
+  Short original [drafts](legal/review-and-publication.md) were prepared on 2026-10-18 at the owner’s request; they remain unpublished pending operator facts/review. Do not substitute drafts for acceptance.
 - **Availability conflict:** summary says ≥99%; §4.2 says 99.9%. Preserve the
   stricter engineering target pending source harmonization; neither is proved locally.
 - **B05 cross-reference:** its course-module rule points to E05 (rewards).

@@ -3,7 +3,13 @@
 Start here for current scope, detailed evidence and the next useful improvements.
 This index consolidates the feature summaries previously repeated in README.
 It does not replace approved requirements, decisions or the implementation records.
-Last reviewed: 2026-10-13.
+Last reviewed: 2026-10-18.
+The [panel learning/onboarding record](panel-learning-and-onboarding.md) owns
+username-first signup, optional private names, verified-account creator applications,
+independent ordered tracks, interpreter-backed step previews, guarded teaching
+revisions and the [50-floor matrix](tower-teaching-matrix.md). The
+[form inventory](form-guidance-inventory.md) maps validation/help, and
+[short legal drafts](legal/review-and-publication.md) remain unpublished.
 The [business reporting record](system-reports-implementation.md) owns daily,
 monthly and yearly period views, exact posted cash/expense reconciliation,
 bounded private transaction registers and separate business PDF/Excel exports.

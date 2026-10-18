@@ -1,3 +1,4 @@
+import { mountLearningTrace } from './learning-trace.js';
 import { createIcon } from '../icons.js';
 import { publishFeedback } from '../feedback.js';
 import { saveCompletion } from './save-completion.js';
@@ -41,9 +42,11 @@ export function runProgram(instance, program, { repeat = false, conditional = fa
             const move = moves[command];
             const next = [position[0] + move[0], position[1] + move[1]];
             if (!path.has(key(next))) return result(false, `Oops, step ${trace.length + 1} leaves the path. Change your arrows and try again!`);
+            const before = [...position];
+            const crystalHere = crystals.has(key(next));
             position = next;
             if (instance.mode === 'conditional' && conditional) crystals.delete(key(position));
-            trace.push({ position: [...position], crystals: [...crystals], index });
+            trace.push({ position: [...position], crystals: [...crystals], index, before, cycle: cycle + 1, crystalHere });
         }
     }
     if (key(position) !== key(instance.goal)) return result(false, 'A good start! You haven’t reached the flag yet. Try changing your program.');
@@ -69,6 +72,7 @@ export function mountGarden(root) {
     const remove = root.querySelector('[data-step-remove]');
     const program = [];
     let running = false;
+    let inspector;
     let selected = -1;
     const tiles = [];
     board.style.setProperty('--columns', instance.width);
@@ -128,7 +132,7 @@ export function mountGarden(root) {
         progress.textContent = `${program.length} / ${instance.maxCommands} instructions`;
         updateTools();
     };
-    const changed = () => { root.dataset.playState = 'ready'; success.hidden = true; renderProgram(); renderBoard(); tiles.forEach(({ tile }) => tile.classList.remove('visited-tile')); };
+    const changed = () => { root.dataset.playState = 'ready'; success.hidden = true; renderProgram(); renderBoard(); tiles.forEach(({ tile }) => tile.classList.remove('visited-tile')); inspector?.refresh(); };
     root.querySelectorAll('[data-game-repeat], [data-game-conditional]').forEach(input => input.addEventListener('change', () => {
         if (!running) { changed(); feedback.textContent = 'Rule updated. Run your program to test it.'; }
     }));
@@ -155,8 +159,9 @@ export function mountGarden(root) {
     root.querySelector('[data-game-undo]').addEventListener('click', undo);
     root.querySelector('[data-game-reset]').addEventListener('click', () => {
         if (running) return;
-        program.length = 0; selected = -1; changed();
-        root.querySelectorAll('input').forEach((input) => { input.checked = false; });
+        program.length = 0; selected = -1;
+        root.querySelectorAll('input[type=checkbox]').forEach((input) => { input.checked = false; });
+        changed();
         feedback.textContent = 'A fresh start. Build a new program and give it a try.';
     });
     root.querySelector('[data-game-hint]').addEventListener('click', () => { feedback.textContent = instance.hint; publishFeedback(root, instance.hint); });
@@ -170,6 +175,7 @@ export function mountGarden(root) {
     });
     root.querySelector('[data-game-run]').addEventListener('click', async () => {
         if (running) return;
+        inspector.cancel();
         running = true; success.hidden = true; renderBoard(); tiles.forEach(({ tile }) => tile.classList.remove('visited-tile'));
         root.dataset.playState = 'running'; root.setAttribute('aria-busy', 'true');
         const result = runProgram(instance, program, { repeat: root.querySelector('[data-game-repeat]')?.checked, conditional: root.querySelector('[data-game-conditional]')?.checked });
@@ -196,8 +202,18 @@ export function mountGarden(root) {
             root.setAttribute('aria-busy', 'false');
             root.querySelectorAll('button, input').forEach((control) => { control.disabled = false; });
             updateTools();
+            inspector.refresh();
             programTrack.querySelectorAll('.program-step').forEach((step) => step.classList.remove('executing'));
         }
     });
-    renderBoard(); renderProgram();
+    inspector = mountLearningTrace(root, instance, () => [...program], (instructions) => {
+        const conditional = !!root.querySelector('[data-game-conditional]')?.checked;
+        const result = runProgram(instance, instructions, { repeat: !!root.querySelector('[data-game-repeat]')?.checked, conditional });
+        return {
+            initial: { position: instance.start, crystals: instance.crystals },
+            frames: result.trace.map(frame => ({ index: frame.index, state: frame, explanation: `Iteration ${frame.cycle}. MOVE ${instructions[frame.index].toUpperCase()}.${instance.mode === 'conditional' ? ` Crystal condition: ${frame.crystalHere ? 'TRUE' : 'FALSE'}; collection rule ${conditional ? 'on' : 'off'}.` : ''}` })),
+            message: instructions.length ? `Preview only. ${result.message}` : 'Add a movement to inspect its effect.',
+        };
+    }, state => renderBoard(state.position, state.crystals.map(point => Array.isArray(point) ? key(point) : point)), () => running);
+    inspector.refresh(); renderBoard(); renderProgram();
 }

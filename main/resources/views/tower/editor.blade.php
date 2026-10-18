@@ -5,6 +5,11 @@
     <p class="overline">TOWER STUDIO · LEVEL {{ $level->position }}</p>
     <h1>Build a meaningful challenge.</h1>
     <p>Edit prompts, scenarios and stages. Publishing starts a new immutable revision. An open attempt on an older revision must reload; saved level clears remain intact.</p>
+    @if($usingSuggestion ?? false)
+        <div class="action-receipt" role="status"><b>Unsaved editorial suggestion</b><p>Review these corrected instructions and scenario-aware hints, test every stage, then publish explicitly. The existing revision and earlier clears are unchanged.</p><a class="quiet-link" href="{{ route('tower-studio.edit', $level) }}">Discard suggestion</a></div>
+    @elseif($suggested ?? null)
+        <p>This level matches the original Kody seed. <a class="quiet-link" href="{{ route('tower-studio.edit', [$level, 'suggested' => 1]) }}">Review the teaching update</a>. Customized revisions are never replaced automatically.</p>
+    @endif
     @include('layouts.form-errors')
     <nav class="editor-jumps" aria-label="Tower editing steps">
         <a href="#tower-prompts">01 · Story</a><a href="#tower-config">02 · Stages</a><a href="#tower-sources">03 · Sources</a><a href="#tower-preview">04 · Saved preview</a>

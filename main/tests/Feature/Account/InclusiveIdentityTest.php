@@ -6,9 +6,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-test('A01 accepts multiword Unicode names and ordinary family-name punctuation', function (string $first, string $last) {
-    $this->postJson(route('register.store'), registrationData(['first_name' => $first, 'last_name' => $last]))->assertCreated();
-    expect(User::sole()->first_name)->toBe($first)->and(User::sole()->last_name)->toBe($last);
+test('A06 optional profile names accept multiword Unicode names and ordinary family-name punctuation', function (string $first, string $last) {
+    $user = User::factory()->create();
+    profileSignIn($this, $user);
+    $this->patch(route('account.update'), profileEditData($user, ['first_name' => $first, 'last_name' => $last]))->assertRedirect(route('account.show'));
+    expect($user->fresh()->first_name)->toBe($first)->and($user->fresh()->last_name)->toBe($last);
 })->with([['Maria Clara', 'De La Cruz'], ['José', "O'Connor"], ['Anne-Marie', 'Dela Peña']]);
 
 test('A03 username login uses the same account lockout as email and lands learners on the tower', function () {
