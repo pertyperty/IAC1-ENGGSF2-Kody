@@ -1,7 +1,10 @@
 export function mountFormGuidance(document) {
     let sequence = 0;
+    const eligible = field => field.name && field.type !== 'hidden' && !field.closest('[data-coding-game], [data-arcade-game], [data-practice-quiz]');
+    const pageFields = [...document.querySelectorAll('form input, form select, form textarea')].filter(eligible);
+    const errorName = field => field.name.replace(/\[([^\]]+)\]/g, '.$1');
     for (const form of document.querySelectorAll('form')) {
-        const fields = [...form.querySelectorAll('input, select, textarea')].filter(field => field.name && field.type !== 'hidden' && !field.closest('[data-coding-game], [data-arcade-game], [data-quiz]'));
+        const fields = [...form.querySelectorAll('input, select, textarea')].filter(eligible);
         for (const field of fields) {
             if (!field.id) field.id = `form-field-${++sequence}`;
             if (field.getAttribute('aria-describedby') || !['text', 'email', 'textarea', 'number'].includes(field.type)) continue;
@@ -22,8 +25,11 @@ export function mountFormGuidance(document) {
             field.insertAdjacentElement('afterend', help); field.setAttribute('aria-describedby', help.id);
         }
         for (const error of document.querySelectorAll('[data-field-error]')) {
-            const field = fields.find(item => item.name.replace(/\[([^\]]+)\]/g, '.$1') === error.dataset.fieldError);
-            if (!field) continue;
+            const matches = pageFields.filter(field => errorName(field) === error.dataset.fieldError);
+            // Staff pages can contain several independent forms with the same field name.
+            // An ambiguous summary stays readable instead of pointing at the wrong action.
+            if (matches.length !== 1 || !fields.includes(matches[0])) continue;
+            const field = matches[0];
             if (!error.id) error.id = `form-error-${++sequence}`;
             field.setAttribute('aria-invalid', 'true');
             field.setAttribute('aria-describedby', [field.getAttribute('aria-describedby'), error.id].filter(Boolean).join(' '));

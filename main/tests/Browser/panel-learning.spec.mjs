@@ -36,6 +36,21 @@ test('new registration explains its four inputs without collecting names or publ
     await audit(page);
 });
 
+test('registration server errors link to the correct field without changing its accessible label', async ({ page }) => {
+    await page.goto('/register');
+    await page.getByLabel('Username (required)', { exact: true }).fill('browser_tracklearner');
+    await page.getByLabel('Email address (required)', { exact: true }).fill('duplicatecheck@browser.example.test');
+    await page.getByLabel('Password (required)', { exact: true }).fill('BrowserStrong12!');
+    await page.getByLabel('Confirm password (required)', { exact: true }).fill('BrowserStrong12!');
+    await page.getByRole('button', { name: /Create account/ }).click();
+    const error = page.locator('[data-field-error=username]');
+    await expect(error).toContainText('already been taken');
+    await expect(page.getByLabel('Username (required)', { exact: true })).toHaveAttribute('aria-invalid', 'true');
+    await error.getByRole('link').click();
+    await expect(page.getByLabel('Username (required)', { exact: true })).toBeFocused();
+    await audit(page);
+});
+
 for (const [template, command, expected] of [
     ['pixel-studio', 'paint 1 1 mint', '(1, 1) = mint'],
     ['number-machine', 'add 3', 'value = 5'],
