@@ -75,7 +75,7 @@ export function mountLearningTrace(root, game, getProgram, buildTrace, render, i
         replayToken++;
         const program = getProgram(); trace = buildTrace(program); cursor = 0;
         source.replaceChildren();
-        if (game.template === 'command-garden' && game.mode === 'loop') { const line = document.createElement('li'); line.textContent = root.querySelector('[data-game-repeat]')?.checked ? 'REPEAT the following body 2 TIMES' : 'Repeat is off; this level requires it.'; line.className = 'trace-rule'; source.append(line); }
+        if (game.template === 'command-garden' && game.mode === 'loop') { const line = document.createElement('li'); line.textContent = root.querySelector('[data-game-repeat]')?.checked ? 'REPEAT the following body 2 TIMES' : 'Repeat is off; this level requires it.'; line.className = 'trace-rule'; line.value = 0; source.append(line); }
         program.slice(0, 12).forEach(command => { const line = document.createElement('li'); line.textContent = readableInstruction(game.template, command); if (game.template === 'command-garden' && game.mode === 'conditional' && root.querySelector('[data-game-conditional]')?.checked) line.textContent += '; IF crystal here THEN COLLECT'; source.append(line); });
         state.textContent = `Initial state\n${stateText(game, trace.initial)}`; status.textContent = trace.message; step.disabled = !trace.frames.length || isBusy();
         if (paint) show();
