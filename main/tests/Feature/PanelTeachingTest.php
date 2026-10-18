@@ -45,7 +45,7 @@ test('independent tracks admit their first level but enforce internal sequence w
     $this->assertDatabaseMissing('tower_clearances', ['user_id' => $user->id, 'level_id' => TowerLevel::where('position', 1)->value('id')]);
 });
 
-test('all fifty teaching proposals have bounded server-verified reference solutions and honest outcomes', function () {
+test('all eighty teaching proposals have bounded server-verified reference solutions and honest outcomes', function () {
     $seed = new TowerLevelSeeder;
     foreach ($seed->curriculum() as $index => $entry) {
         foreach (app(TowerCurriculumAudit::class)->entry($entry, $index + 1)['stages'] as $stage) {

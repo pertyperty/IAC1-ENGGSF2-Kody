@@ -6,6 +6,9 @@ class LessonBriefings
 {
     public function for(array $game): array
     {
+        if ($game['template'] === 'choice-quiz' && isset($game['briefing'])) {
+            return $game['briefing'];
+        }
         $scenario = $game['scenario'] ?? [];
         $mode = $game['mode'] ?? 'sequence';
         [$outcome, $explanation, $example, $task, $success] = match ($game['template']) {

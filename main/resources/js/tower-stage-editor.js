@@ -22,6 +22,14 @@ export function editTowerStage(root, stage, index, changed, previewHost) {
     details.append(heading); root.append(details);
     field(details, 'Stage title', stage.title, value => stage.title = value, { max: 100 });
     if (stage.template === 'choice-quiz') {
+        if (stage.briefing) {
+            const teaching = doc.createElement('fieldset');
+            const legend = doc.createElement('legend'); legend.textContent = 'Teaching notes'; teaching.append(legend);
+            for (const [key, label] of Object.entries({ outcome: 'Learning objective', explanation: 'Explain the rule', example: 'Different worked example', task: 'Learner task', success: 'Success criteria' })) {
+                field(teaching, label, stage.briefing[key], value => stage.briefing[key] = value, { area: true });
+            }
+            details.append(teaching);
+        }
         const questions = stage.version !== 1 ? stage.questions : [stage];
         if (Array.isArray(questions)) questions.forEach((question, position) => {
             const group = doc.createElement('fieldset');
@@ -129,6 +137,13 @@ export function previewTowerStage(editor, stage, host) {
         validateQuiz(stage);
         const root = doc.createElement('section'); root.className = 'practice-quiz'; root.dataset.practiceQuiz = JSON.stringify(stage);
         const title = doc.createElement('h2'); title.textContent = stage.title; root.append(title);
+        if (stage.briefing) {
+            const notes = doc.createElement('aside'); notes.className = 'lesson-briefing';
+            for (const key of ['outcome', 'explanation', 'example', 'task', 'success']) {
+                const text = doc.createElement('p'); text.textContent = stage.briefing[key]; notes.append(text);
+            }
+            root.append(notes);
+        }
         const form = doc.createElement('form');
         root.append(form);
         const button = doc.createElement('button'); button.type = 'submit'; button.className = 'button button-play'; button.textContent = 'Check my idea'; form.append(button);

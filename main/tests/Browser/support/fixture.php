@@ -78,7 +78,7 @@ try {
             (new TowerLevelSeeder)->run();
         }
         $accounts = [];
-        foreach (['instructor' => Role::Instructor, 'moderator' => Role::Moderator, 'administrator' => Role::Administrator, 'learner' => Role::Learner, 'arcadelearner' => Role::Learner, 'tracklearner' => Role::Learner,
+        foreach (['instructor' => Role::Instructor, 'moderator' => Role::Moderator, 'administrator' => Role::Administrator, 'learner' => Role::Learner, 'arcadelearner' => Role::Learner, 'tracklearner' => Role::Learner, 'expertlearner' => Role::Learner, 'experteditor' => Role::Administrator,
             'navlearner' => Role::Learner, 'navcontributor' => Role::Contributor, 'navinstructor' => Role::Instructor,
             'navmoderator' => Role::Moderator, 'navadministrator' => Role::Administrator, 'interactive' => Role::Learner,
             'towerlearner' => Role::Learner, 'toweradmin' => Role::Administrator, 'stickylearner' => Role::Learner, 'usabilitylearner' => Role::Learner, 'picturelearner' => Role::Learner, 'librarylearner' => Role::Learner, 'guidelearner' => Role::Learner,
@@ -189,7 +189,7 @@ try {
         $revision = CodingChallengeRevision::where('title', 'Upgrade history quest')->sole();
         $learner = User::where('email', 'learner@browser.example.test')->sole();
         if ($revision->category !== 'foundations' || $revision->tags !== []
-            || DB::table('tower_levels')->count() !== 50 || DB::table('tower_revisions')->count() !== 50
+            || DB::table('tower_levels')->count() !== 80 || DB::table('tower_revisions')->count() !== 80
             || DB::table('module_revisions')->where('attachments', '!=', '[]')->exists()
             || VerificationDelivery::where('user_id', $learner->id)->sole()->token !== str_repeat('a', 64)
             || app(WalletLedger::class)->snapshot($learner->id)['balance'] !== 50

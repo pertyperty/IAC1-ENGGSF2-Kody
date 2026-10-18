@@ -1,5 +1,13 @@
 # Authoring reliable tower levels
 
+The [three-track expansion](tower-skill-expansion.md) is the current 80-floor
+inventory. Never renumber existing levels or infer difficulty from position alone:
+nullable explicit track metadata preserves historical and customized floors.
+New quizzes may include plain-text `briefing` fields: `outcome`, `explanation`,
+`example`, `task` and `success`, each required when briefing is present and limited
+to 1,000 characters. Edit them in the stage's Teaching notes controls; compare the
+unsaved preview before publishing. Briefings do not alter grading or rewards.
+
 Use this guide for a human editor or a future content-research agent. Tower levels
 are original teaching scenarios composed from typed games/quizzes, not arbitrary
 uploaded programs. Current implementation and approved access/reward rules are in

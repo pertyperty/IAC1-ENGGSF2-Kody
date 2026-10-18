@@ -1,9 +1,9 @@
 @extends('layouts.learning')
 @section('title', 'Level '.$level->position.' · '.$revision->title.' — Kody')
 @section('content')
-<section class="tower-level page-width" data-tower-level="{{ $level->position }}" data-map-url="{{ route('home') }}" data-welcome-url="{{ route('welcome') }}" @guest data-guest-tower @endguest>
+<section class="tower-level page-width" data-tower-level="{{ $level->position }}" data-map-url="{{ route('home', ['track' => app(\App\Services\Gamification\TowerTracks::class)->key($level)]) }}" data-welcome-url="{{ route('welcome') }}" @guest data-guest-tower @endguest>
     <p class="field-hint">{{ app(\App\Services\Gamification\TowerTracks::class)->for($level)['label'] }} · Track entry is self-selected. Clearances record completed tasks, not certified mastery.</p>
-    <div class="section-heading"><div><p class="overline">{{ $level->position % 10 === 0 ? 'BOSS CHECKPOINT' : 'TOWER LEVEL' }} {{ $level->position }}</p><h1>{{ $revision->title }}</h1><p>{{ $revision->description }}</p></div><a class="button button-secondary" href="{{ route('home') }}"><x-action-icon name="left"/> Level map</a></div>
+    <div class="section-heading"><div><p class="overline">{{ $level->position % 10 === 0 ? 'BOSS CHECKPOINT' : 'TOWER LEVEL' }} {{ $level->position }}</p><h1>{{ $revision->title }}</h1><p>{{ $revision->description }}</p></div><a class="button button-secondary" href="{{ route('home', ['track' => app(\App\Services\Gamification\TowerTracks::class)->key($level)]) }}"><x-action-icon name="left"/> Level map</a></div>
     <nav class="tower-stage-tabs" aria-label="Level stages">@foreach($revision->stages as $instance)<a data-tower-stage-link="{{ $loop->index }}" href="#tower-stage-{{ $loop->index }}" @if($loop->index > 0 && !in_array($loop->index - 1, $done, true)) aria-disabled="true" tabindex="-1" @endif>{{ $loop->iteration }}. {{ $instance['title'] }}</a>@endforeach</nav>
     <div class="lesson-note" data-tower-locked hidden>Clear the previous trial before opening this level. <a class="button button-secondary button-small" href="{{ route('home') }}">Return to the map</a></div>
     <div data-tower-stages>
