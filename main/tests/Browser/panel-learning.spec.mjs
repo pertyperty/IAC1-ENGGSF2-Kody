@@ -75,6 +75,12 @@ for (const [template, command, expected] of [
         await expect(game.locator('.trace-state')).toContainText(expected);
         expect(requests).toEqual([]);
         await audit(page);
+        if (template === 'terminal-quest') {
+            await page.locator('[data-theme-toggle]').focus();
+            await page.keyboard.press('Enter');
+            await expect(page.locator('[data-theme-toggle]')).toHaveAttribute('aria-pressed', 'true');
+            await audit(page);
+        }
     });
 }
 

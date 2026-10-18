@@ -46,6 +46,7 @@
 .cabinet-action { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: auto; padding: 10px; border-radius: 8px; background: var(--surface-soft); font-size: 12px; font-weight: 700; color: var(--accent-text); }
 .arcade-station { scroll-margin-top: calc(var(--navigation-offset, 128px) + 20px); }.arcade-station > .panel-heading { flex-wrap: wrap; gap: 16px; margin-bottom: 20px; }.arcade-station .game-card { border-radius: 16px; }
 .arcade-station .arcade-scene { background: var(--surface-soft); }.arcade-station .arcade-mission { padding: 12px 16px; border-inline-start: 3px solid var(--accent); background: var(--surface); border-radius: 6px; }
+.arcade-station .terminal-game .arcade-scene, .arcade-station .terminal-game .arcade-mission { background: var(--terminal); color: var(--terminal-text); }
 .practice-quiz .game-heading { gap: 16px; flex-wrap: wrap; padding: 0 0 18px; margin-bottom: 24px; border-bottom: 1px solid var(--border); }
 .practice-quiz .game-heading h2 { margin-bottom: 0; }.practice-quiz form { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 20px; align-items: start; }
 .practice-quiz form > fieldset { padding: 20px; margin: 0; border: 1px solid var(--border); border-radius: 12px; background: var(--surface-soft); min-width: 0; }
