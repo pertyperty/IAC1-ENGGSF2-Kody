@@ -125,6 +125,16 @@ The complete local browser pass finished with **63 passing workflows**, includin
 all five role workspaces, reports, Office previews, registration, role approvals,
 game interactions and the new Expert path. Frontend tests passed 62 cases.
 
+### Shared error-page repair
+
+The broad backend review exposed a joined `Kody@endsection` directive in the
+shared branded error layout. Blade treated the directive as text, leaving its
+title section/output buffer open and emitting the status/title before the HTML
+document. Separating the directive restores the intended title and balanced
+rendering. Six status-specific checks cover 403/404/419/429/500/503, including the
+independent database-light 500/503 fallback. The Tower tests are also rerun to
+verify that the former buffer warnings are removed, rather than suppressed.
+
 ### Local installation
 
 After a new private custom-format backup, the reviewed additive migration and
