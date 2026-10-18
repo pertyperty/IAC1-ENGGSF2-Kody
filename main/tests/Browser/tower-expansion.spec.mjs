@@ -68,6 +68,13 @@ test('Administrator filters advanced floors and edits teaching notes through iso
     await page.getByRole('link', { name: /LEVEL 71/ }).click();
     const editor = page.locator('[data-tower-editor]');
     await editor.getByText('Customize stage 1', { exact: true }).click();
+    const original = JSON.parse(await editor.locator('[name="stages_json"]').inputValue())[0].briefing;
+    await editor.getByRole('button', { name: 'Remove custom teaching notes' }).click();
+    await expect(editor.getByLabel('Explain the rule', { exact: true })).toHaveCount(0);
+    await editor.getByRole('button', { name: 'Add teaching notes' }).click();
+    for (const [key, label] of Object.entries({ outcome: 'Stage learning objective', explanation: 'Explain the rule', example: 'Different worked example', task: 'Learner task', success: 'Success criteria' })) {
+        await editor.getByLabel(label, { exact: true }).fill(original[key]);
+    }
     await editor.getByLabel('Explain the rule', { exact: true }).fill('Reviewed teaching note: preserve a shrinking half-open interval and its boundary invariant.');
     let mutations = 0;
     page.on('request', request => { if (['POST', 'PUT', 'PATCH'].includes(request.method()) && request.url().includes('/tower')) mutations++; });
@@ -75,6 +82,8 @@ test('Administrator filters advanced floors and edits teaching notes through iso
     await expect(editor.locator('.tower-draft-preview .lesson-briefing')).toContainText('Reviewed teaching note');
     expect(mutations).toBe(0);
     for (const width of [1440, 390]) { await page.setViewportSize({ width, height: 1000 }); await audit(page); }
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.screenshot({ path: 'storage/app/browser-results/expert-studio-mobile.png' });
     await editor.getByRole('button', { name: 'Publish level revision' }).click();
     await expect(page.locator('[data-flash-toast]')).toContainText('Tower revision published');
     await page.locator('[data-tower-editor]').getByText('Customize stage 1', { exact: true }).click();

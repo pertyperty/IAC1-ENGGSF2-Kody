@@ -98,6 +98,11 @@ weighted path cost, minimum coins and both knapsack update orders. Every new qui
 question has a rejected incorrect answer. Human learning-effectiveness, diagnostic
 placement and a broader coding examination still need separate evidence.
 
+The audit exits unsuccessfully if a retained revision cannot be reference-verified
+or the bounded report is truncated. A valid seed proposal no longer hides a
+retained/custom failure. A bounded reference-finder failure requests editorial
+review; it does not prove that a custom puzzle is impossible.
+
 ## Release and verification
 
 Migrate before deploying code that queries track metadata. Explicitly run
@@ -112,3 +117,13 @@ passed typed server replay, and focused progression/authoring checks, frontend
 tests and both production bundles passed. Final full regression and browser
 results are recorded below after completion. Live providers and production
 operations remain deferred.
+
+### Local installation
+
+After a new private custom-format backup, the reviewed additive migration and
+append-only seed were applied transactionally to loopback local PostgreSQL
+`kody`. Thirty new floors were inserted; all 77 protected tables and all existing
+Tower level/revision rows were unchanged. The private post-install audit verifies
+all 130 retained revisions, without truncation. An initial helper audit-identifier
+type error rolled its transaction back; the corrected operation passed all guards.
+No account, password, role, session, learner history or financial state was reset.
