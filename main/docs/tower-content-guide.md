@@ -7,6 +7,13 @@ uploaded programs. Current implementation and approved access/reward rules are i
 
 ## Editorial workflow
 
+The [2026-10-18 teaching amendment](panel-learning-and-onboarding.md) adds shared
+briefings and actual-program stepping. Use the [50-floor matrix](tower-teaching-matrix.md)
+and private `kody:tower-curriculum-audit` output before revising content. Never
+equate a reachable puzzle with mastery. Beginner and Intermediate practice admit
+independently; progression inside each stays sequential. Expert is unavailable
+until advanced topics, prerequisites and transfer tasks have been reviewed.
+
 1. Choose one objective, target language/version and prerequisite concept. Keep
    levels 1–3 accessible to guests and people new to programming. Use coherent
    chapter themes and increase reasoning difficulty rather than adding jargon.

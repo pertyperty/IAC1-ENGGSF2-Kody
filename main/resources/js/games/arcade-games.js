@@ -1,3 +1,4 @@
+import { mountLearningTrace, arcadeTrace } from './learning-trace.js';
 import { createIcon } from '../icons.js';
 import { publishFeedback } from '../feedback.js';
 import { puzzleTemplates, validPuzzle, evaluatePuzzle, renderPuzzle } from './puzzle-games.js';
@@ -96,6 +97,7 @@ export function mountArcade(root) {
     const count = root.querySelector('[data-arcade-count]');
     const programList = root.querySelector('[data-arcade-program]');
     let busy = false;
+    let inspector;
     let selectedColor = 'mint';
     let selectedPosition = null;
     let colorSelect;
@@ -191,6 +193,7 @@ export function mountArcade(root) {
             }); remove.append(createIcon(root.ownerDocument, 'close')); row.append(remove);
             programList.append(row);
         });
+        inspector?.refresh();
         root.dataset.playState = 'ready';
         previewStatus.textContent = program.length ? 'Preview only. Run your program to check and save an eligible win.' : 'Build your idea, then run it to check the objective.';
     }
@@ -276,6 +279,7 @@ export function mountArcade(root) {
     root.querySelector('[data-arcade-help]').textContent = { 'pixel-studio': 'Syntax: paint 1 1 mint. Blank cells must stay blank.', 'number-machine': 'Syntax: add 3, subtract 2, multiply 2. One instruction per line.', 'sort-lab': 'Syntax: swap 1 2. Sort smallest to largest.', 'logic-switchboard': 'Tap the switches or use flip 1. AND: all on · OR: any on · XOR: odd number on.', 'string-forge': 'Commands: upper · lower · reverse · trim · append Code. One transformation per line.', 'memory-trail': 'Commands: push 2 · pop · duplicate · swap. The rightmost value is the top.', 'terminal-quest': 'Commands: ls · cat filename · cp source destination. Up/Down recalls commands. No pipes, scripts or host shell access.' }[game.template];
     async function run(showResult = true) {
         if (busy) return;
+        inspector.cancel();
         busy = true; selectedPosition = null; root.dataset.playState = 'running'; root.setAttribute('aria-busy', 'true');
         root.querySelectorAll('button, input, select, textarea').forEach(control => { control.disabled = true; });
         try {
@@ -291,20 +295,23 @@ export function mountArcade(root) {
             output.textContent = [...result.output, result.error ?? (result.success ? `Objective complete! ${game.learningIdea}` : 'Keep experimenting. The objective is not complete yet.')].join('\n');
             root.dataset.playState = result.success ? 'success' : 'retry';
             previewStatus.textContent = result.success ? 'Objective complete. You made that happen!' : 'Try changing a step, then run it again.';
+            if (!showResult) previewStatus.textContent = 'Preview only. Press Run to validate and save an eligible completion.';
             if (!result.success && showResult) publishFeedback(root, result.error ?? 'Your objective is not complete yet. Change a step and run again.', result.error ? 'error' : 'info', false, null, null, true);
-            if (result.success) {
+            if (result.success && showResult) {
                 const message = await saveCompletion(root, { program });
                 if (message) output.textContent += `\n${message}`;
             }
         } finally {
             busy = false; root.setAttribute('aria-busy', 'false');
             root.querySelectorAll('button, input, select, textarea').forEach(control => { control.disabled = false; });
+            inspector.refresh();
         }
     }
-    root.querySelector('[data-arcade-run]').addEventListener('click', run);
+    root.querySelector('[data-arcade-run]').addEventListener('click', () => run(true));
     root.querySelector('[data-arcade-hint]').addEventListener('click', () => { output.textContent = game.hint; publishFeedback(root, game.hint); });
     root.querySelector('[data-arcade-reset]').addEventListener('click', () => {
         if (!busy) { code.value = ''; history.length = 0; historyIndex = 0; if (terminalInput) terminalInput.value = ''; preview(); output.textContent = 'Ready when you are.'; }
     });
+    inspector = mountLearningTrace(root, game, lines, program => arcadeTrace(game, program, evaluateArcade), render, () => busy);
     preview();
 }

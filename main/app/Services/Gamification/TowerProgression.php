@@ -23,26 +23,30 @@ class TowerProgression
     public function snapshot(?int $userId): array
     {
         $completed = $userId === null ? [] : DB::table('tower_clearances')->where('user_id', $userId)->pluck('level_id')->all();
-        $previous = true;
+        $previous = ['beginner' => true, 'intermediate' => true];
         $levels = TowerLevel::with('currentRevision')->whereNotNull('current_revision_id')->orderBy('position')->limit(1000)->get();
         $steps = $levels->map(function ($level) use ($completed, &$previous): array {
             $cleared = in_array($level->id, $completed, true);
-            $step = ['level' => $level, 'completed' => $cleared, 'unlocked' => $previous];
-            $previous = $previous && $cleared;
+            $track = app(TowerTracks::class)->key($level);
+            $step = ['level' => $level, 'completed' => $cleared, 'unlocked' => $previous[$track], 'track' => $track];
+            $previous[$track] = $previous[$track] && $cleared;
 
             return $step;
         });
 
         return ['steps' => $steps, 'completed_count' => count($completed), 'total' => $levels->count(),
+            'tracks' => app(TowerTracks::class)->all(),
+            'track_next' => collect(app(TowerTracks::class)->all())->map(fn ($track, $key) => $steps->first(fn ($step) => $step['track'] === $key && $step['unlocked'] && ! $step['completed'])['level'] ?? null)->all(),
             'next' => $steps->first(fn ($step) => $step['unlocked'] && ! $step['completed'])['level'] ?? null];
     }
 
     public function assertUnlocked(User $user, TowerLevel $level): void
     {
         Gate::forUser($user)->authorize('viewLearning', LearningCourse::class);
-        $missing = TowerLevel::where('position', '<', $level->position)->whereNotNull('current_revision_id')
+        $track = app(TowerTracks::class)->for($level);
+        $missing = TowerLevel::whereBetween('position', [$track['start'], $track['end']])->where('position', '<', $level->position)->whereNotNull('current_revision_id')
             ->whereNotExists(fn ($query) => $query->selectRaw('1')->from('tower_clearances')->whereColumn('level_id', 'tower_levels.id')->where('user_id', $user->id))->exists();
-        abort_if($missing, 403, 'Clear the previous tower levels first.');
+        abort_if($missing, 403, 'Clear the previous levels in this track first.');
     }
 
     public function complete(User $actor, string $sessionId, TowerLevel $level, int $revisionId, int $stage, array $input): array
@@ -75,7 +79,8 @@ class TowerProgression
                 app(LearningProgression::class)->recordTowerActivity($user, $sessionId, $current->id, $instance,
                     $input + ['tower_revision_id' => $revisionId, 'tower_stage' => $stage]);
             }
-            $next = TowerLevel::where('position', '>', $current->position)->whereNotNull('current_revision_id')->orderBy('position')->first();
+            $track = app(TowerTracks::class)->for($current);
+            $next = TowerLevel::whereBetween('position', [$track['start'], $track['end']])->where('position', '>', $current->position)->whereNotNull('current_revision_id')->orderBy('position')->first();
 
             return ['message' => $cleared ? 'Tower level cleared! Your streak is saved.' : 'Stage cleared. Continue to the next stage.',
                 'tower' => ['cleared' => $cleared, 'next' => $cleared ? ($next ? route('tower.show', $next) : route('home')) : null, 'stage' => $stage]];

@@ -1,8 +1,10 @@
 // Route names come from the server. Guides explain existing controls; they never invoke them.
 const guide = (selector, title, message) => [selector, title, message];
 const game = [
+    guide('.lesson-briefing', 'Understand the idea first', 'Read your learning goal, actual task and success condition. Open the different worked example if this idea is new.'),
     guide('[data-arcade-world], [data-game-board], [data-practice-quiz]', 'Meet the challenge', 'Read the objective and inspect the starting state. A quiz asks you to choose an answer; games let you build and test an idea.'),
     guide('[data-arcade-controls], [data-game-controls], .game-controls', 'Build your idea', 'Use the controls or the program editor to prepare your answer. Changing your program is a preview, not a saved win.'),
+    guide('.learning-trace', 'Follow your own program', 'Read the pseudocode, predict the next state and use Step preview. Replay and Restart stay local; they never save a completion.'),
     guide('[data-arcade-run], [data-game-run], [data-practice-quiz] button[type="submit"]', 'Try, adjust, then run', 'Run checks your answer. Published lessons save eligible results only after server validation; arcade practice stays local.'),
 ];
 const lesson = [

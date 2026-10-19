@@ -4,7 +4,6 @@ use App\Actions\Account\RegisterAccount;
 use App\Enums\AccountStatus;
 use App\Enums\Role;
 use App\Models\EmailVerification;
-use App\Models\InstructorApplication;
 use App\Models\User;
 use App\Models\VerificationDelivery;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -20,7 +19,6 @@ function registrationData(array $overrides = []): array
 {
     return array_replace([
         'username' => 'learnerone', 'email' => 'learner@example.test',
-        'first_name' => 'Maria', 'last_name' => 'Cruz',
         'password' => 'StrongPass12!', 'password_confirmation' => 'StrongPass12!',
         'account_type' => 'learner',
     ], $overrides);
@@ -34,6 +32,7 @@ test('A01 registration creates an unverified learner and durable delivery atomic
         ->and($user->account_role)->toBe(Role::Learner)
         ->and($user->account_status)->toBe(AccountStatus::Unverified)
         ->and($user->email_verified_at)->toBeNull()
+        ->and($user->first_name)->toBeNull()->and($user->last_name)->toBeNull()->and($user->name)->toBe('learnerone')
         ->and(Hash::check('StrongPass12!', $user->password))->toBeTrue();
     $verification = EmailVerification::sole();
     $delivery = VerificationDelivery::sole();
@@ -79,25 +78,14 @@ test('A01 authenticated users cannot register another account', function () {
     $this->assertDatabaseCount('users', 1);
 });
 
-test('A01 instructor applicants retain learner privileges and store credentials privately', function () {
+test('A01 public signup rejects instructor credentials and preserves the verified account application boundary', function () {
     Storage::fake('local');
     $data = registrationData(['account_type' => 'instructor', 'institution_name' => 'University', 'specialization' => 'Programming']);
-    $data['credential_document'] = UploadedFile::fake()->createWithContent('proof.pdf', "%PDF-1.4\n1 0 obj\n<<>>\nendobj\n%%EOF");
-    $this->postJson(route('register.store'), $data)->assertCreated();
-
-    $application = InstructorApplication::sole();
-    expect(User::sole()->account_role)->toBe(Role::Learner)
-        ->and($application->verification_status)->toBe('Pending')
-        ->and($application->credential_path)->not->toContain('proof.pdf')
-        ->and($application->toArray())->not->toHaveKeys(['credential_disk', 'credential_path']);
-    Storage::disk('local')->assertExists($application->credential_path);
-    expect(Storage::disk('local')->path($application->credential_path))->not->toStartWith(public_path());
-    if (PHP_OS_FAMILY !== 'Windows') {
-        // Windows ACLs do not expose POSIX visibility through Flysystem's chmod adapter.
-        expect(Storage::disk('local')->getVisibility($application->credential_path))->toBe('private');
-    }
-    $response = $this->get('/storage/'.$application->credential_path);
-    expect(in_array($response->status(), [403, 404], true))->toBeTrue();
+    $data['credential_document'] = UploadedFile::fake()->createWithContent('proof.pdf', "%PDF-1.4\n%%EOF");
+    $this->postJson(route('register.store'), $data)->assertUnprocessable()->assertJsonValidationErrors(['account_type', 'credential_document']);
+    $this->assertDatabaseCount('users', 0);
+    $this->assertDatabaseCount('instructor_applications', 0);
+    expect(Storage::disk('local')->allFiles())->toBe([]);
 });
 
 test('A01 rejects executable files disguised as teaching credentials', function () {
@@ -109,15 +97,13 @@ test('A01 rejects executable files disguised as teaching credentials', function 
     $this->assertDatabaseCount('users', 0);
 });
 
-test('A01 a queue persistence failure rolls back account and token and cleans credentials', function () {
+test('A01 a queue persistence failure rolls back account and token', function () {
     Storage::fake('local');
     $queue = Mockery::mock();
     $queue->shouldReceive('push')->once()->andThrow(new RuntimeException('queue unavailable'));
     Queue::shouldReceive('connection')->with('database')->andReturn($queue);
 
-    $data = registrationData(['account_type' => 'instructor', 'institution_name' => 'University', 'specialization' => 'Programming']);
-    $file = UploadedFile::fake()->createWithContent('proof.pdf', "%PDF-1.4\n%%EOF");
-    expect(fn () => app(RegisterAccount::class)->handle($data, $file))->toThrow(RuntimeException::class, 'queue unavailable');
+    expect(fn () => app(RegisterAccount::class)->handle(registrationData()))->toThrow(RuntimeException::class, 'queue unavailable');
     $this->assertDatabaseCount('users', 0);
     $this->assertDatabaseCount('email_verifications', 0);
     $this->assertDatabaseCount('verification_deliveries', 0);

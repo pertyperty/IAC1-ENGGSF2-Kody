@@ -25,18 +25,15 @@ class RegisterAccountRequest extends FormRequest
         return [
             'username' => ['required', 'string', 'min:6', 'max:30', Rule::unique('users', 'username')],
             'email' => ['required', 'string', 'email', 'max:100', Rule::unique('users', 'email')],
-            'first_name' => ['required', 'string', 'max:50', 'regex:/\A\p{L}[\p{L}\p{M}]*(?:[ \x{0027}\x{2019}-]\p{L}[\p{L}\p{M}]*)*\z/u'],
-            'last_name' => ['required', 'string', 'max:50', 'regex:/\A\p{L}[\p{L}\p{M}]*(?:[ \x{0027}\x{2019}-]\p{L}[\p{L}\p{M}]*)*\z/u'],
+            'first_name' => ['prohibited'], 'last_name' => ['prohibited'], 'name' => ['prohibited'],
             'password' => AccountPasswords::rules(),
-            'account_type' => ['required', Rule::in(['learner', 'instructor'])],
+            'account_type' => ['sometimes', Rule::in(['learner'])],
             'account_role' => ['prohibited'],
             'account_status' => ['prohibited'],
             'email_verified_at' => ['prohibited'],
             'role' => ['prohibited'],
             'permissions' => ['prohibited'],
-            'institution_name' => ['exclude_unless:account_type,instructor', 'required', 'string', 'max:100'],
-            'specialization' => ['exclude_unless:account_type,instructor', 'required', 'string', 'max:100'],
-            'credential_document' => ['exclude_unless:account_type,instructor', 'required', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:'.config('account.credentials.max_kilobytes')],
+            'institution_name' => ['prohibited'], 'specialization' => ['prohibited'], 'credential_document' => ['prohibited'],
         ];
     }
 }

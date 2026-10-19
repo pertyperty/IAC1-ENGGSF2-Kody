@@ -6,6 +6,7 @@ use App\Jobs\Account\SendSupportCorrectionNotice;
 use App\Models\User;
 use App\Services\Account\AccountSecurity;
 use App\Services\Account\CurrentAccountSession;
+use App\Support\AccountIdentity;
 use App\Support\AccountPasswords;
 use Illuminate\Database\QueryException;
 use Illuminate\Database\UniqueConstraintViolationException;
@@ -46,7 +47,7 @@ class SupportProfileCorrections
                 if ($changed === []) {
                     return false;
                 }
-                $current->name = $current->first_name.' '.$current->last_name;
+                $current->name = AccountIdentity::name($current->first_name, $current->last_name, $current->username);
                 app(AccountSecurity::class)->revoke($current);
                 $current->forceFill(['profile_version' => $current->profile_version + 1])->save();
                 $id = (string) Str::uuid();

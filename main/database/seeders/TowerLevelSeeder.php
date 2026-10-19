@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\TowerLevel;
 use App\Models\TowerRevision;
+use App\Services\Games\LessonBriefings;
 use App\Services\Games\QuizAuthoring;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -20,13 +21,36 @@ class TowerLevelSeeder extends Seeder
                 }
                 $level = TowerLevel::create(['position' => $index + 1]);
                 $revision = TowerRevision::create($entry + ['level_id' => $level->id, 'number' => 1,
-                    'source_notes' => 'Original Kody curriculum and scenarios, 2026-10-10–11. Editorial learning material; not copied course or repository content.']);
+                    'source_notes' => 'Original Kody curriculum and scenarios, editorial revision 2026-10-18. Editorial learning material; not copied course or repository content.']);
                 $level->update(['current_revision_id' => $revision->id]);
             }
         });
     }
 
     public function curriculum(): array
+    {
+        $briefings = app(LessonBriefings::class);
+
+        return array_map(function (array $entry) use ($briefings): array {
+            $entry['stages'] = array_map(function (array $stage) use ($briefings): array {
+                if ($stage['template'] !== 'choice-quiz') {
+                    $stage['instructions'] = $briefings->for($stage)['task'];
+                    $stage['hint'] = $briefings->hint($stage);
+                }
+
+                return $stage;
+            }, $entry['stages']);
+            $entry['description'] = implode(' ', array_unique(array_map(fn ($stage) => $briefings->for($stage)['outcome'], $entry['stages'])));
+            if ($entry['concept'] === 'Foundation mastery') {
+                $entry['concept'] = 'Foundation synthesis';
+            }
+
+            return $entry;
+        }, $this->legacyCurriculum());
+    }
+
+    // Retained only to recognize untouched original seed revisions when suggesting an update.
+    public function legacyCurriculum(): array
     {
         $garden = fn (string $slug) => config('learning.instances.'.$slug);
         $arcade = fn (string $slug, array $scenario) => array_replace(config('arcade.'.$slug), ['scenario' => $scenario]);

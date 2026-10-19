@@ -6,6 +6,7 @@ use App\Enums\AccountStatus;
 use App\Models\EmailVerification;
 use App\Models\User;
 use App\Services\Administration\AuditRecorder;
+use App\Support\AccountIdentity;
 use App\Support\AccountPasswords;
 use Illuminate\Database\QueryException;
 use Illuminate\Database\UniqueConstraintViolationException;
@@ -34,7 +35,7 @@ class ProfileEditing
                     throw ValidationException::withMessages(['current_password' => 'Confirm your current password for email or password changes.']);
                 }
                 $user->fill(array_intersect_key($data, array_flip(['username', 'first_name', 'last_name', 'email'])));
-                $user->name = $user->first_name.' '.$user->last_name;
+                $user->name = AccountIdentity::name($user->first_name, $user->last_name, $user->username);
                 $changed = array_keys($user->getDirty());
                 if ($passwordChanged) {
                     $user->password = $data['password'];

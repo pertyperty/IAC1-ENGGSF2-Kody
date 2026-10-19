@@ -15,6 +15,7 @@
         <div class="tower-overview">@auth<b>{{ $tower['completed_count'] }} / {{ $tower['total'] }}</b><span>levels cleared</span>@else<b>3 free trials</b><span>Join to save your climb</span>@endauth</div>
     </div>
     <div class="tower-map-tools tower-overlay">
+        <details class="tower-track-picker"><summary>Choose a skill track</summary><div><p>Start either track. Clear levels in order within it. Choosing a track never grants earlier wins, XP or streaks.</p>@foreach($tower['tracks'] as $key => $track)<a class="button button-secondary button-small" href="{{ $tower['track_next'][$key] ? route('tower.show', $tower['track_next'][$key]) : route('home') }}"><b>{{ $track['label'] }}</b> · {{ $track['title'] }}</a>@endforeach<span class="field-hint">Expert: not available yet. Advanced algorithms and tradeoff tasks need a reviewed curriculum; these foundation puzzles are not an Expert qualification.</span></div></details>
         <div class="tower-resume">@if($tower['next'])<a class="button button-play" data-tower-continue href="{{ route('tower.show', $tower['next']) }}">{{ $tower['completed_count'] ? 'Continue' : 'Start' }} level {{ $tower['next']->position }} <x-action-icon name="right"/></a>@endif
             @can('manage', \App\Models\TowerLevel::class)<a class="button button-secondary button-small" href="{{ route('tower-studio.index') }}">Tower studio</a>@endcan
         </div>

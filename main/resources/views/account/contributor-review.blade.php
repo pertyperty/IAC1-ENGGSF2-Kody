@@ -1,7 +1,7 @@
 @extends('layouts.account')
 @section('title', 'Review Contributor application — Kody')
 @section('content')
-<h1>Contributor application #{{ $application->id }}</h1><p>{{ $application->user->name }} · {{ $application->approval_status }}</p>
+<h1>Contributor application #{{ $application->id }}</h1><p>{{ $application->user->username }} · {{ $application->approval_status }}</p>
 
 @if($errors->any())<div class="form-errors" role="alert">@foreach($errors->all() as $error)<p>{{ $error }}</p>@endforeach</div>@endif
 <p>{{ $application->request_message }}</p>

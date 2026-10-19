@@ -13,7 +13,6 @@ test('A01 Argon2id preserves every byte of valid multibyte passwords', function 
     $password = 'Aa1!'.str_repeat('😀', 28);
     $data = [
         'username' => 'unicodelearner', 'email' => 'unicode@example.test',
-        'first_name' => 'Maria', 'last_name' => 'Cruz', 'account_type' => 'learner',
         'password' => $password, 'password_confirmation' => $password,
     ];
     $this->postJson(route('register.store'), $data)->assertCreated();
