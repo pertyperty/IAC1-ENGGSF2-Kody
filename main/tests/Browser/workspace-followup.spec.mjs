@@ -22,7 +22,7 @@ test('instructor insights are owned graphical records and Tower play preserves t
     await expect(page).toHaveURL(/insight_days=7/); await expect(page.locator('.creator-chart').first().locator('.chart-bar')).toHaveCount(7);
     await page.locator('.creator-chart').first().getByText('View daily totals', { exact: true }).click(); await audit(page);
     await page.screenshot({ path: 'storage/app/browser-results/creator-insights-desktop.png', fullPage: true });
-    await page.getByRole('link', { name: 'Play the Tower', exact: false }).click(); await expect(page.locator('[data-tower-stop]')).toHaveCount(50);
+    await page.getByRole('link', { name: 'Play the Tower', exact: false }).click(); await expect(page.locator('[data-tower-stop]')).toHaveCount(80);
     await page.locator('[data-tower-stop="1"] .tower-node').click();
     for (const direction of ['right', 'right', 'up', 'right', 'right']) await page.getByRole('button', { name: `Add ${direction}`, exact: true }).click();
     await page.locator('[data-game-run]').click(); await expect(page.locator('[data-game-result]')).toBeVisible();
@@ -33,7 +33,7 @@ test('instructor insights are owned graphical records and Tower play preserves t
         await secondStage.getByRole('radio').first().check(); await secondStage.getByRole('button', { name: 'Check my idea', exact: true }).click();
     }
     await expect(page.locator('[data-tower-victory]')).toBeVisible();
-    await expect(page.locator('[data-progress-level]')).toHaveText('1 / 50');
+    await expect(page.locator('[data-progress-level]')).toHaveText('1 / 80');
     await page.goto('/dashboard'); await expect(page.locator('[data-progress-strip]')).toHaveCount(0);
     await page.setViewportSize({ width: 320, height: 740 }); await audit(page);
 });

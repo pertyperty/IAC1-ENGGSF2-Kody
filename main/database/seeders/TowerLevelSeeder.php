@@ -6,6 +6,7 @@ use App\Models\TowerLevel;
 use App\Models\TowerRevision;
 use App\Services\Games\LessonBriefings;
 use App\Services\Games\QuizAuthoring;
+use App\Services\Games\TowerExpansion;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -19,9 +20,9 @@ class TowerLevelSeeder extends Seeder
                 if (TowerLevel::where('position', $index + 1)->exists()) {
                     continue;
                 }
-                $level = TowerLevel::create(['position' => $index + 1]);
+                $level = TowerLevel::create(['position' => $index + 1, 'skill_track' => app(TowerExpansion::class)->track($index + 1)]);
                 $revision = TowerRevision::create($entry + ['level_id' => $level->id, 'number' => 1,
-                    'source_notes' => 'Original Kody curriculum and scenarios, editorial revision 2026-10-18. Editorial learning material; not copied course or repository content.']);
+                    'source_notes' => 'Original Kody curriculum and scenarios, editorial revision 2026-10-18. Editorial learning material; not copied course or repository content.'.($index >= 50 ? ' Expansion source reading and independent checks: docs/tower-skill-expansion.md. Python 3.14 documentation and MIT OCW 6.006 Spring 2020 lecture notes; no imported code, exercises or assets.' : '')]);
                 $level->update(['current_revision_id' => $revision->id]);
             }
         });
@@ -31,7 +32,7 @@ class TowerLevelSeeder extends Seeder
     {
         $briefings = app(LessonBriefings::class);
 
-        return array_map(function (array $entry) use ($briefings): array {
+        $original = array_map(function (array $entry) use ($briefings): array {
             $entry['stages'] = array_map(function (array $stage) use ($briefings): array {
                 if ($stage['template'] !== 'choice-quiz') {
                     $stage['instructions'] = $briefings->for($stage)['task'];
@@ -47,6 +48,8 @@ class TowerLevelSeeder extends Seeder
 
             return $entry;
         }, $this->legacyCurriculum());
+
+        return [...$original, ...app(TowerExpansion::class)->entries()];
     }
 
     // Retained only to recognize untouched original seed revisions when suggesting an update.

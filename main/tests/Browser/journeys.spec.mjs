@@ -40,7 +40,7 @@ test('navigation hides on downward scroll and returns by upward scroll, hover an
     await page.keyboard.press('Enter');
     await expect(page.locator('#main-content')).toBeFocused();
     await expect(header.getByRole('link', { name: 'Kody home', exact: true })).toBeVisible();
-    await expect(page.locator('[data-tower-stop]')).toHaveCount(50);
+    await expect(page.locator('[data-tower-stop]')).toHaveCount(80);
     await page.goto('/welcome');
     await page.mouse.move(700, 600);
     await page.mouse.wheel(0, 650);
@@ -223,7 +223,7 @@ test('A01 A02 B03 B05: guest trial, registration, verified play, reading and cou
     expect(JSON.parse(fixture('snapshot', email))).toMatchObject({ xp: 20, levels: 1, streak: 1 });
     await expect(page.locator('[data-progress-xp]')).toHaveText('20');
     await expect(page.locator('[data-progress-streak]')).toHaveText('1');
-    await expect(page.locator('[data-progress-level]')).toHaveText('0 / 50');
+    await expect(page.locator('[data-progress-level]')).toHaveText('0 / 80');
     await expect(page.locator('[data-game-feedback]')).toContainText('saved');
     const course = manifest.courses['first-programs'];
     await page.goto(`/learn/courses/${course.id}`);
@@ -276,7 +276,7 @@ test('learner username sign-in lands on the tower and saved wins refresh the del
     await expect(page).toHaveURL(/\/$/);
     await expect(page.locator('.header-username')).toContainText('browser_towerlearner');
     await page.locator('[data-tower-stop="1"] a').click(); await solveGarden(page);
-    await expect(page.locator('[data-progress-level]')).toContainText('1 / 50');
+    await expect(page.locator('[data-progress-level]')).toContainText('1 / 80');
     await expect(page.locator('[data-tower-victory]')).toBeVisible();
     await page.reload(); await page.getByRole('link', { name: 'Level map', exact: false }).click();
     await expect(page.locator('[data-tower-stop="1"]')).toHaveClass(/is-cleared/);

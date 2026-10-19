@@ -20,10 +20,12 @@ class TowerProgression
             'total' => DB::table('tower_levels')->whereNotNull('current_revision_id')->count()];
     }
 
-    public function snapshot(?int $userId): array
+    public function snapshot(?int $userId, ?string $selectedTrack = null): array
     {
         $completed = $userId === null ? [] : DB::table('tower_clearances')->where('user_id', $userId)->pluck('level_id')->all();
-        $previous = ['beginner' => true, 'intermediate' => true];
+        $tracks = app(TowerTracks::class)->all();
+        $selectedTrack = array_key_exists($selectedTrack ?? '', $tracks) ? $selectedTrack : 'beginner';
+        $previous = array_fill_keys(array_keys($tracks), true);
         $levels = TowerLevel::with('currentRevision')->whereNotNull('current_revision_id')->orderBy('position')->limit(1000)->get();
         $steps = $levels->map(function ($level) use ($completed, &$previous): array {
             $cleared = in_array($level->id, $completed, true);
@@ -34,17 +36,18 @@ class TowerProgression
             return $step;
         });
 
+        $trackNext = collect($tracks)->map(fn ($track, $key) => $steps->first(fn ($step) => $step['track'] === $key && $step['unlocked'] && ! $step['completed'])['level'] ?? null)->all();
+
         return ['steps' => $steps, 'completed_count' => count($completed), 'total' => $levels->count(),
-            'tracks' => app(TowerTracks::class)->all(),
-            'track_next' => collect(app(TowerTracks::class)->all())->map(fn ($track, $key) => $steps->first(fn ($step) => $step['track'] === $key && $step['unlocked'] && ! $step['completed'])['level'] ?? null)->all(),
-            'next' => $steps->first(fn ($step) => $step['unlocked'] && ! $step['completed'])['level'] ?? null];
+            'tracks' => $tracks, 'selected_track' => $selectedTrack, 'track_next' => $trackNext,
+            'track_counts' => collect($tracks)->map(fn ($track, $key) => ['total' => $steps->where('track', $key)->count(), 'completed' => $steps->where('track', $key)->where('completed', true)->count()])->all(),
+            'next' => $trackNext[$selectedTrack]];
     }
 
     public function assertUnlocked(User $user, TowerLevel $level): void
     {
         Gate::forUser($user)->authorize('viewLearning', LearningCourse::class);
-        $track = app(TowerTracks::class)->for($level);
-        $missing = TowerLevel::whereBetween('position', [$track['start'], $track['end']])->where('position', '<', $level->position)->whereNotNull('current_revision_id')
+        $missing = app(TowerTracks::class)->query(app(TowerTracks::class)->key($level))->where('position', '<', $level->position)->whereNotNull('current_revision_id')
             ->whereNotExists(fn ($query) => $query->selectRaw('1')->from('tower_clearances')->whereColumn('level_id', 'tower_levels.id')->where('user_id', $user->id))->exists();
         abort_if($missing, 403, 'Clear the previous levels in this track first.');
     }
@@ -79,11 +82,11 @@ class TowerProgression
                 app(LearningProgression::class)->recordTowerActivity($user, $sessionId, $current->id, $instance,
                     $input + ['tower_revision_id' => $revisionId, 'tower_stage' => $stage]);
             }
-            $track = app(TowerTracks::class)->for($current);
-            $next = TowerLevel::whereBetween('position', [$track['start'], $track['end']])->where('position', '>', $current->position)->whereNotNull('current_revision_id')->orderBy('position')->first();
+            $track = app(TowerTracks::class)->key($current);
+            $next = app(TowerTracks::class)->query($track)->where('position', '>', $current->position)->whereNotNull('current_revision_id')->orderBy('position')->first();
 
             return ['message' => $cleared ? 'Tower level cleared! Your streak is saved.' : 'Stage cleared. Continue to the next stage.',
-                'tower' => ['cleared' => $cleared, 'next' => $cleared ? ($next ? route('tower.show', $next) : route('home')) : null, 'stage' => $stage]];
+                'tower' => ['cleared' => $cleared, 'next' => $cleared ? ($next ? route('tower.show', $next) : route('home', ['track' => $track])) : null, 'stage' => $stage]];
         });
     }
 }
