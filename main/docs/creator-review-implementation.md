@@ -1,18 +1,21 @@
 # A10 instructor / creator approval
 
-Implements A10's review slice, fed by private Pending applications from A01.
-Instructors are Kody's learning content creators. Subsequent Content milestones
-implement module/course authoring and publication. A06 first applications and
-rejected resubmissions from existing accounts are implemented in the
-[account editing follow-up](profile-editing-implementation.md), with retained
-credential versions and decisions. Registration and review now share that history.
+Implements A10's review slice for private Pending applications from verified
+existing Learner/Contributor accounts. Instructors author learning modules and
+courses through the Content studio. A06 first applications and rejected
+resubmissions retain credential versions and decisions through the
+[account editing follow-up](profile-editing-implementation.md). The later
+[onboarding amendment](panel-learning-and-onboarding.md) keeps registration to
+username, email and password; qualification collection belongs to the separate
+verified-account application flow. Retained older registration applications
+continue to use the same review history.
 
 The owner approved Pending/Approved/Rejected dictionary labels, rejection
 preserving Learner access, Moderator/Administrator review (A10 actors rather
 than the dictionary's Admin-only control), and format checks plus manual
 credibility review without an invented institutional-domain list or Invalid
-account status. Registration already validates email, institution, specialization,
-actual credential MIME and size.
+account status. The application flow validates institution, specialization and
+actual credential MIME/size before private storage.
 
 ## Authorization and persistence
 
@@ -22,7 +25,8 @@ The action locks users in consistent ID order and then the application. It
 rechecks reviewer permissions/session and Pending state/record version. Reviewers
 cannot review their own application. Approval requires verified Active Learner
 or Contributor access and grants only Instructor. Rejection preserves the
-applicant's role and lifecycle status. No administrator account is seeded.
+applicant's role and lifecycle status. Approval never grants Administrator access;
+guarded local role fixtures are separate from this workflow.
 
 Migration `2026_10_03_000005_add_creator_review_and_audit` adds review metadata,
 version, audit history and durable notification deliveries. It is additive.
