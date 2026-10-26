@@ -26,7 +26,7 @@ class PublishedChallengeController extends Controller
             'tag' => ['nullable', Rule::in(array_keys(config('challenges.tags')))],
             'difficulty' => ['nullable', Rule::in(['Easy', 'Medium', 'Hard'])]]);
         $query = $filters['q'] ?? '';
-        $challenges = CodingChallengeRevision::select(['id', 'challenge_id', 'title', 'language', 'difficulty', 'category', 'tags', 'price_kb', 'minimum_xp'])->with('challenge.creator:id,account_status')
+        $challenges = CodingChallengeRevision::select(['id', 'challenge_id', 'title', 'language', 'difficulty', 'category', 'tags', 'price_kb', 'minimum_xp'])->with(['challenge.creator:id,username,account_role,account_status,email_verified_at', 'challenge.creator.creatorVerification'])
             ->where('review_status', 'Approved')->whereHas('challenge', fn ($builder) => $builder->where('status', 'Published')->whereNull('staff_withdrawn_at')->whereColumn('published_revision_id', 'coding_challenge_revisions.id'))
             ->when(trim($query) !== '', fn ($builder) => $builder->where('title', 'ilike', '%'.addcslashes(trim($query), '%_\\').'%'))
             ->when($filters['language'] ?? null, fn ($builder, $language) => $builder->where('language', $language))

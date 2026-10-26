@@ -4,6 +4,7 @@ namespace App\Services\Administration;
 
 use App\Models\User;
 use App\Services\Account\CurrentAccountSession;
+use App\Services\Operations\Heartbeats;
 use App\Support\AccountPasswords;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -51,6 +52,7 @@ class SiteManagement
         Gate::forUser($user)->authorize('manageSite', User::class);
 
         return ['announcement' => DB::table('site_announcements')->where('id', 1)->firstOrFail(),
+            'heartbeats' => app(Heartbeats::class)->snapshot(),
             'queues' => DB::table('jobs')->select('queue')->selectRaw('count(*) as total, min(created_at) as oldest,
                 count(*) FILTER (WHERE reserved_at IS NOT NULL) as reserved,
                 count(*) FILTER (WHERE reserved_at IS NULL AND available_at <= ?) as ready,

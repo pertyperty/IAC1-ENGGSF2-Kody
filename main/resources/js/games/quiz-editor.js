@@ -1,6 +1,8 @@
 export function readQuizQuestions(root) {
     return [...root.querySelectorAll('[data-quiz-question-editor]')].map(question => {
         const common = Object.fromEntries(['id', 'question', 'explanation'].map(field => [field, question.querySelector(`[data-question-field="${field}"]`).value]));
+        const retry = question.querySelector('[data-question-field="retry_explanation"]')?.value.trim();
+        if (retry) common.retry_explanation = retry;
         const type = question.querySelector('[data-question-field="type"]').value;
         if (type === 'blank') return { ...common, type, accepted: [...question.querySelectorAll('[data-accepted-answer]')].map(input => input.value), case_sensitive: question.querySelector('[data-case-sensitive]').checked };
         if (type === 'matching') return { ...common, type, pairs: [...question.querySelectorAll('[data-matching-pair]')].map(pair => Object.fromEntries(['id', 'left', 'right'].map(field => [field, pair.querySelector(`[data-pair-field="${field}"]`).value]))) };

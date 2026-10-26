@@ -1,5 +1,25 @@
 # Kody Engineering Agent Guidelines
 
+The owner's 2026-10-26 maintainability pass is tracked in the
+[refactoring review](docs/refactoring-review-2026-10-26.md). Reuse Account-owned
+`CredentialDocuments` for qualification availability and audited downloads.
+Keep catalog projections small and creator aggregates scoped to owned activity;
+preserve query-budget, history, policy and private-storage regression checks.
+Continue with focused batches rather than a whole-tree rewrite. Live activation
+remains separate from refactoring.
+
+The owner's 2026-10-25 amendment prioritizes simple, readable learning UI and
+visible pseudocode with bounded instruction panels. See
+[simple learning and creator credibility](docs/simple-learning-and-creator-credibility.md).
+Guides are opt-in. Preserve server-validated Run and preview isolation. Public
+creator profiles publish only explicitly supplied fields and usernames, never
+private names/email/qualification documents. Role pills are separate from manually
+issued qualifications badges; current staff/password/session, approved private
+proof, version checks and audit govern grant/revoke. Preserve credential history
+and account-erasure integration. Personal review lists grant nothing. Heartbeats
+probe the database worker without accumulating jobs; real supervision/alerts and
+all existing private-provider/legal activation deferrals remain separate.
+
 The owner's later 2026-10-18 request adds actual Beginner, Intermediate and Expert
 Tower content. See [three-track expansion](docs/tower-skill-expansion.md). Eighty
 free floors retain positions 1–50 and append 51–60 Beginner, 61–70 Intermediate

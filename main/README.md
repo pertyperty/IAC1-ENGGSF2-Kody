@@ -1,6 +1,6 @@
 # Kody
 
-Game-first coding platform with an editable 25-level tower, creator-authored lessons, customizable games and
+Game-first coding platform with an editable 80-level tower across three skill tracks, creator-authored lessons, customizable games and
 reviewed courses. Laravel modular monolith with PostgreSQL as the canonical database.
 
 Read `AGENTS.md` and [architecture conventions](docs/architecture.md) first.
@@ -8,6 +8,8 @@ The [implementation map](docs/implementation-status.md) is the master index for
 feature scope, traceability and remaining improvements. It links the detailed
 records without duplicating their approved decisions. Owner-deferred features
 remain in the [deferred register](docs/deferred-features.md).
+The [refactoring review](docs/refactoring-review-2026-10-26.md) tracks the current
+maintainability pass, measured query reductions and the next focused batches.
 
 The shared interface uses blue/grey light and dark themes, a remembered header
 toggle and responsive controls. Creators can preview unsaved games and quizzes;
@@ -100,6 +102,16 @@ npm audit --audit-level=high
 npm run test:games
 npm run build
 ```
+
+On Windows, set `KODY_TEST_PHP` to the full working PHP executable (not a `.bat`
+wrapper) for PHP-backed frontend/browser fixtures. For example, in PowerShell:
+`$env:KODY_TEST_PHP = 'C:\path\to\php.exe'`. Verify its configuration/extensions
+with that executable before running the tests; the suite must receive clean JSON.
+
+`npm run test:browser:engines` runs the isolated Chromium/Firefox/WebKit smoke
+matrix after `npx playwright install chromium firefox webkit`. The normal browser
+command retains the full Chromium workflow suite. See
+[the current learning and creator implementation](docs/simple-learning-and-creator-credibility.md).
 
 `composer format` applies Pint formatting. There is no configured static analyzer.
 Tests cover health, PostgreSQL persistence/constraints/concurrency, registration,

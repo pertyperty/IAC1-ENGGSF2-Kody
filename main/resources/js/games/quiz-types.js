@@ -9,7 +9,8 @@ export function validateQuestion(question) {
     const type = question.type ?? 'choice';
     const distinct = labels => labels.every(label => typeof label === 'string' && label.trim()) && new Set(labels.map(label => label.trim())).size === labels.length;
     const allowed = { choice: ['options', 'answer'], blank: ['accepted', 'case_sensitive'], matching: ['pairs'] }[type];
-    if (!allowed || Object.keys(question).some(key => !['id', 'type', 'question', 'explanation', ...allowed].includes(key))) throw new Error('Unsupported question fields.');
+    if (!allowed || Object.keys(question).some(key => !['id', 'type', 'question', 'explanation', 'retry_explanation', ...allowed].includes(key))) throw new Error('Unsupported question fields.');
+    if (question.retry_explanation != null && (typeof question.retry_explanation !== 'string' || [...question.retry_explanation].length > 1000)) throw new Error('Retry feedback must be at most 1000 characters.');
     if (type === 'choice') {
         if (!Array.isArray(question.options) || question.options.length < 2 || question.options.length > 6
             || !distinct(question.options.map(option => option.label)) || question.options.some(option => [...option.label].length > 300 || !/^[a-z0-9_-]{1,30}$/.test(option.id))
@@ -32,7 +33,7 @@ export function checkQuestion(question, answer) {
     const correct = type === 'blank' ? typeof answer === 'string' && [...answer].length <= 100 && question.accepted.some(accepted => normalizeBlank(accepted, question.case_sensitive) === normalizeBlank(answer, question.case_sensitive))
         : type === 'matching' ? Boolean(answer && typeof answer === 'object' && !Array.isArray(answer) && Object.keys(answer).length === question.pairs.length && question.pairs.every(pair => answer[pair.id] === pair.id))
         : answer === question.answer;
-    return { correct, message: `${correct ? 'You got it!' : 'Try another idea.'} ${question.explanation}` };
+    return { correct, message: `${correct ? 'Correct.' : 'Try again.'} ${!correct && question.retry_explanation?.trim() ? question.retry_explanation : question.explanation}` };
 }
 
 export function readQuestionAnswer(group, question) {

@@ -7,6 +7,18 @@ fake-provider evidence belong in [economy implementation](economy-implementation
 This register owns remaining activation/verification deferrals; do not ask for
 these private keys again.
 
+Reviewed 22 October 2026: see the [prioritized improvement review](improvement-review-2026-10-22.md)
+for code checks, current local setup status and implementation acceptance criteria.
+The rows below include unresolved launch requirements, optional product policies
+and environmental verification. They are not all missing implementations: Terms
+acceptance still needs code after text approval, whereas provider adapters already
+exist. The three-track Expert curriculum supersedes its earlier content deferral.
+
+The [25 October implementation](simple-learning-and-creator-credibility.md) adds
+the personal review list, worker/scheduler probes and automated Firefox/WebKit
+learning smoke checks. These do not complete human learning-effectiveness studies,
+real-device checks, supervised operations or live provider activation.
+
 The 2026-10-12 [preparation follow-up](studios-media-and-integration-readiness.md)
 adds verification OTP, owned checkout status, PDF purchase receipts and queued
 receipt attachments, plus cross-context execution admission limits and result
@@ -24,7 +36,7 @@ callback contracts, execution-provider drills and staging remain deferred below.
 | SendGrid live setup | TLS-required SMTP, durable account/financial notices and uncertain-delivery review. | Private key, authenticated sender/domain, real inbox/delivery/failure and supervised worker checks. Array transport is testing only. |
 | Numeric ratings — B10 | Approved replaceable/removable Like/Helpful/Favorite reaction. | Approved scale, eligibility and aggregation if numeric ratings are later wanted. |
 | Tower direct rewards and paid prerequisites | All 80 current levels are free; server-validated final clears qualify streaks and preserve revision history. | A separate approved tower XP/KodeBit formula and explicit prerequisite/access configuration. No additional tower rewards or mandatory paid lessons are enabled. Existing module rewards stay separate. |
-| Actual device and SRS capacity/availability evidence | Isolated Chromium journeys/axe/viewport checks, bounded queries and populated local restore; explicit pilot sizing assumptions. | Safari/Firefox/devices, staged load against unchanged SRS targets, measured feedback/latency/availability and recovery. |
+| Actual device and SRS capacity/availability evidence | Full isolated Chromium journeys/axe/viewport checks, Firefox/WebKit learning smoke checks, bounded queries and populated local restore; explicit pilot sizing assumptions. | Broader cross-engine workflows and actual Safari/mobile devices, staged load against unchanged SRS targets, measured feedback/latency/availability and recovery. |
 
 Setup: [integration guide](integration-setup.md). Policy:
 [decisions](economy-and-launch-decisions.md). Verification:

@@ -41,13 +41,13 @@ test('Expert map resumes the chosen track and a mixed quiz saves exactly the ver
     await expect(quiz.locator('.lesson-briefing')).toContainText('loop invariant');
     const submissions = [];
     page.on('request', request => { if (request.method() === 'POST' && request.url().includes('/tower/')) submissions.push(request.url()); });
-    await quiz.getByRole('button', { name: 'Check my idea' }).click();
+    await quiz.getByRole('button', { name: 'Check answers' }).click();
     await expect(page.locator('[data-game-result]')).toBeVisible();
     expect(submissions).toHaveLength(0);
     await page.locator('[data-result-return]').click();
     await answerQuiz(quiz);
     const response = page.waitForResponse(response => response.request().method() === 'POST' && response.url().includes('/tower/'));
-    await quiz.getByRole('button', { name: 'Check my idea' }).click();
+    await quiz.getByRole('button', { name: 'Check answers' }).click();
     expect((await response).status()).toBe(200);
     await expect(page.locator('[data-game-result]')).toBeVisible();
     await expect(page.locator('[data-progress-level]')).toContainText('1 / 80');

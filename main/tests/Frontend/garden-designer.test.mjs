@@ -1,10 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { execFileSync } from 'node:child_process';
+import { phpFixture } from '../Support/php-fixture.mjs';
 import { gardenLayout, paintGarden } from '../../resources/js/games/garden-designer.js';
 import { runProgram } from '../../resources/js/games/command-garden.js';
 
-const presets = JSON.parse(execFileSync('php', ['-r', 'echo json_encode(require "config/learning.php");']).toString()).instances;
+const presets = JSON.parse(phpFixture(['-r', 'echo json_encode(require "config/learning.php");']).toString()).instances;
 
 test('garden painting preserves inputs and protects objectives while changing path tiles', () => {
     const layout = gardenLayout(presets.sequences);

@@ -326,7 +326,7 @@ test('Administrator rail pulls and pins labels; tower drafts preview without pub
     const quizPreview = quizStage.locator('.tower-draft-preview');
     const editorUrl = page.url();
     await quizPreview.getByRole('radio').first().check();
-    await quizPreview.getByRole('button', { name: 'Check my idea', exact: true }).click();
+    await quizPreview.getByRole('button', { name: 'Check answers', exact: true }).click();
     await expect(quizPreview.locator('[data-quiz-feedback]')).toContainText('You got it');
     await expect(page.locator('[data-game-result]')).toBeVisible(); await page.locator('[data-result-return]').click();
     await expect(page).toHaveURL(editorUrl);
@@ -422,8 +422,8 @@ test('empty catalogs offer clear next actions on narrow screens in both themes',
     await page.setViewportSize({ width: 320, height: 740 });
     for (const dark of [false, true]) {
         for (const [path, title, action] of [
-            ['/learn', 'No adventures found', 'See all modules'],
-            ['/learn/courses', 'No journeys found', 'Explore adventures'],
+            ['/learn', 'No lessons found', 'See all modules'],
+            ['/learn/courses', 'No courses found', 'Browse lessons'],
             ['/challenges', 'No coding quests found', 'Explore adventures'],
         ]) {
             await page.goto(`${path}?q=zzzz-no-matching-content`);
@@ -482,13 +482,13 @@ test('B05: four creator arcade assessments and a multi-question quiz save valida
     for (const label of ['The result must always stay the same', 'A loop around the three steps', 'Check a condition before collecting']) {
         await page.getByRole('radio', { name: label, exact: true }).check();
     }
-    await page.getByRole('button', { name: 'Check my idea' }).click();
+    await page.getByRole('button', { name: 'Check answers' }).click();
     await expect(page.locator('[data-quiz-feedback]')).toContainText('try again');
     await expect(page.locator('[data-game-result]')).toBeVisible(); await page.locator('[data-result-return]').click();
     expect(JSON.parse(fixture('snapshot', 'arcadelearner@browser.example.test'))).toMatchObject({ xp: 160, xp_awards: 4 });
     await audit(page);
     await page.getByRole('radio', { name: 'The robot may end up somewhere different', exact: true }).check();
-    await page.getByRole('button', { name: 'Check my idea' }).click();
+    await page.getByRole('button', { name: 'Check answers' }).click();
     await expect(page.locator('[data-quiz-feedback]')).toContainText('saved');
     await audit(page);
     expect(JSON.parse(fixture('snapshot', 'arcadelearner@browser.example.test'))).toMatchObject({ xp: 200, xp_awards: 5, streak: 1 });
@@ -550,6 +550,7 @@ test('interactive games edit and preview locally; confirmed runs save through th
     page.on('request', request => { if (request.method() === 'POST' && request.url() === completion) saves++; });
     await garden.focus();
     for (const key of ['ArrowRight', 'ArrowUp', 'ArrowRight', 'ArrowRight', 'ArrowRight']) await page.keyboard.press(key);
+    await garden.getByText('Arrange instructions', { exact: true }).click();
     await garden.getByRole('button', { name: 'Step 2: up', exact: true }).focus();
     await page.keyboard.press('Alt+ArrowRight');
     await expect(garden.getByRole('button', { name: 'Step 3: up', exact: true })).toBeFocused();

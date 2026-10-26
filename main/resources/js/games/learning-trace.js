@@ -41,11 +41,14 @@ export function stateText(game, state) {
 
 export function mountLearningTrace(root, game, getProgram, buildTrace, render, isBusy) {
     const document = root.ownerDocument;
-    const panel = document.createElement('details'); panel.className = 'learning-trace'; panel.open = true;
-    const summary = document.createElement('summary'); summary.textContent = 'Read & step through your program'; panel.append(summary);
-    const note = document.createElement('p'); note.className = 'field-hint'; note.textContent = 'Pseudocode describes this simulator, not a full programming language. Predict a change, then inspect it. Previews never save progress.';
+    const panel = document.createElement('section'); panel.className = 'learning-trace'; panel.setAttribute('aria-label', 'Pseudocode');
+    const heading = document.createElement('h3'); heading.textContent = 'Pseudocode'; panel.append(heading);
+    const note = document.createElement('p'); note.className = 'field-hint'; note.textContent = 'Read your program. Step through it, or Run to check and save.';
     const source = document.createElement('ol'); source.className = 'trace-source'; source.setAttribute('aria-label', 'Readable program');
-    const state = document.createElement('pre'); state.className = 'trace-state';
+    const state = document.createElement('pre'); state.className = 'trace-state'; state.tabIndex = 0; state.setAttribute('aria-label', 'Program state');
+    const statePanel = document.createElement('details');
+    const stateSummary = document.createElement('summary'); stateSummary.textContent = 'Program state'; statePanel.append(stateSummary, state);
+    source.tabIndex = 0;
     const status = document.createElement('p'); status.className = 'field-hint'; status.setAttribute('role', 'status');
     const actions = document.createElement('div'); actions.className = 'trace-actions';
     let trace, cursor = 0, replayToken = 0;
@@ -69,8 +72,9 @@ export function mountLearningTrace(root, game, getProgram, buildTrace, render, i
         }
     });
     button('Restart preview', () => { replayToken++; cursor = 0; show(); });
-    panel.append(note, source, state, actions, status);
-    root.querySelector('.game-controls').append(panel);
+    panel.append(note, source, actions, status, statePanel);
+    const controls = root.querySelector('.game-controls');
+    controls.insertBefore(panel, controls.querySelector('.game-toolbar'));
     const refresh = (paint = false) => {
         replayToken++;
         const program = getProgram(); trace = buildTrace(program); cursor = 0;

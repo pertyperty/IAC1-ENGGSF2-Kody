@@ -26,6 +26,12 @@ attempts by original submission date, including weekly contexts. These are
 current retained records, including older revisions, rather than immutable
 historical financial reports. Erased records no longer contribute.
 
+The [26 October refactor](refactoring-review-2026-10-26.md) retains these metric
+definitions while reducing reads. Instructor reports skip submission queries;
+Contributor headline counts share one PostgreSQL filtered aggregate, with the
+two daily charts queried separately. Regression checks cover empty windows,
+returning participants, excluded dates and the bounded submission-query count.
+
 Instructors can open the Tower from their sidebar and creator dashboard. Their
 dashboard remains a creator workspace; the participant HUD appears only during
 Tower play. Existing server-validated sequential progression and streak rules

@@ -43,4 +43,5 @@
 {{ $supportHistory->links() }}
 <h2>Enforcement history</h2>@forelse($history as $event)<p>{{ $event->action }} · Staff account #{{ $event->actor_id }} · {{ \Carbon\CarbonImmutable::parse($event->created_at)->setTimezone('Asia/Manila')->format('M j, Y g:i A') }} Asia/Manila</p>@empty<p>No recorded enforcement actions.</p>@endforelse
 {{ $history->links() }}<p class="secondary-link"><a href="{{ route('account-governance.index') }}">Back to accounts</a></p>
+@can('verifyCreator', $account)<p><a href="{{ route('creator-badges.show', $account) }}">Review qualifications badge</a></p>@endcan
 @endsection

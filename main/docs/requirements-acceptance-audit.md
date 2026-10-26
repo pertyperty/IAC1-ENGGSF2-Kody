@@ -106,7 +106,7 @@ alternate flow or NFR. See [browser verification](acceptance-verification.md).
 | 99.9% uptime and fault recovery | Health/reconciliation/retry procedures | Monitoring/SLO history, response and outage drills |
 | Backup interval ≤24 hours, restore | Local custom-format restore; managed backup template | Encrypted managed DB/key/private-object restore and timed staging recovery |
 | Maintenance 1–5 AM Manila, ≤4 hours/month | Deployment/rollback procedures | Scheduled maintenance and measured downtime |
-| Chrome/Firefox/Edge/Safari and mobile | Chromium browser journeys, viewport/keyboard/axe checks | Other engines, actual devices, screen reader and user testing |
+| Chrome/Firefox/Edge/Safari and mobile | Full Chromium journeys plus Firefox/WebKit learning smoke checks, viewport/keyboard/axe checks | Broader engine workflows, actual Safari/mobile devices, screen reader and user testing |
 | Async effects, modularity, logs | Module-owned services, durable jobs/notices, full/cached CI | Supervised workers/scheduler and actual delivery/deployment rehearsal |
 
 The [deferred register](deferred-features.md) owns activation blockers. Do not

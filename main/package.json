@@ -5,6 +5,7 @@
   "scripts": {
     "test:games": "node --test tests/Frontend/*.test.mjs",
     "test:browser": "node tests/Browser/run.mjs",
+    "test:browser:engines": "node tests/Browser/run.mjs --cross-browser",
     "test:restore": "node tests/Browser/run.mjs --rehearse",
     "build": "vite build && vite build --config vite.office.config.js",
     "dev": "vite"
@@ -19,7 +20,7 @@
     "docx-preview": "0.4.1",
     "laravel-vite-plugin": "^3.1",
     "tailwindcss": "^4.0.0",
-    "vite": "^8.0.0"
+    "vite": "^8.3.5"
   },
   "optionalDependencies": {
     "@laravel/multiplex": "^0.4.1"
