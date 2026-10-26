@@ -34,6 +34,15 @@ Audit writes store IDs/event/minimal transition context, omitting credentials,
 storage paths and document contents. Downloads also create audit events. This is
 durable history, not a claim of tamper-proof storage or production retention.
 
+Current and retained Instructor downloads and Contributor downloads now share
+Account-owned `CredentialDocuments`. It checks the resource policy before history
+or storage access and applies the same private-disk/path/header rules used by
+qualifications badge proof checks. Missing disk configuration is unavailable
+proof, not an uncaught disk-resolution error. See the
+[refactoring review](refactoring-review-2026-10-26.md) for the security matrix;
+[creator credibility](simple-learning-and-creator-credibility.md) owns the later
+public-profile/badge scope and private history UI.
+
 ## Documents and notifications
 
 Credentials stay on private Laravel storage with generated names. Authorized

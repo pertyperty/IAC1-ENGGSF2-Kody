@@ -4,6 +4,10 @@ Start here for current scope, detailed evidence and the next useful improvements
 This index consolidates the feature summaries previously repeated in README.
 It does not replace approved requirements, decisions or the implementation records.
 Last reviewed: 2026-10-26.
+The [refactoring review](refactoring-review-2026-10-26.md) starts a separate
+maintainability pass across all modules: shared private credential reads, fewer
+creator-dashboard aggregates, summary-only lesson cards and query-free empty
+histories. It records the next focused batches and their verification boundaries.
 The [simple learning and creator credibility amendment](simple-learning-and-creator-credibility.md)
 owns readable shared UI, bounded visible pseudocode, opt-in guides, public creator
 profiles/bylines, manually reviewed qualifications badges, private credential
@@ -154,11 +158,11 @@ provider-fake verification is not live delivery/execution evidence.
 - Variable-length quiz authoring, multi-question server completion, sequential
   creator paths, reading completion and dashboards are implemented in
   [the completion milestone](platform-completion-implementation.md).
-- The latest Tower delivery records 63 isolated Chromium browser workflows exercising registration, play,
-  creator/staff publication, all five role workspaces, direct/mobile game interactions,
-  themes, save-failure retry and axe checks. Exercise
-  long content, keyboard authoring and error/retry paths across actual
-  Safari, Firefox and mobile devices. Local checks use one Chromium surface.
+- The simple-learning delivery records 67 isolated Chromium workflows plus six
+  Chromium/Firefox/WebKit learning smoke checks. These exercise registration,
+  creator/staff publication, all five role workspaces, mobile layouts, themes,
+  retry and accessibility. Broader cross-engine workflows, actual Safari/mobile
+  devices and screen-reader sessions remain separate verification work.
 - Supply reviewed Terms content/version, then add recorded server-enforced
   registration acceptance; this is an actual A01 gap tracked alongside activation
   deferrals, not a completed feature.

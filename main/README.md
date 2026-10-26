@@ -8,6 +8,8 @@ The [implementation map](docs/implementation-status.md) is the master index for
 feature scope, traceability and remaining improvements. It links the detailed
 records without duplicating their approved decisions. Owner-deferred features
 remain in the [deferred register](docs/deferred-features.md).
+The [refactoring review](docs/refactoring-review-2026-10-26.md) tracks the current
+maintainability pass, measured query reductions and the next focused batches.
 
 The shared interface uses blue/grey light and dark themes, a remembered header
 toggle and responsive controls. Creators can preview unsaved games and quizzes;

@@ -6,11 +6,11 @@ use App\Enums\Role;
 use App\Models\ContributorApplication;
 use App\Models\InstructorApplication;
 use App\Models\User;
+use App\Services\Account\CredentialDocuments;
 use App\Services\Account\CurrentAccountSession;
 use App\Support\AccountPasswords;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 
 class CreatorBadges
@@ -48,13 +48,8 @@ class CreatorBadges
                 || (int) ($data['application_id'] ?? 0) !== $proof->id || (int) ($data['application_version'] ?? 0) !== $proof->record_version)) {
                 throw ValidationException::withMessages(['qualifications_reviewed' => 'Review the current approved application and its supporting documents first.']);
             }
-            if ($active) {
-                $prefix = $creator->account_role === Role::Instructor ? 'instructor-credentials/' : 'contributor-credentials/';
-                if ($proof->credential_disk === 'public' || config('filesystems.disks.'.$proof->credential_disk.'.visibility') === 'public'
-                    || ! str_starts_with($proof->credential_path, $prefix) || str_contains($proof->credential_path, '..') || str_contains($proof->credential_path, '\\')
-                    || ! Storage::disk($proof->credential_disk)->exists($proof->credential_path)) {
-                    throw ValidationException::withMessages(['qualifications_reviewed' => 'The supporting document is unavailable. Resolve it before granting a badge.']);
-                }
+            if ($active && ! app(CredentialDocuments::class)->available($proof)) {
+                throw ValidationException::withMessages(['qualifications_reviewed' => 'The supporting document is unavailable. Resolve it before granting a badge.']);
             }
             if (! $active && $existing === null) {
                 throw ValidationException::withMessages(['decision' => 'There is no badge to revoke.']);

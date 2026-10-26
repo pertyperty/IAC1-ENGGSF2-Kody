@@ -53,22 +53,40 @@ test('Contributors receive quest metrics and noncreator accounts cannot inspect 
     }
 });
 
+test('creator insights bound submission scans to the metrics relevant to each role', function (Role $role, int $scans) {
+    $creator = moduleAccount($role);
+    DB::enableQueryLog();
+    try {
+        $result = app(CreatorInsights::class)->snapshot($creator, 'module-test-session', 7);
+        $queries = collect(DB::getQueryLog())->filter(fn ($query) => str_contains($query['query'], '"challenge_submissions"'));
+        expect($queries)->toHaveCount($scans);
+        expect(array_column($result['metrics'], 'value'))->toBe($role === Role::Instructor ? [0, 0, 0, 0] : [0, 0, 0, 'No results']);
+    } finally {
+        DB::disableQueryLog();
+        DB::flushQueryLog();
+    }
+})->with([[Role::Instructor, 0], [Role::Contributor, 3]]);
+
 test('quest insights separate pending attempts from terminal pass rates and exclude other creators', function () {
     readyJudge();
     $challenge = challengeFixture(true);
     $other = challengeFixture(true);
     $creator = User::findOrFail($challenge->created_by);
+    $returningStudent = moduleAccount(Role::Learner);
     foreach (['Passed', 'Failed', 'Queued'] as $status) {
-        $submission = submitAttempt($challenge, moduleAccount(Role::Learner));
+        $submission = submitAttempt($challenge, $status === 'Queued' ? moduleAccount(Role::Learner) : $returningStudent);
         if ($status !== 'Queued') {
             DB::table('challenge_submissions')->where('id', $submission->id)->update([
                 'status' => $status, 'passed_cases' => $status === 'Passed' ? $submission->total_cases : 0, 'completed_at' => now(),
             ]);
+            DB::table('challenge_participations')->where('id', $submission->participation_id)->update(['active_submission_id' => null]);
         }
     }
     submitAttempt($other, moduleAccount(Role::Learner));
+    $older = submitAttempt($challenge, moduleAccount(Role::Learner));
+    DB::table('challenge_submissions')->where('id', $older->id)->update(['submitted_at' => now()->subDays(8)]);
     $result = app(CreatorInsights::class)->snapshot($creator, 'module-test-session', 7);
-    expect(array_column($result['metrics'], 'value'))->toBe([3, 3, 1, '50%']);
+    expect(array_column($result['metrics'], 'value'))->toBe([2, 3, 1, '50%']);
     expect(array_sum(array_column($result['charts'][0]['points'], 'value')))->toBe(3);
     expect(array_sum(array_column($result['charts'][1]['points'], 'value')))->toBe(1);
 });

@@ -1,5 +1,13 @@
 # Kody Engineering Agent Guidelines
 
+The owner's 2026-10-26 maintainability pass is tracked in the
+[refactoring review](docs/refactoring-review-2026-10-26.md). Reuse Account-owned
+`CredentialDocuments` for qualification availability and audited downloads.
+Keep catalog projections small and creator aggregates scoped to owned activity;
+preserve query-budget, history, policy and private-storage regression checks.
+Continue with focused batches rather than a whole-tree rewrite. Live activation
+remains separate from refactoring.
+
 The owner's 2026-10-25 amendment prioritizes simple, readable learning UI and
 visible pseudocode with bounded instruction panels. See
 [simple learning and creator credibility](docs/simple-learning-and-creator-credibility.md).

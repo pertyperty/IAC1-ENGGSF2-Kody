@@ -87,6 +87,17 @@ test('badge decisions reject missing proof self review and replaced or demoted r
     $this->assertDatabaseCount('creator_verifications', 0);
 });
 
+test('badge grants reject unavailable credential storage with a validation error', function (string $disk) {
+    $creator = moduleAccount(Role::Instructor);
+    $proof = approvedBadgeProof($creator);
+    $proof->forceFill(['credential_disk' => $disk])->save();
+    moduleSignIn($this, moduleAccount(Role::Moderator));
+    $this->putJson(route('creator-badges.update', $creator), badgeData(['application_id' => $proof->id]))
+        ->assertUnprocessable()->assertJsonValidationErrors('qualifications_reviewed');
+    $this->assertDatabaseCount('creator_verifications', 0);
+    $this->assertDatabaseCount('audit_events', 0);
+})->with(['public', 'undefined-proof']);
+
 test('creator bylines appear on published content and a revoked badge disappears immediately', function () {
     $module = moduleFixture(true);
     $creator = $module->creator;

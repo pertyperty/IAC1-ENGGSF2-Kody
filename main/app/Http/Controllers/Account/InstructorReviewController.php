@@ -6,14 +6,13 @@ use App\Actions\Account\ReviewInstructorApplication;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Account\ReviewInstructorRequest;
 use App\Models\InstructorApplication;
-use App\Services\Administration\AuditRecorder;
+use App\Services\Account\CredentialDocuments;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class InstructorReviewController extends Controller
@@ -36,18 +35,9 @@ class InstructorReviewController extends Controller
         return response()->view('account.instructor-review', compact('application', 'versions'))->header('Cache-Control', 'no-store, private');
     }
 
-    public function credential(Request $request, InstructorApplication $application): StreamedResponse
+    public function credential(Request $request, InstructorApplication $application, CredentialDocuments $documents): StreamedResponse
     {
-        Gate::authorize('view', $application);
-        $disk = $application->credential_disk;
-        $path = $application->credential_path;
-        abort_if($disk === 'public' || config('filesystems.disks.'.$disk.'.visibility') === 'public'
-            || ! str_starts_with($path, 'instructor-credentials/') || str_contains($path, '..') || str_contains($path, '\\'), 404);
-        abort_unless(Storage::disk($disk)->exists($path), 404);
-        app(AuditRecorder::class)->record($request->user()->id, $application->user_id, 'instructor_application.credential_downloaded', 'instructor_application', (string) $application->id);
-
-        return Storage::disk($disk)->download($path, 'instructor-credential.'.pathinfo($path, PATHINFO_EXTENSION),
-            ['Content-Type' => 'application/octet-stream', 'X-Content-Type-Options' => 'nosniff', 'Cache-Control' => 'no-store, private']);
+        return $documents->download($request->user(), $application);
     }
 
     public function review(ReviewInstructorRequest $request, InstructorApplication $application, ReviewInstructorApplication $review): JsonResponse|RedirectResponse
@@ -59,20 +49,8 @@ class InstructorReviewController extends Controller
             : redirect()->route('instructor-reviews.show', $application)->with('status', 'Application reviewed. The applicant will be notified.');
     }
 
-    public function versionCredential(Request $request, InstructorApplication $application, int $version): StreamedResponse
+    public function versionCredential(Request $request, InstructorApplication $application, int $version, CredentialDocuments $documents): StreamedResponse
     {
-        Gate::authorize('view', $application);
-        $record = DB::table('instructor_application_versions')->where('instructor_application_id', $application->id)->where('application_version', $version)->first();
-        abort_if($record === null, 404);
-        $disk = $record->credential_disk;
-        $path = $record->credential_path;
-        abort_if($disk === 'public' || config('filesystems.disks.'.$disk.'.visibility') === 'public'
-            || ! str_starts_with($path, 'instructor-credentials/') || str_contains($path, '..') || str_contains($path, '\\'), 404);
-        abort_unless(Storage::disk($disk)->exists($path), 404);
-        app(AuditRecorder::class)->record($request->user()->id, $application->user_id, 'instructor_application.credential_downloaded',
-            'instructor_application', (string) $application->id, ['application_version' => $version]);
-
-        return Storage::disk($disk)->download($path, 'instructor-credential-v'.$version.'.'.pathinfo($path, PATHINFO_EXTENSION),
-            ['Content-Type' => 'application/octet-stream', 'X-Content-Type-Options' => 'nosniff', 'Cache-Control' => 'no-store, private']);
+        return $documents->download($request->user(), $application, $version);
     }
 }

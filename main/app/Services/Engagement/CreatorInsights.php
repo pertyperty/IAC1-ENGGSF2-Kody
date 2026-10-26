@@ -32,9 +32,6 @@ class CreatorInsights
         foreach ([[$opens, 'first_opened_at'], [$wins, 'activity.completed_at'], [$reads, 'completed_at'], [$attempts, 'submission.submitted_at']] as [$query, $column]) {
             $query->where($column, '>=', $start->utc())->where($column, '<', $end->utc());
         }
-        $confirmed = (clone $attempts)->count();
-        $passed = (clone $attempts)->where('submission.status', 'Passed')->count();
-        $terminal = (clone $attempts)->whereIn('submission.status', ['Passed', 'Failed'])->count();
         if ($user->account_role === Role::Instructor) {
             $metrics = [['label' => 'First-time readers', 'value' => (clone $opens)->distinct()->count('user_id'), 'note' => 'Distinct other participants whose first module opening falls in this window.'],
                 ['label' => 'Validated game / quiz wins', 'value' => (clone $wins)->count(), 'note' => 'Saved daily activity; replays on different days can count again.'],
@@ -43,10 +40,13 @@ class CreatorInsights
             $charts = [['title' => 'First module openings', 'note' => 'A first recorded opening is not a page-view counter.', 'values' => $this->daily($opens, 'first_opened_at')],
                 ['title' => 'Validated learning activity', 'note' => 'Game and quiz wins only. Article reading is excluded.', 'values' => $this->daily($wins, 'activity.completed_at')]];
         } else {
-            $metrics = [['label' => 'Quest participants', 'value' => (clone $attempts)->distinct()->count('participation.user_id'), 'note' => 'Distinct other participants who confirmed a submission.'],
-                ['label' => 'Confirmed attempts', 'value' => $confirmed, 'note' => 'Durable submissions to your quests, including weekly contexts.'],
-                ['label' => 'Verified passes', 'value' => $passed, 'note' => 'Current Passed verdicts for attempts submitted in this window.'],
-                ['label' => 'Pass rate', 'value' => $terminal ? round($passed * 100 / $terminal).'%' : 'No results', 'note' => 'Passed / (Passed + Failed); pending and unavailable results excluded.']];
+            $totals = (clone $attempts)->selectRaw("COUNT(DISTINCT participation.user_id) AS participants, COUNT(*) AS confirmed,
+                COUNT(*) FILTER (WHERE submission.status = 'Passed') AS passed,
+                COUNT(*) FILTER (WHERE submission.status IN ('Passed', 'Failed')) AS terminal")->first();
+            $metrics = [['label' => 'Quest participants', 'value' => (int) $totals->participants, 'note' => 'Distinct other participants who confirmed a submission.'],
+                ['label' => 'Confirmed attempts', 'value' => (int) $totals->confirmed, 'note' => 'Durable submissions to your quests, including weekly contexts.'],
+                ['label' => 'Verified passes', 'value' => (int) $totals->passed, 'note' => 'Current Passed verdicts for attempts submitted in this window.'],
+                ['label' => 'Pass rate', 'value' => $totals->terminal ? round($totals->passed * 100 / $totals->terminal).'%' : 'No results', 'note' => 'Passed / (Passed + Failed); pending and unavailable results excluded.']];
             $charts = [['title' => 'Confirmed quest attempts', 'note' => 'Grouped by submission day, not evaluation completion day.', 'values' => $this->daily($attempts, 'submission.submitted_at')],
                 ['title' => 'Verified passing attempts', 'note' => 'Current Passed results grouped by their original submission day.', 'values' => $this->daily((clone $attempts)->where('submission.status', 'Passed'), 'submission.submitted_at')]];
         }

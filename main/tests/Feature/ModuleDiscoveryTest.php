@@ -4,6 +4,19 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
+test('B01 lesson cards load summary metadata without lesson bodies attachments or full assessments', function () {
+    moduleFixture(true, ['title' => 'Compact terminal lesson', 'game_preset' => 'terminal-quest']);
+    $this->get(route('learning.catalog'))->assertOk()->assertSee('Compact terminal lesson')
+        ->assertViewHas('published', function ($results) {
+            $revision = $results->sole();
+            expect($revision->assessment_template)->toBe('terminal-quest');
+            expect($revision->getAttributes())->not->toHaveKeys(['content', 'attachments', 'assessment', 'review_notes']);
+            expect($revision->module->creator->relationLoaded('creatorVerification'))->toBeTrue();
+
+            return true;
+        });
+});
+
 test('B01 catalog combines literal search with published assessment template filtering', function () {
     moduleFixture(true, ['title' => 'Terminal delivery', 'game_preset' => 'terminal-quest']);
     moduleFixture(true, ['title' => 'Pixel delivery', 'game_preset' => 'pixel-studio']);
