@@ -34,7 +34,7 @@ class LearningController extends Controller
             ->filter(fn (array $module) => str_contains(mb_strtolower(implode(' ', $module)), mb_strtolower(trim($query))))
             ->filter(fn (array $module, string $slug) => $template === '' || config('learning.instances.'.$slug.'.template') === $template || config('learning.quizzes.'.$slug.'.template') === $template)->all();
 
-        $published = ModuleRevision::with('module.creator:id,account_status')->where('review_status', 'Approved')->whereHas('module', fn ($builder) => $builder->where('status', 'Published')->whereNull('staff_withdrawn_at')->whereColumn('published_revision_id', 'module_revisions.id'))
+        $published = ModuleRevision::with(['module.creator:id,username,account_role,account_status,email_verified_at', 'module.creator.creatorVerification'])->where('review_status', 'Approved')->whereHas('module', fn ($builder) => $builder->where('status', 'Published')->whereNull('staff_withdrawn_at')->whereColumn('published_revision_id', 'module_revisions.id'))
             ->when(trim($query) !== '', fn ($builder) => $builder->where(fn ($search) => $search->where('title', 'ilike', '%'.addcslashes(trim($query), '%_\\').'%')->orWhere('description', 'ilike', '%'.addcslashes(trim($query), '%_\\').'%')))
             ->when($template !== '', fn ($builder) => $builder->where('assessment->template', $template))
             ->orderByDesc('id')->paginate(12)->withQueryString();

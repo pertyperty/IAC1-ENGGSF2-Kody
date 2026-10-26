@@ -1,0 +1,72 @@
+/* Shared reading rhythm; keep primary controls and code legible in both themes. */
+body { font-size: 16px; line-height: 1.6; }
+.field-hint, .form-note, .catalog-note, .secondary-link, .scene-caption,
+.profile-details, .game-card .game-feedback, .game-card .arcade-output,
+.game-card .game-instructions p, .game-card .arcade-code-label,
+.game-card .program-heading b, .game-card .program-heading > span { font-size: .9375rem; line-height: 1.6; }
+.field-guide, .account-form small, .studio-form .field-hint, .workspace-grid > a > span:last-child,
+.game-option, .board-legend, .game-help, .site-footer, .review-list > a > span { font-size: .875rem; line-height: 1.6; }
+.account-form, .studio-form { overflow-wrap: anywhere; }
+.practice-quiz label, .practice-quiz [data-quiz-feedback], .practice-quiz [data-question-feedback],
+.quiz-progress-note, .notice, .form-errors { font-size: .9375rem; line-height: 1.6; }
+.quiz-progress-note { margin-top: .75rem; }
+.quiz-progress-note p { margin-top: .5rem; }
+.garden-game .board-legend-help { color: #294334; font-size: .875rem; }
+:root[data-theme="dark"] .garden-game .board-legend-help { color: #d6e9d9; }
+.journey-next { padding: 1rem 1.25rem; }
+.journey-next h2 { font-size: 1.125rem; }
+.help-search .studio-form label { margin: 0; }
+.tower-level { padding-top: 1rem; }
+.tower-level > .section-heading { margin-bottom: 1rem; }
+.tower-level > .section-heading .overline { display: none; }
+.tower-level > .section-heading h1 { font-size: clamp(1.5rem, 3vw, 2rem); margin-bottom: .5rem; }
+.tower-level > .field-hint:first-child { margin-block: 0 .25rem; }
+.step-pill, .status-pill, .game-card .step-pill, .game-card .game-badge,
+.game-card .game-kicker, .module-meta, .overline { font-size: .8125rem; }
+.button, .primary-button { min-height: 44px; }
+.help-search { display: flex; flex-direction: column; gap: 1.5rem; }
+.help-search .studio-form { display: grid; gap: .75rem; }
+.help-topics { display: flex; flex-wrap: wrap; gap: .75rem; margin: 0; }
+.help-group + .help-group { margin-top: 2rem; }
+.help-grid .lesson-note { padding: 1.25rem; }
+.help-grid h3 { font-size: 1.0625rem; line-height: 1.5; margin-bottom: .75rem; }
+.profile-tools, .studio-actions, .filter-actions { gap: .75rem; }
+.lesson-briefing { display: block; padding: 1rem 1.25rem; }
+.lesson-briefing p { margin: .375rem 0; }
+.lesson-briefing details { margin-top: .75rem; }
+.lesson-briefing pre, .trace-state { white-space: pre-wrap; overflow-wrap: anywhere; }
+.game-card .game-heading { padding: 1rem 1.25rem; }
+.game-card .game-controls { padding: 1.25rem; }
+.game-card .game-heading h2 { font-size: 1.375rem; }
+.game-card .learning-trace { margin: 1rem 0; padding: 1rem; border: 1px solid var(--border); border-radius: 12px; background: var(--surface-soft); min-width: 0; }
+.learning-trace h3 { font-size: 1rem; margin: 0; }
+.learning-trace > .field-hint { margin: .375rem 0 .75rem; }
+.game-card .trace-source { height: 11rem; max-height: 11rem; overflow: auto; overscroll-behavior: contain; padding: .75rem .75rem .75rem 2.75rem; margin: 0 0 .75rem; background: var(--surface); font: .9375rem/1.8 ui-monospace, Consolas, monospace; border-radius: 8px; scrollbar-gutter: stable; }
+.trace-source li { white-space: pre-wrap; overflow-wrap: anywhere; padding-inline: .25rem; }
+.trace-source li[aria-current] { background: var(--accent-soft); color: var(--accent-text); }
+.trace-state { max-height: 8rem; overflow: auto; font-size: .9375rem; }
+.trace-actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+.trace-actions .button { font-size: .875rem; padding: .5rem .75rem; }
+.program-arrange { margin: .75rem 0; }
+.program-arrange summary, .game-help summary { padding-block: .375rem; }
+.garden-game .program-track { height: 84px; min-height: 84px; overflow: auto; flex-wrap: nowrap; }
+.game-card .arcade-program-list { max-height: 9rem; overflow: auto; overscroll-behavior: contain; }
+.game-card .arcade-output { max-height: 8rem; overflow: auto; white-space: pre-wrap; }
+.game-card .game-feedback { min-height: 3rem; max-height: 8rem; overflow: auto; }
+.game-card textarea[data-arcade-code] { height: 9rem; resize: none; overflow: auto; font: .9375rem/1.6 ui-monospace, Consolas, monospace; }
+.creator-byline { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; margin: .75rem 0; font-size: .9375rem; }
+.creator-byline a { text-decoration: underline; text-underline-offset: 3px; }
+.creator-badge, .creator-role { display: inline-flex; align-items: center; gap: .25rem; border-radius: 6px; padding: .125rem .5rem; font-size: .8125rem; line-height: 1.6; }
+.creator-role { background: var(--surface-soft); color: var(--text); border: 1px solid var(--border); }
+.creator-badge { background: var(--accent-soft); color: var(--accent-text); border: 1px solid var(--accent-line); }
+.creator-profile { max-width: 880px; }
+.creator-profile section { margin-block: 1.75rem; }
+.creator-profile p { max-width: 68ch; white-space: pre-line; overflow-wrap: anywhere; }
+.review-list { display: grid; gap: .75rem; padding: 0; list-style: none; }
+.review-list li { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; padding: 1rem; border: 1px solid var(--border); border-radius: 12px; }
+@media (max-width: 700px) {
+ .play-stage .garden-workbench, .review-page .garden-workbench, .arcade-workbench { grid-template-columns: minmax(0, 1fr); }
+ .game-card .game-controls { padding: 1rem; }
+ .game-card .game-heading { align-items: flex-start; flex-wrap: wrap; }
+ .game-card .trace-source { height: 10rem; }
+}

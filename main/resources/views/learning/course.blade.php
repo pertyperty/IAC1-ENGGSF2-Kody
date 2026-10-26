@@ -2,7 +2,7 @@
 @section('title', $revision->title.' — Kody')
 @section('content')
 <section class="review-page page-width course-trail-page">
-<p class="overline">{{ $revision->category }} · {{ $revision->difficulty }} · {{ $revision->estimated_duration }} hours</p><h1>{{ $revision->title }}</h1><p>{{ $revision->description }}</p>
+<p class="overline">{{ $revision->category }} · {{ $revision->difficulty }} · {{ $revision->estimated_duration }} hours</p><h1>{{ $revision->title }}</h1><x-creator-byline :creator="$course->creator"/><p>{{ $revision->description }}</p>
 
 @include('layouts.form-errors')
 @if($course->status === 'Archived')<p class="lesson-note">This journey is archived. You can keep learning because you joined before it was archived.</p>@endif

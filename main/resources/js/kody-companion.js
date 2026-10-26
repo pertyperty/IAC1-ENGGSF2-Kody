@@ -123,8 +123,7 @@ export function mountKodyCompanion(doc, win) {
     doc.querySelectorAll('[data-tour-open]').forEach(button => { button.hidden = false; button.addEventListener('click', open); });
     win.addEventListener('resize', () => { positionPet(); positionTip(); });
     doc.addEventListener('scroll', positionTip, { capture: true, passive: true });
-    // First public guest arrival gets the welcome screen; keep authentication/errors focused.
-    if (dialog.dataset.guest === 'true' && !doc.body.classList.contains('account-page') && !doc.querySelector('.kody-error') && read(win, TOUR_KEY) !== 'dismissed') open();
+    // Tours are available from Help and the guide button, without interrupting play.
 }
 
 export function mountPageLoader(doc, win) {

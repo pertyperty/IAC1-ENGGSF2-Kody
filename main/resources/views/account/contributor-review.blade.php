@@ -16,4 +16,7 @@
 <label><input type="checkbox" name="confirmed" value="1" required> I reviewed the application and confirm this decision.</label><button class="primary-button">Confirm decision</button></form>
 @else<p>{{ $application->moderator_feedback }}</p><p>This submitted application has already been decided.</p>@endif
 <p class="secondary-link"><a href="{{ route('contributor-reviews.index') }}">Back to applications</a></p>
+
+<p class="field-hint">Qualification documents are private. Check the name, issuing organisation, date and relevance before deciding. Record any concerns in the review.</p>
+@can('verifyCreator', $application->user)<p><a class="button button-secondary" href="{{ route('creator-badges.show', $application->user) }}">Review qualifications badge</a></p>@endcan
 @endsection

@@ -2,7 +2,7 @@
 @section('title', $revision->title.' — Kody')
 @section('content')
 <section class="review-page page-width">
-    <p class="eyebrow">YOUR NEXT ADVENTURE</p><h1>{{ $revision->title }}</h1>
+    <p class="eyebrow">CONTENT ACCESS</p><h1>{{ $revision->title }}</h1><x-creator-byline :creator="$target->creator"/>
     <p class="intro">{{ $price === 0 ? 'Free access' : $price.' KodeBits' }} · Unlock once to continue learning.</p>
     @if($errors->any())<div class="notice" role="alert">{{ $errors->first() }}</div>@endif
     @if(!$requirements['eligible'])<p class="lesson-note">Reach {{ $requirements['minimum_xp'] }} XP and complete the required assessments first. Adventures still to clear: {{ implode(', ', $requirements['missing_titles']) ?: 'none' }}.</p>@endif

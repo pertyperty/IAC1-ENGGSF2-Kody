@@ -1,5 +1,17 @@
 # Kody Engineering Agent Guidelines
 
+The owner's 2026-10-25 amendment prioritizes simple, readable learning UI and
+visible pseudocode with bounded instruction panels. See
+[simple learning and creator credibility](docs/simple-learning-and-creator-credibility.md).
+Guides are opt-in. Preserve server-validated Run and preview isolation. Public
+creator profiles publish only explicitly supplied fields and usernames, never
+private names/email/qualification documents. Role pills are separate from manually
+issued qualifications badges; current staff/password/session, approved private
+proof, version checks and audit govern grant/revoke. Preserve credential history
+and account-erasure integration. Personal review lists grant nothing. Heartbeats
+probe the database worker without accumulating jobs; real supervision/alerts and
+all existing private-provider/legal activation deferrals remain separate.
+
 The owner's later 2026-10-18 request adds actual Beginner, Intermediate and Expert
 Tower content. See [three-track expansion](docs/tower-skill-expansion.md). Eighty
 free floors retain positions 1–50 and append 51–60 Beginner, 61–70 Intermediate

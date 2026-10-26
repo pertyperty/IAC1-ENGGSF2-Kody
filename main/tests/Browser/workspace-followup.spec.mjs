@@ -30,7 +30,7 @@ test('instructor insights are owned graphical records and Tower play preserves t
     const secondStage = page.locator('[data-tower-stage="1"]');
     if (await secondStage.count()) {
         await page.locator('[data-result-return]').click(); await expect(secondStage).toBeVisible();
-        await secondStage.getByRole('radio').first().check(); await secondStage.getByRole('button', { name: 'Check my idea', exact: true }).click();
+        await secondStage.getByRole('radio').first().check(); await secondStage.getByRole('button', { name: 'Check answers', exact: true }).click();
     }
     await expect(page.locator('[data-tower-victory]')).toBeVisible();
     await expect(page.locator('[data-progress-level]')).toHaveText('1 / 80');

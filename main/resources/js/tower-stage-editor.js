@@ -64,7 +64,11 @@ export function editTowerStage(root, stage, index, changed, previewHost) {
             select.addEventListener('change', () => { question.answer = select.value; changed(); previewHost.replaceChildren(); });
             answerLabel.append(select); group.append(answerLabel);
             }
-            field(group, 'Explanation', question.explanation, value => question.explanation = value, { area: true }); details.append(group);
+            field(group, 'Explanation', question.explanation, value => question.explanation = value, { area: true });
+            if (stage.version === 3) field(group, 'Help after an incorrect answer (optional)', question.retry_explanation ?? '', value => {
+                if (value.trim()) question.retry_explanation = value; else delete question.retry_explanation;
+            }, { area: true });
+            details.append(group);
         });
     } else {
         for (const [key, label] of Object.entries({ concept: 'Topic', instructions: 'Mission instructions', hint: 'Hint', learningIdea: 'What the learner discovers' })) {
@@ -160,7 +164,7 @@ export function previewTowerStage(editor, stage, host) {
         }
         const form = doc.createElement('form');
         root.append(form);
-        const button = doc.createElement('button'); button.type = 'submit'; button.className = 'button button-play'; button.textContent = 'Check my idea'; form.append(button);
+        const button = doc.createElement('button'); button.type = 'submit'; button.className = 'button button-play'; button.textContent = 'Check answers'; form.append(button);
         const feedback = doc.createElement('p'); feedback.dataset.quizFeedback = ''; feedback.setAttribute('role', 'status'); feedback.textContent = 'Unsaved preview. No progress or rewards.';
         root.append(feedback); renderQuizForm(root, stage); host.replaceChildren(root); mountQuiz(root); return;
     }

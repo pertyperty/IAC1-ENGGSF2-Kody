@@ -11,7 +11,7 @@ class QuizAuthoring
     {
         return [
             'quiz_questions' => ['sometimes', 'required', 'array', 'list', 'min:1', 'max:10'],
-            'quiz_questions.*' => ['required', 'array:id,type,question,explanation,options,answer,accepted,case_sensitive,pairs', function (string $attribute, mixed $value, \Closure $fail): void {
+            'quiz_questions.*' => ['required', 'array:id,type,question,explanation,retry_explanation,options,answer,accepted,case_sensitive,pairs', function (string $attribute, mixed $value, \Closure $fail): void {
                 if (! is_array($value)) {
                     return;
                 }
@@ -29,7 +29,7 @@ class QuizAuthoring
     {
         $questions = Validator::make(['quiz_questions' => $questions, 'title' => $title], $this->rules()
             + ['title' => ['required', 'string', 'max:100']])->validate()['quiz_questions'];
-        $mixed = collect($questions)->contains(fn ($question) => ($question['type'] ?? 'choice') !== 'choice');
+        $mixed = collect($questions)->contains(fn ($question) => ($question['type'] ?? 'choice') !== 'choice' || filled($question['retry_explanation'] ?? null));
         $questions = array_map(fn ($question) => app(QuizQuestions::class)->validate($question), $questions);
         if (! $mixed && count($questions) === 1) {
             return ['template' => 'choice-quiz', 'version' => 1, 'title' => $title]

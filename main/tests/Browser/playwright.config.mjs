@@ -10,5 +10,7 @@ export default defineConfig({
     reporter: [['list'], ['html', { outputFolder: resolve(import.meta.dirname, '../../storage/app/browser-report'), open: 'never' }]],
     outputDir: resolve(import.meta.dirname, '../../storage/app/browser-results'),
     use: { baseURL: process.env.KODY_BROWSER_BASE_URL, serviceWorkers: 'block', screenshot: 'only-on-failure', trace: process.env.KODY_BROWSER_TRACE === '1' ? 'retain-on-failure' : 'off' },
-    projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
+    projects: process.env.KODY_CROSS_BROWSER === '1'
+        ? ['chromium', 'firefox', 'webkit'].map(name => ({ name, grep: /@cross-browser/, use: { browserName: name } }))
+        : [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
 });

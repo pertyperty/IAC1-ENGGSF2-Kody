@@ -64,10 +64,10 @@ test('arcade lobby quiz cabinet automatically checks choices blanks and matching
     await quiz.getByLabel('True', { exact: true }).check(); await quiz.getByLabel('Your short answer').fill(' IF ');
     for (const [label, value] of [['Loop', 'loop'], ['Variable', 'variable'], ['Condition', 'condition']]) await quiz.getByLabel(label, { exact: true }).selectOption(value);
     await page.setViewportSize({ width: 320, height: 740 }); await audit(page);
-    await quiz.getByRole('button', { name: 'Check my idea' }).click();
+    await quiz.getByRole('button', { name: 'Check answers' }).click();
     const result = page.locator('[data-game-result]'); await expect(result).toBeVisible(); await expect(result.locator('[data-result-message]')).toContainText('local practice');
     await audit(page); await result.locator('[data-result-return]').click();
-    await expect(quiz.getByRole('button', { name: 'Check my idea' })).toBeFocused(); expect(writes).toEqual([]);
+    await expect(quiz.getByRole('button', { name: 'Check answers' })).toBeFocused(); expect(writes).toEqual([]);
 });
 
 test('creator mixed quiz preview is editable and learner completion is saved by the server', async ({ browser }) => {
@@ -98,7 +98,7 @@ test('creator mixed quiz preview is editable and learner completion is saved by 
                 const quiz = page.locator('[data-practice-quiz]'); await expect(quiz).toHaveAttribute('data-completion-url', /\/quiz$/);
                 await quiz.getByLabel('True', { exact: true }).check(); await quiz.getByLabel('Your short answer').fill(' IF ');
                 for (const [label, value] of [['Loop', 'loop'], ['Variable', 'variable'], ['Condition', 'condition']]) await quiz.getByLabel(label, { exact: true }).selectOption(value);
-                await quiz.getByRole('button', { name: 'Check my idea' }).click();
+                await quiz.getByRole('button', { name: 'Check answers' }).click();
                 await expect(page.locator('[data-game-result]')).toBeVisible(); await expect(quiz.locator('[data-quiz-feedback]')).toContainText(/saved/i);
                 await page.locator('[data-result-return]').click(); await page.goto('/learn?q=Choose%2C%20recall'); await expect(page.locator('.module-card').filter({ hasText: 'Choose, recall and connect' }).locator('.saved-progress')).toContainText('Completed');
             }

@@ -5,6 +5,7 @@
   "scripts": {
     "test:games": "node --test tests/Frontend/*.test.mjs",
     "test:browser": "node tests/Browser/run.mjs",
+    "test:browser:engines": "node tests/Browser/run.mjs --cross-browser",
     "test:restore": "node tests/Browser/run.mjs --rehearse",
     "build": "vite build && vite build --config vite.office.config.js",
     "dev": "vite"

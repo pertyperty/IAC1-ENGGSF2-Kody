@@ -1,10 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { execFileSync } from 'node:child_process';
+import { phpFixture } from '../Support/php-fixture.mjs';
 import { runProgram, validateInstance } from '../../resources/js/games/command-garden.js';
 
 // Exercise the actual built-in creator-slot data, not a duplicate fixture map.
-const { instances } = JSON.parse(execFileSync(process.env.KODY_TEST_PHP || 'php', ['-r', 'echo json_encode(require "config/learning.php");'], { encoding: 'utf8' }));
+const { instances } = JSON.parse(phpFixture(['-r', 'echo json_encode(require "config/learning.php");'], { encoding: 'utf8' }));
 
 test('game placeholder limits match server Unicode character counts', () => {
     const instance = structuredClone(instances.sequences);
@@ -74,6 +74,6 @@ test('browser preview and authoritative PHP evaluator agree on success and failu
             for (const repeat of [false, true]) for (const conditional of [false, true]) cases.push({ level, program, repeat, conditional });
         }
     }
-    const server = JSON.parse(execFileSync(process.env.KODY_TEST_PHP || 'php', ['tests/Support/game-evaluation.php'], { input: JSON.stringify(cases), encoding: 'utf8' }));
+    const server = JSON.parse(phpFixture(['tests/Support/game-evaluation.php'], { input: JSON.stringify(cases), encoding: 'utf8' }));
     assert.deepEqual(server, cases.map(({level, program, repeat, conditional}) => runProgram(instances[level], program, {repeat, conditional}).success));
 });

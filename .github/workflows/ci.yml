@@ -16,7 +16,7 @@ concurrency:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     defaults:
       run:
         working-directory: main
@@ -97,7 +97,7 @@ jobs:
           php artisan config:cache
           php artisan route:cache
           php artisan view:cache
-          php artisan test --filter='HealthTest|LoginTest|SessionConflictTest|DatabaseSessionsTest|PasswordHashingTest|RecoveryTest|ProfileTest|LearningTest|LearningProgressionTest|InstructorReviewTest|ModulePublishingTest|ChallengePublishingTest|ChallengeDiscoveryTest|BrowserIsolationTest|CoursePublishingTest|GamePresetsTest|ContentModerationTest|FaqTest|ContentFeedbackTest|ContentDeletionTest|GoogleAuthenticationTest|GardenDesignerTest|ArcadeGamesTest|ModuleDiscoveryTest|CreatorJourneyTest|InterfaceTest|LocalAdministratorTest|QuizAuthoringTest|CourseLearningPathTest|PlatformDashboardTest|CurriculumTest|SetupStatusTest|CourseLearningTest|Economy|WeeklyResultsTest|PrivateObjectErasureTest|LaunchReadinessTest|SystemReportsTest|TowerTest|ModuleMediaTest|InclusiveIdentityTest|ProfilePicturesTest|PuzzleGamesTest|LocalShowcaseTest|ArticleReadingTest|VerificationOtpTest|RecentAccountsTest|ReportExportsTest|IntegrationPreparationTest|GamifiedJourneyTest|LearningHistoryTest|SiteSupportTest|CreatorInsightsTest|RoleChangeTransitionTest|LocalRoleDemoTest|LocalRoleAccountsSeederTest'
+          php artisan test --filter='HealthTest|LoginTest|SessionConflictTest|DatabaseSessionsTest|PasswordHashingTest|RecoveryTest|ProfileTest|LearningTest|LearningProgressionTest|InstructorReviewTest|ModulePublishingTest|ChallengePublishingTest|ChallengeDiscoveryTest|BrowserIsolationTest|CoursePublishingTest|GamePresetsTest|ContentModerationTest|FaqTest|ContentFeedbackTest|ContentDeletionTest|GoogleAuthenticationTest|GardenDesignerTest|ArcadeGamesTest|ModuleDiscoveryTest|CreatorJourneyTest|InterfaceTest|LocalAdministratorTest|QuizAuthoringTest|CourseLearningPathTest|PlatformDashboardTest|CurriculumTest|SetupStatusTest|CourseLearningTest|Economy|WeeklyResultsTest|PrivateObjectErasureTest|LaunchReadinessTest|SystemReportsTest|TowerTest|ModuleMediaTest|InclusiveIdentityTest|ProfilePicturesTest|PuzzleGamesTest|LocalShowcaseTest|ArticleReadingTest|VerificationOtpTest|RecentAccountsTest|ReportExportsTest|IntegrationPreparationTest|GamifiedJourneyTest|LearningHistoryTest|SiteSupportTest|CreatorInsightsTest|RoleChangeTransitionTest|LocalRoleDemoTest|LocalRoleAccountsSeederTest|CreatorProfilesTest|LearningSupportTest|QuizRemediationTest'
           php artisan route:list --path=up
           php artisan route:list --path=ready
           php artisan route:clear
@@ -107,6 +107,10 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Browser journeys and accessibility regressions
         run: npm run test:browser
+      - name: Install additional browser engines
+        run: npx playwright install --with-deps firefox webkit
+      - name: Cross-engine learning smoke checks
+        run: npm run test:browser:engines
       - name: Install matching PostgreSQL recovery client
         run: |
           sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y

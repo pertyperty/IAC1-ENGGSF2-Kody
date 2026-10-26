@@ -3,7 +3,17 @@
 Start here for current scope, detailed evidence and the next useful improvements.
 This index consolidates the feature summaries previously repeated in README.
 It does not replace approved requirements, decisions or the implementation records.
-Last reviewed: 2026-10-18.
+Last reviewed: 2026-10-26.
+The [simple learning and creator credibility amendment](simple-learning-and-creator-credibility.md)
+owns readable shared UI, bounded visible pseudocode, opt-in guides, public creator
+profiles/bylines, manually reviewed qualifications badges, private credential
+history, personal review lists, worker/scheduler heartbeats and cross-engine smoke
+verification. It implements the independent next steps from the review below.
+The [improvement and deferral review](improvement-review-2026-10-22.md) records
+current launch gaps, a reproduced local test-runtime issue, prioritized proposals
+and the remaining provider/policy/verification dependencies. Its 63-test frontend
+pass is historical; the current amendment records 64 frontend tests and the new
+backend, browser and recovery verification. Older delivery counts below are historical.
 The [three-track expansion](tower-skill-expansion.md) adds 30 new lessons for an
 80-floor/111-stage Tower, preserved track metadata, algorithm reasoning, editable
 quiz teaching notes and consistent track continuation. It supersedes the earlier
@@ -97,7 +107,7 @@ existing accounts; default seeding provisions them only in local mode.
 | Area / use cases | Current implementation | Detailed records |
 | --- | --- | --- |
 | Main tower / approved B01/B02/B05 amendment | 80 free editable levels in three independently enterable, internally ordered tracks; local guest trials 1–3, boss checkpoints every 10 levels, final-win streak credit with no additional XP/KB. Learners land on the map; Instructors can also play while retaining their creator workspace. | [Three-track expansion](tower-skill-expansion.md), [Tower/media](tower-and-media-implementation.md), [content guide](tower-content-guide.md) |
-| Private lesson media / D01–D02, B04 | Revision-pinned PDF/DOCX/PPTX uploads, authorized view/download, text-only office previews, canonical YouTube/Vimeo embeds and quizzes alongside media. | [Tower/media](tower-and-media-implementation.md) |
+| Private lesson media / D01–D02, B04 | Revision-pinned PDF/DOCX/PPTX uploads, authorized view/download, isolated Office rendering with text fallback, canonical YouTube/Vimeo embeds and quizzes alongside media. | [Studio/media readiness](studios-media-and-integration-readiness.md), [Tower/media](tower-and-media-implementation.md) |
 | Account registration / A01–A02 | Validated registration, private Instructor credentials, Unverified activation, bounded resend and transactional delivery. | [Registration and verification](account-implementation-plan.md) |
 | Sign-in and recovery / A03–A05 | Progressive lockouts, replacement-session consent, POST logout and generic recovery; approved Archived reactivation. | [Login](login-implementation.md), [recovery/profile](recovery-profile-implementation.md) |
 | Personal accounts / A06–A07 | All-role self editing; password-confirmed sensitive changes; participant archival. Deletion also covers retained creator material after explicit consent, staff privacy inventory review and financial/evaluation settlement. | [Editing](profile-editing-implementation.md), [archival](account-archival-implementation.md), [deletion](account-deletion-plan.md) |
@@ -109,6 +119,7 @@ existing accounts; default seeding provisions them only in local mode.
 | Coding quests / C01–C07, B07 | Reviewed topic/concept discovery, challenge authoring, hidden tests, revision-pinned durable submissions and concurrency-safe three-attempt limits. Judge0 adapter and fake-provider tests exist; live execution is disabled. | [Challenge studio](challenge-studio-implementation.md), [submissions](challenge-submission-implementation.md) |
 | Weekly play / E02–E06 | Manila Sunday windows, future scheduling, immutable started events, separate three-attempt budgets and private verified-result history, best-score ties, immutable staff publication and cash/spend-capped KB rewards. Live execution depends on deferred Judge0 setup. | [Weekly events](weekly-challenge-plan.md) |
 | Reactions / B10 | One replaceable/removable Like, Helpful or Favorite after server-recorded authorized use and current access; courses additionally require enrollment. | [Feedback](content-feedback-implementation.md) |
+| Creator credibility / A06/A09/A10, B03/B04/B07, G05 amendment | Creator bylines and public optional work/experience profiles; role labels and separate staff-issued qualifications checks backed by approved private applications; paginated private Instructor submission history. | [Simple learning and creator credibility](simple-learning-and-creator-credibility.md) |
 | Staff governance / G01–G06 | Protected account search/enforcement, Moderator appointments/removal, support corrections, content withdrawal/restoration, session revocation and durable audit/notice records. | [Accounts](account-governance-implementation.md), [appointments](moderator-appointments-implementation.md), [support corrections](support-profile-corrections-implementation.md), [withdrawal](content-withdrawal-implementation.md) |
 | Reports / G07 | Administrator-only repeatable read snapshots, day/month/year trends, reconciled platform cash and paid expenses, separate current liabilities/monthly cost estimates, bounded transaction registers and formatted PDF/CSV/Excel management reports. | [Report definitions](system-reports-implementation.md) |
 | Help / B11, G11–G13 | Public Active FAQ search/categories and Administrator authoring with version checks/audit. | [Help](faq-implementation.md) |
@@ -143,13 +154,14 @@ provider-fake verification is not live delivery/execution evidence.
 - Variable-length quiz authoring, multi-question server completion, sequential
   creator paths, reading completion and dashboards are implemented in
   [the completion milestone](platform-completion-implementation.md).
-- Thirty-three isolated Chromium browser workflows now exercise real registration, play,
+- The latest Tower delivery records 63 isolated Chromium browser workflows exercising registration, play,
   creator/staff publication, all five role workspaces, direct/mobile game interactions,
   themes, save-failure retry and axe checks. Exercise
   long content, keyboard authoring and error/retry paths across actual
   Safari, Firefox and mobile devices. Local checks use one Chromium surface.
 - Supply reviewed Terms content/version, then add recorded server-enforced
-  registration acceptance; this is an actual A01 gap, not an owner-deferred feature.
+  registration acceptance; this is an actual A01 gap tracked alongside activation
+  deferrals, not a completed feature.
 - Measure staging catalog, dashboard, lesson and worker load against SRS targets.
 - Publish customized launch curriculum through designated creators and staff;
   editable plans are not automatically published course records.
