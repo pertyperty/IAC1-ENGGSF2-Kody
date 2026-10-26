@@ -148,6 +148,14 @@ backend checks** passed again. The mobile Garden and creator profile screenshots
 were inspected visually. Reports/screenshots are retained in ignored private
 verification evidence; these are local results, not a claim of remote CI success.
 
+PR #34's first CI run stopped at the dependency audit: the retained Vite 8.3.1
+lock entry matched new development-server/editor advisories, including
+[GHSA-587h-7wmj-h5pm](https://github.com/advisories/GHSA-587h-7wmj-h5pm).
+The follow-up raises the Vite requirement and lock to patched 8.3.5 with its
+compatible build dependencies. A clean isolated `npm ci`, zero-vulnerability
+`npm audit` and both production builds passed with the patched lock. CI is rerun
+through the ordinary PR checks; the security gate remains enabled.
+
 Early runs found stale text locators, a duplicate footer-link locator and
 an inaccessible scrollable output region. Those were corrected without disabling
 accessibility or workflow checks. Concurrent asset rebuilding also invalidated an
