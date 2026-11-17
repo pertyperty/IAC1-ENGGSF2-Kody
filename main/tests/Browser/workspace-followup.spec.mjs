@@ -69,7 +69,7 @@ test('Administrator announcement preview saves safely and operations panels rema
     }
 });
 
-test('welcome support and wallet tiers have clear responsive destinations without in-site email', async ({ page }) => {
+test('welcome support and disabled checkout have clear responsive destinations without in-site email', async ({ page }) => {
     for (const width of [1920, 390, 320]) {
         await page.setViewportSize({ width, height: 900 }); await page.goto('/welcome'); await audit(page);
         await expect(page.getByRole('link', { name: 'Explore courses', exact: false })).toBeVisible();
@@ -77,10 +77,13 @@ test('welcome support and wallet tiers have clear responsive destinations withou
     }
     await page.goto('/login'); await page.getByLabel('Email or username').fill('browser_appeallearner'); await page.getByLabel(/^Password/).fill('BrowserStrong12!'); await page.getByRole('button', { name: /Sign in/ }).click();
     await expect(page).toHaveURL(/\/login$/); await expect(page.getByRole('link', { name: /appeal a suspension/ })).toHaveAttribute('href', /\/contact#appeals$/);
-    await login(page, 'siteadmin'); await page.goto('/wallet'); await expect(page.locator('.wallet-package')).toHaveCount(3);
-    await expect(page.locator('.package-coins img')).toHaveCount(6); await expect(page.locator('.wallet-package .kodebit-value img')).toHaveCount(3);
+    await login(page, 'siteadmin');
+    await page.goto('/wallet');
+    await expect(page.locator('.wallet-package')).toHaveCount(0);
+    await expect(page.getByText('Purchases are unavailable.', { exact: false })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Manage refunds and earnings' })).toBeVisible();
     await expect(page.locator('.header-wallet img')).toHaveCount(1);
-    await audit(page); await page.screenshot({ path: 'storage/app/browser-results/wallet-distinct-packages.png', fullPage: true });
+    await audit(page); await page.screenshot({ path: 'storage/app/browser-results/wallet-disabled-checkout.png', fullPage: true });
 });
 
 test('page spotlight follows rectangular elements and companion hides and returns smoothly', async ({ page }) => {
