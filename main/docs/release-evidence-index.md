@@ -5,6 +5,10 @@ revision, date, reviewer and artifact/reference. A configured flag or an uncheck
 box is not completed evidence. Never place tokens, credentials, private proof,
 raw learner submissions or sensitive database dumps in this document.
 
+The [17 November consolidation checks](consolidation-verification-2026-11-17.md)
+record local development evidence and its exact source revisions. They do not
+fill the unassigned release candidate or staged sign-offs below.
+
 ## Candidate
 
 | Field | Value |

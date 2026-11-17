@@ -46,7 +46,8 @@ is removed; verified-account applications retain their existing server workflow.
 
 Focused checks passed 80 backend tests / 1,061 assertions and two new Chromium
 workflows, including mobile accessibility and cancelled/reverted authoring edits.
-Complete stack verification is recorded separately after the final runs. A stale
+Complete stack verification is recorded in the
+[development evidence](consolidation-verification-2026-11-17.md). A stale
 dashboard-copy assertion was updated from adventures to lessons; no domain policy
 was changed to satisfy it.
 
