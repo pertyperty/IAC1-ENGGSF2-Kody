@@ -15,8 +15,10 @@ The owner's 2026-11-18 PR grouping adds [navigation discovery](docs/navigation-d
 Tower map/list views share track progression and server admission; guests retain
 browser trial sequencing. The staff inbox projects only pending latest summaries,
 excludes self-review and links to existing credential/publication review workflows.
-Keep privacy/finance routes and specialized history available. Incremental tooling,
-measured optimization and live release evidence remain separate batches.
+Keep privacy/finance routes and specialized history available. The
+[scoped static check](docs/static-analysis-2026-11-18.md) runs with `composer analyse`
+and no baseline/blanket ignores; expand its paths through focused verified changes.
+Measured optimization and live release evidence remain separate batches.
 
 The owner's 2026-10-26 maintainability pass is tracked in the
 [refactoring review](docs/refactoring-review-2026-10-26.md). Reuse Account-owned

@@ -60,7 +60,9 @@ completion and does not activate providers.
 
 The [navigation discovery batch](navigation-discovery-2026-11-18.md) adds optional
 Tower list navigation and a filtered staff review inbox. Measured page-specific
-JavaScript loading, financial-report query consolidation and incremental static
-analysis remain separate focused batches. No device/latency speedup is asserted.
+JavaScript loading and financial-report query consolidation remain separate
+measured batches. [Scoped static analysis](static-analysis-2026-11-18.md) now covers
+selected authorization/operations/credential/inbox boundaries; wider coverage
+remains incremental. No device/latency speedup is asserted.
 The [current learning policy](current-learning-policy.md) consolidates superseding
 rules so older milestone wording does not guide new work incorrectly.

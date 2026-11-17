@@ -82,6 +82,8 @@ jobs:
           php artisan about
       - name: Verify formatting
         run: composer lint
+      - name: Analyse scoped PHP boundaries
+        run: composer analyse
       - name: Test configurable game templates
         run: npm run test:games
       - name: Build frontend assets
