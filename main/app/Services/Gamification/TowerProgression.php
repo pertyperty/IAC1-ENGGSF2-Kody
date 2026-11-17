@@ -14,6 +14,22 @@ use Illuminate\Validation\ValidationException;
 
 class TowerProgression
 {
+    /** A small read projection for continuation; no stage definitions or progress writes. */
+    public function continuation(int $userId, ?string $track): array
+    {
+        $tracks = app(TowerTracks::class);
+        $key = array_key_exists($track ?? '', $tracks->all()) ? $track : 'beginner';
+        $levels = $tracks->query($key)->whereNotNull('current_revision_id');
+        $cleared = fn ($query) => $query->selectRaw('1')->from('tower_clearances')
+            ->whereColumn('level_id', 'tower_levels.id')->where('user_id', $userId);
+        $next = (clone $levels)->whereNotExists($cleared)->orderBy('position')->first(['id', 'position']);
+
+        return ['track' => $key, 'label' => $tracks->all()[$key]['label'], 'total' => (clone $levels)->count(),
+            'completed' => (clone $levels)->whereExists($cleared)->count(),
+            'next' => $next === null ? null : ['position' => $next->position, 'url' => route('tower.show', $next)],
+            'map_url' => route('home', ['track' => $key])];
+    }
+
     public function counts(int $userId): array
     {
         return ['completed_count' => DB::table('tower_clearances')->where('user_id', $userId)->count(),

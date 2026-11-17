@@ -8,7 +8,6 @@ use App\Http\Requests\Learning\CompleteQuizRequest;
 use App\Models\LearningCourse;
 use App\Models\WeeklyEvent;
 use App\Services\Engagement\CreatorInsights;
-use App\Services\Engagement\LearnerMissions;
 use App\Services\Engagement\PlatformDashboard;
 use App\Services\Gamification\Achievements;
 use App\Services\Gamification\LearningProgression;
@@ -36,11 +35,11 @@ class PlayController extends Controller
         $participant = $request->user()->account_role === Role::Learner && Gate::allows('viewLearning', LearningCourse::class);
         $progress = $participant ? $progression->snapshot($request->user()->id) : null;
         $dashboard = $dashboard->snapshot($request->user());
-        $missions = $participant ? app(LearnerMissions::class)->snapshot($progress, $dashboard['achievements']) : [];
+        $continuation = $participant ? app(TowerProgression::class)->continuation($request->user()->id, $request->session()->get('tower.track')) : null;
         $insights = in_array($request->user()->account_role, [Role::Instructor, Role::Contributor], true)
             ? app(CreatorInsights::class)->snapshot($request->user(), $request->session()->getId(), $days) : null;
 
-        return response()->view('learning.hub', ['progress' => $progress, 'dashboard' => $dashboard, 'missions' => $missions, 'insights' => $insights,
+        return response()->view('learning.hub', ['progress' => $progress, 'dashboard' => $dashboard, 'continuation' => $continuation, 'insights' => $insights,
             'weekly' => $participant ? WeeklyEvent::open()->with('revision:id,title,language,difficulty')->first() : null])->header('Cache-Control', 'no-store, private');
     }
 

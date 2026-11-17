@@ -2,7 +2,7 @@
 @section('title', 'Your wallet — Kody')
 @section('content')
 <section class="review-page page-width wallet-page">
-    <p class="overline">YOUR KODY WALLET</p><h1>More adventures ahead</h1>
+    <p class="overline">YOUR KODY WALLET</p><h1>Your wallet</h1>
     @include('layouts.form-errors')
     <div class="wallet-summary">
         <article class="wallet-summary-card"><h2>Available KodeBits</h2><div class="wallet-amount"><x-kody-art name="kodebit" size="64"/><strong>{{ number_format($wallet['available']) }} KB</strong></div><p>{{ number_format($wallet['reserved']) }} KB reserved · {{ number_format($wallet['balance']) }} KB total</p></article>
@@ -14,16 +14,15 @@
     </div>
     <div class="workspace-columns wallet-columns">
         <section class="content-panel">
-            <h2>Choose your next boost</h2><p class="field-hint">One-time PHP purchases. KodeBits do not expire and cannot be exchanged for cash.</p>
-            @if(!$paymentsReady)<p class="notice"><x-action-icon name="shield"/> Live checkout is being prepared. Free adventures remain available.</p>@endif
+            @if($paymentsReady)<h2>Buy KodeBits</h2><p class="field-hint">One-time PHP purchases. KodeBits do not expire and cannot be exchanged for cash.</p>
             <div class="wallet-packages">
                 @foreach(config('economy.packages') as $slug => $package)
                     <article class="wallet-package wallet-package-{{ $slug }}"><div class="package-identity"><span class="package-tier">{{ ['starter' => 'A small start', 'builder' => 'Keep exploring', 'explorer' => 'Build your library'][$slug] ?? 'Your next adventure' }}</span><div class="package-coins" aria-hidden="true">@for($coin = 0; $coin < min(3, $loop->iteration); $coin++)<x-kody-art name="kodebit" class="package-art" size="56"/>@endfor</div></div><h3>{{ $package['label'] }}</h3><strong><x-kodebits :amount="$package['kodebits']"/></strong><p class="package-price">PHP {{ \App\Support\ExactMoney::decimal($package['price_minor']) }}</p>
-                        @if($paymentsReady)<form class="studio-form" method="post" action="{{ route('wallet.purchase') }}">@csrf<input type="hidden" name="package" value="{{ $slug }}"><input type="hidden" name="confirmation_id" value="{{ $confirmationId }}">@include('transactions.password-confirmation')<button class="button button-play">Continue to Xendit <x-action-icon name="right"/></button></form>
-                        @else<span class="field-hint">Checkout setup pending</span>@endif
+                        <form class="studio-form" method="post" action="{{ route('wallet.purchase') }}">@csrf<input type="hidden" name="package" value="{{ $slug }}"><input type="hidden" name="confirmation_id" value="{{ $confirmationId }}">@include('transactions.password-confirmation')<button class="button button-play">Continue to Xendit <x-action-icon name="right"/></button></form>
                     </article>
                 @endforeach
             </div>
+            @else<p class="notice">Purchases are unavailable. Your balances, history and refund support remain accessible.</p><p><a class="quiet-link" href="{{ route('learning.catalog') }}">Browse lessons</a></p>@endif
             @if($purchases->isNotEmpty())
                 <h2>Purchase status</h2><div class="wallet-history">
                 @foreach($purchases as $purchase)

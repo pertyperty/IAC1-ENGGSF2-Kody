@@ -98,5 +98,6 @@ Focused development checks: 75 backend tests / 410 assertions passed for ingress
 real queue processing, same-second/stale probe handling, learning support, health,
 site administration and challenge admissions. Frontend tests: 64 passed. Locked
 Composer audit and npm audit report no known advisories after updating. Broader
-cached/backend/browser/build and restore evidence is recorded with the complete
-consolidation validation; these focused results alone are not release acceptance.
+cached/backend/browser/build and restore evidence is recorded in the
+[consolidation validation](consolidation-verification-2026-11-17.md); these focused
+results alone are not release acceptance.

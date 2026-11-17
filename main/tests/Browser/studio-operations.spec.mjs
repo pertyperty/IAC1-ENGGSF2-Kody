@@ -82,7 +82,7 @@ test('article completion shows shared progress XP wallet and readable reaction c
     await expect(reaction).toHaveAccessibleName('Like · 1 reactions');
     await audit(page); await page.getByRole('button', { name: /Dismiss notification/ }).first().click();
     await page.goto('/learn?q=What%20is%20a%20program'); await expect(page.getByText('Completed · article read', { exact: true })).toBeVisible();
-    await page.goto('/wallet'); await expect(page.getByText('Live checkout is being prepared.', { exact: false })).toBeVisible();
+    await page.goto('/wallet'); await expect(page.getByText('Purchases are unavailable.', { exact: false })).toBeVisible();
     for (const width of [1920, 390, 320]) { await page.setViewportSize({ width, height: 900 }); await audit(page); }
     await page.screenshot({ path: 'storage/app/browser-results/wallet-mobile-polish.png', fullPage: true });
 });
