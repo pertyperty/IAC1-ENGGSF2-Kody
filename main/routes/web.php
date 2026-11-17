@@ -22,6 +22,7 @@ use App\Http\Controllers\Administration\ContentModerationController;
 use App\Http\Controllers\Administration\CreatorBadgeController;
 use App\Http\Controllers\Administration\FaqController;
 use App\Http\Controllers\Administration\GamePresetController;
+use App\Http\Controllers\Administration\ReviewInboxController;
 use App\Http\Controllers\Administration\SiteManagementController;
 use App\Http\Controllers\Administration\SystemReportController;
 use App\Http\Controllers\Administration\TowerStudioController;
@@ -285,3 +286,5 @@ Route::middleware(['auth', 'account.session'])->prefix('manage/instructors')->na
 
 Route::post('/account/picture', [ProfilePictureController::class, 'update'])->middleware(['auth', 'account.session', 'throttle:10,1,profile-picture:'])->name('account.picture-update');
 Route::get('/accounts/{user}/picture', [ProfilePictureController::class, 'show'])->whereNumber('user')->middleware(['auth', 'account.session'])->name('account.picture');
+
+Route::get('/manage/reviews', ReviewInboxController::class)->middleware(['auth', 'account.session'])->name('review-inbox');

@@ -1,0 +1,22 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    level: 5
+    paths:
+        - app/Enums
+        - app/Policies
+        - app/Services/Operations
+        - app/Jobs/Operations
+        - app/Console/Commands/QueueCoverage.php
+        - app/Console/Commands/OperationsHeartbeat.php
+        - app/Http/Middleware/TrustConfiguredProxies.php
+        - app/Services/Account/CredentialDocuments.php
+        - app/Services/Administration/ReviewInbox.php
+        - app/Http/Controllers/Administration/ReviewInboxController.php
+    tmpDir: storage/framework/cache/phpstan
+    checkModelProperties: true
+    # Enum/date casts live in model casts() methods, not constant PHPDoc shapes.
+    parseModelCastsMethod: true
+    parallel:
+        maximumNumberOfProcesses: 2

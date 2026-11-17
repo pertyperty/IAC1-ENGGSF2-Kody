@@ -80,7 +80,7 @@ try {
             (new TowerLevelSeeder)->run();
         }
         $accounts = [];
-        foreach (['credinstructor' => Role::Instructor, 'credmoderator' => Role::Moderator, 'reviewlearner' => Role::Learner,
+        foreach (['discoveryinstructor' => Role::Instructor, 'discoverymoderator' => Role::Moderator, 'discoverylearner' => Role::Learner, 'credinstructor' => Role::Instructor, 'credmoderator' => Role::Moderator, 'reviewlearner' => Role::Learner,
             'instructor' => Role::Instructor, 'moderator' => Role::Moderator, 'administrator' => Role::Administrator, 'learner' => Role::Learner, 'arcadelearner' => Role::Learner, 'tracklearner' => Role::Learner, 'expertlearner' => Role::Learner, 'experteditor' => Role::Administrator,
             'navlearner' => Role::Learner, 'navcontributor' => Role::Contributor, 'navinstructor' => Role::Instructor,
             'navmoderator' => Role::Moderator, 'navadministrator' => Role::Administrator, 'interactive' => Role::Learner,

@@ -24,7 +24,8 @@ class CreatorProfileController extends Controller
         foreach (['Lessons' => LearningModule::class, 'Courses' => LearningCourse::class, 'Coding challenges' => CodingChallenge::class] as $label => $model) {
             $query = $model::where('created_by', $creator->id)->where('status', 'Published')->whereNull('staff_withdrawn_at')
                 ->whereHas('publishedRevision', fn ($revision) => $revision->where('review_status', 'Approved'));
-            $content[$label] = ['total' => (clone $query)->count(), 'items' => $query->with('publishedRevision')->orderByDesc('id')->limit(6)->get()];
+            $content[$label] = ['total' => (clone $query)->count(), 'items' => $query->select(['id', 'published_revision_id'])
+                ->with('publishedRevision:id,title')->orderByDesc('id')->limit(6)->get()];
         }
 
         return response()->view('creators.show', compact('creator', 'profile', 'content'))->header('Cache-Control', 'no-store, private');

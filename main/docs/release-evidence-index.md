@@ -5,6 +5,10 @@ revision, date, reviewer and artifact/reference. A configured flag or an uncheck
 box is not completed evidence. Never place tokens, credentials, private proof,
 raw learner submissions or sensitive database dumps in this document.
 
+The [17 November consolidation checks](consolidation-verification-2026-11-17.md)
+record local development evidence and its exact source revisions. They do not
+fill the unassigned release candidate or staged sign-offs below.
+
 ## Candidate
 
 | Field | Value |
@@ -40,6 +44,10 @@ evidence, not an attestation that these staged checks passed.
 | Restore and application rollback | Missing staged evidence | Isolated managed restore, key/private-file recovery, integrity checks, measured RPO/RTO and compatible release switch |
 | Accessibility / target devices | Partial local automation only | Real-device and screen-reader sessions plus automated workflow evidence at candidate revision |
 | SRS load, latency and availability | Unmeasured in target environment | Relevant capacity/latency tests and observation period; a small pilot does not prove 500 users or 99.9% availability |
+
+The [18 November npm advisory disposition](static-analysis-2026-11-18.md#npm-advisory-gate)
+records an open unpatched build-tool dependency gate. PHP audits pass, but fresh
+npm audit fails; the dependency-security row cannot be signed off from earlier CI.
 
 ## Separate activation gates
 

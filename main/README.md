@@ -8,6 +8,10 @@ The [implementation map](docs/implementation-status.md) is the master index for
 feature scope, traceability and remaining improvements. It links the detailed
 records without duplicating their approved decisions. Owner-deferred features
 remain in the [deferred register](docs/deferred-features.md).
+Current consolidation: [learner flow](docs/consolidated-learner-flow.md),
+[security/queues/ingress](docs/consolidation-security-and-operations.md),
+[policy summary](docs/current-learning-policy.md) and
+[release evidence](docs/release-evidence-index.md).
 The [refactoring review](docs/refactoring-review-2026-10-26.md) tracks the current
 maintainability pass, measured query reductions and the next focused batches.
 

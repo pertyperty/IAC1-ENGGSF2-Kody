@@ -183,7 +183,7 @@ test('tower studio rejects malformed quizzes and unsupported executable stages',
 test('creator and staff dashboards omit learner missions and show only their relevant workspace', function (Role $role) {
     moduleSignIn($this, moduleAccount($role));
     $this->get(route('dashboard'))->assertOk()->assertDontSee('data-progress-strip', false)->assertDontSee('daily-progress', false)
-        ->assertDontSee('Your learning journeys')->assertDontSee('level-trail', false);
+        ->assertDontSee('id="dashboard-journeys"', false)->assertDontSee('level-trail', false);
     if ($role === Role::Instructor) {
         $this->get(route('home'))->assertOk()->assertSee('Kody Tower')->assertSee('data-progress-strip', false);
     } else {

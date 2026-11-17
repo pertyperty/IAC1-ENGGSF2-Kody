@@ -54,6 +54,17 @@ test('public creator profiles hide inactive identities and exclude draft and wit
     $this->get(route('creators.show', moduleAccount(Role::Learner)))->assertNotFound();
 });
 
+test('public creator publication lists load titles without complete revision payloads', function () {
+    $module = moduleFixture(true);
+    $this->get(route('creators.show', $module->creator))->assertOk()->assertViewHas('content', function ($content) {
+        $item = $content['Lessons']['items']->sole();
+        expect(array_keys($item->getAttributes()))->toBe(['id', 'published_revision_id']);
+        expect(array_keys($item->publishedRevision->getAttributes()))->toBe(['id', 'title']);
+
+        return true;
+    });
+});
+
 test('only current staff can grant reviewed creator badges with approved unchanged proof and an audited decision', function () {
     $creator = moduleAccount(Role::Instructor);
     $proof = approvedBadgeProof($creator);

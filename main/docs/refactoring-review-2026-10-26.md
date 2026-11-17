@@ -82,3 +82,14 @@ branch only after the additive migration from PR #34, which it builds upon.
 Live SendGrid, Google, Judge0, Xendit and AWS/staging work remains in the existing
 integration and deferred-feature records. Local fake-provider results cannot
 establish those live contracts or production capacity.
+
+
+## 18 November tooling follow-up
+
+The [scoped static-analysis check](static-analysis-2026-11-18.md) adds Laravel-aware
+level-5 checks for selected authorization, operations, private credential and inbox
+boundaries. This supersedes the earlier statement that no analysis package exists;
+the remaining application still needs incremental coverage. The [navigation
+batch](navigation-discovery-2026-11-18.md) also completes the optional Tower list and
+filtered pending staff inbox. Measured report/bundle optimization, human curriculum
+review and staged provider/operations verification remain separate work.

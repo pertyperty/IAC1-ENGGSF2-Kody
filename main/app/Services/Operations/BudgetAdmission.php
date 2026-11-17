@@ -34,13 +34,14 @@ class BudgetAdmission
             app(WalletLedger::class)->lock();
             $month = CarbonImmutable::now('Asia/Manila')->startOfMonth()->toDateString();
             $row = DB::table('operations_budget_reports')->where('month', $month)->lockForUpdate()->first();
+            $version = $row->record_version ?? 0;
             $minor = ExactMoney::minor($data['amount']);
-            if ((int) ($data['record_version'] ?? -1) !== ($row?->record_version ?? 0)) {
+            if ((int) ($data['record_version'] ?? -1) !== $version) {
                 throw ValidationException::withMessages(['record_version' => 'The cost report changed. Reload before recording it.']);
             }
             DB::table('operations_budget_reports')->updateOrInsert(['month' => $month], ['reported_minor' => $minor,
-                'reported_by' => $staff->id, 'record_version' => ($row?->record_version ?? 0) + 1, 'updated_at' => now()]);
-            app(AuditRecorder::class)->record($staff->id, $staff->id, 'operations.cost_reported', 'budget_month', $month, ['amount_minor' => $minor, 'version' => ($row?->record_version ?? 0) + 1, 'source' => $data['source']]);
+                'reported_by' => $staff->id, 'record_version' => $version + 1, 'updated_at' => now()]);
+            app(AuditRecorder::class)->record($staff->id, $staff->id, 'operations.cost_reported', 'budget_month', $month, ['amount_minor' => $minor, 'version' => $version + 1, 'source' => $data['source']]);
             foreach ([50, 80, 100] as $threshold) {
                 if ($minor * 100 < config('operations.monthly_budget_minor') * $threshold) {
                     continue;

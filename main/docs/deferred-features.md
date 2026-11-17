@@ -19,6 +19,28 @@ the personal review list, worker/scheduler probes and automated Firefox/WebKit
 learning smoke checks. These do not complete human learning-effectiveness studies,
 real-device checks, supervised operations or live provider activation.
 
+Reviewed 17 November 2026: the [consolidation batch](consolidation-security-and-operations.md)
+patches the audited PHP dependencies, adds dedicated execution consumers and
+correlated probes for every application queue, and requires explicit proxy/host
+configuration. The [learner flow](consolidated-learner-flow.md) now centers the
+selected Tower track and includes an authoring leave warning. These implementation
+gaps are addressed; staged operation and curriculum effectiveness still need the
+evidence listed in the [release index](release-evidence-index.md).
+
+The [navigation discovery batch](navigation-discovery-2026-11-18.md) implements
+optional Tower list navigation and a filtered staff review inbox. Measured
+JavaScript splitting and reporting-query consolidation still need representative
+measurements. The [scoped static-analysis check](static-analysis-2026-11-18.md)
+starts at the authorization, operations, credentials and inbox boundaries; wider
+coverage remains incremental. Further floors, engines, animation variants
+and new progression/currency systems are paused during consolidation. None of
+these optional additions is a substitute for legal, curriculum or operations work.
+
+18 November security follow-up: the [tooling PR's fresh npm audit](static-analysis-2026-11-18.md#npm-advisory-gate)
+is blocked by unpatched picomatch advisory GHSA-fc5q-39xc-vjpf in the inherited
+Vite toolchain. No patched registry version is published. Keep the CI audit gate;
+earlier clean runs do not complete current dependency-security evidence.
+
 The 2026-10-12 [preparation follow-up](studios-media-and-integration-readiness.md)
 adds verification OTP, owned checkout status, PDF purchase receipts and queued
 receipt attachments, plus cross-context execution admission limits and result

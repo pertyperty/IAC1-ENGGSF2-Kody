@@ -208,7 +208,8 @@ test('A01 A02 B03 B05: guest trial, registration, verified play, reading and cou
     await expect(page.getByRole('heading', { name: 'You’re verified' })).toBeVisible();
     await expect(page).not.toHaveURL(/#/);
     await login(page, 'newplayer');
-    await expect(page.getByRole('heading', { name: 'Your mission board' })).toBeVisible();
+    await page.goto('/dashboard');
+    await expect(page.getByRole('heading', { name: 'Your next Tower level' })).toBeVisible();
     await page.setViewportSize({ width: 320, height: 900 });
     for (const dark of [false, true]) {
         const toggle = page.locator('[data-theme-toggle]');
@@ -459,7 +460,10 @@ test('Shared interface: keyboard navigation, light/dark themes, narrow layouts a
     }
     await login(page, 'administrator');
     await page.goto('/wallet');
-    await expect(page.getByText('105 KodeBits', { exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Available KodeBits' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'KodeBit history' })).toBeVisible();
+    await expect(page.getByText('Purchases are unavailable.', { exact: false })).toBeVisible();
+    await expect(page.locator('.wallet-package')).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'Continue to GCash' })).toHaveCount(0);
     await audit(page);
 });
@@ -496,7 +500,7 @@ test('B05: four creator arcade assessments and a multi-question quiz save valida
 
 for (const [role, destination, link] of [
     ['learner', '/learn', 'Learning catalog'], ['contributor', '/create/challenges', 'Quest studio'],
-    ['instructor', '/create', 'Module studio'], ['moderator', '/manage/modules', 'Module reviews'],
+    ['instructor', '/create', 'Module studio'], ['moderator', '/manage/reviews', 'Review inbox'],
     ['administrator', '/manage/accounts', 'Community'],
 ]) {
     test(`${role} workspace has focused navigation and usable desktop/mobile surfaces in both themes`, async ({ page }) => {

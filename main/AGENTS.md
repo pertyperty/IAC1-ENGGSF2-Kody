@@ -6,6 +6,19 @@ The 2026-11-17 owner continuation prioritizes consolidation over expansion. See
 consumed, correlate bounded probes, use explicit proxy/host configuration, and
 preserve the free-pilot release boundary without removing SRS obligations. No
 additional floors, engines or provider activation is part of this consolidation.
+The [learner flow](docs/consolidated-learner-flow.md) keeps one primary selected-track
+Tower continuation, optional starter history and grouped navigation. Preserve the
+authoring leave guard, small public projections and existing rewards summarized
+in [current learning policy](docs/current-learning-policy.md).
+
+The owner's 2026-11-18 PR grouping adds [navigation discovery](docs/navigation-discovery-2026-11-18.md).
+Tower map/list views share track progression and server admission; guests retain
+browser trial sequencing. The staff inbox projects only pending latest summaries,
+excludes self-review and links to existing credential/publication review workflows.
+Keep privacy/finance routes and specialized history available. The
+[scoped static check](docs/static-analysis-2026-11-18.md) runs with `composer analyse`
+and no baseline/blanket ignores; expand its paths through focused verified changes.
+Measured optimization and live release evidence remain separate batches.
 
 The owner's 2026-10-26 maintainability pass is tracked in the
 [refactoring review](docs/refactoring-review-2026-10-26.md). Reuse Account-owned
