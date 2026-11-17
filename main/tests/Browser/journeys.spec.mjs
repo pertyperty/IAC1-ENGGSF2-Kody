@@ -460,7 +460,10 @@ test('Shared interface: keyboard navigation, light/dark themes, narrow layouts a
     }
     await login(page, 'administrator');
     await page.goto('/wallet');
-    await expect(page.getByText('105 KodeBits', { exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Available KodeBits' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'KodeBit history' })).toBeVisible();
+    await expect(page.getByText('Purchases are unavailable.', { exact: false })).toBeVisible();
+    await expect(page.locator('.wallet-package')).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'Continue to GCash' })).toHaveCount(0);
     await audit(page);
 });

@@ -93,7 +93,7 @@ Do not treat local concurrency tests or a small pilot as proof of the unchanged 
 
 **Priority: next UX batch. Confirmed interface structure; user impact needs a pilot. B01/B02/B05/E05.**
 
-The main entry is the 80-floor Tower, but the [overview](../resources/views/learning/hub.blade.php) still displays the older three-level ladder, “Your ladder” statistics and starter missions. [LearnerMissions](../app/Services/Engagement/LearnerMissions.php) directs daily/continue actions to those starter lessons. The HUD, meanwhile, shows Tower counts. A learner can reasonably wonder which progress display matters.
+The main entry is the 80-floor Tower, but the [overview](../resources/views/learning/hub.blade.php) still displays the older three-level ladder, “Your ladder” statistics and starter missions. [LearnerMissions](https://github.com/pertyperty/IAC1-ENGGSF2-Kody/blob/bda248c6b436285f59a0a06228f39169eeed9424/main/app/Services/Engagement/LearnerMissions.php) directs daily/continue actions to those starter lessons. The HUD, meanwhile, shows Tower counts. A learner can reasonably wonder which progress display matters.
 
 Make the selected Tower track the primary continue action. Keep the old starter lessons accessible as optional lessons or a secondary completed introduction. Preserve their IDs, clearances, XP history and routes until compatibility is deliberately handled. Relabel the three-level statistics clearly if they remain visible; do not migrate or invent clears.
 

@@ -16,6 +16,16 @@ test.beforeEach(async ({ page }) => {
     });
 });
 
+test.afterEach(async ({ page }) => {
+    // Closing a browser context does not end the application's active session.
+    // Leave shared fixture accounts available for the subsequent journeys.
+    const token = await page.locator('meta[name="csrf-token"]').getAttribute('content');
+    if (token) {
+        const response = await page.request.post('/logout', { form: { _token: token } });
+        expect(response.ok()).toBeTruthy();
+    }
+});
+
 test('one primary Continue follows the selected track and supporting history stays secondary', async ({ page }) => {
     await login(page, 'learner');
     await page.goto('/?track=expert');
@@ -33,6 +43,8 @@ test('one primary Continue follows the selected track and supporting history sta
         await page.setViewportSize({ width, height: 1000 });
         await audit(page);
     }
+    await page.locator('h1').focus();
+    await page.evaluate(() => window.scrollTo(0, 0));
     await page.screenshot({ path: 'storage/app/browser-results/consolidated-progress-mobile.png', fullPage: true });
     await page.goto('/wallet');
     await expect(page.getByText('Purchases are unavailable.', { exact: false })).toBeVisible();
