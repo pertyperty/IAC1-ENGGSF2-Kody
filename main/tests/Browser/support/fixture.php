@@ -64,7 +64,7 @@ try {
         $options = ['--force' => true];
         if ($operation === 'migrate-baseline') {
             $options += ['--realpath' => true, '--path' => array_values(array_filter(glob(database_path('migrations/*.php')),
-                fn (string $path) => ! str_ends_with($path, '2026_10_05_000038_add_challenge_discovery_metadata.php') && ! str_contains(basename($path), '2026_10_10_') && ! str_contains(basename($path), '2026_10_11_') && ! str_contains(basename($path), '2026_10_12_') && ! str_contains(basename($path), '2026_10_18_') && ! str_contains(basename($path), '2026_10_25_')))];
+                fn (string $path) => ! str_ends_with($path, '2026_10_05_000038_add_challenge_discovery_metadata.php') && ! str_contains(basename($path), '2026_10_10_') && ! str_contains(basename($path), '2026_10_11_') && ! str_contains(basename($path), '2026_10_12_') && ! str_contains(basename($path), '2026_10_18_') && ! str_contains(basename($path), '2026_10_25_') && ! str_contains(basename($path), '2026_11_17_')))];
         }
         if (Artisan::call('migrate', $options) !== 0) {
             throw new RuntimeException('Browser migrations failed.');

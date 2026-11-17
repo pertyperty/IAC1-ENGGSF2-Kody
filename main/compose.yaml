@@ -55,7 +55,20 @@ services:
       - artisan
       - queue:work
       - database
+      - --queue=payments,notifications,default
       - --sleep=3
+      - --tries=3
+      - --timeout=60
+
+  execution-worker:
+    <<: *kody-common
+    command:
+      - php
+      - artisan
+      - queue:work
+      - database
+      - --queue=code-execution
+      - --sleep=1
       - --tries=3
       - --timeout=60
 

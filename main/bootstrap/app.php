@@ -5,9 +5,11 @@ use App\Http\Controllers\HealthController;
 use App\Http\Controllers\Transactions\PaymentController;
 use App\Http\Middleware\EnsureActiveAccountSession;
 use App\Http\Middleware\GoogleCallbackPrivacy;
+use App\Http\Middleware\TrustConfiguredProxies;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Middleware\ThrottleRequests;
 use Illuminate\Support\Facades\Route;
@@ -28,7 +30,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->prependToPriorityList(ThrottleRequests::class, GoogleCallbackPrivacy::class);
         $middleware->redirectGuestsTo(fn () => route('login'));
         $middleware->redirectUsersTo(fn (Request $request) => route($request->user()->account_role === Role::Learner ? 'home' : 'dashboard'));
-        $middleware->trustProxies(at: '*'); // Remove later
+        $middleware->replace(TrustProxies::class, TrustConfiguredProxies::class);
+        $middleware->trustHosts(at: fn () => config('http.allowed_hosts'), subdomains: false);
         // Test-case whitespace is part of the expected program behavior.
         $middleware->trimStrings(except: ['test_cases.*.input', 'test_cases.*.expected_output', 'source_code']);
     })

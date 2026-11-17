@@ -1,12 +1,12 @@
 <?php
 
 use App\Enums\Role;
-use App\Jobs\Operations\WorkerHeartbeat;
 use App\Models\TowerLevel;
 use App\Services\Operations\Heartbeats;
 use Database\Seeders\TowerLevelSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Queue;
 
 uses(RefreshDatabase::class);
 
@@ -38,10 +38,10 @@ test('scheduler and worker probes distinguish unknown recent and stale without a
     expect(app(Heartbeats::class)->snapshot()[0]['state'])->toBe('Unknown');
     expect(Artisan::call('kody:operations-heartbeat'))->toBe(0);
     expect(Artisan::call('kody:operations-heartbeat'))->toBe(0);
-    $this->assertDatabaseCount('jobs', 1);
+    $this->assertDatabaseCount('jobs', 4);
     expect(app(Heartbeats::class)->snapshot()[0]['state'])->toBe('Recent');
     expect(app(Heartbeats::class)->snapshot()[1]['state'])->toBe('Unknown');
-    (new WorkerHeartbeat)->handle();
+    Queue::connection('database')->pop('default')->fire();
     expect(app(Heartbeats::class)->snapshot()[1]['state'])->toBe('Recent');
     $this->travel(4)->minutes();
     expect(app(Heartbeats::class)->snapshot()[0]['state'])->toBe('Stale');

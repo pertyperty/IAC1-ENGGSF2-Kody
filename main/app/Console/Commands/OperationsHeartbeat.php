@@ -3,15 +3,17 @@
 namespace App\Console\Commands;
 
 use App\Jobs\Operations\WorkerHeartbeat;
+use App\Services\Operations\Heartbeats;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Str;
 
 class OperationsHeartbeat extends Command
 {
     protected $signature = 'kody:operations-heartbeat';
 
-    protected $description = 'Record scheduler activity and dispatch at most one outstanding database-worker probe';
+    protected $description = 'Record scheduler activity and dispatch one bounded probe per application queue';
 
     public function handle(): int
     {
@@ -22,15 +24,18 @@ class OperationsHeartbeat extends Command
         }
         DB::transaction(function (): void {
             DB::table('operations_heartbeats')->updateOrInsert(['component' => 'scheduler'], ['last_success_at' => now()]);
-            DB::table('operations_heartbeats')->insertOrIgnore(['component' => 'worker']);
-            $worker = DB::table('operations_heartbeats')->where('component', 'worker')->lockForUpdate()->first();
-            if ($worker->last_dispatched_at !== null && ($worker->last_success_at === null || $worker->last_success_at < $worker->last_dispatched_at)) {
-                return; // A stopped worker must not accumulate a queue of probes.
+            foreach (app(Heartbeats::class)->workers() as $component => $queue) {
+                DB::table('operations_heartbeats')->insertOrIgnore(['component' => $component]);
+                $worker = DB::table('operations_heartbeats')->where('component', $component)->lockForUpdate()->first();
+                if ($worker->probe_id !== null) {
+                    continue; // A stopped consumer cannot accumulate probes.
+                }
+                $probeId = (string) Str::uuid();
+                Queue::connection('database')->pushOn($queue, (new WorkerHeartbeat($component, $probeId))->beforeCommit());
+                DB::table('operations_heartbeats')->where('component', $component)->update(['last_dispatched_at' => now(), 'probe_id' => $probeId]);
             }
-            Queue::connection('database')->push((new WorkerHeartbeat)->beforeCommit());
-            DB::table('operations_heartbeats')->where('component', 'worker')->update(['last_dispatched_at' => now()]);
         });
-        $this->info('Scheduler heartbeat recorded. Worker success is recorded only when its probe runs.');
+        $this->info('Scheduler heartbeat recorded. Each queue records success only when its probe runs.');
 
         return self::SUCCESS;
     }

@@ -3,7 +3,13 @@
 Start here for current scope, detailed evidence and the next useful improvements.
 This index consolidates the feature summaries previously repeated in README.
 It does not replace approved requirements, decisions or the implementation records.
-Last reviewed: 2026-10-26.
+Last reviewed: 2026-11-17.
+The [consolidation security/operations batch](consolidation-security-and-operations.md)
+patches dependencies, covers all four application queues with correlated processing
+probes and dedicated execution consumers, and replaces wildcard proxy trust with
+explicit ingress configuration. The [system review](system-scope-review-2026-11-13.md)
+sets the consolidation sequence; the [release evidence index](release-evidence-index.md)
+records the remaining human/legal/staged evidence without claiming readiness.
 The [refactoring review](refactoring-review-2026-10-26.md) starts a separate
 maintainability pass across all modules: shared private credential reads, fewer
 creator-dashboard aggregates, summary-only lesson cards and query-free empty
