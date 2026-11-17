@@ -25,6 +25,7 @@ import { mountDocumentStage } from './document-stage.js';
 import { mountNoticeEditor } from './site-notice.js';
 import { decorateCurrency } from './currency-icons.js';
 import { mountRoleUpdate } from './role-update.js';
+import { mountUnsavedChanges } from './unsaved-changes.js';
 import { mountKodyCompanion, mountPageLoader } from './kody-companion.js';
 
 mountTheme(document, window);
@@ -60,23 +61,6 @@ document.querySelectorAll('[data-coding-game]').forEach(mountGarden);
 document.querySelectorAll('[data-practice-quiz]').forEach(mountQuiz);
 document.querySelectorAll('[data-arcade-game]').forEach(mountArcade);
 
-const accountType = document.querySelector('#account-type');
-const instructorFields = document.querySelector('#instructor-fields');
-
-if (accountType && instructorFields) {
-    const updateInstructorFields = () => {
-        const applying = accountType.value === 'instructor';
-        instructorFields.hidden = !applying;
-        instructorFields.querySelectorAll('input').forEach((input) => {
-            input.disabled = !applying;
-            input.required = applying;
-        });
-    };
-
-    accountType.addEventListener('change', updateInstructorFields);
-    updateInstructorFields();
-}
-
 const cooldown = document.querySelector('[data-recovery-cooldown]');
 if (cooldown) {
     const updateCooldown = () => {
@@ -94,4 +78,5 @@ mountKodyCompanion(document, window);
 document.querySelectorAll('[data-role-update]').forEach(dialog => mountRoleUpdate(dialog, document, window));
 mountPageLoader(document, window);
 decorateCurrency(document);
+mountUnsavedChanges(document, window);
 document.addEventListener('kody:feedback', () => requestAnimationFrame(() => decorateCurrency(document, document.querySelector('[data-toast-region]'))));

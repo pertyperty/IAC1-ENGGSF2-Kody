@@ -208,7 +208,8 @@ test('A01 A02 B03 B05: guest trial, registration, verified play, reading and cou
     await expect(page.getByRole('heading', { name: 'You’re verified' })).toBeVisible();
     await expect(page).not.toHaveURL(/#/);
     await login(page, 'newplayer');
-    await expect(page.getByRole('heading', { name: 'Your mission board' })).toBeVisible();
+    await page.goto('/dashboard');
+    await expect(page.getByRole('heading', { name: 'Your next Tower level' })).toBeVisible();
     await page.setViewportSize({ width: 320, height: 900 });
     for (const dark of [false, true]) {
         const toggle = page.locator('[data-theme-toggle]');

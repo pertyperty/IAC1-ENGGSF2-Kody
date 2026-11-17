@@ -1,13 +1,19 @@
 <nav class="workspace-nav" aria-label="{{ ($mobile ?? false) ? 'Mobile workspace' : 'Your workspace' }}">
-    <p class="rail-label">@can('viewAny', \App\Models\User::class)Explore Kody @else Your playground @endcan</p>
+    <p class="rail-label">Play</p>
     @if(in_array(auth()->user()->account_role, [\App\Enums\Role::Learner, \App\Enums\Role::Instructor], true))<a href="{{ route('home') }}" @if(request()->routeIs('home', 'tower.*')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'tower', 'label' => 'The Tower'])</a>@endif
-    <a href="{{ route('dashboard') }}" @if(request()->routeIs('dashboard', 'learning.show')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'panel', 'label' => 'Overview'])</a>
-    <a href="{{ route('learning.catalog') }}" @if(request()->routeIs('learning.catalog', 'modules.*', 'course-learning.show', 'course-learning.lesson')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'book', 'label' => 'Learning catalog'])</a>
-    <a href="{{ route('course-learning.catalog') }}" @if(request()->routeIs('course-learning.catalog')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'book', 'label' => 'Browse courses'])</a>
-    @can('viewLearning', \App\Models\LearningCourse::class)<a href="{{ route('course-learning.mine') }}" @if(request()->routeIs('course-learning.mine')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'journey', 'label' => 'My courses'])</a>@endcan
-    @can('viewLearning', \App\Models\LearningCourse::class)<a href="{{ route('weekly-events.index') }}" @if(request()->routeIs('weekly-events.*', 'weekly-leaderboards.*', 'weekly-results.show')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'game', 'label' => 'Weekly quests'])</a><a href="{{ route('leaderboards.index') }}" @if(request()->routeIs('leaderboards.*')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'chart', 'label' => 'Leaderboards'])</a>@endcan
     <a href="{{ route('arcade') }}" @if(request()->routeIs('arcade')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'game', 'label' => 'Practice arcade'])</a>
-    <a href="{{ route('challenges.catalog') }}" @if(request()->routeIs('challenges.catalog', 'challenges.show', 'challenges.attempt')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'code', 'label' => 'Coding quests'])</a>
+    <p class="rail-label">Learn</p>
+    <a href="{{ route('learning.catalog') }}" @if(request()->routeIs('learning.catalog', 'modules.*', 'learning.show')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'book', 'label' => 'Learning catalog'])</a>
+    <a href="{{ route('course-learning.catalog') }}" @if(request()->routeIs('course-learning.catalog', 'course-learning.show', 'course-learning.lesson')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'book', 'label' => 'Browse courses'])</a>
+    <a href="{{ route('challenges.catalog') }}" @if(request()->routeIs('challenges.catalog', 'challenges.show', 'challenges.attempt')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'code', 'label' => 'Coding challenges'])</a>
+    <p class="rail-label">My progress</p>
+    <a href="{{ route('dashboard') }}" @if(request()->routeIs('dashboard')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'panel', 'label' => auth()->user()->account_role === \App\Enums\Role::Learner ? 'My progress' : 'Overview'])</a>
+    @can('viewLearning', \App\Models\LearningCourse::class)
+    <a href="{{ route('course-learning.mine') }}" @if(request()->routeIs('course-learning.mine')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'journey', 'label' => 'My courses'])</a>
+    <a href="{{ route('review-queue.index') }}" @if(request()->routeIs('review-queue.index')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'book', 'label' => 'Review later'])</a>
+    <a href="{{ route('weekly-events.index') }}" @if(request()->routeIs('weekly-events.*', 'weekly-leaderboards.*', 'weekly-results.show')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'game', 'label' => 'Weekly challenge history'])</a>
+    <a href="{{ route('leaderboards.index') }}" @if(request()->routeIs('leaderboards.*')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'chart', 'label' => 'Leaderboards'])</a>
+    @endcan
     @can('create', \App\Models\CodingChallenge::class)
     <p class="rail-label">Creator workspace</p>
     @can('create', \App\Models\LearningModule::class)<a href="{{ route('studio.index') }}" @if(request()->routeIs('studio.*')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'create', 'label' => 'Module studio'])</a><a href="{{ route('courses.index') }}" @if(request()->routeIs('courses.*', 'curriculum.*')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'book', 'label' => 'Course builder'])</a>@endcan
@@ -27,7 +33,7 @@
     @endcan
     @can('manage', \App\Models\TowerLevel::class)<a href="{{ route('tower-studio.index') }}" @if(request()->routeIs('tower-studio.*')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'tower', 'label' => 'Tower studio'])</a>@endcan
     @can('manageSite', \App\Models\User::class)<a href="{{ route('site-management.index') }}" @if(request()->routeIs('site-management.*')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'settings', 'label' => 'Site management'])</a>@endcan
-    <p class="rail-label">A little support</p>
+    <p class="rail-label">Help and account</p>
     @can('viewAny', \App\Models\GamePreset::class)<a href="{{ route('game-presets.index') }}" @if(request()->routeIs('game-presets.*')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'game', 'label' => 'Game presets'])</a>@endcan
     @can('viewAny', \App\Models\FaqEntry::class)<a href="{{ route('faq-management.index') }}" @if(request()->routeIs('faq-management.*')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'help', 'label' => 'FAQ management'])</a>@endcan
     @can('viewAny', \App\Models\User::class)<a href="{{ route('creator-erasure.index') }}" @if(request()->routeIs('creator-erasure.*')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'shield', 'label' => 'Privacy reviews'])</a>@endcan
@@ -38,5 +44,4 @@
 
     <a href="{{ route('contact') }}" @if(request()->routeIs('contact')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'mail', 'label' => 'Contact Kody'])</a>
 
-@can('viewLearning', \App\Models\LearningCourse::class)<a href="{{ route('review-queue.index') }}">@include('layouts.navigation-item-content', ['icon' => 'book', 'label' => 'Review later'])</a>@endcan
 </nav>

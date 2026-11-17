@@ -1,40 +1,61 @@
 <?php
 
 use App\Enums\Role;
+use App\Models\TowerLevel;
 use App\Models\User;
 use App\Services\Content\CourseLearning;
-use App\Services\Engagement\LearnerMissions;
 use App\Services\Gamification\Achievements;
 use App\Services\Gamification\LearningProgression;
+use App\Services\Gamification\TowerProgression;
+use Database\Seeders\TowerLevelSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 
 uses(RefreshDatabase::class);
 
-test('mission board shows owned saved goals only to participant roles without granting rewards', function (Role $role) {
+test('one Tower continuation is shown only to learners without granting progress or rewards', function (Role $role) {
+    $this->seed(TowerLevelSeeder::class);
     $user = moduleAccount($role);
     moduleSignIn($this, $user);
     $response = $this->get(route('dashboard'))->assertOk();
     if ($role === Role::Learner) {
-        $response->assertSee('Your mission board')->assertSee('Save a daily win')->assertSee('Grow toward Explorer');
+        $response->assertSee('Your next Tower level')->assertSee('Continue level 1')->assertSee('Optional starter lessons');
+        expect(substr_count($response->getContent(), 'data-primary-continue'))->toBe(1);
     } else {
-        $response->assertDontSee('Your mission board');
+        $response->assertDontSee('data-primary-continue', false);
     }
+    $response->assertDontSee('Your mission board')->assertDontSee('Your ladder');
+    $this->assertDatabaseCount('tower_clearances', 0);
     $this->assertDatabaseCount('learning_activity_days', 0);
     $this->assertDatabaseCount('xp_awards', 0);
 })->with(Role::cases());
 
-test('mission goals reflect saved daily wins and approved rank thresholds and expire on Manila dates', function () {
-    $this->travelTo(now()->setTimezone('Asia/Manila')->startOfDay()->addHours(12));
+test('continuation uses the selected Tower track and never mistakes starter history for Tower clears', function () {
+    $this->seed(TowerLevelSeeder::class);
     $user = moduleAccount(Role::Learner);
     app(LearningProgression::class)->record($user, 'module-test-session', 'sequences', 'game', courseWin());
-    $goals = app(LearnerMissions::class)->snapshot(app(LearningProgression::class)->snapshot($user->id), app(Achievements::class)->snapshot($user->id));
-    expect($goals[0]['done'])->toBeTrue()->and($goals[1]['value'])->toBe(1)
-        ->and($goals[1]['url'])->toBe(route('learning.show', 'loops'))->and($goals[2]['max'])->toBe(200);
-    $this->travel(1)->days();
-    $goals = app(LearnerMissions::class)->snapshot(app(LearningProgression::class)->snapshot($user->id), app(Achievements::class)->fromXp(3000));
-    expect($goals[0]['done'])->toBeFalse()->and($goals[2]['done'])->toBeTrue()->and($goals[2]['value'])->toBe(3000);
+    moduleSignIn($this, $user);
+    $this->get(route('home', ['track' => 'expert']))->assertOk();
+    $this->get(route('dashboard'))->assertOk()->assertSee('Continue level 71');
+    $service = app(TowerProgression::class);
+    $next = $service->continuation($user->id, 'expert');
+    expect($next['completed'])->toBe(0)->and($next['total'])->toBe(10);
+    $level = TowerLevel::where('position', 71)->firstOrFail();
+    DB::table('tower_clearances')->insert(['user_id' => $user->id, 'level_id' => $level->id, 'revision_id' => $level->current_revision_id, 'completed_at' => now()]);
+    expect($service->continuation($user->id, 'expert')['next']['position'])->toBe(72);
+    expect($service->continuation(moduleAccount(Role::Learner)->id, 'expert')['next']['position'])->toBe(71);
+    expect($service->continuation($user->id, 'forged')['next']['position'])->toBe(1);
     $this->assertDatabaseCount('xp_awards', 1);
+});
+
+test('empty and completed tracks have an explicit map action without inventing another next level', function () {
+    $user = moduleAccount(Role::Learner);
+    expect(app(TowerProgression::class)->continuation($user->id, 'expert'))->toMatchArray(['total' => 0, 'completed' => 0, 'next' => null]);
+    $this->seed(TowerLevelSeeder::class);
+    foreach (TowerLevel::where('skill_track', 'expert')->get() as $level) {
+        DB::table('tower_clearances')->insert(['user_id' => $user->id, 'level_id' => $level->id, 'revision_id' => $level->current_revision_id, 'completed_at' => now()]);
+    }
+    expect(app(TowerProgression::class)->continuation($user->id, 'expert'))->toMatchArray(['total' => 10, 'completed' => 10, 'next' => null]);
 });
 
 test('course trail continuation comes from committed reading and game progress and ends without a fabricated next link', function () {

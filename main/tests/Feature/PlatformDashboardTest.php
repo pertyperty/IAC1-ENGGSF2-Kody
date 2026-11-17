@@ -22,7 +22,7 @@ test('B01 dashboard consolidates owned progress recent learning and unread notic
     $otherCourse = courseFixture(true, overrides: ['title' => 'Other learner private journey']);
     joinCourse($otherCourse, $other);
     moduleSignIn($this, $user);
-    $this->get(route('dashboard'))->assertOk()->assertSee('Garden journey')->assertSee('1 of 1 adventures completed')
+    $this->get(route('dashboard'))->assertOk()->assertSee('Garden journey')->assertSee('1 of 1 lessons completed')
         ->assertSee('Pick up where you left off')->assertSee('0 unread')->assertDontSee('Other learner private journey')
         ->assertHeader('Cache-Control', 'no-store, private');
     $this->assertDatabaseCount('learning_activity_days', 1);
@@ -78,5 +78,5 @@ test('B01 dashboard rejects guests and suspended sessions while staff retain the
     $user->forceFill(['account_status' => AccountStatus::Suspended])->save();
     $this->get(route('dashboard'))->assertRedirect(route('login'));
     moduleSignIn($this, User::factory()->create(['account_role' => Role::Moderator]));
-    $this->get(route('dashboard'))->assertOk()->assertSee('Your updates')->assertDontSee('Your learning journeys')->assertDontSee('Your creator studio');
+    $this->get(route('dashboard'))->assertOk()->assertSee('Your updates')->assertDontSee('id="dashboard-journeys"', false)->assertDontSee('Your creator studio');
 });

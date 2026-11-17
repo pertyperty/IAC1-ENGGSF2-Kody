@@ -4,6 +4,12 @@ Start here for current scope, detailed evidence and the next useful improvements
 This index consolidates the feature summaries previously repeated in README.
 It does not replace approved requirements, decisions or the implementation records.
 Last reviewed: 2026-11-17.
+The [consolidated learner flow](consolidated-learner-flow.md) makes the selected
+Tower track the primary Continue action, keeps starter lessons optional, groups
+navigation, reduces unavailable-checkout promotion, warns before leaving edited
+authoring forms and narrows public creator queries. The
+[current learning policy](current-learning-policy.md) records superseding reward,
+reading, track and credibility rules without changing them.
 The [consolidation security/operations batch](consolidation-security-and-operations.md)
 patches dependencies, covers all four application queues with correlated processing
 probes and dedicated execution consumers, and replaces wildcard proxy trust with
