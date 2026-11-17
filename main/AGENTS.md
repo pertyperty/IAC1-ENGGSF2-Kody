@@ -1,5 +1,12 @@
 # Kody Engineering Agent Guidelines
 
+The 2026-11-17 owner continuation prioritizes consolidation over expansion. See
+[security and operations](docs/consolidation-security-and-operations.md) and the
+[system review](docs/system-scope-review-2026-11-13.md). Keep every produced queue
+consumed, correlate bounded probes, use explicit proxy/host configuration, and
+preserve the free-pilot release boundary without removing SRS obligations. No
+additional floors, engines or provider activation is part of this consolidation.
+
 The owner's 2026-10-26 maintainability pass is tracked in the
 [refactoring review](docs/refactoring-review-2026-10-26.md). Reuse Account-owned
 `CredentialDocuments` for qualification availability and audited downloads.

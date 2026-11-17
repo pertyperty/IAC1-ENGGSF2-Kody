@@ -21,7 +21,8 @@ limits, authorized revision-pinned streaming and the erasure worker using
 [the tower/media record](tower-and-media-implementation.md).
 
 The [Supervisor example](../ops/supervisor/kody-worker.conf.example) runs the
-database payments/notifications/default queues as an unprivileged service user. Review executable,
+database payments/notifications/default queues and a separate code-execution
+worker as an unprivileged service user. Review executable,
 release/storage paths, ownership and log retention before installing. The example
 uses a 60-second worker timeout, below the current 90-second queue `retry_after`;
 jobs have their own shorter bounded timeouts. Keep `retry_after` above all job
@@ -31,8 +32,13 @@ configuration, not evidence of capacity. Increase concurrency only after measuri
 After each switch, run `php artisan queue:restart`; Supervisor must start the
 replacement worker against the new release. Confirm the worker PID changes and
 processes a non-sensitive sandbox job. Check `queue:failed`, durable delivery state
-and queue age. Diagnose failed jobs before explicitly retrying them. Financial work uses payments and notifications in addition to default. A worker
-that listens only to default will strand financial work; inspect every queue.
+and queue age. Diagnose failed jobs before explicitly retrying them. Financial work uses payments and notifications; evaluations use code-execution.
+A default-only consumer strands those workloads. Run `kody:operations-heartbeat`,
+allow both consumers to process probes, then require `kody:queue-check` to pass.
+Probe success is consumption evidence, not provider or capacity evidence.
+See [consolidation operations](consolidation-security-and-operations.md) for the
+required additive probe migration, explicit ingress configuration and queue bounds.
+Record staged acceptance in the [release evidence index](release-evidence-index.md).
 
 ## Scheduler
 

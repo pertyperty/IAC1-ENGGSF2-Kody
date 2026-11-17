@@ -79,7 +79,9 @@ Run `php artisan serve` and `npm run dev` in separate terminals. Run the databas
 worker in another terminal:
 
 ```sh
-php artisan queue:work database --sleep=3 --tries=3 --timeout=60
+php artisan queue:work database --queue=payments,notifications,default --sleep=3 --tries=3 --timeout=60
+# In a separate terminal/process:
+php artisan queue:work database --queue=code-execution --sleep=1 --tries=3 --timeout=60
 php artisan schedule:work
 ```
 
