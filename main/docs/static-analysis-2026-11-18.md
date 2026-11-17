@@ -67,3 +67,38 @@ production-readiness claim is made here. No schema change or provider activation
 part of this batch. Remaining curriculum, legal, operations and measured-performance
 work stays in the [deferred register](deferred-features.md) and
 [release evidence index](release-evidence-index.md).
+
+
+## npm advisory gate
+
+The first remote run on this tooling revision stopped at the existing npm audit
+step, before static analysis. The local PHP checks above pass, but this PR's CI is
+**blocked**, not fully verified. Earlier #41/#42 CI runs passed before the current
+registry advisory result; they do not attest to a fresh audit today.
+
+Fresh `npm audit` reports six high-severity affected dependency entries derived
+from one root advisory: [GHSA-fc5q-39xc-vjpf](https://github.com/advisories/GHSA-fc5q-39xc-vjpf)
+(CVE-2026-112366), repeated-extglob regular-expression denial of service in
+`picomatch`. The advisory was updated on 17 November 2026 at 15:56:44 UTC and lists
+all versions through 4.0.7, with no first patched version. Registry `latest` is
+4.0.7; 4.0.8 is not published. The inherited lock contains 4.0.7 through Vite /
+tinyglobby / fdir and 2.3.2 through vite-plugin-full-reload. This PR has not changed
+the npm manifest or lock.
+
+Application-source inspection found no direct picomatch/glob-pattern calls; the
+dependency tree places it in build tooling. `npm audit --omit=dev` reports zero,
+but that alone is not absence-of-risk evidence: browser build dependencies are
+also declared as development packages. No exploitability or release waiver is
+claimed. Builds should continue to use reviewed repository inputs.
+
+The advisory's linked [upstream PR #194](https://github.com/micromatch/picomatch/pull/194)
+is open and explicitly states that it does not generally fix the vulnerability;
+its text still identifies an exponential single-branch pattern. Pinning it is not
+a demonstrated fix. npm's automated suggestion downgrades Vite/Laravel tooling
+across incompatible major versions, so it was not applied.
+
+No audit threshold, suppression, dependency alias or unreviewed fork was added.
+The next dependency-maintenance PR must use a verified upstream fix, update every
+affected path, retain a clean lock install and rerun full audits/builds/browser CI.
+Until then, this security gate remains open in the
+[release evidence index](release-evidence-index.md).

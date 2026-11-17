@@ -36,6 +36,11 @@ coverage remains incremental. Further floors, engines, animation variants
 and new progression/currency systems are paused during consolidation. None of
 these optional additions is a substitute for legal, curriculum or operations work.
 
+18 November security follow-up: the [tooling PR's fresh npm audit](static-analysis-2026-11-18.md#npm-advisory-gate)
+is blocked by unpatched picomatch advisory GHSA-fc5q-39xc-vjpf in the inherited
+Vite toolchain. No patched registry version is published. Keep the CI audit gate;
+earlier clean runs do not complete current dependency-security evidence.
+
 The 2026-10-12 [preparation follow-up](studios-media-and-integration-readiness.md)
 adds verification OTP, owned checkout status, PDF purchase receipts and queued
 receipt attachments, plus cross-context execution admission limits and result

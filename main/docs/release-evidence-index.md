@@ -45,6 +45,10 @@ evidence, not an attestation that these staged checks passed.
 | Accessibility / target devices | Partial local automation only | Real-device and screen-reader sessions plus automated workflow evidence at candidate revision |
 | SRS load, latency and availability | Unmeasured in target environment | Relevant capacity/latency tests and observation period; a small pilot does not prove 500 users or 99.9% availability |
 
+The [18 November npm advisory disposition](static-analysis-2026-11-18.md#npm-advisory-gate)
+records an open unpatched build-tool dependency gate. PHP audits pass, but fresh
+npm audit fails; the dependency-security row cannot be signed off from earlier CI.
+
 ## Separate activation gates
 
 Standard Judge0 execution, weekly competitions, payments/payouts/refunds and optional
