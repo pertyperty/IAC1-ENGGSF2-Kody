@@ -11,6 +11,13 @@ Tower continuation, optional starter history and grouped navigation. Preserve th
 authoring leave guard, small public projections and existing rewards summarized
 in [current learning policy](docs/current-learning-policy.md).
 
+The owner's 2026-11-18 PR grouping adds [navigation discovery](docs/navigation-discovery-2026-11-18.md).
+Tower map/list views share track progression and server admission; guests retain
+browser trial sequencing. The staff inbox projects only pending latest summaries,
+excludes self-review and links to existing credential/publication review workflows.
+Keep privacy/finance routes and specialized history available. Incremental tooling,
+measured optimization and live release evidence remain separate batches.
+
 The owner's 2026-10-26 maintainability pass is tracked in the
 [refactoring review](docs/refactoring-review-2026-10-26.md). Reuse Account-owned
 `CredentialDocuments` for qualification availability and audited downloads.

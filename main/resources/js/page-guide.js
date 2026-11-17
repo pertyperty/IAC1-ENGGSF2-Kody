@@ -28,7 +28,7 @@ const profiles = [
     { match: /^contact$/, steps: [guide('a[href^="mailto:"]', 'Reach a human', 'This link opens your email app. You can also copy the support address into your preferred email service.'), guide('#appeals h2', 'Ask for an account review', 'Use the appeal email link and include your username and explanation. Do not send passwords or verification codes. An appeal never automatically restores access.')] },
     { match: /^site-management\./, steps: [guide('[data-notice-title]', 'Write a short announcement', 'Use plain text and a permitted Kody destination. The preview is unsaved until you confirm your password and save.'), guide('.site-operations h2', 'Inspect stored operations', 'Queue totals and configuration switches are read-only snapshots. These controls expose no provider keys or job payloads.')] },
     { match: /^(home|tower\.index)$/, steps: [
-        guide('[data-tower-stop="1"] .tower-node', 'One discovery at a time', 'Choose an unlocked floor to play. Guests can try floors 1–3; level 4 invites you to join.'),
+        guide('[data-tower-stop="1"] .tower-node, .tower-level-list a', 'One discovery at a time', 'Choose an unlocked floor to play. Guests can try floors 1–3; level 4 invites you to join.'),
         guide('[data-tower-present]', 'Find your next step', 'Jump to your current floor. The arrows explore higher and lower floors without changing your progress.'),
     ] },
     { match: /^tower\.(show|preview)/, steps: [guide('.tower-stage-tabs', 'One stage at a time', 'Follow this floor’s stages. Clear the current stage to unlock the next; the final validated stage clears the floor.'), ...game] },

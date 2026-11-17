@@ -70,3 +70,26 @@ body { font-size: 16px; line-height: 1.6; }
  .game-card .game-heading { align-items: flex-start; flex-wrap: wrap; }
  .game-card .trace-source { height: 10rem; }
 }
+
+/* Alternative navigation reuses the same Tower and staff review rules. */
+.tower-title-row { flex-wrap: wrap; gap: .5rem; }
+.tower-list-switch { display: inline-flex; align-items: center; min-height: 44px; font-size: .875rem; white-space: nowrap; }
+.tower-list-page { padding-block: 2rem; }
+.tower-level-list { list-style: none; padding: 0; display: grid; gap: .75rem; }
+.tower-level-list > li { display: flex; align-items: center; gap: 1rem; padding: 1rem; border: 1px solid var(--border); border-radius: 1rem; background: var(--surface); }
+.tower-level-list > li[aria-current="step"] { border-color: var(--accent); }
+.tower-list-number { flex: 0 0 2.5rem; font-size: 1.25rem; font-weight: 800; text-align: center; }
+.tower-level-list > li > div { flex: 1; min-width: 0; }
+.tower-list-title { font-size: 1.0625rem; font-weight: 700; overflow-wrap: anywhere; }
+.tower-level-list p { margin: .35rem 0 0; }
+.tower-list-status { font-weight: 700; }
+.review-inbox-filter { display: flex; align-items: center; flex-wrap: wrap; gap: .75rem; margin-block: 1.5rem; }
+.review-inbox-filter select { width: auto; max-width: 100%; min-height: 2.75rem; }
+.review-inbox-history { margin-block: 1.5rem; }
+.review-inbox-history summary { cursor: pointer; padding-block: .75rem; }
+@media (max-width: 540px) {
+    .tower-level-list > li { flex-wrap: wrap; gap: .75rem; }
+    .tower-level-list > li > div { flex-basis: calc(100% - 3.5rem); }
+    .tower-list-status { margin-left: 3.25rem; }
+    .review-inbox-filter label { flex-basis: 100%; }
+}

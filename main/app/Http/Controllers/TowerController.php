@@ -29,7 +29,13 @@ class TowerController extends Controller
             $track = 'beginner';
         }
 
-        return response()->view('tower.map', ['tower' => $tower->snapshot($request->user()?->id, $track)])->header('Cache-Control', 'no-store, private');
+        $view = $request->query('view', $request->session()->get('tower.view', 'map'));
+        $view = in_array($view, ['map', 'list'], true) ? $view : 'map';
+        if ($request->user()) {
+            $request->session()->put('tower.view', $view);
+        }
+
+        return response()->view('tower.'.$view, ['tower' => $tower->snapshot($request->user()?->id, $track)])->header('Cache-Control', 'no-store, private');
     }
 
     public function show(Request $request, TowerLevel $level, TowerProgression $tower): Response|RedirectResponse

@@ -500,7 +500,7 @@ test('B05: four creator arcade assessments and a multi-question quiz save valida
 
 for (const [role, destination, link] of [
     ['learner', '/learn', 'Learning catalog'], ['contributor', '/create/challenges', 'Quest studio'],
-    ['instructor', '/create', 'Module studio'], ['moderator', '/manage/modules', 'Module reviews'],
+    ['instructor', '/create', 'Module studio'], ['moderator', '/manage/reviews', 'Review inbox'],
     ['administrator', '/manage/accounts', 'Community'],
 ]) {
     test(`${role} workspace has focused navigation and usable desktop/mobile surfaces in both themes`, async ({ page }) => {

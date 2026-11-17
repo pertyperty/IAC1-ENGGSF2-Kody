@@ -58,8 +58,9 @@ acceptance implementation and staged operations remain in the
 [release index](release-evidence-index.md). The proposed free pilot is not full SRS
 completion and does not activate providers.
 
-Optional Tower list navigation, a filtered review inbox, measured page-specific
+The [navigation discovery batch](navigation-discovery-2026-11-18.md) adds optional
+Tower list navigation and a filtered staff review inbox. Measured page-specific
 JavaScript loading, financial-report query consolidation and incremental static
-analysis remain future focused batches. No device/latency speedup is asserted.
+analysis remain separate focused batches. No device/latency speedup is asserted.
 The [current learning policy](current-learning-policy.md) consolidates superseding
 rules so older milestone wording does not guide new work incorrectly.

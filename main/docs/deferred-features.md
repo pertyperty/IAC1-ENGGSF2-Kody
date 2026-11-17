@@ -27,9 +27,10 @@ selected Tower track and includes an authoring leave warning. These implementati
 gaps are addressed; staged operation and curriculum effectiveness still need the
 evidence listed in the [release index](release-evidence-index.md).
 
-Optional Tower list navigation, a filtered staff review inbox, measured JavaScript
-splitting, reporting-query consolidation and incremental static analysis remain
-unimplemented maintenance batches. Further floors, engines, animation variants
+The [navigation discovery batch](navigation-discovery-2026-11-18.md) implements
+optional Tower list navigation and a filtered staff review inbox. Measured
+JavaScript splitting, reporting-query consolidation and incremental static
+analysis remain separate maintenance batches. Further floors, engines, animation variants
 and new progression/currency systems are paused during consolidation. None of
 these optional additions is a substitute for legal, curriculum or operations work.
 

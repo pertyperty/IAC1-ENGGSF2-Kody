@@ -14,6 +14,26 @@ function guestClearance(win) {
 export function mountTower(doc, win) {
     const map = doc.querySelector('[data-tower-map]');
     if (map) { mountTowerGrid(map, win); mountTowerScenery(map, win); }
+    const list = doc.querySelector('[data-tower-list][data-guest-tower]');
+    const applyList = () => {
+        if (!list) return;
+        const cleared = guestClearance(win);
+        list.querySelectorAll('[data-tower-list-level]').forEach(row => {
+            const position = Number(row.dataset.towerListLevel);
+            const locked = position <= 3 && position > cleared + 1;
+            const link = row.querySelector('a');
+            link.setAttribute('aria-disabled', String(locked));
+            link.tabIndex = locked ? -1 : 0;
+            row.querySelector('[data-tower-list-status]').textContent = position > 3 ? 'Sign in' : position <= cleared ? 'Trial cleared' : locked ? 'Locked' : 'Up next';
+            if (position === cleared + 1 && position <= 3) row.setAttribute('aria-current', 'step');
+            else row.removeAttribute('aria-current');
+        });
+    };
+    list?.addEventListener('click', event => {
+        if (event.target.closest('[aria-disabled="true"]')) event.preventDefault();
+    });
+    applyList();
+    win.addEventListener('pageshow', applyList);
     const level = doc.querySelector('[data-tower-level]');
     const guest = map?.hasAttribute('data-guest-tower') || level?.hasAttribute('data-guest-tower');
     const applyMap = () => {
