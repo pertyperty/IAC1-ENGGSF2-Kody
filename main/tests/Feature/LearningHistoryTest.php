@@ -11,6 +11,18 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 uses(RefreshDatabase::class);
 
+test('empty lesson histories return without querying progress tables', function () {
+    $user = moduleAccount(Role::Learner);
+    DB::enableQueryLog();
+    try {
+        expect(app(LearningHistory::class)->modules($user, collect()))->toBeEmpty();
+        expect(DB::getQueryLog())->toBeEmpty();
+    } finally {
+        DB::disableQueryLog();
+        DB::flushQueryLog();
+    }
+});
+
 test('saved catalogs reflect course reading and assessment completions without changing play credit', function () {
     [$course, $reading, $game] = pathFixture();
     $user = moduleAccount(Role::Learner);

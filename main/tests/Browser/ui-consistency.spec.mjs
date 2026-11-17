@@ -29,7 +29,7 @@ test('course cards render unjoined progress and shared actions have aligned icon
     const hud = page.locator('[data-progress-strip]');
     const boxes = await hud.locator('a').evaluateAll(links => links.map(link => { const box = link.getBoundingClientRect(); return { left: box.left, right: box.right }; }));
     expect(Math.abs((boxes[0].left + boxes.at(-1).right) / 2 - 960)).toBeLessThan(2);
-    const action = page.getByRole('link', { name: 'Explore individual adventures' });
+    const action = page.getByRole('main').getByRole('link', { name: 'Browse lessons' });
     const icon = await action.locator('svg').boundingBox(), button = await action.boundingBox();
     expect(Math.abs(icon.y + icon.height / 2 - button.y - button.height / 2)).toBeLessThan(2);
     await audit(page);

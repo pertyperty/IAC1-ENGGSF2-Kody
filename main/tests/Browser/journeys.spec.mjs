@@ -40,7 +40,7 @@ test('navigation hides on downward scroll and returns by upward scroll, hover an
     await page.keyboard.press('Enter');
     await expect(page.locator('#main-content')).toBeFocused();
     await expect(header.getByRole('link', { name: 'Kody home', exact: true })).toBeVisible();
-    await expect(page.locator('[data-tower-stop]')).toHaveCount(50);
+    await expect(page.locator('[data-tower-stop]')).toHaveCount(80);
     await page.goto('/welcome');
     await page.mouse.move(700, 600);
     await page.mouse.wheel(0, 650);
@@ -223,7 +223,7 @@ test('A01 A02 B03 B05: guest trial, registration, verified play, reading and cou
     expect(JSON.parse(fixture('snapshot', email))).toMatchObject({ xp: 20, levels: 1, streak: 1 });
     await expect(page.locator('[data-progress-xp]')).toHaveText('20');
     await expect(page.locator('[data-progress-streak]')).toHaveText('1');
-    await expect(page.locator('[data-progress-level]')).toHaveText('0 / 50');
+    await expect(page.locator('[data-progress-level]')).toHaveText('0 / 80');
     await expect(page.locator('[data-game-feedback]')).toContainText('saved');
     const course = manifest.courses['first-programs'];
     await page.goto(`/learn/courses/${course.id}`);
@@ -276,7 +276,7 @@ test('learner username sign-in lands on the tower and saved wins refresh the del
     await expect(page).toHaveURL(/\/$/);
     await expect(page.locator('.header-username')).toContainText('browser_towerlearner');
     await page.locator('[data-tower-stop="1"] a').click(); await solveGarden(page);
-    await expect(page.locator('[data-progress-level]')).toContainText('1 / 50');
+    await expect(page.locator('[data-progress-level]')).toContainText('1 / 80');
     await expect(page.locator('[data-tower-victory]')).toBeVisible();
     await page.reload(); await page.getByRole('link', { name: 'Level map', exact: false }).click();
     await expect(page.locator('[data-tower-stop="1"]')).toHaveClass(/is-cleared/);
@@ -326,7 +326,7 @@ test('Administrator rail pulls and pins labels; tower drafts preview without pub
     const quizPreview = quizStage.locator('.tower-draft-preview');
     const editorUrl = page.url();
     await quizPreview.getByRole('radio').first().check();
-    await quizPreview.getByRole('button', { name: 'Check my idea', exact: true }).click();
+    await quizPreview.getByRole('button', { name: 'Check answers', exact: true }).click();
     await expect(quizPreview.locator('[data-quiz-feedback]')).toContainText('You got it');
     await expect(page.locator('[data-game-result]')).toBeVisible(); await page.locator('[data-result-return]').click();
     await expect(page).toHaveURL(editorUrl);
@@ -422,8 +422,8 @@ test('empty catalogs offer clear next actions on narrow screens in both themes',
     await page.setViewportSize({ width: 320, height: 740 });
     for (const dark of [false, true]) {
         for (const [path, title, action] of [
-            ['/learn', 'No adventures found', 'See all modules'],
-            ['/learn/courses', 'No journeys found', 'Explore adventures'],
+            ['/learn', 'No lessons found', 'See all modules'],
+            ['/learn/courses', 'No courses found', 'Browse lessons'],
             ['/challenges', 'No coding quests found', 'Explore adventures'],
         ]) {
             await page.goto(`${path}?q=zzzz-no-matching-content`);
@@ -482,13 +482,13 @@ test('B05: four creator arcade assessments and a multi-question quiz save valida
     for (const label of ['The result must always stay the same', 'A loop around the three steps', 'Check a condition before collecting']) {
         await page.getByRole('radio', { name: label, exact: true }).check();
     }
-    await page.getByRole('button', { name: 'Check my idea' }).click();
+    await page.getByRole('button', { name: 'Check answers' }).click();
     await expect(page.locator('[data-quiz-feedback]')).toContainText('try again');
     await expect(page.locator('[data-game-result]')).toBeVisible(); await page.locator('[data-result-return]').click();
     expect(JSON.parse(fixture('snapshot', 'arcadelearner@browser.example.test'))).toMatchObject({ xp: 160, xp_awards: 4 });
     await audit(page);
     await page.getByRole('radio', { name: 'The robot may end up somewhere different', exact: true }).check();
-    await page.getByRole('button', { name: 'Check my idea' }).click();
+    await page.getByRole('button', { name: 'Check answers' }).click();
     await expect(page.locator('[data-quiz-feedback]')).toContainText('saved');
     await audit(page);
     expect(JSON.parse(fixture('snapshot', 'arcadelearner@browser.example.test'))).toMatchObject({ xp: 200, xp_awards: 5, streak: 1 });
@@ -550,6 +550,7 @@ test('interactive games edit and preview locally; confirmed runs save through th
     page.on('request', request => { if (request.method() === 'POST' && request.url() === completion) saves++; });
     await garden.focus();
     for (const key of ['ArrowRight', 'ArrowUp', 'ArrowRight', 'ArrowRight', 'ArrowRight']) await page.keyboard.press(key);
+    await garden.getByText('Arrange instructions', { exact: true }).click();
     await garden.getByRole('button', { name: 'Step 2: up', exact: true }).focus();
     await page.keyboard.press('Alt+ArrowRight');
     await expect(garden.getByRole('button', { name: 'Step 3: up', exact: true })).toBeFocused();

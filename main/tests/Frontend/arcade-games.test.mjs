@@ -1,9 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { execFileSync } from 'node:child_process';
+import { phpFixture } from '../Support/php-fixture.mjs';
 import { evaluateArcade, validScenario } from '../../resources/js/games/arcade-games.js';
 
-const games = JSON.parse(execFileSync('php', ['-r', 'echo json_encode(require "config/arcade.php");']).toString());
+const games = JSON.parse(phpFixture(['-r', 'echo json_encode(require "config/arcade.php");']).toString());
 const solutions = { 'pixel-studio': ['paint 1 1 mint', 'paint 2 2 peach'], 'number-machine': ['add 3', 'multiply 2'],
     'sort-lab': ['swap 1 2', 'swap 2 3'], 'terminal-quest': ['ls', 'cp hello.txt release.txt', 'cat release.txt'], 'logic-switchboard': ['flip 1', 'flip 2'], 'string-forge': ['upper', 'reverse'], 'memory-trail': ['push 2', 'push 3'] };
 for (const [template, program] of Object.entries(solutions)) {
@@ -38,6 +38,6 @@ test('browser and authoritative server agree across valid and hostile programs',
     for (const [template, solution] of Object.entries(solutions)) {
         for (const program of [solution, solution.slice(0, 1), [], ['bad'], [...solution, 'bad'], Array(13).fill(solution[0]), ['cat ../file.txt'], ['add 999'], ['swap 6 6'], ['paint 1 1 mint\n']]) cases.push({ template, program });
     }
-    const server = JSON.parse(execFileSync('php', ['tests/Support/arcade-evaluation.php'], { input: JSON.stringify(cases) }).toString());
+    const server = JSON.parse(phpFixture(['tests/Support/arcade-evaluation.php'], { input: JSON.stringify(cases) }).toString());
     assert.deepEqual(server, cases.map(({ template, program }) => evaluateArcade(games[template], program).success));
 });

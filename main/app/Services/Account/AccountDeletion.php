@@ -96,6 +96,10 @@ class AccountDeletion
 
     private function removePrivateData(User $user): void
     {
+        // Delete badge proof references before removing their private applications.
+        DB::table('creator_verifications')->where('user_id', $user->id)->delete();
+        DB::table('creator_profiles')->where('user_id', $user->id)->delete();
+        DB::table('tower_review_items')->where('user_id', $user->id)->delete();
         if ($user->profile_picture !== null) {
             $this->queueFile($user, $user->profile_picture['disk'], $user->profile_picture['path']);
         }

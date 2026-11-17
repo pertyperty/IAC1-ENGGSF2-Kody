@@ -9,10 +9,12 @@ async function returning(page) {
     await page.addInitScript(() => localStorage.setItem('kody-tour-v1', 'dismissed'));
 }
 
-test('first guest gets a keyboard accessible mascot welcome and spotlight tour that can be skipped and replayed', async ({ page }) => {
+test('guests choose a keyboard accessible guide without an automatic interruption and can skip or replay it', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/');
     const tour = page.locator('[data-kody-tour]');
+    await expect(tour).toBeHidden();
+    await page.getByRole('button', { name: 'Kody guide and companion' }).click();
     await expect(tour).toBeVisible();
     await expect(tour.getByRole('button', { name: 'Click to begin' })).toBeFocused();
     await expect(tour.getByRole('link', { name: 'Log in', exact: true })).toHaveAttribute('href', /\/login$/);
@@ -83,7 +85,7 @@ test('companion supports bounded drag keyboard movement hide and restoration acr
 });
 
 test('help topics profile photo and sidebar labels have coherent wide and mobile layouts', async ({ page }) => {
-    await returning(page); await page.goto('/help'); await expect(page.getByRole('heading', { name: 'A little help goes a long way.' })).toBeVisible(); await audit(page);
+    await returning(page); await page.goto('/help'); await expect(page.getByRole('heading', { name: 'How can we help?' })).toBeVisible(); await audit(page);
     await page.screenshot({ path: 'storage/app/browser-results/kody-help-wide.png', fullPage: true });
     await page.setViewportSize({ width: 320, height: 740 }); await audit(page);
     await page.goto('/login'); await page.getByLabel('Email or username').fill('browser_guidelearner'); await page.getByLabel(/^Password/).fill('BrowserStrong12!'); await page.getByRole('button', { name: /Sign in/ }).click();

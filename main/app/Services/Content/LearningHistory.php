@@ -27,6 +27,9 @@ class LearningHistory
     /** Combine standalone wins with course completion, retaining the exact completed edition. */
     public function modules(User $user, Collection $revisions): Collection
     {
+        if ($revisions->isEmpty()) {
+            return collect();
+        }
         $ids = $revisions->pluck('module_id')->all();
         $course = DB::table('course_module_progress as p')->join('course_enrollments as e', 'e.id', '=', 'p.enrollment_id')
             ->join('course_revision_modules as a', 'a.id', '=', 'p.assignment_id')->where('e.user_id', $user->id)->whereIn('a.module_id', $ids)

@@ -21,7 +21,17 @@ class TowerAuthoring
                     Validator::make($stage, ['question' => ['required', 'string'], 'options' => ['required', 'array'], 'answer' => ['required', 'string'], 'explanation' => ['required', 'string']])->validate();
                 }
 
-                return app(QuizAuthoring::class)->instance($stage['title'] ?? '', app(QuizAuthoring::class)->questions($stage));
+                $quiz = app(QuizAuthoring::class)->instance($stage['title'] ?? '', app(QuizAuthoring::class)->questions($stage));
+                if (array_key_exists('briefing', $stage)) {
+                    $fields = ['outcome', 'explanation', 'example', 'task', 'success'];
+                    $rules = ['briefing' => ['required', 'array:'.implode(',', $fields)]];
+                    foreach ($fields as $field) {
+                        $rules['briefing.'.$field] = ['required', 'string', 'max:1000'];
+                    }
+                    $quiz['briefing'] = Validator::make($stage, $rules)->validate()['briefing'];
+                }
+
+                return $quiz;
             }
             $basis = ($stage['template'] ?? null) === 'command-garden'
                 ? match ($stage['mode'] ?? null) {

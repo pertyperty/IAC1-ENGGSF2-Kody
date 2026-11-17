@@ -26,7 +26,7 @@ class CourseLearningController extends Controller
     {
         $query = $request->validate(['q' => ['nullable', 'string', 'max:80']])['q'] ?? '';
         $courses = CourseRevision::select(['id', 'course_id', 'title', 'description', 'category', 'difficulty', 'estimated_duration', 'price_kb', 'minimum_xp'])
-            ->with('course.creator:id,account_status')->where('review_status', 'Approved')->whereHas('course', fn ($builder) => $builder->where('status', 'Published')->whereNull('staff_withdrawn_at')->whereColumn('published_revision_id', 'course_revisions.id'))
+            ->with(['course.creator:id,username,account_role,account_status,email_verified_at', 'course.creator.creatorVerification'])->where('review_status', 'Approved')->whereHas('course', fn ($builder) => $builder->where('status', 'Published')->whereNull('staff_withdrawn_at')->whereColumn('published_revision_id', 'course_revisions.id'))
             ->when(trim($query) !== '', fn ($builder) => $builder->where(fn ($search) => $search->where('title', 'ilike', '%'.addcslashes(trim($query), '%_\\').'%')->orWhere('description', 'ilike', '%'.addcslashes(trim($query), '%_\\').'%')->orWhere('category', 'ilike', '%'.addcslashes(trim($query), '%_\\').'%')))
             ->orderByDesc('id')->paginate(12)->withQueryString();
 

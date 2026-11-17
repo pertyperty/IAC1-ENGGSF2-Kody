@@ -4,7 +4,7 @@
     <a href="{{ route('dashboard') }}" @if(request()->routeIs('dashboard', 'learning.show')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'panel', 'label' => 'Overview'])</a>
     <a href="{{ route('learning.catalog') }}" @if(request()->routeIs('learning.catalog', 'modules.*', 'course-learning.show', 'course-learning.lesson')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'book', 'label' => 'Learning catalog'])</a>
     <a href="{{ route('course-learning.catalog') }}" @if(request()->routeIs('course-learning.catalog')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'book', 'label' => 'Browse courses'])</a>
-    @can('viewLearning', \App\Models\LearningCourse::class)<a href="{{ route('course-learning.mine') }}" @if(request()->routeIs('course-learning.mine')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'journey', 'label' => 'My journeys'])</a>@endcan
+    @can('viewLearning', \App\Models\LearningCourse::class)<a href="{{ route('course-learning.mine') }}" @if(request()->routeIs('course-learning.mine')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'journey', 'label' => 'My courses'])</a>@endcan
     @can('viewLearning', \App\Models\LearningCourse::class)<a href="{{ route('weekly-events.index') }}" @if(request()->routeIs('weekly-events.*', 'weekly-leaderboards.*', 'weekly-results.show')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'game', 'label' => 'Weekly quests'])</a><a href="{{ route('leaderboards.index') }}" @if(request()->routeIs('leaderboards.*')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'chart', 'label' => 'Leaderboards'])</a>@endcan
     <a href="{{ route('arcade') }}" @if(request()->routeIs('arcade')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'game', 'label' => 'Practice arcade'])</a>
     <a href="{{ route('challenges.catalog') }}" @if(request()->routeIs('challenges.catalog', 'challenges.show', 'challenges.attempt')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'code', 'label' => 'Coding quests'])</a>
@@ -38,4 +38,5 @@
 
     <a href="{{ route('contact') }}" @if(request()->routeIs('contact')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'mail', 'label' => 'Contact Kody'])</a>
 
+@can('viewLearning', \App\Models\LearningCourse::class)<a href="{{ route('review-queue.index') }}">@include('layouts.navigation-item-content', ['icon' => 'book', 'label' => 'Review later'])</a>@endcan
 </nav>

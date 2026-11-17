@@ -8,6 +8,13 @@ use App\Models\User;
 
 class UserPolicy
 {
+    public function verifyCreator(User $actor, User $account): bool
+    {
+        return $this->viewAny($actor) && $actor->id !== $account->id
+            && $account->account_status === AccountStatus::Active && $account->email_verified_at !== null
+            && in_array($account->account_role, [Role::Instructor, Role::Contributor], true);
+    }
+
     public function viewAny(User $actor): bool
     {
         return $actor->account_status === AccountStatus::Active && $actor->email_verified_at !== null

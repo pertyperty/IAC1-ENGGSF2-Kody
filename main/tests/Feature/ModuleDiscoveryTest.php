@@ -4,6 +4,19 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
+test('B01 lesson cards load summary metadata without lesson bodies attachments or full assessments', function () {
+    moduleFixture(true, ['title' => 'Compact terminal lesson', 'game_preset' => 'terminal-quest']);
+    $this->get(route('learning.catalog'))->assertOk()->assertSee('Compact terminal lesson')
+        ->assertViewHas('published', function ($results) {
+            $revision = $results->sole();
+            expect($revision->assessment_template)->toBe('terminal-quest');
+            expect($revision->getAttributes())->not->toHaveKeys(['content', 'attachments', 'assessment', 'review_notes']);
+            expect($revision->module->creator->relationLoaded('creatorVerification'))->toBeTrue();
+
+            return true;
+        });
+});
+
 test('B01 catalog combines literal search with published assessment template filtering', function () {
     moduleFixture(true, ['title' => 'Terminal delivery', 'game_preset' => 'terminal-quest']);
     moduleFixture(true, ['title' => 'Pixel delivery', 'game_preset' => 'pixel-studio']);
@@ -13,7 +26,7 @@ test('B01 catalog combines literal search with published assessment template fil
     $this->get(route('learning.catalog', ['template' => 'terminal-quest', 'q' => 'DELIVERY']))
         ->assertOk()->assertSee('Terminal delivery')->assertDontSee('Pixel delivery')
         ->assertDontSee('Other terminal')->assertDontSee('Draft delivery')->assertDontSee('First steps');
-    $this->get(route('learning.catalog', ['q' => '%']))->assertOk()->assertSee('No adventures found')->assertSee('See all modules');
+    $this->get(route('learning.catalog', ['q' => '%']))->assertOk()->assertSee('No lessons found')->assertSee('See all modules');
 });
 
 test('B01 discovery excludes archived withdrawn and unpublished replacement revisions', function () {
@@ -27,7 +40,7 @@ test('B01 discovery excludes archived withdrawn and unpublished replacement revi
 
     $this->get(route('learning.catalog', ['template' => 'terminal-quest']))->assertOk()
         ->assertSee('Published terminal')->assertDontSee('Archived terminal')->assertDontSee('Withdrawn terminal')->assertDontSee('Replacement pixels');
-    $this->get(route('learning.catalog', ['template' => 'pixel-studio']))->assertOk()->assertSee('No adventures found')->assertSee('See all modules');
+    $this->get(route('learning.catalog', ['template' => 'pixel-studio']))->assertOk()->assertSee('No lessons found')->assertSee('See all modules');
 });
 
 test('B01 starter trails expose both their garden and quiz activities', function () {

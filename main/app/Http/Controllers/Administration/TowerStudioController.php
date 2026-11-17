@@ -7,6 +7,7 @@ use App\Http\Requests\Administration\SaveTowerRequest;
 use App\Models\TowerLevel;
 use App\Services\Games\TowerEditorialUpgrade;
 use App\Services\Games\TowerPublishing;
+use App\Services\Gamification\TowerTracks;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -14,11 +15,15 @@ use Illuminate\Support\Facades\Gate;
 
 class TowerStudioController extends Controller
 {
-    public function index(): Response
+    public function index(Request $request): Response
     {
         Gate::authorize('manage', TowerLevel::class);
 
-        return response()->view('tower.studio', ['levels' => TowerLevel::with('currentRevision')->orderBy('position')->paginate(25)])->header('Cache-Control', 'no-store, private');
+        $track = $request->query('track');
+        $query = is_string($track) && array_key_exists($track, app(TowerTracks::class)->all())
+            ? app(TowerTracks::class)->query($track) : TowerLevel::query();
+
+        return response()->view('tower.studio', ['levels' => $query->with('currentRevision')->orderBy('position')->paginate(25)->withQueryString()])->header('Cache-Control', 'no-store, private');
     }
 
     public function edit(Request $request, TowerLevel $level): Response

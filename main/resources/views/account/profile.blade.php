@@ -6,8 +6,8 @@
     <div class="profile-overview"><section class="profile-identity">
     <a class="profile-picture-link" href="{{ route('account.edit') }}#profile-picture" aria-label="Edit your profile picture">@include('layouts.avatar', ['avatarUser' => auth()->user(), 'avatarClass' => 'profile-avatar'])<span class="profile-edit-icon" aria-hidden="true"><x-action-icon name="pencil"/></span></a><span class="profile-edit-cue">Edit picture</span>
     <h1>Your profile</h1><b>{{ $profile['username'] ?? 'Kody player' }}</b><p>{{ $profile['role'] }} · {{ $profile['status'] }}</p>
-    @if(!$profile['first_name'] && !$profile['last_name'])<p class="field-hint">You can play with just your username. Adding personal names is optional; skip this step or add them later in Edit your player profile.</p>@endif
-    <div class="profile-tools"><a class="button button-play" href="{{ route('account.edit') }}">Edit your player profile</a><a class="button button-secondary" href="{{ route('account.google') }}">Manage Google sign-in</a><a class="button button-secondary" href="{{ route('wallet.index') }}"><x-kody-art name="kodebit" size="28"/> Your KodeBits and earnings</a></div>
+    @if(!$profile['first_name'] && !$profile['last_name'])<p class="field-hint">You can play with just your username. Adding personal names is optional; skip this step or add them later in Edit profile.</p>@endif
+    <div class="profile-tools"><a class="button button-play" href="{{ route('account.edit') }}">Edit profile</a><a class="button button-secondary" href="{{ route('account.google') }}">Manage Google sign-in</a><a class="button button-secondary" href="{{ route('wallet.index') }}"><x-kody-art name="kodebit" size="28"/> Wallet and earnings</a></div>
     </section><section><h2>Account details</h2><p class="field-hint">Your email is masked for privacy.</p>
     <dl class="profile-details">
         <dt>Username</dt><dd>{{ $profile['username'] ?? 'Not yet provided' }}</dd>
@@ -19,7 +19,7 @@
         <dt>Joined</dt><dd>{{ $profile['joined_at'] ?? 'Not available' }}</dd>
     </dl>
     @if($application)<div class="notice"><b>Instructor application: {{ $application->verification_status }}</b>@if($application->verification_notes)<p>{{ $application->verification_notes }}</p>@endif</div>@endif
-    @if(in_array(auth()->user()->account_role, [\App\Enums\Role::Learner, \App\Enums\Role::Contributor], true))<a class="button button-secondary" href="{{ route('instructor-application.create') }}">Become a learning creator</a>@endif
+    @if(in_array(auth()->user()->account_role, [\App\Enums\Role::Learner, \App\Enums\Role::Contributor], true))<a class="button button-secondary" href="{{ route('instructor-application.create') }}">Apply as an instructor</a>@endif
     </section></div><div class="profile-support">
     <div class="profile-actions">
         @can('create', \App\Models\LearningModule::class)<a href="{{ route('studio.index') }}">Open your creator studio <x-action-icon name="right"/></a>@endcan
@@ -27,6 +27,7 @@
         <a href="{{ route('notifications.index') }}">Your updates <x-action-icon name="right"/></a>
         @can('viewOwn', \App\Models\ContributorApplication::class)<a href="{{ route('contributor-application.create') }}">Contributor application and history <x-action-icon name="right"/></a>@endcan
     </div>
+    @if(app(\App\Services\Account\CreatorProfiles::class)->visible(auth()->user()))<p><a href="{{ route('creators.show', auth()->user()) }}">View public creator profile</a> ? <a href="{{ route('creator-profile.edit') }}">Edit public details</a></p>@endif
     @include('layouts.staff-tools')
     @can('archive', auth()->user())<p class="secondary-link"><a href="{{ route('account.archive') }}">Take a break: archive your account</a></p>@endcan
     @can('delete', auth()->user())<p class="secondary-link"><a href="{{ route('account.delete') }}">Permanently delete your account</a></p>@endcan

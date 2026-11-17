@@ -1,0 +1,70 @@
+
+name: kody
+
+x-kody-common: &kody-common
+  image: kody-app:local
+  build:
+    context: .
+    dockerfile: Dockerfile
+  env_file:
+    - .env
+  environment:
+    DB_CONNECTION: pgsql
+    DB_HOST: db
+    DB_PORT: "5432"
+  volumes:
+    - ./storage:/var/www/html/storage
+  depends_on:
+    db:
+      condition: service_healthy
+  restart: unless-stopped
+
+services:
+  app:
+    <<: *kody-common
+    ports:
+      - "127.0.0.1:8000:8000"
+    command:
+      - php
+      - artisan
+      - serve
+      - --host=0.0.0.0
+      - --port=8000
+
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: ${DB_DATABASE:?Set DB_DATABASE}
+      POSTGRES_USER: ${DB_USERNAME:?Set DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"
+      interval: 5s
+      timeout: 5s
+      retries: 15
+    restart: unless-stopped
+
+  worker:
+    <<: *kody-common
+    command:
+      - php
+      - artisan
+      - queue:work
+      - database
+      - --sleep=3
+      - --tries=3
+      - --timeout=60
+
+  scheduler:
+    <<: *kody-common
+    command:
+      - php
+      - artisan
+      - schedule:work
+
+volumes:
+  postgres_data:

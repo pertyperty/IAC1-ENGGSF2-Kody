@@ -1,12 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { execFileSync } from 'node:child_process';
+import { phpFixture } from '../Support/php-fixture.mjs';
 import { arcadeTrace, readableInstruction, stateText } from '../../resources/js/games/learning-trace.js';
 import { evaluateArcade } from '../../resources/js/games/arcade-games.js';
 import { runProgram } from '../../resources/js/games/command-garden.js';
 
-const games = JSON.parse(execFileSync(process.env.KODY_TEST_PHP || 'php', ['-r', 'echo json_encode(require "config/arcade.php");'], { encoding: 'utf8' }));
-const { instances } = JSON.parse(execFileSync(process.env.KODY_TEST_PHP || 'php', ['-r', 'echo json_encode(require "config/learning.php");'], { encoding: 'utf8' }));
+const games = JSON.parse(phpFixture(['-r', 'echo json_encode(require "config/arcade.php");'], { encoding: 'utf8' }));
+const { instances } = JSON.parse(phpFixture(['-r', 'echo json_encode(require "config/learning.php");'], { encoding: 'utf8' }));
 test('trace states come from the actual interpreter and stop at the first invalid instruction', () => {
     const game = games['number-machine'];
     const trace = arcadeTrace(game, ['add 3', 'multiply 2', 'bad', 'add 1'], evaluateArcade);

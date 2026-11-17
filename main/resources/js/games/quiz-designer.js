@@ -18,7 +18,7 @@ export function quizFromFields(fields) {
 export function quizFromQuestions(title, questions) {
     if (!title?.trim() || [...title].length > 100 || !Array.isArray(questions) || questions.length < 1 || questions.length > 10) throw new Error('Invalid quiz.');
     questions.forEach(validateQuestion);
-    const mixed = questions.some(question => (question.type ?? 'choice') !== 'choice');
+    const mixed = questions.some(question => (question.type ?? 'choice') !== 'choice' || question.retry_explanation?.trim());
     return validateQuiz(!mixed && questions.length === 1 ? { ...questions[0], template: 'choice-quiz', version: 1, title }
         : { template: 'choice-quiz', version: mixed ? 3 : 2, title, questions });
 }

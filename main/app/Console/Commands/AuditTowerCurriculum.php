@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\TowerRevision;
 use App\Services\Games\TowerCurriculumAudit;
+use App\Services\Gamification\TowerTracks;
 use Database\Seeders\TowerLevelSeeder;
 use Illuminate\Console\Command;
 
@@ -23,13 +24,15 @@ class AuditTowerCurriculum extends Command
             $revisions = TowerRevision::with('level')->orderBy('id')->limit(5001)->get();
             $report['truncated'] = $revisions->count() > 5000;
             foreach ($revisions->take(5000) as $revision) {
-                $report['persisted'][] = $audit->entry($revision->toArray(), $revision->level->position)
+                $report['persisted'][] = $audit->entry($revision->toArray(), $revision->level->position, app(TowerTracks::class)->key($revision->level))
                     + ['revision_id' => $revision->id, 'number' => $revision->number, 'current' => $revision->level->current_revision_id === $revision->id,
                         'provenance' => $revision->source_notes, 'publication' => 'Retained immutable revision; inspect editorial accuracy separately from seed proposals.'];
             }
         }
         $this->line(json_encode($report, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR));
 
-        return collect($report['seed'])->every(fn ($entry) => collect($entry['stages'])->every(fn ($stage) => $stage['reference_verified'])) ? self::SUCCESS : self::FAILURE;
+        // A successful seed proposal must not hide an unverified retained/custom revision.
+        return ! $report['truncated'] && collect([...$report['seed'], ...$report['persisted']])
+            ->every(fn ($entry) => collect($entry['stages'])->every(fn ($stage) => $stage['reference_verified'])) ? self::SUCCESS : self::FAILURE;
     }
 }

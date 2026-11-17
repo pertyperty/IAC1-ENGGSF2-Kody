@@ -92,6 +92,8 @@ test('Intermediate practice is independently enterable while its later levels st
     await expect(page).toHaveURL(/\/$/);
     await page.getByText('Choose a skill track', { exact: true }).click();
     await page.getByRole('link', { name: /Intermediate practice/ }).click();
+    await expect(page).toHaveURL(/\?track=intermediate$/);
+    await page.locator('[data-tower-continue]').click();
     await expect(page).toHaveURL(/\/tower\/26$/);
     const game = page.locator('[data-arcade-game]');
     await game.getByRole('button', { name: 'Flip input 1', exact: true }).click();

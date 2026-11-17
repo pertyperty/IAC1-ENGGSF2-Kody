@@ -6,6 +6,7 @@ use App\Enums\Role;
 use App\Http\Requests\Learning\CompleteTowerRequest;
 use App\Models\TowerLevel;
 use App\Services\Gamification\TowerProgression;
+use App\Services\Gamification\TowerTracks;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -20,7 +21,15 @@ class TowerController extends Controller
             return redirect()->route('dashboard');
         }
 
-        return response()->view('tower.map', ['tower' => $tower->snapshot($request->user()?->id)])->header('Cache-Control', 'no-store, private');
+        $choice = $request->query('track');
+        $track = is_string($choice) && array_key_exists($choice, app(TowerTracks::class)->all()) ? $choice : $request->session()->get('tower.track', 'beginner');
+        if ($request->user()) {
+            $request->session()->put('tower.track', $track);
+        } else {
+            $track = 'beginner';
+        }
+
+        return response()->view('tower.map', ['tower' => $tower->snapshot($request->user()?->id, $track)])->header('Cache-Control', 'no-store, private');
     }
 
     public function show(Request $request, TowerLevel $level, TowerProgression $tower): Response|RedirectResponse
@@ -31,6 +40,7 @@ class TowerController extends Controller
         }
         if ($request->user()) {
             $tower->assertUnlocked($request->user(), $level);
+            $request->session()->put('tower.track', app(TowerTracks::class)->key($level));
         }
         $done = $request->user() ? DB::table('tower_stage_completions')->where('user_id', $request->user()->id)->where('revision_id', $level->current_revision_id)->pluck('stage')->all() : [];
 

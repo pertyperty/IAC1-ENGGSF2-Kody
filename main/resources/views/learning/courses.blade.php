@@ -1,14 +1,14 @@
 @extends('layouts.learning')
-@section('title', 'Learning journeys — Kody')
+@section('title', 'Courses — Kody')
 @section('content')
 <section class="module-section page-width">
-    <p class="overline">ONE SMALL ADVENTURE AT A TIME</p>
-    <h1>Find your next journey</h1>
-    <p>Follow a creator's trail from your first idea to your next breakthrough.</p>
+    <p class="overline">COURSES</p>
+    <h1>Find a course</h1>
+    <p>Learn with a sequence of lessons from a creator.</p>
     <div class="studio-actions">
-        <a class="button button-secondary button-small" href="{{ route('learning.catalog') }}"><x-action-icon name="book"/> Explore individual adventures</a>
+        <a class="button button-secondary button-small" href="{{ route('learning.catalog') }}"><x-action-icon name="book"/> Browse lessons</a>
         @can('viewLearning', \App\Models\LearningCourse::class)
-            <a class="button button-secondary button-small" href="{{ route('course-learning.mine') }}"><x-action-icon name="journey"/> Your journeys</a>
+            <a class="button button-secondary button-small" href="{{ route('course-learning.mine') }}"><x-action-icon name="journey"/> Your courses</a>
         @endcan
     </div>
     <form method="get" class="catalog-search">
@@ -21,7 +21,7 @@
                 <div class="module-art" aria-hidden="true"><span class="module-symbol"><x-action-icon name="journey"/></span></div>
                 <div class="module-copy">
                     <div class="module-meta"><span>{{ $revision->category }}</span><span>{{ $revision->difficulty }} · {{ $revision->estimated_duration }} hours</span></div>
-                    <h2>{{ $revision->title }}</h2>
+                    <h2>{{ $revision->title }}</h2><x-creator-byline :creator="$revision->course->creator" :linked="false"/>
                     @if($participant)
                         @if($courseProgress->has($revision->course_id))
                             @include('learning.saved-progress', ['saved' => $courseProgress->get($revision->course_id)])
@@ -41,14 +41,14 @@
                         @can('viewAny', \App\Models\LearningCourse::class)
                             Review this course
                         @else
-                            @auth Explore this journey @else Sign in to explore @endauth
+                            @auth View course @else Sign in to explore @endauth
                         @endcan
                         <x-action-icon name="right"/>
                     </span>
                 </div>
             </a>
         @empty
-            <x-empty-state title="No journeys found" description="Try another search or start with an individual learning adventure." :action-url="route('learning.catalog')" action-label="Explore adventures" />
+            <x-empty-state title="No courses found" description="Try another search or browse individual lessons." :action-url="route('learning.catalog')" action-label="Browse lessons" />
         @endforelse
     </div>
     {{ $courses->links() }}

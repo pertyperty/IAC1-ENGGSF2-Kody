@@ -42,7 +42,7 @@ test('current username sign-in pictures hamburger feedback and theme remain usab
 
 test('tower fills the page and climbs along a responsive winding path with accessible descriptions', async ({ page }) => {
     await page.goto('/');
-    await expect(page.locator('[data-tower-stop]')).toHaveCount(50);
+    await expect(page.locator('[data-tower-stop]')).toHaveCount(80);
     const map = page.locator('[data-tower-viewport]');
     const first = page.locator('[data-tower-stop="1"] .tower-node');
     const second = page.locator('[data-tower-stop="2"] .tower-node');

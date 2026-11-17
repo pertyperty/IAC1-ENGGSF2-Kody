@@ -5,6 +5,7 @@ use App\Http\Controllers\Account\AccountDeletionController;
 use App\Http\Controllers\Account\ContributorApplicationController;
 use App\Http\Controllers\Account\ContributorReviewController;
 use App\Http\Controllers\Account\CreatorErasureController;
+use App\Http\Controllers\Account\CreatorProfileController;
 use App\Http\Controllers\Account\EmailVerificationController;
 use App\Http\Controllers\Account\GoogleAuthenticationController;
 use App\Http\Controllers\Account\InstructorApplicationController;
@@ -18,6 +19,7 @@ use App\Http\Controllers\Account\RegistrationController;
 use App\Http\Controllers\Account\RoleUpdateController;
 use App\Http\Controllers\Administration\AccountGovernanceController;
 use App\Http\Controllers\Administration\ContentModerationController;
+use App\Http\Controllers\Administration\CreatorBadgeController;
 use App\Http\Controllers\Administration\FaqController;
 use App\Http\Controllers\Administration\GamePresetController;
 use App\Http\Controllers\Administration\SiteManagementController;
@@ -41,6 +43,7 @@ use App\Http\Controllers\Engagement\ContentReactionController;
 use App\Http\Controllers\Gamification\LeaderboardController;
 use App\Http\Controllers\Gamification\WeeklyEventStudioController;
 use App\Http\Controllers\HelpController;
+use App\Http\Controllers\Learning\ReviewQueueController;
 use App\Http\Controllers\LearningController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PlayController;
@@ -57,6 +60,20 @@ use Illuminate\Support\Facades\Route;
 Route::pattern('course', '[0-9]+');
 Route::pattern('challenge', '[0-9]+');
 Route::pattern('weeklyEvent', '[0-9]+');
+
+Route::middleware(['auth', 'account.session'])->group(function (): void {
+    Route::get('/learn/review', [ReviewQueueController::class, 'index'])->name('review-queue.index');
+    Route::post('/learn/review/{level}', [ReviewQueueController::class, 'update'])->whereNumber('level')->middleware('throttle:20,1,review-queue:')->name('review-queue.update');
+});
+
+Route::get('/creators/{creator}', [CreatorProfileController::class, 'show'])
+    ->whereNumber('creator')->middleware(OptionalAccountSession::class)->name('creators.show');
+Route::middleware(['auth', 'account.session'])->group(function (): void {
+    Route::get('/account/public-profile', [CreatorProfileController::class, 'edit'])->name('creator-profile.edit');
+    Route::put('/account/public-profile', [CreatorProfileController::class, 'update'])->middleware('throttle:10,1,creator-profile:')->name('creator-profile.update');
+    Route::get('/manage/creator-badges/{creator}', [CreatorBadgeController::class, 'show'])->whereNumber('creator')->name('creator-badges.show');
+    Route::put('/manage/creator-badges/{creator}', [CreatorBadgeController::class, 'update'])->whereNumber('creator')->middleware('throttle:6,1,creator-badge:')->name('creator-badges.update');
+});
 
 Route::get('/', [TowerController::class, 'index'])->middleware(OptionalAccountSession::class)->name('home');
 Route::get('/welcome', [LearningController::class, 'home'])->middleware(OptionalAccountSession::class)->name('welcome');
@@ -259,6 +276,7 @@ Route::middleware(['auth', 'account.session'])->group(function (): void {
     Route::post('/account/google/unlink', [GoogleAuthenticationController::class, 'unlink'])->middleware('throttle:5,1,google-unlink:')->name('google.unlink');
 });
 Route::middleware(['auth', 'account.session'])->prefix('manage/instructors')->name('instructor-reviews.')->group(function (): void {
+    Route::get('/{application}/versions/{version}/credential', [InstructorReviewController::class, 'versionCredential'])->whereNumber('version')->middleware('throttle:20,1,credential-read:')->name('version-credential');
     Route::get('/', [InstructorReviewController::class, 'index'])->name('index');
     Route::get('/{application}', [InstructorReviewController::class, 'show'])->name('show');
     Route::get('/{application}/credential', [InstructorReviewController::class, 'credential'])->middleware('throttle:20,1,credential-read:')->name('credential');

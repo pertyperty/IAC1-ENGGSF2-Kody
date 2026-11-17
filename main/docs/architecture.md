@@ -1,4 +1,9 @@
-# Foundation conventions
+# Architecture and foundation conventions
+
+Use the [implementation map](implementation-status.md) for the current feature
+inventory and the [economy amendment](economy-implementation.md) for adopted
+access/reward rules. Earlier milestone records preserve their original scope;
+they do not override later owner amendments.
 
 [Google authentication](google-authentication-implementation.md) is Account-owned.
 A dedicated Socialite adapter translates server-verified provider identity into
@@ -14,12 +19,13 @@ Gamification daily activity. Published revision pointers keep draft edits out of
 learner views. New modules and published replacements require Moderator/Admin
 approval; Instructor owners may archive Published modules with preserved history.
 
-[Course learning](course-learning-implementation.md) adds Content-owned free
+[Course learning](course-learning-implementation.md) adds Content-owned reviewed
 enrollment and revision-pinned lesson access. Every request rechecks current
 account/session and owned enrollment. Course archiving preserves enrolled access;
 module archiving still blocks that module. Gamification validates course template
-wins through the shared approved-revision writer; its ledger-free streak activity
-does not grant paid access or financial rewards.
+wins through the shared approved-revision writer and awards once-per-module XP
+under the current economy policy. Transaction-owned access rules distinguish
+free and purchased courses; saved progress alone does not grant paid access.
 
 [Challenge studio](challenge-studio-implementation.md) adds Challenge-owned
 immutable definitions and test snapshots, Contributor/Instructor ownership,
@@ -33,14 +39,17 @@ commits with the attempt; PostgreSQL uniqueness/locks enforce lifetime attempt
 limits and one active evaluation. The Judge0 adapter translates provider verdicts
 without exposing raw output, and a scheduler closes overdue work. Provider
 activation requires verified configured compiler mappings and resource limits.
-No reward, rank, streak or balance changes occur in this submission workflow.
+Terminal results call Gamification-owned achievement/weekly capture operations;
+only authoritative eligible outcomes receive the adopted idempotent XP awards.
+Provider availability and live activation remain separate from those domain rules.
 
 [Weekly events](weekly-challenge-plan.md) adds Gamification-owned approved revision
 selection and Manila scheduling. Challenge Management reuses its existing secure
 submission/evaluation pipeline with independent per-event participations. Generated
 context keys and composite foreign keys prevent mixing standard and weekly budgets
 or revisions. The calendar lock serializes moderator/scheduler/admission changes;
-financial and rank rewards remain unavailable.
+staff-published results and capped KodeBit rewards follow the economy amendment.
+Retained Deferred events remain Deferred; live execution still needs Judge0 setup.
 
 The project owner's [2026-10-03 game-first amendment](game-first-product-direction.md)
 sets the current product direction. The play hub is the primary experience;
@@ -64,6 +73,11 @@ keep their approved versions alongside the application and record amendments.
 SDD Sections 5–9 remain reserved; do not infer their schema or algorithms.
 
 ## Module ownership
+
+Account-owned `CredentialDocuments` centralizes private role-application document
+availability and policy-authorized audited downloads, including scoped Instructor
+history. Administration badge grants reuse availability checks while retaining
+their own locked decision rules. See the [refactoring review](refactoring-review-2026-10-26.md).
 
 Keep one Laravel deployment and the existing directory structure. Add module
 subdirectories only when a real use case needs them, for example
@@ -102,7 +116,8 @@ transitions must follow A09/A10 and G02/G05 when implemented. Role fields
 and privileges must remain excluded from user input and mass assignment.
 The current User fillable list accepts identity fields and password; regression
 tests verify role/permission input is ignored and undefined privileges are denied.
-This is an authorization mechanism, not completed RBAC behavior.
+Resource policies and current-session checks enforce the implemented role flows;
+provider activation and unmeasured NFRs remain separate requirements.
 
 ## Transactions and asynchronous work
 
@@ -119,8 +134,8 @@ Define bounded timeouts, retries/backoff and unique operation IDs per real job.
 
 Scheduled definitions belong in `routes/console.php`. Real weekly tasks must use
 overlap/distributed-lock protection and their shared weekly-instance state;
-no placeholder tasks have been added. Store timestamps in UTC; resolve weekly
-PHT semantics against the SRS before implementing them.
+no placeholder tasks have been added. Store timestamps in UTC; weekly windows
+start Sunday in Asia/Manila under the adopted weekly-event policy.
 
 ## External boundaries
 
@@ -136,8 +151,10 @@ configuration; no live provider execution has been verified.
 
 This foundation supports SRS 3.4 (security/technical constraints), 4.2 (persistent
 data, asynchronous processing, access control and modular maintenance), and SDD
-3.1–3.3 / 4.1–4.2. It completes no A–G business use case and proves no availability,
-concurrency, latency, encryption-at-rest or backup target.
+3.1–3.3 / 4.1–4.2. Foundation conventions alone do not establish business-use-case
+completion or measured availability, concurrency, latency, encryption-at-rest or
+backup targets. Feature completion and local restore evidence are recorded in
+the implementation map; staged operational evidence remains outstanding.
 
 Subsequent account slices are documented in
 [registration/verification](account-implementation-plan.md) and
@@ -146,9 +163,10 @@ actual scope. Those implementations do not establish unmeasured NFR compliance.
 
 [A04/A05 recovery/profile](recovery-profile-implementation.md) and the
 [play implementation](play-implementation.md) document the subsequent tested
-slices. The play hub now records server-validated daily streaks and level
-clearance; it does not yet issue XP, ranks or KodeBits. Creator-published adventures are
-implemented by the Content studio slice.
+slices. The main entry is now the editable 80-floor Tower with three skill
+tracks, server-validated clears and final-win streaks. Tower clears grant no
+additional XP or KodeBits. Separate module/challenge achievements, ranks and capped
+weekly rewards follow the current economy policy. Creator lessons belong to Content.
 
 [A10 creator review](creator-review-implementation.md) adds policy-controlled
 private credential review, atomic role elevation/audit/pending notification and

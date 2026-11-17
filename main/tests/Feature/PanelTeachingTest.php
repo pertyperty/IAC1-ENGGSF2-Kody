@@ -33,7 +33,7 @@ test('independent tracks admit their first level but enforce internal sequence w
     moduleSignIn($this, $user);
     $start = TowerLevel::where('position', 26)->sole();
     $next = TowerLevel::where('position', 27)->sole();
-    $this->get(route('tower.show', $start))->assertOk()->assertSee('self-selected')->assertHeader('Cache-Control', 'no-store, private');
+    $this->get(route('tower.show', $start))->assertOk()->assertSee('Intermediate practice')->assertHeader('Cache-Control', 'no-store, private');
     $this->get(route('tower.show', $next))->assertForbidden();
     $this->postJson(route('tower.complete', [$next, $next->current_revision_id, 0]), towerSolution($next->currentRevision->stages[0]))->assertForbidden();
     $this->postJson(route('tower.complete', [$start, $start->current_revision_id, 0]), towerSolution($start->currentRevision->stages[0]))->assertOk()->assertJsonPath('tower.next', route('tower.show', $next));
@@ -45,7 +45,7 @@ test('independent tracks admit their first level but enforce internal sequence w
     $this->assertDatabaseMissing('tower_clearances', ['user_id' => $user->id, 'level_id' => TowerLevel::where('position', 1)->value('id')]);
 });
 
-test('all fifty teaching proposals have bounded server-verified reference solutions and honest outcomes', function () {
+test('all eighty teaching proposals have bounded server-verified reference solutions and honest outcomes', function () {
     $seed = new TowerLevelSeeder;
     foreach ($seed->curriculum() as $index => $entry) {
         foreach (app(TowerCurriculumAudit::class)->entry($entry, $index + 1)['stages'] as $stage) {

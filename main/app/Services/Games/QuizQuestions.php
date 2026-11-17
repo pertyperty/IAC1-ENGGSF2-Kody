@@ -14,10 +14,11 @@ class QuizQuestions
         $fields = match ($type) {
             'choice' => ['options', 'answer'], 'blank' => ['accepted', 'case_sensitive'], 'matching' => ['pairs'], default => [],
         };
-        $rules = ['question' => ['required', 'array:'.implode(',', ['id', 'type', 'question', 'explanation', ...$fields])],
+        $rules = ['question' => ['required', 'array:'.implode(',', ['id', 'type', 'question', 'explanation', 'retry_explanation', ...$fields])],
             'question.id' => ['required', 'string', 'regex:/\A[a-z0-9_-]{1,30}\z/'],
             'question.type' => ['sometimes', Rule::in(['choice', 'blank', 'matching'])],
-            'question.question' => ['required', 'string', 'max:500'], 'question.explanation' => ['required', 'string', 'max:1000']];
+            'question.question' => ['required', 'string', 'max:500'], 'question.explanation' => ['required', 'string', 'max:1000'],
+            'question.retry_explanation' => ['sometimes', 'nullable', 'string', 'max:1000']];
         $rules += match ($type) {
             'choice' => ['question.options' => ['required', 'array', 'list', 'min:2', 'max:6'],
                 'question.options.*' => ['required', 'array:id,label'],

@@ -8,6 +8,7 @@ import { once } from 'node:events';
 
 const root = resolve(import.meta.dirname, '../..');
 const php = process.env.KODY_TEST_PHP || 'php';
+const crossBrowser = process.argv.includes('--cross-browser');
 const database = `kody_browser_${randomBytes(16).toString('hex')}`;
 const temporary = await mkdtemp(join(tmpdir(), 'kody-browser-'));
 const listener = createServer();
@@ -24,6 +25,7 @@ const env = { ...process.env, APP_ENV: 'testing', APP_DEBUG: 'false', KODY_BROWS
     GOOGLE_AUTH_ENABLED: 'false', JUDGE0_ENABLED: 'false', XENDIT_ENABLED: 'false',
     XENDIT_CONTRACT_VERIFIED: 'false', BCRYPT_ROUNDS: '4', LOG_CHANNEL: 'stderr',
     KODY_BROWSER_BASE_URL: `http://127.0.0.1:${port}`, KODY_BROWSER_MANIFEST: join(temporary, 'manifest.json'), KODY_TEST_PHP: php,
+    KODY_CROSS_BROWSER: crossBrowser ? '1' : '0',
     // Database URLs can override the explicit isolation configuration in Laravel.
     DB_URL: '', DATABASE_URL: '', GOOGLE_CLIENT_SECRET: '', GOOGLE_CLIENT_ID: '', JUDGE0_RAPIDAPI_KEY: '',
     JUDGE0_AUTH_TOKEN: '', XENDIT_SECRET_KEY: '', XENDIT_CALLBACK_TOKEN: '', SENDGRID_API_KEY: '',
@@ -86,7 +88,7 @@ try {
             await new Promise(resolve => setTimeout(resolve, 250));
         }
         if (!ready) throw new Error('The isolated browser server did not become healthy.');
-        runner = spawn(process.execPath, ['node_modules/@playwright/test/cli.js', 'test', '--config=tests/Browser/playwright.config.mjs', ...process.argv.slice(2)],
+        runner = spawn(process.execPath, ['node_modules/@playwright/test/cli.js', 'test', '--config=tests/Browser/playwright.config.mjs', ...process.argv.slice(2).filter(argument => argument !== '--cross-browser')],
             { cwd: root, env, stdio: 'inherit', windowsHide: true });
         runner.on('error', () => {});
         [status] = await once(runner, 'exit');

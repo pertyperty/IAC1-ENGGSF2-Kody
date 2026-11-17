@@ -1,12 +1,43 @@
 # Kody Engineering Agent Guidelines
 
+The owner's 2026-10-26 maintainability pass is tracked in the
+[refactoring review](docs/refactoring-review-2026-10-26.md). Reuse Account-owned
+`CredentialDocuments` for qualification availability and audited downloads.
+Keep catalog projections small and creator aggregates scoped to owned activity;
+preserve query-budget, history, policy and private-storage regression checks.
+Continue with focused batches rather than a whole-tree rewrite. Live activation
+remains separate from refactoring.
+
+The owner's 2026-10-25 amendment prioritizes simple, readable learning UI and
+visible pseudocode with bounded instruction panels. See
+[simple learning and creator credibility](docs/simple-learning-and-creator-credibility.md).
+Guides are opt-in. Preserve server-validated Run and preview isolation. Public
+creator profiles publish only explicitly supplied fields and usernames, never
+private names/email/qualification documents. Role pills are separate from manually
+issued qualifications badges; current staff/password/session, approved private
+proof, version checks and audit govern grant/revoke. Preserve credential history
+and account-erasure integration. Personal review lists grant nothing. Heartbeats
+probe the database worker without accumulating jobs; real supervision/alerts and
+all existing private-provider/legal activation deferrals remain separate.
+
+The owner's later 2026-10-18 request adds actual Beginner, Intermediate and Expert
+Tower content. See [three-track expansion](docs/tower-skill-expansion.md). Eighty
+free floors retain positions 1–50 and append 51–60 Beginner, 61–70 Intermediate
+and 71–80 Expert. Nullable checked track metadata preserves legacy/custom floor
+classification. Order progression within each track; never invent earlier clears.
+Expert teaches algorithm reasoning, not live runtime or certification. Track
+choice is cosmetic session state, never admission or rewards. Keep editable typed
+quiz briefings, immutable revisions and final-stage streaks with no extra Tower
+XP/KB. Seed only missing positions after migration; never overwrite custom floors.
+Human learning-effectiveness and live provider verification remain separate.
+
 The owner's 2026-10-18 panel follow-up delegates product recommendations. See
 [learning and onboarding](docs/panel-learning-and-onboarding.md). Signup collects
 username/email/password only; optional private names move to A06 and Instructor
 credentials to the existing verified-account A10 flow. Preserve current identity,
 hashing, verification, lockout, session and review safeguards. Beginner (1–25) and
-Intermediate practice (26+) are independently enterable, sequential inside each;
-no fabricated earlier clears or Expert/mastery claims. Readable programs and
+Intermediate practice (originally 26+) are independently enterable, sequential inside each;
+no fabricated earlier clears or certification claims. The expansion above adds Expert content. Readable programs and
 Step/Replay/Restart are local interpreter previews; only explicit Run saves.
 Seed teaching updates are immutable, audited, explicit and exact-original guarded;
 never reseed over custom edits. Short Terms/Privacy drafts remain unpublished

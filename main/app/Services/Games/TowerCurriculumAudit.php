@@ -2,6 +2,7 @@
 
 namespace App\Services\Games;
 
+use App\Services\Gamification\TowerTracks;
 use RuntimeException;
 
 class TowerCurriculumAudit
@@ -102,7 +103,7 @@ class TowerCurriculumAudit
         return [...$parts, $difference];
     }
 
-    public function entry(array $entry, int $position): array
+    public function entry(array $entry, int $position, ?string $track = null): array
     {
         $stages = [];
         foreach ($entry['stages'] as $index => $stage) {
@@ -125,9 +126,11 @@ class TowerCurriculumAudit
                 'transfer_task' => 'Predict the next state, compare it with the trace, then change one instruction and explain the difference. This is optional reflection, not an independently graded mastery claim.'];
         }
 
+        $track ??= app(TowerExpansion::class)->track($position) ?? ($position <= 25 ? 'beginner' : 'intermediate');
+
         return ['position' => $position, 'title' => $entry['title'], 'topic' => $entry['concept'],
-            'track' => $position <= 25 ? 'Beginner' : 'Intermediate practice',
-            'prerequisite' => in_array($position, [1, 26], true) ? 'Independent track entry; no earlier clears granted.' : 'Previous published levels in this track.',
+            'track' => app(TowerTracks::class)->all()[$track]['label'],
+            'prerequisite' => 'Independently enterable track; previous published levels within it, if any. No earlier clears granted.',
             'assessment_limit' => 'Formative practice; completion verifies the saved objective, not general programming mastery.',
             'stages' => $stages];
     }

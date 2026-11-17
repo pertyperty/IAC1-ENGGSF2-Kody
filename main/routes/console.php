@@ -11,6 +11,7 @@ Schedule::command('kody:weekly-events-sync')->everyMinute()->withoutOverlapping(
 Schedule::command('kody:account-erasures-retry')->everyFiveMinutes()->withoutOverlapping();
 Schedule::command('kody:google-attempts-prune')->daily()->withoutOverlapping();
 Schedule::command('kody:finance-recover')->everyFiveMinutes()->withoutOverlapping();
+Schedule::command('kody:operations-heartbeat')->everyMinute()->withoutOverlapping();
 
 Artisan::command('kody:finance-recover', function (): void {
     app(FinancialRecovery::class)->sweep();
