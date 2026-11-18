@@ -1,3 +1,10 @@
+> Superseded for registration on 18 November 2026: the owner explicitly authorized
+> original project terms and the University of Baguio correspondence address.
+> [The learner-first implementation](../learner-first-rework-2026-11-18.md#registration-terms)
+> now publishes dated text and records atomic acceptance for new accounts. The
+> earlier draft-only status below is historical. Production legal/retention review
+> and an existing-user material-change policy remain separate release work.
+
 # Simple legal drafts: review and publication
 
 The owner requested short, plain Terms and Privacy on 2026-10-18. The drafts are original Kody text; they are intentionally not HTTP routes or registration checkboxes. Keeping them simple does not supply the operator's missing legal identity. Registration acceptance is **not implemented or claimed**.

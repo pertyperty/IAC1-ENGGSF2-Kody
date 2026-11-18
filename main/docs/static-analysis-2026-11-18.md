@@ -110,3 +110,10 @@ The next dependency-maintenance PR must use a verified upstream fix, update ever
 affected path, retain a clean lock install and rerun full audits/builds/browser CI.
 Until then, this security gate remains open in the
 [release evidence index](release-evidence-index.md).
+
+
+The [learner-first rework](learner-first-rework-2026-11-18.md) adds registration
+terms/action and the four assessment/game services to this scope: 32 files in
+all. Exhaustive unsupported-template handling and a redundant loop check were
+resolved directly, without ignores or a baseline. Its record owns verification
+at that later revision.
