@@ -6,6 +6,10 @@ integration. This batch changes account registration, learner presentation and
 assessment authoring; it does not activate any provider, add floors or introduce
 another progression system.
 
+The [assessment guidance follow-up](assessment-guidance-followup-2026-11-18.md)
+corrects task-specific command references, concept-check interaction and remaining
+lesson publication terminology, with its own verification record.
+
 ## Public comparison and observed behavior
 
 Reviewed the running public projects in a browser on 18 November, rather than

@@ -6,6 +6,11 @@ integration. [The rework](learner-first-rework-2026-11-18.md) adds registration
 terms/acceptance, simpler shared screens and guided assessments. Existing provider
 code remains disabled; local fake-provider tests are preservation checks.
 
+The [assessment guidance follow-up](assessment-guidance-followup-2026-11-18.md)
+aligns command help with pinned task rules, removes repeated answer-check playback
+and clarifies lesson publication actions. It does not close the human learning,
+editorial, legal or staged operations gates below.
+
 The owner delegated remaining business decisions and implementation on 2026-10-04.
 The [economy/launch amendment](economy-and-launch-decisions.md) supersedes earlier
 pricing, XP, rewards, payout and creator-deletion deferrals. Their code and
