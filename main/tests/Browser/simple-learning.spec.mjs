@@ -48,6 +48,17 @@ test('@cross-browser Help controls have space and account forms stay accessible'
     await audit(page);
 });
 
+test('@cross-browser a long activity explanation stays keyboard scrollable on mobile', async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 740 });
+    await page.goto('/playground?game=number-machine');
+    await page.getByText('How it works', { exact: true }).click();
+    const explanation = page.getByRole('region', { name: 'Activity explanation', exact: true });
+    await explanation.focus();
+    await page.keyboard.press('End');
+    await expect.poll(() => explanation.evaluate(element => element.scrollTop)).toBeGreaterThan(0);
+    await audit(page);
+});
+
 test('creator publishes a profile and staff explicitly grants then revokes the qualifications badge', async ({ page }) => {
     await login(page, 'credinstructor');
     await page.goto('/account/public-profile');

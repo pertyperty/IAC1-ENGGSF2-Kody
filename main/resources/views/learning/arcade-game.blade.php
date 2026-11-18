@@ -2,7 +2,7 @@
     <div class="game-heading"><div><span class="game-kicker">{{ $game['concept'] }}</span><h2>{{ $game['title'] }}</h2></div></div>
     @include('learning.briefing')
     <div class="arcade-workbench">
-        <div class="arcade-scene"><div data-arcade-world class="arcade-world" role="group" aria-label="Activity state"></div><p class="scene-caption" data-arcade-preview-status role="status">Add instructions, then run your program.</p></div>
+        <div class="arcade-scene"><div data-arcade-world class="arcade-world" role="group" aria-label="Activity state"></div><p class="scene-caption" data-arcade-preview-status role="status" tabindex="0">Add instructions, then run your program.</p></div>
         <div class="game-controls">
             <div class="program-heading"><b>Your program</b><span data-arcade-count>0 / {{ $game['maxCommands'] }} instructions</span></div>
             <div data-arcade-controls class="arcade-controls"></div>

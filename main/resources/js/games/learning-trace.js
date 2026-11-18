@@ -49,7 +49,7 @@ export function mountLearningTrace(root, game, getProgram, buildTrace, render, i
     const statePanel = document.createElement('details');
     const stateSummary = document.createElement('summary'); stateSummary.textContent = 'Program state'; statePanel.append(stateSummary, state);
     source.tabIndex = 0;
-    const status = document.createElement('p'); status.className = 'field-hint'; status.setAttribute('role', 'status');
+    const status = document.createElement('p'); status.className = 'field-hint'; status.setAttribute('role', 'status'); status.tabIndex = 0;
     const actions = document.createElement('div'); actions.className = 'trace-actions';
     let trace, cursor = 0, replayToken = 0;
     const show = () => {
