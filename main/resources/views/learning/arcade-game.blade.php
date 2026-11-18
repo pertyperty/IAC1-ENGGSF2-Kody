@@ -1,3 +1,6 @@
+@pushOnce('page-scripts', 'play')
+    @vite('resources/js/play.js')
+@endPushOnce
 <section class="game-card arcade-game" data-arcade-game="{{ json_encode($game, JSON_THROW_ON_ERROR) }}" @if(isset($completionUrl)) data-completion-url="{{ $completionUrl }}" @endif aria-label="{{ $game['title'] }}">
     <div class="game-heading"><div><span class="game-kicker">{{ $game['concept'] }}</span><h2>{{ $game['title'] }}</h2></div></div>
     @include('learning.briefing')

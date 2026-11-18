@@ -4,6 +4,9 @@
 @section('main-class', 'tower-map-main')
 @section('footer')@endsection
 @section('content')
+@pushOnce('page-scripts', 'tower-page')
+    @vite('resources/js/tower-page.js')
+@endPushOnce
 <section class="tower-page" data-tower-map data-welcome-url="{{ route('welcome') }}" @guest data-guest-tower @endguest>
     <div class="tower-scenery" aria-hidden="true"><img data-ascent-art src="{{ asset(config('branding.assets.tower')) }}" alt=""><div class="ascent-glow"></div>@include('tower.scenic-details')</div>
     <span class="tower-altitude" data-tower-altitude aria-hidden="true">Meadow · floors 1–10</span>

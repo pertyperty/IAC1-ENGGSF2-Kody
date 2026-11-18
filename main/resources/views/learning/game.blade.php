@@ -1,3 +1,6 @@
+@pushOnce('page-scripts', 'play')
+    @vite('resources/js/play.js')
+@endPushOnce
 <section class="game-card garden-game" data-coding-game="{{ json_encode($game, JSON_THROW_ON_ERROR) }}" @if(isset($completionUrl) || isset($module)) data-completion-url="{{ $completionUrl ?? route('play.game', $module) }}" @endif tabindex="0" aria-label="{{ $game['title'] }} coding game. When this game is focused, arrow keys add moves; Enter runs your program.">
     <div class="game-heading"><div><span class="game-kicker">{{ $game['concept'] }}</span><h2>{{ $game['title'] }}</h2></div></div>
     @php($briefing = app(\App\Services\Games\LessonBriefings::class)->for($game))
