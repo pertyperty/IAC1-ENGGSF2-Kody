@@ -320,7 +320,7 @@ test('Administrator rail pulls and pins labels; tower drafts preview without pub
     await expect(preview.locator('[data-game-success]')).toBeVisible();
     await expect(page.locator('[data-game-result]')).toBeVisible(); await page.locator('[data-result-return]').click();
     await page.screenshot({ path: 'storage/app/browser-results/tower-stage-editor.png', fullPage: true });
-    await page.getByRole('button', { name: 'Add Concept check', exact: true }).click();
+    await page.getByRole('button', { name: 'Add quiz stage', exact: true }).click();
     const quizStage = page.locator('.tower-stage-summary').last();
     await quizStage.getByText('Customize stage 2', { exact: true }).click();
     await quizStage.getByLabel('Question', { exact: true }).fill('Can instruction order change the result?');
