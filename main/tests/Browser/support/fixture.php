@@ -136,7 +136,7 @@ try {
             $manifest['modules']['quiz-lab'] = $module->id;
             $challenges = app(ChallengePublishing::class);
             $challenge = $challenges->save($accounts['questcreator'], 'browser-seed-session', config('challenge-examples')[array_key_first(config('challenge-examples'))]
-                + ['language' => 'python', 'difficulty' => 'Easy', 'cpu_time_ms' => 1000, 'memory_kib' => 262144]);
+                + ['language' => 'python', 'difficulty' => 'Easy', 'category' => 'numbers', 'tags' => ['variables'], 'cpu_time_ms' => 1000, 'memory_kib' => 262144]);
             $challenges->submit($accounts['questcreator'], 'browser-seed-session', $challenge, 1);
             $challenges->review($accounts['moderator'], 'browser-seed-session', $challenge->fresh(), 2, 'Approved', null);
             $event = app(WeeklyEvents::class)->configure($accounts['moderator'], 'browser-seed-session', [
