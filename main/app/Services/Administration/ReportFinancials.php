@@ -12,11 +12,17 @@ class ReportFinancials
 
     public function snapshot(CarbonImmutable $start, CarbonImmutable $end): array
     {
-        $cash = DB::table('platform_cash_entries')->where('created_at', '>=', $start)->where('created_at', '<', $end);
         $opening = (int) DB::table('platform_cash_entries')->where('created_at', '<', $start)->sum('amount_minor');
-        $inflows = (int) (clone $cash)->where('amount_minor', '>', 0)->sum('amount_minor');
-        $outflows = -(int) (clone $cash)->where('amount_minor', '<', 0)->sum('amount_minor');
-        $expenses = -(int) (clone $cash)->where('reference', 'like', 'operating-expense:%')->sum('amount_minor');
+        $cash = DB::table('platform_cash_entries')->where('created_at', '>=', $start)->where('created_at', '<', $end)
+            ->selectRaw(
+                'COALESCE(SUM(amount_minor) FILTER (WHERE amount_minor > 0), 0) AS inflows, '.
+                'COALESCE(SUM(amount_minor) FILTER (WHERE amount_minor < 0), 0) AS outflows, '.
+                'COALESCE(SUM(amount_minor) FILTER (WHERE reference LIKE ?), 0) AS expenses',
+                ['operating-expense:%'],
+            )->first();
+        $inflows = (int) $cash->inflows;
+        $outflows = -(int) $cash->outflows;
+        $expenses = -(int) $cash->expenses;
         $current = DB::table('economy_locks')->find(1);
         $totals = [
             ['metric' => 'Opening posted platform cash', 'minor' => $opening],
@@ -25,7 +31,7 @@ class ReportFinancials
             ['metric' => 'Paid operating expenses (included in outflows)', 'minor' => $expenses],
             ['metric' => 'Net cash movement', 'minor' => $inflows - $outflows],
             ['metric' => 'Closing posted platform cash', 'minor' => $opening + $inflows - $outflows],
-            ['metric' => 'Current reserved platform cash (snapshot)', 'minor' => (int) ($current?->reserved_minor ?? 0)],
+            ['metric' => 'Current reserved platform cash (snapshot)', 'minor' => (int) ($current->reserved_minor ?? 0)],
             ['metric' => 'Current wallet backing liability (snapshot)', 'minor' => (int) DB::table('wallet_lots')->sum('remaining_minor')],
             ['metric' => 'Current unclaimed cash creator earnings (snapshot)', 'minor' => (int) DB::table('publisher_earnings')->where('kind', 'Cash')->where('status', 'Available')->selectRaw('COALESCE(SUM(amount_minor - claimed_minor), 0) AS total')->value('total')],
         ];

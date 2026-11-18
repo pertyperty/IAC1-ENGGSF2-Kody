@@ -69,6 +69,13 @@ work stays in the [deferred register](deferred-features.md) and
 [release evidence index](release-evidence-index.md).
 
 
+## Scope expansion
+
+The [financial-report follow-up](financial-report-reads-2026-11-18.md) adds the
+report projection to the same level-5 check, expanding the scope from 23 to 24
+files without ignores. Its focused record owns the additional regression results.
+The 23-file results above describe the initial tooling revision.
+
 ## npm advisory gate
 
 The first remote run on this tooling revision stopped at the existing npm audit
