@@ -18,11 +18,15 @@ return new class extends Migration
 
     public function down(): void
     {
-        if (DB::table('users')->whereNotNull('terms_accepted_at')->exists()) {
-            throw new RuntimeException('Retained terms acceptance must not be discarded.');
-        }
-        Schema::table('users', function (Blueprint $table): void {
-            $table->dropColumn(['terms_version', 'terms_accepted_at']);
+        DB::transaction(function (): void {
+            // Keep registration from adding acceptance between this check and the drop.
+            DB::statement('LOCK TABLE users IN ACCESS EXCLUSIVE MODE');
+            if (DB::table('users')->whereNotNull('terms_accepted_at')->exists()) {
+                throw new RuntimeException('Retained terms acceptance must not be discarded.');
+            }
+            Schema::table('users', function (Blueprint $table): void {
+                $table->dropColumn(['terms_version', 'terms_accepted_at']);
+            });
         });
     }
 };

@@ -6,9 +6,19 @@ use App\Support\RegistrationTerms;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\ValidationException;
 
 uses(RefreshDatabase::class);
+
+test('A01 acceptance columns can roll back only before any agreement is retained', function () {
+    $legacy = User::factory()->create();
+    $migration = require database_path('migrations/2026_11_18_000001_record_registration_terms_acceptance.php');
+    $migration->down();
+    expect(Schema::hasColumn('users', 'terms_version'))->toBeFalse()
+        ->and(Schema::hasColumn('users', 'terms_accepted_at'))->toBeFalse()
+        ->and(User::findOrFail($legacy->id)->id)->toBe($legacy->id);
+});
 
 test('A01 terms are public and registration asks for an unchecked agreement', function () {
     $this->get(route('legal.terms'))->assertOk()->assertSee('General Luna Road')->assertSee('Kody project team');
