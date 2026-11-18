@@ -284,16 +284,28 @@ export function mountArcade(root) {
         const program = lines(); program.pop(); code.value = program.join('\n'); preview(); output.textContent = 'Instruction removed. Run the program to see the updated state.';
     }));
     code.addEventListener('input', () => { if (!busy) preview(); });
-    root.querySelector('[data-arcade-help]').textContent = { 'pixel-studio': 'Syntax: paint 1 1 mint. Blank cells must stay blank.', 'number-machine': 'Syntax: add 3, subtract 2, multiply 2. One instruction per line.', 'sort-lab': 'Syntax: swap 1 2. Sort smallest to largest.', 'logic-switchboard': 'Tap the switches or use flip 1. AND: all on · OR: any on · XOR: odd number on.', 'string-forge': 'Commands: upper · lower · reverse · trim · append Code. One transformation per line.', 'memory-trail': 'Commands: push 2 · pop · duplicate · swap. The rightmost value is the top.', 'terminal-quest': 'Commands: ls · cat filename · cp source destination. Up/Down recalls commands. No pipes, scripts or host shell access.' }[game.template];
+    const commandHelp = {
+        'pixel-studio': 'Syntax: paint 1 1 mint. Blank cells must stay blank.',
+        'number-machine': 'Syntax: add 3, subtract 2, multiply 2. One instruction per line.',
+        'sort-lab': 'Syntax: swap 1 2. Sort smallest to largest.',
+        'logic-switchboard': 'Tap the switches or use flip 1. AND: all on. OR: any on. XOR: odd number on.',
+        'string-forge': 'Commands: upper, lower, reverse, trim, append Code. One transformation per line.',
+        'memory-trail': 'Commands: push 2, pop, duplicate, swap. The rightmost value is the top.',
+        'terminal-quest': 'Commands: ls, cat filename, cp source destination. Up/Down recalls commands. No pipes, scripts or host shell access.',
+    };
+    root.querySelector('[data-arcade-help]').textContent = game.assessment?.commands.length
+        ? `For this task: ${game.assessment.commands.join(', ')}. One instruction per line.`
+        : commandHelp[game.template];
     async function run(showResult = true) {
         if (busy) return;
+        const checkingAnswer = showResult && root.dataset.playState === 'checking';
         inspector.cancel();
         busy = true; selectedPosition = null; root.dataset.playState = 'running'; root.setAttribute('aria-busy', 'true');
         root.querySelectorAll('button, input, select, textarea').forEach(control => { control.disabled = true; });
         try {
             const program = lines();
             const delay = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 220;
-            if (game.template !== 'terminal-quest') for (let step = 1; step <= Math.min(program.length, 12); step++) {
+            if (!checkingAnswer && game.template !== 'terminal-quest') for (let step = 1; step <= Math.min(program.length, 12); step++) {
                 const frame = evaluateArcade(game, program.slice(0, step));
                 render(frame.state); previewStatus.textContent = `Running step ${step} of ${program.length}…`;
                 if (delay) await new Promise(resolve => setTimeout(resolve, delay));
@@ -316,7 +328,10 @@ export function mountArcade(root) {
             busy = false; root.setAttribute('aria-busy', 'false');
             root.querySelectorAll('button, input, select, textarea').forEach(control => { control.disabled = false; });
             inspector.refresh();
-            if (root.dataset.playState === 'checking') root.querySelector('[data-concept-check] input')?.focus({ preventScroll: true });
+            if (root.dataset.playState === 'checking') {
+                const check = root.querySelector('[data-concept-check]');
+                (check.querySelector('input:checked') ?? check.querySelector('input'))?.focus({ preventScroll: true });
+            }
         }
     }
     root.querySelector('[data-arcade-run]').addEventListener('click', () => run(true));

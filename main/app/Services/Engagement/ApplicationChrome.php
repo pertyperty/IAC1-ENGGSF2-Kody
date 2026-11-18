@@ -51,7 +51,7 @@ class ApplicationChrome
             }
         }
         if ($request->routeIs('challenges.create', 'challenges.edit', 'challenges.archive-confirmation')) {
-            $back = ['url' => route('challenges.index'), 'label' => 'Back to quest studio'];
+            $back = ['url' => route('challenges.index'), 'label' => 'Back to challenge studio'];
         } elseif ($request->routeIs('challenges.show')) {
             $back = ['url' => route('challenges.catalog'), 'label' => 'Back to coding challenges'];
         } elseif ($request->routeIs('account.*') && ! $request->routeIs('account.show')) {

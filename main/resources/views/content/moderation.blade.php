@@ -7,7 +7,7 @@
 <p>{{ ucfirst($kind) }} #{{ $item->id }} · {{ $item->status }} · {{ $item->isWithdrawn() ? 'Staff withdrawal active' : 'No staff block' }}</p>
 <p>{{ $revision?->description }}</p>
 @if($kind === 'module')<pre class="lesson-note">{{ $revision?->content }}</pre><p>{{ $revision?->video_url }}</p><pre class="lesson-note">{{ json_encode($revision?->assessment, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</pre>
-@elseif($kind === 'course')<h2>Pinned adventures</h2>@foreach($revision?->modules ?? [] as $slot)<p>{{ $slot->position }}. {{ $slot->revision->title }} · Module #{{ $slot->module_id }} · Revision #{{ $slot->module_revision_id }}</p>@endforeach
+@elseif($kind === 'course')<h2>Saved lesson versions</h2>@foreach($revision?->modules ?? [] as $slot)<p>{{ $slot->position }}. {{ $slot->revision->title }} · Module #{{ $slot->module_id }} · Revision #{{ $slot->module_revision_id }}</p>@endforeach
 @elseif($kind === 'challenge')<p>{{ $revision?->language }} · {{ $revision?->rules }}</p><pre class="lesson-note">Input: {{ $revision?->input_format }}
 Output: {{ $revision?->output_format }}</pre><h2>Approved revision test cases · Staff only</h2>@foreach($revision?->testCases ?? [] as $case)<pre class="lesson-note">{{ $case->hidden ? 'Hidden' : 'Sample' }} case {{ $case->position }}
 Input: {{ $case->input }}

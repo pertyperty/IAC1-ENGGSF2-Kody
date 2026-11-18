@@ -46,7 +46,7 @@
                 @if($revision?->game_preset_revision_id)<p class="lesson-note">Saved preset revision #{{ $revision->game_preset_revision_id }}. To save a new draft, choose a current available version below.</p>@endif
                 <label for="managed_preset">Available preset</label><select id="managed_preset" name="managed_preset"><option value="">Choose a preset</option>@foreach($presets as $preset)<option value="{{ $preset->current_revision_id }}" @selected((string) old('managed_preset', $revision?->game_preset_revision_id) === (string) $preset->current_revision_id)>{{ $preset->name }} · v{{ $preset->currentRevision->number }} · {{ $preset->currentRevision->instance['template'] === 'choice-quiz' ? 'Quick quiz' : 'Coding game' }}</option>@endforeach</select>
                 @if($presets->count() === 100)<p class="field-hint">Showing the first 100 available presets.</p>@endif
-                <label for="preset_title">Activity title</label><input id="preset_title" name="preset_title" maxlength="100" value="{{ old('preset_title', $assessment['title'] ?? 'My adventure') }}">
+                <label for="preset_title">Activity title</label><input id="preset_title" name="preset_title" maxlength="100" value="{{ old('preset_title', $assessment['title'] ?? 'My activity') }}">
             </div>
             <div data-game-fields>
                 <label for="game_challenge">Assessment task</label>

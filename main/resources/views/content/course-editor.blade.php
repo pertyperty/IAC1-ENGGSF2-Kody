@@ -1,5 +1,5 @@
 @extends('layouts.learning')
-@section('title', 'Shape a course — Kody')
+@section('title', 'Course editor — Kody')
 @section('content')
 
 

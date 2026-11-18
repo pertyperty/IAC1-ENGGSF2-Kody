@@ -178,16 +178,22 @@ export function mountGarden(root) {
     });
     root.querySelector('[data-game-run]').addEventListener('click', async () => {
         if (running) return;
+        const checkingAnswer = root.dataset.playState === 'checking';
         inspector.cancel();
-        running = true; success.hidden = true; renderBoard(); tiles.forEach(({ tile }) => tile.classList.remove('visited-tile'));
+        running = true;
+        success.hidden = true;
+        if (!checkingAnswer) {
+            renderBoard();
+            tiles.forEach(({ tile }) => tile.classList.remove('visited-tile'));
+        }
         root.dataset.playState = 'running'; root.setAttribute('aria-busy', 'true');
         const result = runProgram(instance, program, { repeat: root.querySelector('[data-game-repeat]')?.checked, conditional: root.querySelector('[data-game-conditional]')?.checked });
         root.querySelectorAll('button, input').forEach((control) => { control.disabled = true; });
-        feedback.textContent = 'Kody is following your instructions…';
+        if (!checkingAnswer) feedback.textContent = 'Kody is following your instructions…';
         const delay = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 280;
         try {
-            for (const frame of result.trace) {
-                if (delay) await new Promise((resolve) => setTimeout(resolve, delay));
+            for (const frame of checkingAnswer ? result.trace.slice(-1) : result.trace) {
+                if (delay && !checkingAnswer) await new Promise((resolve) => setTimeout(resolve, delay));
                 renderBoard(frame.position, frame.crystals);
                 tiles.find(({ point }) => key(point) === key(frame.position))?.tile.classList.add('visited-tile');
                 programTrack.querySelectorAll('.program-step').forEach((step, index) => step.classList.toggle('executing', index === frame.index));
@@ -210,7 +216,10 @@ export function mountGarden(root) {
             root.querySelectorAll('button, input').forEach((control) => { control.disabled = false; });
             updateTools();
             inspector.refresh();
-            if (root.dataset.playState === 'checking') root.querySelector('[data-concept-check] input')?.focus({ preventScroll: true });
+            if (root.dataset.playState === 'checking') {
+                const check = root.querySelector('[data-concept-check]');
+                (check.querySelector('input:checked') ?? check.querySelector('input'))?.focus({ preventScroll: true });
+            }
             programTrack.querySelectorAll('.program-step').forEach((step) => step.classList.remove('executing'));
         }
     });

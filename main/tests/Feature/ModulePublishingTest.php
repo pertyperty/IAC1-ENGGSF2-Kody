@@ -244,7 +244,7 @@ test('D03 owner confirms archive and learner access stops while history survives
     $learner = moduleAccount(Role::Learner);
     app(LearningProgression::class)->recordModule($learner, 'module-test-session', $module->id, $module->published_revision_id, 'game', ['program' => ['right', 'right', 'up', 'right', 'right']]);
     moduleSignIn($this, User::find($module->created_by));
-    $this->get(route('studio.archive-confirmation', $module))->assertOk()->assertSee('Confirm archive');
+    $this->get(route('studio.archive-confirmation', $module))->assertOk()->assertSee('Archive lesson');
     $this->postJson(route('studio.archive', $module), ['record_version' => 3])->assertUnprocessable();
     $this->postJson(route('studio.archive', $module), ['record_version' => 2, 'confirmed' => true])->assertUnprocessable();
     $this->post(route('studio.archive', $module), ['record_version' => 3, 'confirmed' => true])->assertRedirect();

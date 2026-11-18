@@ -256,6 +256,6 @@ test('D05 removing every picker slot saves an empty private draft and prevents s
     $this->post(route('courses.store'), courseData(['']))->assertRedirect();
     $course = LearningCourse::sole();
     expect($course->latestRevision->modules)->toBeEmpty();
-    $this->get(route('courses.edit', $course))->assertOk()->assertSee('Save a draft with adventures');
+    $this->get(route('courses.edit', $course))->assertOk()->assertSee('Add lessons and save a draft');
     $this->postJson(route('courses.submit', $course), ['record_version' => 1])->assertUnprocessable();
 });

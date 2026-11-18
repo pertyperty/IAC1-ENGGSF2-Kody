@@ -18,29 +18,49 @@ export function mountConceptCheck(root, game) {
     const doc = root.ownerDocument;
     const check = game.assessment.check;
     const group = doc.createElement('fieldset');
-    const legend = doc.createElement('legend'); legend.textContent = check.question; group.append(legend);
+    const legend = doc.createElement('legend');
+    legend.textContent = check.question;
+    group.append(legend);
     const name = `concept-${globalThis.crypto.randomUUID()}`;
     Object.entries(check.options).forEach(([value, text]) => {
         const label = doc.createElement('label');
-        const input = doc.createElement('input'); input.type = 'radio'; input.name = name; input.value = value;
-        label.append(input, doc.createTextNode(text)); group.append(label);
+        const input = doc.createElement('input');
+        input.type = 'radio';
+        input.name = name;
+        input.value = value;
+        label.append(input, doc.createTextNode(text));
+        group.append(label);
     });
-    const note = doc.createElement('p'); note.setAttribute('role', 'status');
-    host.append(group, note); host.hidden = true;
+    const note = doc.createElement('p');
+    note.setAttribute('role', 'status');
+    host.append(group, note);
+    host.hidden = true;
     const run = root.querySelector('[data-game-run], [data-arcade-run]');
     const originalLabel = run.textContent.trim();
     const answer = () => group.querySelector('input:checked')?.value;
+    const labelRun = text => {
+        run.textContent = text;
+        run.setAttribute('aria-label', text);
+    };
     return {
         answer,
         verify() {
             host.hidden = false;
-            if (conceptAnswerCorrect(game, answer())) { note.textContent = check.explanation; return true; }
+            if (conceptAnswerCorrect(game, answer())) {
+                note.textContent = check.explanation;
+                labelRun(originalLabel);
+                return true;
+            }
             note.textContent = answer() ? `Try again. ${check.explanation}` : 'Your program works. Answer this concept check, then check your answer.';
-            run.textContent = 'Check answer'; run.setAttribute('aria-label', 'Check answer');
-            group.querySelector('input')?.focus({ preventScroll: true });
+            labelRun('Check answer');
             return false;
         },
-        reset() { host.hidden = true; note.textContent = ''; run.textContent = originalLabel; run.setAttribute('aria-label', originalLabel); },
+        reset() {
+            host.hidden = true;
+            note.textContent = '';
+            group.querySelectorAll('input').forEach(input => { input.checked = false; });
+            labelRun(originalLabel);
+        },
     };
 }
 
