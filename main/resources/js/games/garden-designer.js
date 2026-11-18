@@ -122,9 +122,10 @@ export function mountGardenDesigner(form, presets) {
             preview.dataset.codingGame = JSON.stringify(game);
             preview.setAttribute('aria-label', `${game.title} coding game`);
             preview.querySelector('h2').textContent = game.title;
-            preview.querySelector('.game-instructions p').textContent = game.instructions;
+            preview.querySelector('.activity-goal p').textContent = game.instructions;
+            preview.querySelector('.activity-reference > div').textContent = game.hint;
             preview.querySelector('[data-game-success] span').textContent = game.learningIdea;
-            preview.querySelector('.step-pill').textContent = game.concept;
+            preview.querySelector('.game-kicker').textContent = game.concept;
             preview.querySelector('[data-game-board]').setAttribute('aria-label', `Garden with ${game.width} columns and ${game.height} rows. Start: column ${game.start[0] + 1}, row ${game.start[1] + 1}. Goal: column ${game.goal[0] + 1}, row ${game.goal[1] + 1}. Path: ${game.path.map(([x, y]) => `${x + 1},${y + 1}`).join('; ')}. Crystals: ${game.crystals.map(([x, y]) => `${x + 1},${y + 1}`).join('; ') || 'none'}.`);
             // The reusable shell contains both mode controls; activate only the selected mechanic.
             preview.querySelector('[data-game-repeat]').closest('label').hidden = game.mode !== 'loop';

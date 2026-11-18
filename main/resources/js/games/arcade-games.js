@@ -1,8 +1,8 @@
 import { mountLearningTrace, arcadeTrace } from './learning-trace.js';
 import { createIcon } from '../icons.js';
-import { publishFeedback } from '../feedback.js';
 import { puzzleTemplates, validPuzzle, evaluatePuzzle, renderPuzzle } from './puzzle-games.js';
 import { saveCompletion } from './save-completion.js';
+import { programRuleError, mountConceptCheck, objectiveFeedback } from './assessment-challenges.js';
 
 export const arcadeTemplates = ['pixel-studio', 'number-machine', 'sort-lab', 'terminal-quest', ...puzzleTemplates];
 
@@ -29,6 +29,8 @@ export function validScenario(template, scenario) {
 }
 
 export function evaluateArcade(game, program) {
+    const ruleError = Array.isArray(program) ? programRuleError(game, program) : null;
+    if (ruleError) return { ...evaluateArcade({ ...game, assessment: undefined }, []), success: false, error: ruleError };
     if (puzzleTemplates.includes(game.template)) return evaluatePuzzle(game, program);
     const scenario = game.scenario;
     const state = { number: scenario.start ?? 0, items: [...(scenario.items ?? [])], pixels: {}, files: Object.fromEntries((scenario.files ?? []).map((file) => [file.name, file.content])) };
@@ -96,6 +98,8 @@ export function mountArcade(root) {
     const previewStatus = root.querySelector('[data-arcade-preview-status]');
     const count = root.querySelector('[data-arcade-count]');
     const programList = root.querySelector('[data-arcade-program]');
+    const conceptCheck = mountConceptCheck(root, game);
+    const limit = game.assessment?.limit ?? 12;
     let busy = false;
     let inspector;
     let selectedColor = 'mint';
@@ -172,16 +176,17 @@ export function mountArcade(root) {
             const mission = node('div', '', 'terminal-mission');
             mission.append(node('span', 'VIRTUAL WORKSPACE', 'game-kicker'), node('h3', `Make ${game.scenario.destination}`), node('p', `Copy a file containing “${game.scenario.content}”, then inspect the new file with cat.`));
             const files = node('ul', '', 'terminal-files');
-            Object.keys(state.files).forEach(name => files.append(node('li', `▤  ${name}`)));
+            Object.keys(state.files).forEach(name => files.append(node('li', name)));
             world.append(mission, files, node('p', 'A safe simulator. Commands never access your computer.', 'scene-instruction'));
         }
     }
     function preview() {
+        conceptCheck.reset();
         selectedPosition = null;
         const program = lines();
         const result = evaluateArcade(game, program);
         render(result.state);
-        count.textContent = `${program.length} / 12 steps`;
+        count.textContent = `${program.length} / ${limit} instructions`;
         programList.replaceChildren();
         program.slice(0, 12).forEach((command, index) => {
             const row = node('li', '');
@@ -207,7 +212,7 @@ export function mountArcade(root) {
     function add(command) {
         if (busy || !command) return false;
         const program = lines();
-        if (program.length >= 12) { output.textContent = 'Your program already has 12 instructions. Remove one or reset.'; return false; }
+        if (program.length >= limit) { output.textContent = `Use at most ${limit} instructions. Remove a step to change your program.`; return false; }
         code.value = [...program, command].join('\n'); preview(); return true;
     }
     function paint(x, y) {
@@ -220,7 +225,10 @@ export function mountArcade(root) {
         world.querySelector(`[aria-label^="Paint column ${x}, row ${y};"]`)?.focus({ preventScroll: true });
     }
     let build;
-    if (game.template === 'pixel-studio') {
+    if (game.assessment?.commands.length) {
+        const instruction = select('Instruction', game.assessment.commands);
+        build = () => instruction.value;
+    } else if (game.template === 'pixel-studio') {
         const palette = node('div', '', 'paint-palette'); palette.setAttribute('role', 'group'); palette.setAttribute('aria-label', 'Paint color');
         ['mint', 'peach', 'lavender'].forEach(color => {
             const swatch = button(color, `paint-swatch pixel-${color}`, `Paint with ${color}`, () => {
@@ -292,23 +300,27 @@ export function mountArcade(root) {
                 if (frame.error) break;
             }
             const result = evaluateArcade(game, program); render(result.state);
-            output.textContent = [...result.output, result.error ?? (result.success ? `Objective complete! ${game.learningIdea}` : 'Keep experimenting. The objective is not complete yet.')].join('\n');
+            output.textContent = [...(game.template === 'terminal-quest' ? result.output : []), result.success ? `Program complete. ${game.learningIdea}` : objectiveFeedback(game, result)].join('\n');
             root.dataset.playState = result.success ? 'success' : 'retry';
             previewStatus.textContent = result.success ? 'Objective complete. You made that happen!' : 'Try changing a step, then run it again.';
             if (!showResult) previewStatus.textContent = 'Preview only. Press Run to validate and save an eligible completion.';
-            if (!result.success && showResult) publishFeedback(root, result.error ?? 'Your objective is not complete yet. Change a step and run again.', result.error ? 'error' : 'info', false, null, null, true);
-            if (result.success && showResult) {
-                const message = await saveCompletion(root, { program });
+            if (!result.success && showResult) output.focus({ preventScroll: true });
+            if (result.success && showResult && conceptCheck.verify()) {
+                const message = await saveCompletion(root, { program, assessment_answer: conceptCheck.answer() });
                 if (message) output.textContent += `\n${message}`;
+            } else if (result.success && showResult && game.assessment) {
+                root.dataset.playState = 'checking';
+                previewStatus.textContent = 'Program complete. Finish the concept check.';
             }
         } finally {
             busy = false; root.setAttribute('aria-busy', 'false');
             root.querySelectorAll('button, input, select, textarea').forEach(control => { control.disabled = false; });
             inspector.refresh();
+            if (root.dataset.playState === 'checking') root.querySelector('[data-concept-check] input')?.focus({ preventScroll: true });
         }
     }
     root.querySelector('[data-arcade-run]').addEventListener('click', () => run(true));
-    root.querySelector('[data-arcade-hint]').addEventListener('click', () => { output.textContent = game.hint; publishFeedback(root, game.hint); });
+    root.querySelector('[data-arcade-hint]').addEventListener('click', () => { output.textContent = game.hint; output.focus({ preventScroll: true }); });
     root.querySelector('[data-arcade-reset]').addEventListener('click', () => {
         if (!busy) { code.value = ''; history.length = 0; historyIndex = 0; if (terminalInput) terminalInput.value = ''; preview(); output.textContent = 'Ready when you are.'; }
     });

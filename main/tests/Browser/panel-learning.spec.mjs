@@ -8,15 +8,15 @@ test.beforeEach(async ({ page }) => {
 test('Garden teaching is before the board and previews never submit or unlock guest progress', async ({ page }) => {
     await page.goto('/tower/1');
     const game = page.locator('[data-coding-game]');
-    await expect(game.locator('.lesson-briefing')).toContainText('Explain how ordered');
+    await expect(game.locator('.lesson-briefing .activity-goal')).toContainText('Reach column');
     await game.locator('[data-command=right]').click();
     await expect(game.locator('.trace-source')).toContainText('MOVE RIGHT');
     const submissions = [];
     page.on('request', request => { if (request.method() === 'POST') submissions.push(request.url()); });
-    await game.getByRole('button', { name: 'Step preview', exact: true }).click();
+    await game.getByRole('button', { name: 'Step', exact: true }).click();
     await expect(game.locator('.trace-state')).toContainText('column 2, row 3');
     await expect(game.locator('[data-game-board]')).toHaveAttribute('aria-label', /column 2, row 3/);
-    await game.getByRole('button', { name: 'Restart preview', exact: true }).click();
+    await game.getByRole('button', { name: 'Restart', exact: true }).click();
     await expect(game.locator('.trace-state')).toContainText('column 1, row 3');
     expect(submissions).toEqual([]);
     expect(await page.evaluate(() => localStorage.getItem('kody-guest-tower-v1'))).toBeNull();
@@ -42,6 +42,7 @@ test('registration server errors link to the correct field without changing its 
     await page.getByLabel('Email address (required)', { exact: true }).fill('duplicatecheck@browser.example.test');
     await page.getByLabel('Password (required)', { exact: true }).fill('BrowserStrong12!');
     await page.getByLabel('Confirm password (required)', { exact: true }).fill('BrowserStrong12!');
+    await page.getByLabel('I agree to the Terms and conditions.').check();
     await page.getByRole('button', { name: /Create account/ }).click();
     const error = page.locator('[data-field-error=username]');
     await expect(error).toContainText('already been taken');
@@ -54,11 +55,11 @@ test('registration server errors link to the correct field without changing its 
 for (const [template, command, expected] of [
     ['pixel-studio', 'paint 1 1 mint', '(1, 1) = mint'],
     ['number-machine', 'add 3', 'value = 5'],
-    ['sort-lab', 'swap 1 2', 'items = [1, 3, 2]'],
-    ['terminal-quest', 'cat hello.txt', 'hello.txt:'],
-    ['logic-switchboard', 'flip 1', 'TRUE AND FALSE = FALSE'],
-    ['string-forge', 'upper', 'text = "KODY"'],
-    ['memory-trail', 'push 2', 'stack = [1, 2]'],
+    ['sort-lab', 'swap 1 2', 'items = [1, 5, 4, 2, 3]'],
+    ['terminal-quest', 'cat draft.txt', 'draft.txt:'],
+    ['logic-switchboard', 'flip 1', 'TRUE AND TRUE AND FALSE AND FALSE = FALSE'],
+    ['string-forge', 'upper', 'text = " CODE "'],
+    ['memory-trail', 'swap', 'stack = [2, 4, 7]'],
 ]) {
     test(`${template} shows the same program and state in mobile preview without submitting`, async ({ page }) => {
         await page.setViewportSize({ width: 390, height: 950 });
@@ -66,12 +67,12 @@ for (const [template, command, expected] of [
         const requests = [];
         page.on('request', request => { if (request.method() === 'POST') requests.push(request.url()); });
         const game = page.locator('[data-arcade-game]');
-        await game.locator('.arcade-source summary').click();
+        await game.locator('.program-arrange summary').click();
         await game.locator('[data-arcade-code]').fill(command);
-        await game.getByRole('button', { name: 'Step preview', exact: true }).click();
+        await game.getByRole('button', { name: 'Step', exact: true }).click();
         await expect(game.locator('.trace-state')).toContainText(expected);
         await expect(game.locator('.trace-source [aria-current=step]')).toHaveCount(1);
-        await game.getByRole('button', { name: 'Replay preview', exact: true }).click();
+        await game.getByRole('button', { name: 'Replay', exact: true }).click();
         await expect(game.locator('.trace-state')).toContainText(expected);
         expect(requests).toEqual([]);
         await audit(page);
@@ -98,7 +99,7 @@ test('Intermediate practice is independently enterable while its later levels st
     const game = page.locator('[data-arcade-game]');
     await game.getByRole('button', { name: 'Flip input 1', exact: true }).click();
     await expect(game.locator('.trace-source')).toContainText('input[1] = NOT input[1]');
-    await game.getByRole('button', { name: 'Step preview', exact: true }).click();
+    await game.getByRole('button', { name: 'Step', exact: true }).click();
     await expect(game.locator('.trace-state')).toContainText('TRUE AND TRUE AND FALSE = FALSE');
     await expect(game.locator('[data-arcade-output]')).not.toContainText('saved');
     for (const width of [1440, 390]) { await page.setViewportSize({ width, height: 1000 }); await audit(page); }

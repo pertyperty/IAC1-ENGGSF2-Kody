@@ -43,7 +43,7 @@
                         @else
                             @auth View course @else Sign in to explore @endauth
                         @endcan
-                        <x-action-icon name="right"/>
+
                     </span>
                 </div>
             </a>

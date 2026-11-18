@@ -14,6 +14,11 @@ class SaveModuleRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $this->normalizeAccessSettings();
+        $id = $this->input('game_challenge');
+        $task = is_string($id) ? (config('assessment-challenges')[$id] ?? null) : null;
+        if ($this->input('assessment_kind') === 'game' && $task !== null) {
+            $this->merge(['game_preset' => $task['basis']]);
+        }
     }
 
     public function authorize(): bool
@@ -38,12 +43,13 @@ class SaveModuleRequest extends FormRequest
             'managed_preset' => ['exclude_unless:assessment_kind,preset', 'required', 'integer', 'min:1'],
             'preset_title' => ['exclude_unless:assessment_kind,preset', 'required', 'string', 'max:100'],
             'game_preset' => ['exclude_unless:assessment_kind,game', 'required', Rule::in(array_keys(config('learning.instances') + config('arcade')))],
-            'game_scenario' => ['exclude_unless:assessment_kind,game', 'nullable', 'string', 'max:4000'],
-            'game_layout' => ['exclude_unless:assessment_kind,game', 'nullable', 'string', 'max:4000'],
-            'game_title' => ['exclude_unless:assessment_kind,game', 'required', 'string', 'max:100'],
-            'game_instructions' => ['exclude_unless:assessment_kind,game', 'required', 'string', 'max:1000'],
-            'game_hint' => ['exclude_unless:assessment_kind,game', 'required', 'string', 'max:1000'],
-            'game_learning_idea' => ['exclude_unless:assessment_kind,game', 'required', 'string', 'max:1000'],
+            'game_challenge' => ['exclude_unless:assessment_kind,game', 'nullable', 'string', Rule::in(array_keys(config('assessment-challenges')))],
+            'game_scenario' => [Rule::excludeIf(fn () => filled($this->input('game_challenge'))), 'exclude_unless:assessment_kind,game', 'nullable', 'string', 'max:4000'],
+            'game_layout' => [Rule::excludeIf(fn () => filled($this->input('game_challenge'))), 'exclude_unless:assessment_kind,game', 'nullable', 'string', 'max:4000'],
+            'game_title' => [Rule::excludeIf(fn () => filled($this->input('game_challenge'))), 'exclude_unless:assessment_kind,game', 'required', 'string', 'max:100'],
+            'game_instructions' => [Rule::excludeIf(fn () => filled($this->input('game_challenge'))), 'exclude_unless:assessment_kind,game', 'required', 'string', 'max:1000'],
+            'game_hint' => [Rule::excludeIf(fn () => filled($this->input('game_challenge'))), 'exclude_unless:assessment_kind,game', 'required', 'string', 'max:1000'],
+            'game_learning_idea' => [Rule::excludeIf(fn () => filled($this->input('game_challenge'))), 'exclude_unless:assessment_kind,game', 'required', 'string', 'max:1000'],
             'quiz_title' => ['exclude_unless:assessment_kind,quiz', 'required', 'string', 'max:100'],
             'quiz_question' => ['exclude_with:quiz_questions', 'exclude_unless:assessment_kind,quiz', 'required', 'string', 'max:500'],
             'quiz_a' => ['exclude_with:quiz_questions', 'exclude_unless:assessment_kind,quiz', 'required', 'string', 'max:300', 'different:quiz_b'],

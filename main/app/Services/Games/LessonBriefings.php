@@ -6,6 +6,13 @@ class LessonBriefings
 {
     public function for(array $game): array
     {
+        if (isset($game['assessment'])) {
+            $base = $game;
+            unset($base['assessment']);
+
+            return array_replace($this->for($base), ['task' => $game['instructions'], 'outcome' => $game['learningIdea'],
+                'success' => 'Complete the program and concept check.']);
+        }
         if ($game['template'] === 'choice-quiz' && isset($game['briefing'])) {
             return $game['briefing'];
         }

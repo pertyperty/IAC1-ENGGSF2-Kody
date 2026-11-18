@@ -6,5 +6,5 @@
     </div><label class="resource-width-control" data-resource-width-control>Preview width<input type="range" min="30" max="70" step="5" value="50" data-resource-width><output data-resource-width-value>50%</output></label></header>
     <p class="resource-viewer-status field-hint" data-resource-status role="status"></p>
     <iframe class="resource-viewer-frame" data-resource-frame title="Lesson resource preview" referrerpolicy="no-referrer"></iframe>
-    <p class="resource-viewer-footer field-hint">Preview unavailable? <a class="quiet-link" data-resource-original>Open resource page <x-action-icon name="right"/></a>. Download the original for full formatting.</p>
+    <p class="resource-viewer-footer field-hint">Preview unavailable? <a class="quiet-link" data-resource-original>Open resource page</a>. Download the original for full formatting.</p>
 </dialog>

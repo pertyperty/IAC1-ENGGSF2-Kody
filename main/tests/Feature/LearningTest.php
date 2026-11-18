@@ -9,7 +9,7 @@ use Illuminate\Support\Str;
 uses(RefreshDatabase::class);
 
 test('game-first amendment offers a public playable trial and separate learning tab', function () {
-    $this->get(route('welcome'))->assertOk()->assertSee('data-coding-game', false)->assertSee('Run my code')->assertSee('Logic Garden')
+    $this->get(route('welcome'))->assertOk()->assertSee('data-coding-game', false)->assertSee('Run program')->assertSee('Logic Garden')
         ->assertSee(route('learning.catalog'))->assertSee(route('login'))->assertSee('Save your progress with an account');
     $this->assertDatabaseCount('users', 0);
 });
@@ -17,7 +17,7 @@ test('game-first amendment offers a public playable trial and separate learning 
 test('Learning catalog exposes all practice modules and searches their concepts', function () {
     $this->get(route('learning.catalog'))->assertOk()->assertSee('First steps')->assertSee('The loop trail')->assertSee('Crystal collector');
     $this->get(route('learning.catalog', ['q' => 'LOOPS']))->assertOk()->assertSee('The loop trail')->assertDontSee('Crystal collector')->assertDontSee('First steps');
-    $this->get(route('learning.catalog', ['q' => 'not a module']))->assertOk()->assertSee('No lessons found')->assertSee('See all modules');
+    $this->get(route('learning.catalog', ['q' => 'not a module']))->assertOk()->assertSee('No lessons found')->assertSee('See all lessons');
 });
 
 test('Learning search escapes input and bounds query size', function () {

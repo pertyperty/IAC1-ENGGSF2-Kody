@@ -45,7 +45,7 @@ test('B03 Learner Contributor and Instructor confirm one free enrollment and get
     $slot = $course->publishedRevision->modules->sole();
     $user = User::factory()->create(['account_role' => $role]);
     moduleSignIn($this, $user);
-    $this->get(route('course-learning.show', $course))->assertOk()->assertSee('Join this journey')->assertDontSee('data-completion-url', false);
+    $this->get(route('course-learning.show', $course))->assertOk()->assertSee('Enroll in course')->assertDontSee('data-completion-url', false);
     $this->assertDatabaseCount('course_enrollments', 0);
     $this->post(route('course-learning.enroll', $course), ['revision_id' => $course->published_revision_id, 'user_id' => 999, 'access' => 'paid', 'price' => 999])->assertRedirect(route('course-learning.show', $course));
     $enrollment = CourseEnrollment::sole();
@@ -57,7 +57,7 @@ test('B03 Learner Contributor and Instructor confirm one free enrollment and get
     $this->get(route('dashboard'))->assertOk()->assertSee(route('course-learning.mine'));
     $this->get(route('course-learning.lesson', [$course, $slot->id]))->assertOk()->assertSee(route('course-learning.game', [$course, $slot->id]))->assertHeader('Cache-Control', 'no-store, private');
     $this->assertDatabaseCount('course_module_progress', 1);
-    $this->get(route('course-learning.show', $course))->assertSee('Continue your adventure');
+    $this->get(route('course-learning.show', $course))->assertSee('Continue lesson');
 })->with([Role::Learner, Role::Contributor, Role::Instructor]);
 
 test('B03 reviewer roles cannot enroll or consume learner course access', function (Role $role) {

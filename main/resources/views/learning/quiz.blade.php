@@ -1,5 +1,5 @@
 <section class="practice-quiz" data-practice-quiz="{{ json_encode($quiz, JSON_THROW_ON_ERROR) }}" @if(isset($completionUrl) || isset($module)) data-completion-url="{{ $completionUrl ?? route('play.quiz', $module) }}" @endif aria-label="Practice quiz">
-    <div class="game-heading"><div><p class="overline"><x-action-icon name="game"/> QUIZ GAME · RECALL AND CONNECT</p><h2>{{ $quiz['title'] }}</h2></div><span class="game-badge">{{ isset($completionUrl) || isset($module) ? 'VALIDATED PLAY' : 'LOCAL PRACTICE' }}</span></div>
+    <div class="game-heading"><div><p class="overline">Concept check</p><h2>{{ $quiz['title'] }}</h2></div></div>
     @include('learning.briefing', ['game' => $quiz])
     <form>@foreach(app(\App\Services\Games\QuizAuthoring::class)->questions($quiz) as $question)<fieldset data-quiz-question="{{ $question['id'] }}"><legend>{{ $loop->count > 1 ? $loop->iteration.'. ' : '' }}{{ $question['question'] }}</legend>
     @if(($question['type'] ?? 'choice') === 'blank')

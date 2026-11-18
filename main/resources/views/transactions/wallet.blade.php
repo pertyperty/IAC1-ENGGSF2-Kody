@@ -17,8 +17,8 @@
             @if($paymentsReady)<h2>Buy KodeBits</h2><p class="field-hint">One-time PHP purchases. KodeBits do not expire and cannot be exchanged for cash.</p>
             <div class="wallet-packages">
                 @foreach(config('economy.packages') as $slug => $package)
-                    <article class="wallet-package wallet-package-{{ $slug }}"><div class="package-identity"><span class="package-tier">{{ ['starter' => 'A small start', 'builder' => 'Keep exploring', 'explorer' => 'Build your library'][$slug] ?? 'Your next adventure' }}</span><div class="package-coins" aria-hidden="true">@for($coin = 0; $coin < min(3, $loop->iteration); $coin++)<x-kody-art name="kodebit" class="package-art" size="56"/>@endfor</div></div><h3>{{ $package['label'] }}</h3><strong><x-kodebits :amount="$package['kodebits']"/></strong><p class="package-price">PHP {{ \App\Support\ExactMoney::decimal($package['price_minor']) }}</p>
-                        <form class="studio-form" method="post" action="{{ route('wallet.purchase') }}">@csrf<input type="hidden" name="package" value="{{ $slug }}"><input type="hidden" name="confirmation_id" value="{{ $confirmationId }}">@include('transactions.password-confirmation')<button class="button button-play">Continue to Xendit <x-action-icon name="right"/></button></form>
+                    <article class="wallet-package wallet-package-{{ $slug }}"><div class="package-identity"><span class="package-tier">{{ ['starter' => 'A small start', 'builder' => 'Keep exploring', 'explorer' => 'Build your library'][$slug] ?? 'Your next lesson' }}</span><div class="package-coins" aria-hidden="true">@for($coin = 0; $coin < min(3, $loop->iteration); $coin++)<x-kody-art name="kodebit" class="package-art" size="56"/>@endfor</div></div><h3>{{ $package['label'] }}</h3><strong><x-kodebits :amount="$package['kodebits']"/></strong><p class="package-price">PHP {{ \App\Support\ExactMoney::decimal($package['price_minor']) }}</p>
+                        <form class="studio-form" method="post" action="{{ route('wallet.purchase') }}">@csrf<input type="hidden" name="package" value="{{ $slug }}"><input type="hidden" name="confirmation_id" value="{{ $confirmationId }}">@include('transactions.password-confirmation')<button class="button button-play">Continue to Xendit</button></form>
                     </article>
                 @endforeach
             </div>
@@ -26,7 +26,7 @@
             @if($purchases->isNotEmpty())
                 <h2>Purchase status</h2><div class="wallet-history">
                 @foreach($purchases as $purchase)
-                    <article class="wallet-transaction"><strong>{{ ucfirst($purchase->package) }}</strong><span class="status-pill">{{ $purchase->state }}</span><p>PHP {{ \App\Support\ExactMoney::decimal($purchase->gross_minor) }}</p><a class="quiet-link" href="{{ route('wallet.purchase.show', $purchase->id) }}">View status <x-action-icon name="right"/></a>
+                    <article class="wallet-transaction"><strong>{{ ucfirst($purchase->package) }}</strong><span class="status-pill">{{ $purchase->state }}</span><p>PHP {{ \App\Support\ExactMoney::decimal($purchase->gross_minor) }}</p><a class="quiet-link" href="{{ route('wallet.purchase.show', $purchase->id) }}">View status</a>
                     @if($purchase->lot_id)<a class="quiet-link" href="{{ route('wallet.receipt', $purchase->id) }}">Payment receipt <x-action-icon name="download"/></a>@endif
                     <p class="transaction-reference">{{ $purchase->id }}</p></article>
                 @endforeach
@@ -36,7 +36,7 @@
         <section class="content-panel"><h2>KodeBit history</h2><div class="wallet-history">
             @forelse($operations as $operation)
                 <article class="wallet-transaction"><strong>{{ $operation->kind }}</strong><b class="{{ $operation->kodebits > 0 ? 'transaction-credit' : 'transaction-debit' }}">{{ $operation->kodebits > 0 ? '+' : '' }}{{ number_format($operation->kodebits) }} KB</b><p>{{ \Carbon\CarbonImmutable::parse($operation->created_at)->setTimezone('Asia/Manila')->format('M j, Y g:i A') }} Asia/Manila</p><p class="transaction-reference">{{ $operation->id }}</p></article>
-            @empty<x-empty-state title="Your next adventure starts here" description="Verified purchases, learning access and rewards will appear in this ledger." />@endforelse
+            @empty<x-empty-state title="Your next lesson starts here" description="Verified purchases, learning access and rewards will appear in this ledger." />@endforelse
         </div>{{ $operations->links() }}</section>
     </div>
     @if(in_array(auth()->user()->account_role, [\App\Enums\Role::Instructor, \App\Enums\Role::Contributor], true) || $earnings->isNotEmpty())

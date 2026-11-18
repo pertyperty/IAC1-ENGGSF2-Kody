@@ -16,8 +16,8 @@
     @endcan
     @can('create', \App\Models\CodingChallenge::class)
     <p class="rail-label">Creator workspace</p>
-    @can('create', \App\Models\LearningModule::class)<a href="{{ route('studio.index') }}" @if(request()->routeIs('studio.*')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'create', 'label' => 'Module studio'])</a><a href="{{ route('courses.index') }}" @if(request()->routeIs('courses.*', 'curriculum.*')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'book', 'label' => 'Course builder'])</a>@endcan
-    <a href="{{ route('challenges.index') }}" @if(request()->routeIs('challenges.index', 'challenges.create', 'challenges.edit')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'code', 'label' => 'Quest studio'])</a>
+    @can('create', \App\Models\LearningModule::class)<a href="{{ route('studio.index') }}" @if(request()->routeIs('studio.*')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'create', 'label' => 'Lesson studio'])</a><a href="{{ route('courses.index') }}" @if(request()->routeIs('courses.*', 'curriculum.*')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'book', 'label' => 'Course builder'])</a>@endcan
+    <a href="{{ route('challenges.index') }}" @if(request()->routeIs('challenges.index', 'challenges.create', 'challenges.edit')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'code', 'label' => 'Challenge studio'])</a>
     @endcan
     @can('viewAny', \App\Models\User::class)
     <p class="rail-label">{{ auth()->user()->account_role->name }} workspace</p>

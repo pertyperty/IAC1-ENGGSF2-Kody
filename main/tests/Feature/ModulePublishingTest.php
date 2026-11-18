@@ -57,7 +57,7 @@ function moduleSignIn($test, User $user): void
 test('D01 instructors create owned drafts with allowlisted template data and escaped previews', function () {
     $author = User::factory()->create(['account_role' => Role::Instructor]);
     moduleSignIn($this, $author);
-    $this->get(route('studio.create'))->assertOk()->assertSee('Start with a spark');
+    $this->get(route('studio.create'))->assertOk()->assertSee('Create a lesson');
     $this->post(route('studio.store'), moduleData(['title' => '<script>bad()</script>', 'created_by' => 999,
         'status' => 'Published', 'published_revision_id' => 999, 'assessment' => ['source' => 'bad()']]))->assertRedirect();
     $module = LearningModule::sole();

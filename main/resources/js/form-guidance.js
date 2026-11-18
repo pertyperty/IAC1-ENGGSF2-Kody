@@ -7,7 +7,7 @@ export function mountFormGuidance(document) {
         const fields = [...form.querySelectorAll('input, select, textarea')].filter(eligible);
         for (const field of fields) {
             if (!field.id) field.id = `form-field-${++sequence}`;
-            if (field.getAttribute('aria-describedby') || !['text', 'email', 'textarea', 'number'].includes(field.type)) continue;
+            if (!field.hasAttribute('data-show-limit') || field.getAttribute('aria-describedby') || !['text', 'email', 'textarea', 'number'].includes(field.type)) continue;
             const hints = [];
             if (field.minLength > 0 && field.maxLength > 0) hints.push(`${field.minLength}–${field.maxLength} characters.`);
             else if (field.maxLength > 0) hints.push(`Up to ${field.maxLength} characters.`);

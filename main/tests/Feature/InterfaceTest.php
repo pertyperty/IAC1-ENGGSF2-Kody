@@ -36,11 +36,11 @@ test('role navigation distinguishes participant studios and staff tools without 
     $response = $this->get(route('dashboard'))->assertOk()->assertSee('Your workspace')
         ->assertSee('Account menu')->assertSee('Profile & security');
     if ($role === Role::Instructor) {
-        $response->assertSee('Module studio')->assertSee('Course builder')->assertSee('Quest studio');
+        $response->assertSee('Lesson studio')->assertSee('Course builder')->assertSee('Challenge studio');
     } elseif ($role === Role::Contributor) {
-        $response->assertSee('Quest studio')->assertDontSee('Module studio')->assertDontSee('Course builder');
+        $response->assertSee('Challenge studio')->assertDontSee('Lesson studio')->assertDontSee('Course builder');
     } else {
-        $response->assertDontSee('Quest studio')->assertDontSee('Module studio');
+        $response->assertDontSee('Challenge studio')->assertDontSee('Lesson studio');
     }
     if ($role === Role::Moderator) {
         $response->assertSee('Weekly planning')->assertDontSee('Accounting');

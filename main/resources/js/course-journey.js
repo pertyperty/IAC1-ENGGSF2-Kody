@@ -23,21 +23,21 @@ export function mountCourseJourney(root, doc, win) {
         const state = journeyValues(event.detail.journey, courseId, win.location.origin);
         if (!state) return;
         root.classList.toggle('journey-finished', state.finished);
-        root.querySelector('[data-journey-title]').textContent = state.finished ? 'Journey cleared!' : 'Ready for your next adventure.';
-        root.querySelector('[data-journey-count]').textContent = `${state.completed} of ${state.total} adventures completed.`;
+        root.querySelector('[data-journey-title]').textContent = state.finished ? 'Course complete' : 'Your next lesson is ready.';
+        root.querySelector('[data-journey-count]').textContent = `${state.completed} of ${state.total} lessons completed.`;
         const progress = root.querySelector('[data-journey-progress]');
         progress.value = state.completed; progress.max = state.total;
         root.querySelector('[data-journey-note]').textContent = state.finished
-            ? 'All your lesson progress is saved. Discover another journey or revisit a favorite.'
-            : state.next ? 'Your win is saved. Your next adventure is ready.' : 'Your win is saved. Open the trail to check the remaining adventures.';
+            ? 'Your progress is saved. Review a lesson or find another course.'
+            : state.next ? 'Your progress is saved. Your next lesson is ready.' : 'Your progress is saved. View the course to check your remaining lessons.';
         const next = root.querySelector('[data-journey-next]');
         next.hidden = !state.next;
         if (state.next) {
             next.href = state.next.url;
-            next.setAttribute('aria-label', `Next adventure: ${state.next.title}`);
+            next.setAttribute('aria-label', `Next lesson: ${state.next.title}`);
         } else next.removeAttribute('href');
         const overview = root.querySelector('[data-journey-overview]');
         overview.href = state.finished ? `${win.location.origin}/learn/courses` : `${win.location.origin}/learn/courses/${courseId}`;
-        overview.textContent = state.finished ? 'Find another journey' : 'View your trail';
+        overview.textContent = state.finished ? 'Find another course' : 'View course';
     });
 }

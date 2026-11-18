@@ -153,7 +153,7 @@ test('G06 module withdrawal applies to pinned lessons and blocks course composit
     joinCourse($course, $learner);
     staffWithdraw('module', $module);
     moduleSignIn($this, $learner);
-    $this->get(route('course-learning.show', $course))->assertOk()->assertSee('Adventure unavailable')->assertDontSee(route('course-learning.lesson', [$course, $slot->id]));
+    $this->get(route('course-learning.show', $course))->assertOk()->assertSee('Lesson unavailable')->assertDontSee(route('course-learning.lesson', [$course, $slot->id]));
     $this->get(route('course-learning.lesson', [$course, $slot->id]))->assertNotFound();
     expect(fn () => joinCourse($course))->toThrow(ValidationException::class);
     $owner = User::find($course->created_by);

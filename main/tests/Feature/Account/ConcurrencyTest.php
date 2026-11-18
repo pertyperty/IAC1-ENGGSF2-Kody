@@ -15,6 +15,7 @@ use App\Services\Challenges\ChallengePublishing;
 use App\Services\Content\CoursePublishing;
 use App\Services\Content\ModulePublishing;
 use App\Services\Engagement\ContentFeedback;
+use App\Support\RegistrationTerms;
 use Database\Seeders\TowerLevelSeeder;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Crypt;
@@ -497,6 +498,7 @@ test('A01 simultaneous duplicate registrations create one account and one delive
         'username' => 'racelearner', 'email' => 'race@example.test',
         'first_name' => 'Concurrent', 'last_name' => 'Learner',
         'password' => 'StrongPass12!', 'account_type' => 'learner',
+        'terms_accepted' => true, 'terms_version' => RegistrationTerms::VERSION,
     ];
     $results = simultaneousAccountRequests('register', $input, fn () => DB::statement('LOCK TABLE users IN SHARE MODE'));
     sort($results);

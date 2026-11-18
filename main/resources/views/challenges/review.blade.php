@@ -1,5 +1,5 @@
 @extends('layouts.learning')
-@section('title', 'Review a coding quest — Kody')
+@section('title', 'Review a coding challenge — Kody')
 @section('content')
 <section class="review-page page-width">
 @include('transactions.review-access')

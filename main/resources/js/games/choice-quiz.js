@@ -1,5 +1,4 @@
 import { validateQuestion, checkQuestion, readQuestionAnswer } from './quiz-types.js';
-import { publishFeedback } from '../feedback.js';
 import { saveCompletion } from './save-completion.js';
 
 export function validateQuiz(quiz) {
@@ -57,7 +56,11 @@ export function mountQuiz(root) {
         feedback.textContent = result.message;
         if (result.results) result.results.forEach((item) => { root.querySelector(`[data-quiz-question="${item.id}"] [data-question-feedback]`).textContent = item.message; });
         root.classList.toggle('quiz-correct', result.correct);
-        if (!result.correct) publishFeedback(root, result.message, 'info', false, null, null, true);
+        if (!result.correct) {
+            const incorrect = result.results?.find(item => !item.correct);
+            const group = incorrect ? root.querySelector(`[data-quiz-question="${incorrect.id}"]`) : root;
+            group.querySelector('input, select')?.focus({ preventScroll: true });
+        }
         if (result.correct) {
             busy = true;
             const controls = root.querySelectorAll('button, input, select');

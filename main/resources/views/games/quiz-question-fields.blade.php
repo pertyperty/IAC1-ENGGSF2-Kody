@@ -10,7 +10,7 @@
             @include('games.quiz-option-fields')
         @endforeach
     </div>
-    <button type="button" class="game-reset" data-add-option>Add a choice +</button>
+    <button type="button" class="game-reset" data-add-option>Add choice</button>
     <label>Correct choice<select data-question-field="answer" name="quiz_questions[{{ $questionIndex }}][answer]">
         <option value="">Choose the correct answer</option>
         @foreach(is_array($question['options'] ?? null) ? array_values(array_slice($question['options'], 0, 6)) : [] as $optionIndex => $option)

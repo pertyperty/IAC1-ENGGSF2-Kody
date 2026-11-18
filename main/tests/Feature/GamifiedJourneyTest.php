@@ -79,7 +79,7 @@ test('course trail continuation comes from committed reading and game progress a
     $this->postJson(route('course-learning.game', [$course, $game->id]), courseWin())->assertOk()
         ->assertJsonPath('journey.course_id', $course->id)->assertJsonPath('journey.completed', 2)
         ->assertJsonPath('journey.finished', true)->assertJsonPath('journey.next', null);
-    $this->get(route('course-learning.lesson', [$course, $game->id]))->assertOk()->assertSee('Journey cleared!')->assertSee('Find another journey');
+    $this->get(route('course-learning.lesson', [$course, $game->id]))->assertOk()->assertSee('Course complete')->assertSee('Find another course');
     $this->assertDatabaseCount('xp_awards', 2);
 });
 
@@ -90,7 +90,7 @@ test('unavailable course steps retain progress but do not expose withdrawn title
     $module->forceFill(['staff_withdrawn_at' => now()])->save();
     $trail = app(CourseLearning::class)->outline($user, 'module-test-session', $course->id)['trail'];
     expect($trail['next'])->toBeNull()->and($trail['finished'])->toBeFalse()
-        ->and($trail['steps'][0]['title'])->toBe('Adventure unavailable')->and($trail['steps'][1]['state'])->toBe('Locked');
+        ->and($trail['steps'][0]['title'])->toBe('Lesson unavailable')->and($trail['steps'][1]['state'])->toBe('Locked');
     expect(DB::table('course_module_progress')->where('enrollment_id', $enrollment->id)->count())->toBe(0);
 });
 

@@ -125,13 +125,25 @@ test.describe('touch tower grid', () => {
     });
 });
 
-for (const [template, program] of [['logic-switchboard', 'flip 1\nflip 2'], ['string-forge', 'upper\nreverse'], ['memory-trail', 'push 2\npush 3']]) {
+for (const [template, program, answer] of [
+    ['logic-switchboard', 'flip 1\nflip 3\nflip 4', 'FALSE because one input is FALSE'],
+    ['string-forge', 'trim\nupper\nreverse\nappend _ok', 'UPPER also changes the appended suffix'],
+    ['memory-trail', 'swap\npop\nduplicate', '7'],
+]) {
     test(`${template} has an interactive world and confirms practice without saving account progress`, async ({ page }) => {
         await page.goto(`/playground?game=${template}`);
-        await page.getByText('Edit instructions as text', { exact: true }).click();
+        const writes = [];
+        page.on('request', request => { if (request.method() === 'POST') writes.push(request.url()); });
+        await page.locator('.program-arrange > summary').click();
         await page.locator('[data-arcade-code]').fill(program);
         await page.locator('[data-arcade-run]').click();
-        await expect(page.locator('[data-arcade-output]')).toContainText('Objective complete');
+        await expect(page.locator('[data-arcade-output]')).toContainText('Program complete');
+        await expect(page.locator('[data-game-result]')).toBeHidden();
+        await page.getByRole('radio', { name: answer, exact: true }).check();
+        await page.getByRole('button', { name: 'Check answer', exact: true }).click();
+        await expect(page.locator('[data-game-result]')).toBeVisible();
+        await page.locator('[data-result-return]').click();
+        expect(writes).toEqual([]);
         await expect(page.locator('[data-arcade-world]')).toHaveClass(/puzzle-world/);
         await audit(page);
         await page.setViewportSize({ width: 320, height: 740 });
@@ -148,8 +160,9 @@ test('course progress appears in both catalogs and centered results retain icon 
     await page.getByLabel('Email or username').fill('browser_librarylearner');
     await page.getByLabel(/^Password/).fill('BrowserStrong12!');
     await page.getByRole('button', { name: /Sign in/ }).click();
+    await expect(page).toHaveURL(/\/$/);
     await page.goto(`/learn/courses/${course.id}`);
-    await page.getByRole('button', { name: 'Join this journey' }).click();
+    await page.getByRole('button', { name: 'Enroll in course' }).click();
     await page.goto(`/learn/courses/${course.id}/modules/${course.slots[0]}`);
     const readingTitle = await page.locator('main h1').textContent();
     await page.getByRole('button', { name: 'Mark as read' }).click();
@@ -197,18 +210,20 @@ test('practice arcade fills wide layouts and result dialogs remain usable on mob
     await audit(page);
     await page.screenshot({ path: 'storage/app/browser-results/arcade-full-workspace.png' });
     await page.setViewportSize({ width: 320, height: 740 });
-    await game.locator('.arcade-source summary').click();
-    await game.locator('[data-arcade-code]').fill('add 3\nmultiply 2');
+    await game.locator('.program-arrange summary').click();
+    await game.locator('[data-arcade-code]').fill('add 3\nmultiply 2\nsubtract 1\nmultiply 2');
     await game.locator('[data-arcade-run]').click();
+    await game.getByLabel('21', { exact: true }).check();
+    await game.getByRole('button', { name: 'Check answer', exact: true }).click();
     const dialog = page.locator('[data-game-result]');
     await expect(dialog).toBeVisible();
     await expect(dialog.locator('[data-result-message]')).toContainText('local practice');
     await audit(page);
     await dialog.locator('[data-result-return]').click();
     await expect(game.locator('[data-arcade-run]')).toBeFocused();
-    await expect(game.locator('[data-arcade-output]')).toContainText(/objective complete/i);
+    await expect(game.locator('[data-arcade-output]')).toContainText(/program complete/i);
     await game.locator('[data-arcade-code]').fill('subtract 1');
     await game.locator('[data-arcade-run]').click();
-    await expect(dialog.locator('[data-result-art]')).toHaveAttribute('src', /thinking\.webp$/);
-    await dialog.locator('[data-result-return]').click();
+    await expect(dialog).not.toBeVisible();
+    await expect(game.locator('[data-arcade-output]')).toContainText('target is 18');
 });

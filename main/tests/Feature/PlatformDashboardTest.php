@@ -52,7 +52,7 @@ test('B01 creator summary scopes publication and pending counts to the current o
         ->and($snapshot['updates'])->toHaveCount(1);
     moduleSignIn($this, User::factory()->create(['account_role' => Role::Contributor]));
     $contributor = app(PlatformDashboard::class)->snapshot(auth()->user());
-    expect($contributor['creator'])->toHaveCount(1)->and($contributor['creator'][0]['label'])->toBe('Coding quests');
+    expect($contributor['creator'])->toHaveCount(1)->and($contributor['creator'][0]['label'])->toBe('Coding challenges');
 });
 
 test('B01 dashboard has bounded panels and constant query count as enrollments grow', function () {

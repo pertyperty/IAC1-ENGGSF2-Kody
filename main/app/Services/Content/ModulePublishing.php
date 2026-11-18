@@ -143,8 +143,9 @@ class ModulePublishing
     {
         return match ($data['assessment_kind']) {
             'preset' => array_replace(app(GamePresets::class)->snapshot((int) $data['managed_preset']), ['title' => $data['preset_title']]),
-            'game' => array_replace(app(GameAssessment::class)->instance($data), ['preset' => $data['game_preset'],
-                'title' => $data['game_title'], 'instructions' => $data['game_instructions'], 'hint' => $data['game_hint'], 'learningIdea' => $data['game_learning_idea']]),
+            'game' => ! empty($data['game_challenge']) ? app(GameAssessment::class)->instance($data) + ['preset' => $data['game_preset']]
+                : array_replace(app(GameAssessment::class)->instance($data), ['preset' => $data['game_preset'],
+                    'title' => $data['game_title'], 'instructions' => $data['game_instructions'], 'hint' => $data['game_hint'], 'learningIdea' => $data['game_learning_idea']]),
             'quiz' => isset($data['quiz_questions']) ? app(QuizAuthoring::class)->instance($data['quiz_title'], $data['quiz_questions']) : ['template' => 'choice-quiz', 'version' => 1, 'title' => $data['quiz_title'], 'question' => $data['quiz_question'],
                 'options' => [['id' => 'a', 'label' => $data['quiz_a']], ['id' => 'b', 'label' => $data['quiz_b']]],
                 'answer' => $data['quiz_answer'], 'explanation' => $data['quiz_explanation']],

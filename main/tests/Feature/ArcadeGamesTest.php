@@ -5,6 +5,7 @@ use App\Models\LearningModule;
 use App\Models\User;
 use App\Services\Content\ModulePublishing;
 use App\Services\Games\ArcadeGames;
+use App\Services\Games\AssessmentChallenges;
 use App\Services\Games\GamePresets;
 use App\Services\Gamification\LearningProgression;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -94,7 +95,7 @@ test('G08 new managed templates pin custom scenarios into creator lessons', func
 })->with('arcade solutions');
 
 test('game-first guests can try four games without completion endpoints', function ($template, $program) {
-    $this->get(route('arcade', ['game' => $template]))->assertOk()->assertSee(config('arcade')[$template]['title'])
+    $this->get(route('arcade', ['game' => $template]))->assertOk()->assertSee(app(AssessmentChallenges::class)->catalog()[collect(config('assessment-challenges'))->search(fn ($task) => $task['basis'] === $template)]['title'])
         ->assertSee('data-arcade-game', false)->assertDontSee('data-completion-url', false);
     expect(DB::table('learning_activity_days')->count())->toBe(0);
 })->with('arcade solutions');

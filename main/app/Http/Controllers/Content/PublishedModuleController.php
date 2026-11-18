@@ -32,7 +32,8 @@ class PublishedModuleController extends Controller
 
     public function game(CompleteGameRequest $request, LearningModule $module, int $revision, LearningProgression $progression): JsonResponse
     {
-        $input = ['program' => $request->validated('program'), 'repeat' => $request->boolean('repeat'), 'conditional' => $request->boolean('conditional')];
+        $input = ['program' => $request->validated('program'), 'repeat' => $request->boolean('repeat'), 'conditional' => $request->boolean('conditional'),
+            'assessment_answer' => $request->validated('assessment_answer')];
 
         return response()->json($progression->recordModule($request->user(), $request->session()->getId(), $module->id, $revision, 'game', $input))->header('Cache-Control', 'no-store');
     }

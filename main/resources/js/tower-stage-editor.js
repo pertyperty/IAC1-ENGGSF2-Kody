@@ -176,9 +176,10 @@ export function previewTowerStage(editor, stage, host) {
     root.removeAttribute('data-completion-url');
     root.dataset[garden ? 'codingGame' : 'arcadeGame'] = JSON.stringify(stage);
     root.setAttribute('aria-label', `Preview: ${stage.title}`); root.querySelector('h2').textContent = stage.title;
-    root.querySelector(garden ? '.game-instructions > p' : '.arcade-mission').textContent = stage.instructions;
+    root.querySelector('.activity-goal p').textContent = stage.instructions;
+    root.querySelector('.game-kicker').textContent = stage.concept;
+    root.querySelector('.activity-reference > div').textContent = stage.hint;
     if (garden) {
-        root.querySelector('.step-pill').textContent = stage.concept;
         root.querySelector('[data-game-board]').setAttribute('aria-label', `Preview garden, ${stage.width} columns and ${stage.height} rows. Use the visual designer above to inspect the path.`);
         root.querySelector('[data-game-success] span').textContent = stage.learningIdea;
         for (const [key, mode] of [['repeat', 'loop'], ['conditional', 'conditional']]) root.querySelector(`[data-game-${key}]`).closest('label').hidden = stage.mode !== mode;

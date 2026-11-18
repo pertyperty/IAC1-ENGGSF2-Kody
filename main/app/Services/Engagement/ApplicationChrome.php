@@ -32,7 +32,7 @@ class ApplicationChrome
         }
         $achievements = $progress !== null ? ($dashboard['achievements'] ?? app(Achievements::class)->snapshot($user->id)) : null;
         $back = ['url' => route($user ? 'dashboard' : 'home'), 'label' => $user ? 'Back to your workspace' : 'Back to home'];
-        foreach (['studio.*' => ['studio.index', 'Back to module studio'], 'courses.*' => ['courses.index', 'Back to course builder'],
+        foreach (['studio.*' => ['studio.index', 'Back to lesson studio'], 'courses.*' => ['courses.index', 'Back to course builder'],
             'curriculum.*' => ['courses.index', 'Back to course builder'], 'module-reviews.*' => ['module-reviews.index', 'Back to module reviews'],
             'course-reviews.*' => ['course-reviews.index', 'Back to course reviews'], 'challenge-reviews.*' => ['challenge-reviews.index', 'Back to challenge reviews'],
             'account-governance.*' => ['account-governance.index', 'Back to community accounts'],
@@ -44,7 +44,7 @@ class ApplicationChrome
             'wallet.*' => ['wallet.index', 'Back to my wallet'], 'earnings.*' => ['wallet.index', 'Back to my wallet'],
             'help.*' => ['help.index', 'Back to Help'],
             'modules.*' => ['learning.catalog', 'Back to learning catalog'],
-            'challenge-attempts.*' => ['challenges.catalog', 'Back to coding quests'], 'weekly-events.*' => ['weekly-events.index', 'Back to weekly quests']] as $pattern => [$route, $label]) {
+            'challenge-attempts.*' => ['challenges.catalog', 'Back to coding challenges'], 'weekly-events.*' => ['weekly-events.index', 'Back to weekly quests']] as $pattern => [$route, $label]) {
             if ($request->routeIs($pattern) && ! $request->routeIs($route)) {
                 $back = ['url' => route($route), 'label' => $label];
                 break;
@@ -53,7 +53,7 @@ class ApplicationChrome
         if ($request->routeIs('challenges.create', 'challenges.edit', 'challenges.archive-confirmation')) {
             $back = ['url' => route('challenges.index'), 'label' => 'Back to quest studio'];
         } elseif ($request->routeIs('challenges.show')) {
-            $back = ['url' => route('challenges.catalog'), 'label' => 'Back to coding quests'];
+            $back = ['url' => route('challenges.catalog'), 'label' => 'Back to coding challenges'];
         } elseif ($request->routeIs('account.*') && ! $request->routeIs('account.show')) {
             $back = ['url' => route('account.show'), 'label' => 'Back to my account'];
         } elseif ($request->routeIs('course-learning.lesson')) {
@@ -64,7 +64,7 @@ class ApplicationChrome
             if ($request->integer('course') > 0 && $request->integer('slot') > 0) {
                 $back = ['url' => route('course-learning.lesson', [$request->integer('course'), $request->integer('slot')]), 'label' => 'Back to this lesson'];
             } elseif ($user?->can('viewOwned', $request->route('module'))) {
-                $back = ['url' => route('studio.edit', $request->route('module')), 'label' => 'Back to module studio'];
+                $back = ['url' => route('studio.edit', $request->route('module')), 'label' => 'Back to lesson studio'];
             } elseif ($user?->can('viewAny', LearningModule::class)) {
                 $back = ['url' => route('module-reviews.show', $request->route('module')), 'label' => 'Back to module review'];
             } else {

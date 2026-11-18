@@ -91,7 +91,8 @@ export function mountScenarioEditor(form, selector, prompts) {
             preview.setAttribute('aria-label', game.title);
             preview.querySelector('h2').textContent = game.title;
             preview.querySelector('.game-kicker').textContent = `KODY ARCADE · ${game.concept}`;
-            preview.querySelector('.arcade-mission').textContent = game.instructions;
+            preview.querySelector('.activity-goal p').textContent = game.instructions;
+            preview.querySelector('.activity-reference > div').textContent = game.hint;
             mountArcade(preview);
             root.querySelector('[data-scenario-preview-host]').replaceChildren(fragment);
             status.textContent = 'Preview only. Saving checks scenario types, limits and objective reachability on the server.';

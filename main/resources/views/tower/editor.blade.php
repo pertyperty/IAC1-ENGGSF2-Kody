@@ -40,7 +40,7 @@
             <p>Each level supports 1–4 stages. Boss levels require at least two. Use existing typed games or 1–10-question quizzes. Stages unlock in order.</p>
             <div class="tower-template-picks">
                 @foreach(config('learning.instances') + config('arcade') + ['quiz' => config('learning.quizzes.sequences')] as $template)
-                    <button type="button" class="button button-secondary button-small" data-tower-template="{{ json_encode($template, JSON_THROW_ON_ERROR) }}">+ {{ $template['title'] }}</button>
+                    <button type="button" class="button button-secondary button-small" data-tower-template="{{ json_encode($template, JSON_THROW_ON_ERROR) }}">Add {{ $template['title'] }}</button>
                 @endforeach
             </div>
             <div data-tower-stage-summary></div>

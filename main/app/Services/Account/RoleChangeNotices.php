@@ -81,7 +81,7 @@ class RoleChangeNotices
         return ['id' => $id, 'role' => $role->name, 'previous' => Role::tryFrom($data['previous_role'] ?? '')?->name ?? 'Learner',
             'title' => $role === Role::Instructor ? 'You’re now an Instructor' : 'You’re now a Contributor',
             'message' => $role === Role::Instructor ? 'Your teaching journey starts here. Turn what you know into lessons, games and learning paths.' : 'Your next idea can become someone’s coding quest. Create challenges and help learners practice.',
-            'capabilities' => $role === Role::Instructor ? ['Create learning modules', 'Build courses and assessments', 'Keep playing the Tower'] : ['Author coding quests', 'Preview and submit for review', 'Keep your saved learning history'],
+            'capabilities' => $role === Role::Instructor ? ['Create learning modules', 'Build courses and assessments', 'Keep playing the Tower'] : ['Author coding challenges', 'Preview and submit for review', 'Keep your saved learning history'],
             'workspace' => route($role === Role::Instructor ? 'studio.index' : 'challenges.index'),
             'action' => $role === Role::Instructor ? 'Explore your module studio' : 'Explore your quest studio',
             'acknowledge' => route('account.role-update.acknowledge', $id)];

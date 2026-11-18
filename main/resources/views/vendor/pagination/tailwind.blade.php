@@ -11,7 +11,7 @@
                 @endforeach
             @endif
         @endforeach
-        @if($paginator->hasMorePages())<a class="button button-secondary button-small" href="{{ $paginator->nextPageUrl() }}" rel="next">Next <x-action-icon name="right"/></a>@else<span class="pagination-disabled" aria-disabled="true">Next <x-action-icon name="right"/></span>@endif
+        @if($paginator->hasMorePages())<a class="button button-secondary button-small" href="{{ $paginator->nextPageUrl() }}" rel="next">Next</a>@else<span class="pagination-disabled" aria-disabled="true">Next</span>@endif
     </div>
 </nav>
 @endif
