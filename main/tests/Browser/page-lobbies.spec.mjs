@@ -44,10 +44,14 @@ test('favicon and page guides stay specific across Help Arcade weekly quests wal
     await page.setViewportSize({ width: 1920, height: 1000 }); await page.goto('/weekly'); await audit(page);
     await page.screenshot({ path: 'storage/app/browser-results/weekly-lobby-wide.png', fullPage: true });
     await page.goto(`/weekly/${manifest().weekly}`); await expect(page.locator('[data-execution-pending]')).toContainText('Live code execution: setup pending');
+    await expect(page.locator('[data-quest-problem]')).toContainText('Numbers and arithmetic');
+    await expect(page.locator('[data-quest-problem]')).toContainText('Variables');
     await expect(page.getByRole('button', { name: 'Submission unavailable' })).toBeDisabled();
     await guide(page, 'Execution setup is pending'); await audit(page);
     await page.screenshot({ path: 'storage/app/browser-results/weekly-quest-wide.png', fullPage: true });
     await page.goto(`/challenges/${manifest().challenge}`); await expect(page.locator('[data-execution-pending]')).toBeVisible();
+    await expect(page.locator('[data-quest-problem]')).toContainText('Numbers and arithmetic');
+    await expect(page.locator('[data-quest-problem]')).toContainText('Variables');
     await page.setViewportSize({ width: 320, height: 740 }); await audit(page);
     await page.goto('/weekly/leaderboard'); await expect(page.getByRole('heading', { name: 'Weekly leaderboard.' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'The first weekly podium is waiting' })).toBeVisible(); await guide(page, 'Choose a completed week'); await audit(page);

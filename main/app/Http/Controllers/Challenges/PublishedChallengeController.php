@@ -46,6 +46,8 @@ class PublishedChallengeController extends Controller
 
             return response()->view('transactions.access-preview', $access + ['kind' => 'challenge'])->header('Cache-Control', 'no-store, private');
         }
+        // Use the publication checked by admission, rather than the earlier route binding.
+        $challenge = $access['target'];
         $revision = CodingChallengeRevision::whereKey($challenge->published_revision_id)->where('challenge_id', $challenge->id)->where('review_status', 'Approved')
             ->firstOrFail(['id', 'title', 'description', 'language', 'difficulty', 'category', 'tags', 'rules', 'input_format', 'output_format', 'cpu_time_ms', 'memory_kib']);
         // Hidden tests are excluded by SQL and never loaded into the learner view.
