@@ -1,6 +1,6 @@
 # G07 business reporting implementation
 
-Last updated: 2026-10-13. This is the current reporting record, consolidating the
+Last updated: 2026-11-18. This is the current reporting record, consolidating the
 initial aggregate slice and subsequent PDF/Excel and financial reporting work.
 
 ## Scope and ownership
@@ -88,6 +88,16 @@ list the intersecting months in chronological order. Registers include internal
 record IDs, typed state/classification, times and exact monetary/token values.
 Names, email, provider identifiers/payloads, checkout URLs, recipient details,
 invoice evidence, code and hidden tests are excluded.
+
+## Cash-read consolidation follow-up
+
+The [18 November focused batch](financial-report-reads-2026-11-18.md) combines the
+three cash-window sums into one filtered aggregate while keeping historical
+opening cash separate. Its projection query budget falls from 18 to 16. Existing
+read-only snapshot ownership, exact reconciliation, date boundaries, private
+registers and the 200-row detail limit remain intact. The focused record owns
+measurement and new verification; the original broader evidence below retains
+its historical scope.
 
 ## Dedicated export layouts
 

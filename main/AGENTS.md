@@ -36,7 +36,10 @@ excludes self-review and links to existing credential/publication review workflo
 Keep privacy/finance routes and specialized history available. The
 [scoped static check](docs/static-analysis-2026-11-18.md) runs with `composer analyse`
 and no baseline/blanket ignores; expand its paths through focused verified changes.
-Measured optimization and live release evidence remain separate batches.
+The [financial-read follow-up](docs/financial-report-reads-2026-11-18.md) shares
+cash-window sums and caps the projection at 16 queries. Keep its historical opening
+read, exact signed amounts, expense reversals, read-only snapshot and bounded
+private registers. Device optimization and live release evidence remain separate.
 
 The [challenge read follow-up](docs/challenge-problem-reads-2026-11-18.md) uses the
 standard publication checked by admission and preserves the weekly event's pinned

@@ -13,6 +13,7 @@ parameters:
         - app/Http/Middleware/TrustConfiguredProxies.php
         - app/Services/Account/CredentialDocuments.php
         - app/Services/Administration/ReviewInbox.php
+        - app/Services/Administration/ReportFinancials.php
         - app/Http/Controllers/Administration/ReviewInboxController.php
         - app/Http/Controllers/Challenges/PublishedChallengeController.php
         - app/Http/Controllers/Challenges/WeeklyChallengeController.php

@@ -39,8 +39,10 @@ evidence listed in the [release index](release-evidence-index.md).
 
 The [navigation discovery batch](navigation-discovery-2026-11-18.md) implements
 optional Tower list navigation and a filtered staff review inbox. Measured
-JavaScript splitting and reporting-query consolidation still need representative
-measurements. The [scoped static-analysis check](static-analysis-2026-11-18.md)
+JavaScript splitting still needs representative device measurements. The
+[financial-report batch](financial-report-reads-2026-11-18.md) measures and
+consolidates repeated cash-window sums; other reporting optimizations remain
+measurement-led. The [scoped static-analysis check](static-analysis-2026-11-18.md)
 starts at the authorization, operations, credentials and inbox boundaries; wider
 coverage remains incremental. Further floors, engines, animation variants
 and new progression/currency systems are paused during consolidation. None of
