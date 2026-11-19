@@ -1,6 +1,9 @@
 @extends('layouts.learning')
 @section('title', 'Shape a game preset — Kody')
 @section('content')
+@pushOnce('page-scripts', 'authoring')
+    @vite('resources/js/authoring.js')
+@endPushOnce
 <section class="review-page page-width"><a class="quiet-link" href="{{ route('game-presets.index') }}"><x-action-icon name="left"/> Preset workshop</a><h1>{{ $preset ? 'Shape the next version.' : 'Plant a new idea.' }}</h1>
 <p>Games share Kody’s validated objective rules. Quiz games support up to ten automatically checked multiple-choice, fill-in-the-blank and matching questions. Creator lessons use the existing verified Active participant access rules. Validated module wins qualify for daily activity and the platform’s first-completion XP. Presets cannot set extra XP or KodeBit prizes.</p>
 

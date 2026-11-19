@@ -9,6 +9,12 @@ isolated browser harness. Use concise action labels, visible programs, one clear
 goal and contextual help. Prefer spacing over nested cards; keep borders where
 they explain inputs, game cells or important state.
 
+The [19 November page-loading consolidation](docs/page-specific-assets-2026-11-19.md)
+uses the base shell's page-script stack. Game components and Tower/authoring views
+declare their entry once; keep shared controls independent of editor imports.
+Initialize the authoring leave guard after editor defaults, and deploy the full
+Vite manifest/chunk set together. Delivery measurements do not prove device speed.
+
 The owner authorized original registration terms using the University of Baguio
 correspondence address. The dated public text and atomic server-owned acceptance
 supersede the earlier draft-only restriction below. Never fabricate acceptance

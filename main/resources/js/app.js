@@ -1,13 +1,6 @@
-import { mountModuleEditor } from './module-editor.js';
 import { mountFormGuidance } from './form-guidance.js';
-import { mountPresetEditor } from './preset-editor.js';
-import { mountCourseComposer } from './course-composer.js';
-import { mountTestCaseEditor } from './test-case-editor.js';
 import { mountChallengeStatus } from './challenge-status.js';
 import { mountContentReactions } from './content-reactions.js';
-import { mountGarden } from './games/command-garden.js';
-import { mountQuiz } from './games/choice-quiz.js';
-import { mountArcade } from './games/arcade-games.js';
 import { mountTheme } from './theme.js';
 import { mountAccountLinks } from './account-links.js';
 import { mountPasswordFields } from './password-fields.js';
@@ -16,7 +9,6 @@ import { mountScrollNavigation } from './scroll-navigation.js';
 import { mountFeedback } from './feedback.js';
 import { mountProgressStrip } from './progress-strip.js';
 import { mountCourseJourney } from './course-journey.js';
-import { mountTower, mountTowerEditor } from './tower.js';
 import { mountNavigationRail } from './navigation-rail.js';
 import { mountResourceViewer } from './resource-viewer.js';
 import { mountGameResult } from './game-result.js';
@@ -25,7 +17,6 @@ import { mountDocumentStage } from './document-stage.js';
 import { mountNoticeEditor } from './site-notice.js';
 import { decorateCurrency } from './currency-icons.js';
 import { mountRoleUpdate } from './role-update.js';
-import { mountUnsavedChanges } from './unsaved-changes.js';
 import { mountKodyCompanion, mountPageLoader } from './kody-companion.js';
 
 mountTheme(document, window);
@@ -35,12 +26,10 @@ document.querySelectorAll('.report-trend-chart').forEach(chart => {
     window.requestAnimationFrame(() => { chart.scrollLeft = chart.scrollWidth; });
 });
 mountNavigationRail(document, window);
-mountTower(document, window);
 document.querySelectorAll('[data-resource-workspace]').forEach(root => mountResourceViewer(root, window));
 document.querySelectorAll('[data-payment-status]').forEach(root => mountPaymentStatus(root, window));
 document.querySelectorAll('[data-document-stage]').forEach(root => mountDocumentStage(root, window));
 document.querySelectorAll('[data-notice-editor]').forEach(mountNoticeEditor);
-document.querySelectorAll('[data-tower-editor]').forEach(mountTowerEditor);
 mountAccountLinks(document, window);
 mountPasswordFields(document);
 mountWorkspaceMenus(document);
@@ -50,16 +39,8 @@ mountProgressStrip(document, window);
 document.querySelectorAll('[data-course-journey]').forEach(root => mountCourseJourney(root, document, window));
 mountScrollNavigation(document, window);
 
-document.querySelectorAll('[data-module-editor]').forEach(mountModuleEditor);
-document.querySelectorAll('[data-preset-editor]').forEach(mountPresetEditor);
-document.querySelectorAll('[data-course-composer]').forEach(mountCourseComposer);
-document.querySelectorAll('[data-test-case-editor]').forEach(mountTestCaseEditor);
 document.querySelectorAll('[data-challenge-status]').forEach(mountChallengeStatus);
 document.querySelectorAll('[data-content-reactions]').forEach((root) => mountContentReactions(root));
-
-document.querySelectorAll('[data-coding-game]').forEach(mountGarden);
-document.querySelectorAll('[data-practice-quiz]').forEach(mountQuiz);
-document.querySelectorAll('[data-arcade-game]').forEach(mountArcade);
 
 const cooldown = document.querySelector('[data-recovery-cooldown]');
 if (cooldown) {
@@ -78,5 +59,4 @@ mountKodyCompanion(document, window);
 document.querySelectorAll('[data-role-update]').forEach(dialog => mountRoleUpdate(dialog, document, window));
 mountPageLoader(document, window);
 decorateCurrency(document);
-mountUnsavedChanges(document, window);
 document.addEventListener('kody:feedback', () => requestAnimationFrame(() => decorateCurrency(document, document.querySelector('[data-toast-region]'))));

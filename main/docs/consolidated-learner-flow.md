@@ -53,15 +53,17 @@ was changed to satisfy it.
 
 A named curriculum reviewer must select/sign off actual pinned beginner content;
 a human pilot must observe task completion and concept transfer. Synthetic accounts
-and reference solutions do not replace that work. Reviewed legal facts/text,
-acceptance implementation and staged operations remain in the
+and reference solutions do not replace that work. Registration acceptance is
+implemented in the learner-first rework; production legal/retention review and
+staged operations remain in the
 [release index](release-evidence-index.md). The proposed free pilot is not full SRS
 completion and does not activate providers.
 
 The [navigation discovery batch](navigation-discovery-2026-11-18.md) adds optional
-Tower list navigation and a filtered staff review inbox. Measured page-specific
-JavaScript loading and financial-report query consolidation remain separate
-measured batches. [Scoped static analysis](static-analysis-2026-11-18.md) now covers
+Tower list navigation and a filtered staff review inbox. The
+[page-specific loading batch](page-specific-assets-2026-11-19.md) now separates
+shared, play, Tower and authoring scripts. Financial-report query consolidation
+remains a separate measured batch. [Scoped static analysis](static-analysis-2026-11-18.md) now covers
 selected authorization/operations/credential/inbox boundaries; wider coverage
 remains incremental. No device/latency speedup is asserted.
 The [current learning policy](current-learning-policy.md) consolidates superseding

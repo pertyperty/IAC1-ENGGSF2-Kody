@@ -1,6 +1,9 @@
 @extends('layouts.learning')
 @section('title', 'Shape a coding challenge — Kody')
 @section('content')
+@pushOnce('page-scripts', 'authoring')
+    @vite('resources/js/authoring.js')
+@endPushOnce
 
 
 <section class="review-page page-width">

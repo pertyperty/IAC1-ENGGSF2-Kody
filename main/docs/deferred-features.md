@@ -40,9 +40,12 @@ evidence listed in the [release index](release-evidence-index.md).
 The [navigation discovery batch](navigation-discovery-2026-11-18.md) implements
 optional Tower list navigation and a filtered staff review inbox. Measured
 JavaScript splitting still needs representative device measurements. The
-[financial-report batch](financial-report-reads-2026-11-18.md) measures and
+[19 November page-loading batch](page-specific-assets-2026-11-19.md) separates
+shared, play, Tower and authoring scripts with measured per-page delivery.
+The [financial-report batch](financial-report-reads-2026-11-18.md) measures and
 consolidates repeated cash-window sums; other reporting optimizations remain
-measurement-led. The [scoped static-analysis check](static-analysis-2026-11-18.md)
+measurement-led. Reporting-query consolidation still needs representative
+measurements. The [scoped static-analysis check](static-analysis-2026-11-18.md)
 starts at the authorization, operations, credentials and inbox boundaries; wider
 coverage remains incremental. Further floors, engines, animation variants
 and new progression/currency systems are paused during consolidation. None of
@@ -53,10 +56,11 @@ problems with the admitted publication and restores pinned weekly metadata. It
 does not activate Judge0 execution or weekly competitions; their live verification
 requirements below remain open.
 
-18 November security follow-up: the [tooling PR's fresh npm audit](static-analysis-2026-11-18.md#npm-advisory-gate)
-is blocked by unpatched picomatch advisory GHSA-fc5q-39xc-vjpf in the inherited
-Vite toolchain. No patched registry version is published. Keep the CI audit gate;
-earlier clean runs do not complete current dependency-security evidence.
+19 November security recheck: installed-package and lock-file npm audits both
+report zero vulnerabilities on the unchanged lock. The
+[picomatch advisory was withdrawn](static-analysis-2026-11-18.md#19-november-advisory-recheck);
+the earlier failing result remains historical evidence. Keep the CI audit gate
+and rerun it for each candidate; this is not a package patch or release sign-off.
 
 The 2026-10-12 [preparation follow-up](studios-media-and-integration-readiness.md)
 adds verification OTP, owned checkout status, PDF purchase receipts and queued

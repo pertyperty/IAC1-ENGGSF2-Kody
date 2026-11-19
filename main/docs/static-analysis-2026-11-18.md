@@ -82,6 +82,9 @@ The 23-file results above describe the initial tooling revision.
 
 ## npm advisory gate
 
+The following records the initial 18 November failure. The 19 November recheck
+below supersedes its current advisory disposition; historical CI results remain.
+
 The first remote run on this tooling revision stopped at the existing npm audit
 step, before static analysis. The local PHP checks above pass, but this PR's CI is
 **blocked**, not fully verified. Earlier #41/#42 CI runs passed before the current
@@ -120,3 +123,19 @@ terms/action and the four assessment/game services to this scope: 32 files in
 all. Exhaustive unsupported-template handling and a redundant loop check were
 resolved directly, without ignores or a baseline. Its record owns verification
 at that later revision.
+
+## 19 November advisory recheck
+
+Fresh `npm audit --json` and `npm audit --package-lock-only --json` both passed
+with zero reported vulnerabilities on the unchanged dependency manifest and lock.
+The [GitHub advisory](https://github.com/advisories/GHSA-fc5q-39xc-vjpf) now marks
+GHSA-fc5q-39xc-vjpf withdrawn on 18 November 2026. Registry latest remains 4.0.7.
+This is a changed advisory disposition, not a package patch, security waiver or
+proof that every possible dependency defect is absent. No suppression, downgrade
+or audit-threshold change was made.
+
+The local npm advisory gate now passes. Candidate-specific CI and the other
+release checks still require fresh evidence. Logs are retained under
+`storage/app/private/page-assets-npm-*.json`; the
+[page-loading record](page-specific-assets-2026-11-19.md) owns this follow-up's
+source revision and other local checks.
