@@ -1,3 +1,4 @@
+import { finishSignIn } from './support/sign-in.mjs';
 import { test, expect } from '@playwright/test';
 import { audit } from './support/audit.mjs';
 
@@ -10,6 +11,7 @@ async function login(page, name) {
     await page.getByLabel('Email or username').fill(`browser_${name}`);
     await page.getByLabel(/^Password/).fill('BrowserStrong12!');
     await page.getByRole('button', { name: /Sign in/ }).click();
+    await finishSignIn(page);
 }
 
 async function answerQuiz(quiz) {

@@ -1,3 +1,4 @@
+import { finishSignIn } from './support/sign-in.mjs';
 import { test, expect } from '@playwright/test';
 import { audit } from './support/audit.mjs';
 import { readFileSync } from 'node:fs';
@@ -8,7 +9,7 @@ async function login(page, name) {
     await page.getByLabel('Email or username').fill(`browser_${name}`);
     await page.getByLabel(/^Password/).fill('BrowserStrong12!');
     await page.getByRole('button', { name: /Sign in/ }).click();
-    await expect(page).not.toHaveURL(/\/login$/);
+    await finishSignIn(page);
 }
 
 test.beforeEach(async ({ page }) => {

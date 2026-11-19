@@ -1,3 +1,4 @@
+import { finishSignIn } from './support/sign-in.mjs';
 import { test, expect } from '@playwright/test';
 import { audit } from './support/audit.mjs';
 import { readFileSync } from 'node:fs';
@@ -19,6 +20,7 @@ async function login(page, role) {
     await page.getByLabel('Email or username').fill(`${role}@browser.example.test`);
     await page.getByLabel(/^Password/).fill('BrowserStrong12!');
     await page.getByRole('button', { name: 'Sign in', exact: false }).click();
+    await finishSignIn(page);
     const creatorOrStaff = ['instructor','moderator','administrator','navinstructor','navmoderator','navadministrator','navcontributor','toweradmin'].includes(role);
     await expect(page).toHaveURL(creatorOrStaff ? /\/dashboard$/ : /\/$/);
     if (!creatorOrStaff) await page.goto('/dashboard');
