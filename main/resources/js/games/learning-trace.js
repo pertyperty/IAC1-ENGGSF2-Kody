@@ -8,7 +8,7 @@ export function readableInstruction(template, command) {
     if (template === 'sort-lab') return `SWAP items[position ${args[0]}], items[position ${args[1]}]`;
     if (template === 'logic-switchboard') return `input[${rest}] = NOT input[${rest}]`;
     if (template === 'string-forge') return operation === 'append' ? `text = text + ${JSON.stringify(rest)}` : `text = ${operation}(text)`;
-    if (template === 'memory-trail') return `${operation.toUpperCase()}${rest ? ` ${rest}` : ''} · top is on the right`;
+    if (template === 'memory-trail') return { push: `PUSH ${rest} ONTO stack`, pop: 'POP stack', duplicate: 'DUPLICATE TOP OF stack', swap: 'SWAP TOP TWO IN stack' }[operation] ?? command;
     return command; // Terminal commands retain their real, limited simulator syntax.
 }
 
@@ -41,14 +41,16 @@ export function stateText(game, state) {
 
 export function mountLearningTrace(root, game, getProgram, buildTrace, render, isBusy) {
     const document = root.ownerDocument;
-    const panel = document.createElement('section'); panel.className = 'learning-trace'; panel.setAttribute('aria-label', 'Pseudocode');
-    const heading = document.createElement('h3'); heading.textContent = 'Pseudocode'; panel.append(heading);
-    const note = document.createElement('p'); note.className = 'field-hint'; note.textContent = 'Read your program. Step through it, or Run to check and save.';
-    const source = document.createElement('ol'); source.className = 'trace-source'; source.setAttribute('aria-label', 'Readable program');
+    const panel = document.createElement('details');
+    panel.className = 'learning-trace';
+    const heading = document.createElement('summary');
+    heading.textContent = 'Step through program';
+    panel.append(heading);
+    const source = root.querySelector('[data-readable-program]');
     const state = document.createElement('pre'); state.className = 'trace-state'; state.tabIndex = 0; state.setAttribute('aria-label', 'Program state');
     const statePanel = document.createElement('details');
     const stateSummary = document.createElement('summary'); stateSummary.textContent = 'Program state'; statePanel.append(stateSummary, state);
-    source.tabIndex = 0;
+
     const status = document.createElement('p'); status.className = 'field-hint'; status.setAttribute('role', 'status'); status.tabIndex = 0;
     const actions = document.createElement('div'); actions.className = 'trace-actions';
     let trace, cursor = 0, replayToken = 0;
@@ -56,13 +58,26 @@ export function mountLearningTrace(root, game, getProgram, buildTrace, render, i
         const frame = trace.frames[cursor - 1]; const current = frame?.state ?? trace.initial;
         state.textContent = stateText(game, current);
         status.textContent = frame ? `Preview step ${cursor}/${trace.frames.length}. ${frame.explanation}${cursor === trace.frames.length ? ` ${trace.message}` : ''}` : trace.message;
-        source.querySelectorAll('li:not(.trace-rule)').forEach((line, index) => { if (index === frame?.index) line.setAttribute('aria-current', 'step'); else line.removeAttribute('aria-current'); });
+        highlight(frame?.index);
+        const label = root.querySelector('[data-execution-label]');
+        if (label) label.textContent = frame ? `Preview step ${cursor}` : 'Not run';
         step.disabled = isBusy() || cursor >= trace.frames.length;
         render(current);
     };
+    const highlight = index => {
+        source.querySelectorAll('[data-instruction-index]').forEach(line => {
+            if (Number(line.dataset.instructionIndex) === index) {
+                line.setAttribute('aria-current', 'step');
+                const container = source.getBoundingClientRect();
+                const bounds = line.getBoundingClientRect();
+                if (bounds.bottom > container.bottom) source.scrollTop += bounds.bottom - container.bottom;
+                if (bounds.top < container.top) source.scrollTop -= container.top - bounds.top;
+            } else line.removeAttribute('aria-current');
+        });
+    };
     const button = (text, action) => { const item = document.createElement('button'); item.type = 'button'; item.className = 'button button-ghost'; item.textContent = text; item.addEventListener('click', () => { if (!isBusy()) action(); }); actions.append(item); return item; };
     const step = button('Step', () => { replayToken++; cursor = Math.min(cursor + 1, trace.frames.length); show(); });
-    button('Replay', async () => {
+    const replay = button('Replay', async () => {
         const token = ++replayToken; cursor = 0; show();
         const reduced = document.defaultView.matchMedia('(prefers-reduced-motion: reduce)').matches;
         while (cursor < trace.frames.length && token === replayToken && !isBusy()) {
@@ -71,20 +86,21 @@ export function mountLearningTrace(root, game, getProgram, buildTrace, render, i
             cursor++; show();
         }
     });
-    button('Restart', () => { replayToken++; cursor = 0; show(); });
-    panel.append(note, source, actions, status, statePanel);
+    const restart = button('Restart', () => { replayToken++; cursor = 0; show(); });
+    panel.append(actions, status, statePanel);
     const controls = root.querySelector('.game-controls');
-    controls.insertBefore(panel, controls.querySelector('.game-toolbar'));
+    controls.querySelector('.game-extras').append(panel);
     const refresh = (paint = false) => {
         replayToken++;
         const program = getProgram(); trace = buildTrace(program); cursor = 0;
-        source.replaceChildren();
-        if (game.template === 'command-garden' && game.mode === 'loop') { const line = document.createElement('li'); line.textContent = root.querySelector('[data-game-repeat]')?.checked ? 'REPEAT the following body 2 TIMES' : 'Repeat is off; this level requires it.'; line.className = 'trace-rule'; line.value = 0; source.append(line); }
-        if (!program.length) { const placeholder = document.createElement('li'); placeholder.className = 'trace-placeholder'; placeholder.textContent = 'Add an instruction to build your program.'; source.append(placeholder); }
-        program.slice(0, 12).forEach(command => { const line = document.createElement('li'); line.textContent = readableInstruction(game.template, command); if (game.template === 'command-garden' && game.mode === 'conditional' && root.querySelector('[data-game-conditional]')?.checked) line.textContent += '; IF crystal here THEN COLLECT'; source.append(line); });
-        state.textContent = `Initial state\n${stateText(game, trace.initial)}`; status.textContent = program.length ? trace.message : ''; step.disabled = !trace.frames.length || isBusy();
+        highlight();
+        state.textContent = `Initial state\n${stateText(game, trace.initial)}`;
+        status.textContent = program.length ? trace.message : 'Add an instruction to begin.';
+        step.disabled = !trace.frames.length || isBusy();
+        replay.disabled = !trace.frames.length || isBusy();
+        restart.disabled = !trace.frames.length || isBusy();
         if (paint) show();
     };
     // Do not replace the learner's program or initiate a network request.
-    return { refresh, cancel: () => { replayToken++; } };
+    return { refresh, highlight, cancel: () => { replayToken++; } };
 }

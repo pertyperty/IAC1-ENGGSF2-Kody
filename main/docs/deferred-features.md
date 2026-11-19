@@ -1,5 +1,11 @@
 # Deferred-feature register
 
+The [19 November game workspace follow-up](game-workspace-rework-2026-11-19.md)
+records same-tab legal navigation, a single bounded pseudocode editor, clearer
+preview/run state and shared mobile game refinements. These are local interface
+and regression checks; curriculum/difficulty review, human learning, actual devices
+and production legal/operating evidence remain open. Provider work stays paused.
+
 18 November owner direction: pause additional third-party/API implementation
 until the learner-first rework is validated; Judge0 is the first planned later
 integration. [The rework](learner-first-rework-2026-11-18.md) adds registration

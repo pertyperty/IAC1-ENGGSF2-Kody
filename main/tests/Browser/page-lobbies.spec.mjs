@@ -1,3 +1,4 @@
+import { finishSignIn } from './support/sign-in.mjs';
 import { test, expect } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { audit } from './support/audit.mjs';
@@ -11,6 +12,7 @@ test.beforeEach(async ({ page }) => {
 async function login(page, name) {
     await page.goto('/login'); await page.getByLabel('Email or username').fill(`browser_${name}`);
     await page.getByLabel(/^Password/).fill('BrowserStrong12!'); await page.getByRole('button', { name: /Sign in/ }).click();
+    await finishSignIn(page);
 }
 
 async function guide(page, title) {

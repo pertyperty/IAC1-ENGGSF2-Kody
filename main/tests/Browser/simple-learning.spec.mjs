@@ -1,3 +1,4 @@
+import { finishSignIn } from './support/sign-in.mjs';
 import { test, expect } from '@playwright/test';
 import { audit } from './support/audit.mjs';
 import { readFileSync } from 'node:fs';
@@ -8,7 +9,7 @@ async function login(page, name) {
     await page.getByLabel('Email or username').fill(`browser_${name}`);
     await page.getByLabel(/^Password/).fill('BrowserStrong12!');
     await page.getByRole('button', { name: /Sign in/ }).click();
-    await expect(page).not.toHaveURL(/\/login$/);
+    await finishSignIn(page);
 }
 
 test.beforeEach(async ({ page }) => {
@@ -28,6 +29,7 @@ test('@cross-browser pseudocode stays visible and bounded as the program fills',
     for (let i = 0; i < limit; i++) await game.getByRole('button', { name: 'Add right', exact: true }).click();
     await expect(code).toContainText('MOVE RIGHT');
     expect(Math.abs((await code.boundingBox()).height - before.height)).toBeLessThan(2);
+    await game.getByText('Step through program', { exact: true }).click();
     await game.getByRole('button', { name: 'Step', exact: true }).click();
     await expect(code.locator('[aria-current="step"]')).toHaveCount(1);
     for (const width of [1280, 390]) {

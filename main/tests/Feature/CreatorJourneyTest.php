@@ -29,7 +29,8 @@ test('D01 example selection preserves role restrictions and rejects unknown exam
     $this->get(route('studio.create', ['example' => 'sequences']))->assertForbidden();
     moduleSignIn($this, moduleAccount(Role::Instructor));
     $this->getJson(route('studio.create', ['example' => 'executable']))->assertUnprocessable()->assertJsonValidationErrors('example');
-    $this->get(route('studio.index'))->assertOk()->assertSee('Start with a ready-to-play idea');
+    $this->get(route('studio.index'))->assertOk()->assertSee('Start from a lesson example')
+        ->assertSee(route('studio.create', ['example' => 'sequences']));
 });
 
 test('B05 optional starter history and daily feedback preserve the primary Tower continuation', function () {

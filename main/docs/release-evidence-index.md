@@ -1,5 +1,11 @@
 # Release evidence index
 
+The [19 November game workspace follow-up](game-workspace-rework-2026-11-19.md)
+records same-tab legal navigation, a single bounded pseudocode editor, clearer
+preview/run state and shared mobile game refinements. These are local interface
+and regression checks; curriculum/difficulty review, human learning, actual devices
+and production legal/operating evidence remain open. Provider work stays paused.
+
 Copy this record per candidate release. Evidence needs an environment, immutable
 revision, date, reviewer and artifact/reference. A configured flag or an unchecked
 box is not completed evidence. Never place tokens, credentials, private proof,

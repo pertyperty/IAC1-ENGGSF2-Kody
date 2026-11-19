@@ -3,7 +3,15 @@
 Start here for current scope, detailed evidence and the next useful improvements.
 This index consolidates the feature summaries previously repeated in README.
 It does not replace approved requirements, decisions or the implementation records.
-Last reviewed: 2026-11-17.
+Last reviewed: 2026-11-19.
+The [main integration/CI repair](main-integration-ci-2026-11-19.md) records the
+missing #51 ancestry after its feature-branch merge, stale creator-example
+assertions and browser fixture-session corrections. PR #52 targets main directly;
+its acceptance and completed candidate CI remain separate from local checks.
+The [game workspace follow-up](game-workspace-rework-2026-11-19.md) owns same-tab
+registration legal links, one bounded editable pseudocode list, explicit preview/
+run state, simpler pixel controls and vertical stacks across shared game contexts.
+Its local verification does not close curriculum or human usability review.
 The [consolidated learner flow](consolidated-learner-flow.md) makes the selected
 Tower track the primary Continue action, keeps starter lessons optional, groups
 navigation, reduces unavailable-checkout promotion, warns before leaving edited
@@ -39,7 +47,8 @@ username-first signup, optional private names, verified-account creator applicat
 independent ordered tracks, interpreter-backed step previews, guarded teaching
 revisions and the [50-floor matrix](tower-teaching-matrix.md). The
 [form inventory](form-guidance-inventory.md) maps validation/help, and
-[short legal drafts](legal/review-and-publication.md) remain unpublished.
+[owner-authorized dated Terms and Privacy](learner-first-rework-2026-11-18.md)
+now accompany atomic new-user acceptance. Production review remains outstanding.
 The [business reporting record](system-reports-implementation.md) owns daily,
 monthly and yearly period views, exact posted cash/expense reconciliation,
 bounded private transaction registers and separate business PDF/Excel exports.
@@ -175,9 +184,9 @@ provider-fake verification is not live delivery/execution evidence.
   creator/staff publication, all five role workspaces, mobile layouts, themes,
   retry and accessibility. Broader cross-engine workflows, actual Safari/mobile
   devices and screen-reader sessions remain separate verification work.
-- Supply reviewed Terms content/version, then add recorded server-enforced
-  registration acceptance; this is an actual A01 gap tracked alongside activation
-  deferrals, not a completed feature.
+- New-user Terms acceptance is implemented for the owner-authorized dated text.
+  Production operator/eligibility/retention review and existing-user material-change
+  decisions remain open; see the learner rework and deferred register.
 - Measure staging catalog, dashboard, lesson and worker load against SRS targets.
 - Publish customized launch curriculum through designated creators and staff;
   editable plans are not automatically published course records.
