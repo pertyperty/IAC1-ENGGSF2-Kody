@@ -1,4 +1,4 @@
-import { mountLearningTrace, arcadeTrace } from './learning-trace.js';
+import { mountLearningTrace, arcadeTrace, readableInstruction } from './learning-trace.js';
 import { createIcon } from '../icons.js';
 import { puzzleTemplates, validPuzzle, evaluatePuzzle, renderPuzzle } from './puzzle-games.js';
 import { saveCompletion } from './save-completion.js';
@@ -104,7 +104,6 @@ export function mountArcade(root) {
     let inspector;
     let selectedColor = 'mint';
     let selectedPosition = null;
-    let colorSelect;
     let terminalInput;
     let historyIndex = 0;
     const history = [];
@@ -188,9 +187,11 @@ export function mountArcade(root) {
         render(result.state);
         count.textContent = `${program.length} / ${limit} instructions`;
         programList.replaceChildren();
+        if (!program.length) programList.append(node('li', 'Add an instruction to start.', 'trace-placeholder'));
         program.slice(0, 12).forEach((command, index) => {
             const row = node('li', '');
-            row.append(node('small', String(index + 1)), node('code', command));
+            row.dataset.instructionIndex = String(index);
+            row.append(node('small', String(index + 1)), node('code', readableInstruction(game.template, command)));
             const remove = button('', 'instruction-remove', `Remove step ${index + 1}`, () => {
                 const updated = lines(); updated.splice(index, 1); code.value = updated.join('\n'); preview();
                 programList.querySelectorAll('button')[Math.min(index, updated.length - 1)]?.focus({ preventScroll: true });
@@ -200,7 +201,9 @@ export function mountArcade(root) {
         });
         inspector?.refresh();
         root.dataset.playState = 'ready';
-        previewStatus.textContent = program.length ? 'Preview only. Run your program to check and save an eligible win.' : 'Build your idea, then run it to check the objective.';
+        output.textContent = program.length ? 'Program changed. Run to check the goal.' : 'Add instructions, then run your program.';
+        root.querySelector('[data-execution-label]').textContent = program.length ? 'Preview' : 'Not run';
+        previewStatus.textContent = program.length ? 'Preview of your instructions. Run to check the goal.' : 'Add an instruction to start.';
     }
     function select(label, values) {
         const wrapper = node('label', label);
@@ -213,7 +216,10 @@ export function mountArcade(root) {
         if (busy || !command) return false;
         const program = lines();
         if (program.length >= limit) { output.textContent = `Use at most ${limit} instructions. Remove a step to change your program.`; return false; }
-        code.value = [...program, command].join('\n'); preview(); return true;
+        code.value = [...program, command].join('\n');
+        preview();
+        programList.scrollTop = programList.scrollHeight;
+        return true;
     }
     function paint(x, y) {
         if (busy) return;
@@ -232,18 +238,12 @@ export function mountArcade(root) {
         const palette = node('div', '', 'paint-palette'); palette.setAttribute('role', 'group'); palette.setAttribute('aria-label', 'Paint color');
         ['mint', 'peach', 'lavender'].forEach(color => {
             const swatch = button(color, `paint-swatch pixel-${color}`, `Paint with ${color}`, () => {
-                selectedColor = color; colorSelect.value = color;
+                selectedColor = color;
                 palette.querySelectorAll('button').forEach(option => option.setAttribute('aria-pressed', String(option === swatch)));
             });
             swatch.setAttribute('aria-pressed', String(color === selectedColor)); palette.append(swatch);
         });
-        controls.append(palette, node('p', 'Choose a color, then tap your canvas. Or add an instruction below.', 'field-hint'));
-        const x = select('Column', [1, 2, 3]); const y = select('Row', [1, 2, 3]); colorSelect = select('Color', ['mint', 'peach', 'lavender']);
-        colorSelect.addEventListener('change', () => {
-            selectedColor = colorSelect.value;
-            palette.querySelectorAll('button').forEach(option => option.setAttribute('aria-pressed', String(option.textContent === selectedColor)));
-        });
-        build = () => `paint ${x.value} ${y.value} ${colorSelect.value}`;
+        controls.append(palette, node('p', 'Choose a color, then select a cell on your canvas.', 'field-hint'));
     } else if (game.template === 'number-machine') {
         const operation = select('Operation', ['add', 'subtract', 'multiply']);
         const wrapper = node('label', 'Operand'); const value = document.createElement('input'); value.type = 'number'; value.min = '-100'; value.max = '100'; value.value = '3'; wrapper.append(value); controls.append(wrapper);
@@ -277,11 +277,8 @@ export function mountArcade(root) {
         if (busy || !add(command)) return;
         history.push(command); historyIndex = history.length; terminalInput.value = ''; await run(false); terminalInput.focus();
     }
-    controls.append(button(game.template === 'terminal-quest' ? 'Enter command' : 'Add instruction', 'button button-dark', null, async () => {
+    if (build) controls.append(button(game.template === 'terminal-quest' ? 'Enter command' : 'Add instruction', 'button button-dark', null, async () => {
         if (game.template === 'terminal-quest') await enterCommand(); else add(build());
-    }));
-    controls.append(button('Remove last instruction', 'game-reset', null, () => {
-        const program = lines(); program.pop(); code.value = program.join('\n'); preview(); output.textContent = 'Instruction removed. Run the program to see the updated state.';
     }));
     code.addEventListener('input', () => { if (!busy) preview(); });
     const commandHelp = {
@@ -302,11 +299,13 @@ export function mountArcade(root) {
         inspector.cancel();
         busy = true; selectedPosition = null; root.dataset.playState = 'running'; root.setAttribute('aria-busy', 'true');
         root.querySelectorAll('button, input, select, textarea').forEach(control => { control.disabled = true; });
+        root.querySelector('[data-execution-label]').textContent = 'Running';
         try {
             const program = lines();
             const delay = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 220;
             if (!checkingAnswer && game.template !== 'terminal-quest') for (let step = 1; step <= Math.min(program.length, 12); step++) {
                 const frame = evaluateArcade(game, program.slice(0, step));
+                inspector.highlight(step - 1);
                 render(frame.state); previewStatus.textContent = `Running step ${step} of ${program.length}…`;
                 if (delay) await new Promise(resolve => setTimeout(resolve, delay));
                 if (frame.error) break;
@@ -314,8 +313,12 @@ export function mountArcade(root) {
             const result = evaluateArcade(game, program); render(result.state);
             output.textContent = [...(game.template === 'terminal-quest' ? result.output : []), result.success ? `Program complete. ${game.learningIdea}` : objectiveFeedback(game, result)].join('\n');
             root.dataset.playState = result.success ? 'success' : 'retry';
-            previewStatus.textContent = result.success ? 'Objective complete. You made that happen!' : 'Try changing a step, then run it again.';
-            if (!showResult) previewStatus.textContent = 'Preview only. Press Run to validate and save an eligible completion.';
+            root.querySelector('[data-execution-label]').textContent = result.success ? 'Goal reached' : 'Needs changes';
+            previewStatus.textContent = result.success ? 'The program reached the goal.' : 'Edit your program, then run again.';
+            if (!showResult) {
+                root.querySelector('[data-execution-label]').textContent = 'Preview';
+                previewStatus.textContent = 'Preview of your commands. Run to check the goal.';
+            }
             if (!result.success && showResult) output.focus({ preventScroll: true });
             if (result.success && showResult && conceptCheck.verify()) {
                 const message = await saveCompletion(root, { program, assessment_answer: conceptCheck.answer() });

@@ -15,8 +15,8 @@
     <x-password-field name="password" label="Password (required)" :minlength="12" hint="12–32 characters, including uppercase, lowercase, a number and a symbol." />
     <x-password-field name="password_confirmation" label="Confirm password (required)" :minlength="12" hint="Enter the same password again." />
     <input type="hidden" name="terms_version" value="{{ \App\Support\RegistrationTerms::VERSION }}">
-    <label class="checkbox-row terms-agreement" for="terms_accepted"><input id="terms_accepted" type="checkbox" name="terms_accepted" value="1" required> <span>I agree to the <a href="{{ route('legal.terms') }}" target="_blank" rel="noopener">Terms and conditions</a>.</span></label>
-    <p class="form-note">Read how we use your information in the <a href="{{ route('legal.privacy') }}" target="_blank" rel="noopener">Privacy notice</a>.</p>
+    <label class="checkbox-row terms-agreement" for="terms_accepted"><input id="terms_accepted" type="checkbox" name="terms_accepted" value="1" required> <span>I agree to the <a href="{{ route('legal.terms') }}">Terms and conditions</a>.</span></label>
+    <p class="form-note">Read how we use your information in the <a href="{{ route('legal.privacy') }}">Privacy notice</a>.</p>
     <button type="submit" class="primary-button">Create account</button>
     <p class="form-note">Next: verify your email to sign in.</p>
 </form>

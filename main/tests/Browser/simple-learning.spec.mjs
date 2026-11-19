@@ -28,6 +28,7 @@ test('@cross-browser pseudocode stays visible and bounded as the program fills',
     for (let i = 0; i < limit; i++) await game.getByRole('button', { name: 'Add right', exact: true }).click();
     await expect(code).toContainText('MOVE RIGHT');
     expect(Math.abs((await code.boundingBox()).height - before.height)).toBeLessThan(2);
+    await game.getByText('Step through program', { exact: true }).click();
     await game.getByRole('button', { name: 'Step', exact: true }).click();
     await expect(code.locator('[aria-current="step"]')).toHaveCount(1);
     for (const width of [1280, 390]) {
