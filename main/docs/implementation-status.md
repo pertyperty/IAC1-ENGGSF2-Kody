@@ -4,6 +4,10 @@ Start here for current scope, detailed evidence and the next useful improvements
 This index consolidates the feature summaries previously repeated in README.
 It does not replace approved requirements, decisions or the implementation records.
 Last reviewed: 2026-11-19.
+The [main integration/CI repair](main-integration-ci-2026-11-19.md) records the
+missing #51 ancestry after its feature-branch merge, stale creator-example
+assertions and browser fixture-session corrections. PR #52 targets main directly;
+its acceptance and completed candidate CI remain separate from local checks.
 The [game workspace follow-up](game-workspace-rework-2026-11-19.md) owns same-tab
 registration legal links, one bounded editable pseudocode list, explicit preview/
 run state, simpler pixel controls and vertical stacks across shared game contexts.

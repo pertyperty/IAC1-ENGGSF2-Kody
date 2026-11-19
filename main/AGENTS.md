@@ -1,5 +1,11 @@
 # Kody Engineering Agent Guidelines
 
+The [main integration/CI repair](docs/main-integration-ci-2026-11-19.md) verifies
+commit ancestry on fetched main before claiming a stacked PR is integrated.
+A merged child on a feature branch can remain absent from main. Browser fixture
+login helpers must exercise real takeover confirmation when an earlier context
+retains a session; never bypass the application session guard.
+
 The [19 November game workspace follow-up](docs/game-workspace-rework-2026-11-19.md)
 uses one bounded editable pseudocode list per game, explicit preview/run labels
 and optional step tools. Keep loop headers outside instruction indexes, preserve
