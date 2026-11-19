@@ -1,4 +1,4 @@
-import { mountLearningTrace } from './learning-trace.js';
+import { mountLearningTrace, readableInstruction } from './learning-trace.js';
 import { createIcon } from '../icons.js';
 import { saveCompletion } from './save-completion.js';
 import { programRuleError, mountConceptCheck } from './assessment-challenges.js';
@@ -114,17 +114,27 @@ export function mountGarden(root) {
     };
     const renderProgram = () => {
         programTrack.replaceChildren();
+        if (instance.mode === 'loop') {
+            const rule = document.createElement('div');
+            rule.className = 'trace-rule';
+            rule.textContent = root.querySelector('[data-game-repeat]')?.checked ? 'REPEAT 2 TIMES:' : 'Repeat is off.';
+            programTrack.append(rule);
+        }
         if (program.length === 0) {
-            const empty = document.createElement('span'); empty.textContent = 'Add a move to start your program'; programTrack.append(empty);
+            const empty = document.createElement('span'); empty.className = 'trace-placeholder'; empty.textContent = 'Add a move to start.'; programTrack.append(empty);
         }
         program.forEach((command, index) => {
             const step = document.createElement('button');
             step.type = 'button'; step.className = 'program-step';
             const number = document.createElement('small'); number.textContent = index + 1;
-            const arrow = document.createElement('span'); arrow.append(createIcon(document, command)); step.append(number, arrow);
+            const instruction = document.createElement('code');
+            instruction.textContent = readableInstruction('command-garden', command);
+            if (instance.mode === 'conditional' && root.querySelector('[data-game-conditional]')?.checked) instruction.textContent += '; IF crystal here: COLLECT';
+            step.dataset.instructionIndex = String(index);
+            step.append(number, instruction);
             step.setAttribute('aria-label', `Step ${index + 1}: ${command}`);
             step.setAttribute('aria-pressed', String(index === selected)); step.disabled = running;
-            step.addEventListener('click', () => { selected = index; renderProgram(); programTrack.children[index]?.focus(); });
+            step.addEventListener('click', () => { selected = index; renderProgram(); programTrack.querySelectorAll('.program-step')[index]?.focus(); });
             step.addEventListener('keydown', (event) => {
                 if (running) return;
                 if (event.key === 'Delete' || event.key === 'Backspace') { event.preventDefault(); selected = index; editStep('remove'); }
@@ -135,7 +145,17 @@ export function mountGarden(root) {
         progress.textContent = `${program.length} / ${instance.maxCommands} instructions`;
         updateTools();
     };
-    const changed = () => { conceptCheck.reset(); root.dataset.playState = 'ready'; success.hidden = true; renderProgram(); renderBoard(); tiles.forEach(({ tile }) => tile.classList.remove('visited-tile')); inspector?.refresh(); };
+    const changed = () => {
+        conceptCheck.reset();
+        root.dataset.playState = 'ready';
+        root.querySelector('[data-execution-label]').textContent = 'Not run';
+        success.hidden = true;
+        feedback.textContent = program.length ? 'Program changed. Run to check the goal.' : 'Add moves, then run your program.';
+        renderProgram();
+        renderBoard();
+        tiles.forEach(({ tile }) => tile.classList.remove('visited-tile'));
+        inspector?.refresh();
+    };
     root.querySelectorAll('[data-game-repeat], [data-game-conditional]').forEach(input => input.addEventListener('change', () => {
         if (!running) { changed(); feedback.textContent = 'Rule updated. Run your program to test it.'; }
     }));
@@ -147,7 +167,7 @@ export function mountGarden(root) {
             if (destination < 0 || destination >= program.length) return;
             [program[selected], program[destination]] = [program[destination], program[selected]]; selected = destination;
         }
-        changed(); programTrack.children[selected]?.focus(); feedback.textContent = 'Program updated. Run it to test your idea.';
+        changed(); programTrack.querySelectorAll('.program-step')[selected]?.focus(); feedback.textContent = 'Program updated. Run it to test your idea.';
     };
     earlier?.addEventListener('click', () => editStep('earlier'));
     later?.addEventListener('click', () => editStep('later'));
@@ -155,7 +175,8 @@ export function mountGarden(root) {
     const addMove = (command) => {
         if (running) return;
         if (program.length >= instance.maxCommands) { feedback.textContent = `Keep it to ${instance.maxCommands} instructions. Undo a step to change your program.`; return; }
-        program.push(command); selected = program.length - 1; changed(); feedback.textContent = 'Ready when you are. Run your code to see what happens.';
+        program.push(command); selected = program.length - 1; changed();
+        programTrack.scrollTop = programTrack.scrollHeight;
     };
     root.querySelectorAll('[data-command]').forEach((button) => button.addEventListener('click', () => addMove(button.dataset.command)));
     const undo = () => { if (!running) { program.pop(); selected = Math.min(selected, program.length - 1); changed(); } };
@@ -186,6 +207,7 @@ export function mountGarden(root) {
             renderBoard();
             tiles.forEach(({ tile }) => tile.classList.remove('visited-tile'));
         }
+        root.querySelector('[data-execution-label]').textContent = 'Running';
         root.dataset.playState = 'running'; root.setAttribute('aria-busy', 'true');
         const result = runProgram(instance, program, { repeat: root.querySelector('[data-game-repeat]')?.checked, conditional: root.querySelector('[data-game-conditional]')?.checked });
         root.querySelectorAll('button, input').forEach((control) => { control.disabled = true; });
@@ -194,10 +216,12 @@ export function mountGarden(root) {
         try {
             for (const frame of checkingAnswer ? result.trace.slice(-1) : result.trace) {
                 if (delay && !checkingAnswer) await new Promise((resolve) => setTimeout(resolve, delay));
+                inspector.highlight(frame.index);
                 renderBoard(frame.position, frame.crystals);
                 tiles.find(({ point }) => key(point) === key(frame.position))?.tile.classList.add('visited-tile');
                 programTrack.querySelectorAll('.program-step').forEach((step, index) => step.classList.toggle('executing', index === frame.index));
             }
+            root.querySelector('[data-execution-label]').textContent = result.success ? 'Goal reached' : 'Needs changes';
             feedback.textContent = result.message; success.hidden = !result.success;
             root.dataset.playState = result.success ? 'success' : 'retry';
             if (!result.success) feedback.focus({ preventScroll: true });
@@ -209,7 +233,7 @@ export function mountGarden(root) {
                 root.dataset.playState = 'checking';
                 feedback.textContent = 'Program complete. Finish the concept check.';
             }
-            progress.textContent = root.dataset.playState === 'checking' ? 'Concept check' : result.success ? 'Activity complete' : 'Try again';
+            progress.textContent = `${program.length} / ${instance.maxCommands} instructions`;
         } finally {
             running = false;
             root.setAttribute('aria-busy', 'false');

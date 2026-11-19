@@ -134,6 +134,12 @@ test('an instructor previews and saves a guided assessment without configuring a
     await expect(garden.locator('[data-game-conditional]').locator('..')).toBeHidden();
     await garden.getByLabel('Repeat my instructions 2 times').check();
     for (const direction of ['right', 'up', 'right']) await garden.getByRole('button', { name: `Add ${direction}`, exact: true }).click();
+    await expect(garden.locator('.trace-rule')).toHaveText('REPEAT 2 TIMES:');
+    await garden.getByRole('button', { name: 'Step 2: up', exact: true }).focus();
+    await page.keyboard.press('Alt+ArrowRight');
+    await expect(garden.getByRole('button', { name: 'Step 3: up', exact: true })).toBeFocused();
+    await page.keyboard.press('Alt+ArrowLeft');
+    await expect(garden.getByRole('button', { name: 'Step 2: up', exact: true })).toBeFocused();
     await garden.getByRole('button', { name: 'Run program', exact: true }).click();
     await expect(garden.locator('[data-concept-check]')).toBeVisible();
     const feedback = garden.locator('[data-game-feedback]');
@@ -143,6 +149,7 @@ test('an instructor previews and saves a guided assessment without configuring a
     await expect(garden.locator('[data-concept-check] [role=status]')).toContainText('Try again');
     await expect(garden.getByLabel('3', { exact: true })).toBeFocused();
     await expectNoPlayback(feedback, 'following your instructions');
+    await garden.getByText('Step through program', { exact: true }).click();
     await garden.getByRole('button', { name: 'Restart', exact: true }).click();
     await garden.getByLabel('6', { exact: true }).check();
     await garden.getByRole('button', { name: 'Check answer', exact: true }).click();

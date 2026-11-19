@@ -13,6 +13,7 @@ test('Garden teaching is before the board and previews never submit or unlock gu
     await expect(game.locator('.trace-source')).toContainText('MOVE RIGHT');
     const submissions = [];
     page.on('request', request => { if (request.method() === 'POST') submissions.push(request.url()); });
+    await game.getByText('Step through program', { exact: true }).click();
     await game.getByRole('button', { name: 'Step', exact: true }).click();
     await expect(game.locator('.trace-state')).toContainText('column 2, row 3');
     await expect(game.locator('[data-game-board]')).toHaveAttribute('aria-label', /column 2, row 3/);
@@ -69,6 +70,7 @@ for (const [template, command, expected] of [
         const game = page.locator('[data-arcade-game]');
         await game.locator('.program-arrange summary').click();
         await game.locator('[data-arcade-code]').fill(command);
+        await game.getByText('Step through program', { exact: true }).click();
         await game.getByRole('button', { name: 'Step', exact: true }).click();
         await expect(game.locator('.trace-state')).toContainText(expected);
         await expect(game.locator('.trace-source [aria-current=step]')).toHaveCount(1);
@@ -99,6 +101,7 @@ test('Intermediate practice is independently enterable while its later levels st
     const game = page.locator('[data-arcade-game]');
     await game.getByRole('button', { name: 'Flip input 1', exact: true }).click();
     await expect(game.locator('.trace-source')).toContainText('input[1] = NOT input[1]');
+    await game.getByText('Step through program', { exact: true }).click();
     await game.getByRole('button', { name: 'Step', exact: true }).click();
     await expect(game.locator('.trace-state')).toContainText('TRUE AND TRUE AND FALSE = FALSE');
     await expect(game.locator('[data-arcade-output]')).not.toContainText('saved');

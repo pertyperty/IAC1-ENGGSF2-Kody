@@ -71,7 +71,6 @@
 .reaction-button { transition: background .16s, border-color .16s, transform .16s; }
 @media (prefers-reduced-motion: reduce) { .reaction-button { transition: none; } }
 
-.program-edit-tools:has(button):not(:has(button:not(:disabled))) { display: none; }
 .game-toolbar .game-reset, .program-edit-tools .game-reset { min-width: 44px; min-height: 44px; font-size: 18px; }
 .action-icon { flex: 0 0 20px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
 .learning-page:has(.game-result:modal) { overflow: hidden; }

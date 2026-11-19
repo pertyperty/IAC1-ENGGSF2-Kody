@@ -1,5 +1,13 @@
 # Kody Engineering Agent Guidelines
 
+The [19 November game workspace follow-up](docs/game-workspace-rework-2026-11-19.md)
+uses one bounded editable pseudocode list per game, explicit preview/run labels
+and optional step tools. Keep loop headers outside instruction indexes, preserve
+keyboard row focus, clear stale feedback after edits and keep Run stable as rows
+are added. Pixel painting retains accessible canvas cells and text input; stacks
+show TOP vertically. Registration legal links stay in the current tab without
+changing legal versions or acceptance. Guides remain available during play.
+
 The owner's 2026-11-18 major rework prioritizes learner clarity and assessment
 quality. See [learner-first rework](docs/learner-first-rework-2026-11-18.md). Freeze
 new third-party/API integration work until the owner resumes it; Judge0 is the
