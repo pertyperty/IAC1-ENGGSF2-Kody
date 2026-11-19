@@ -15,11 +15,13 @@ class WeeklyEvent extends Model
         return ['starts_at' => 'immutable_datetime', 'ends_at' => 'immutable_datetime', 'record_version' => 'integer'];
     }
 
+    /** @return BelongsTo<CodingChallengeRevision, $this> */
     public function revision(): BelongsTo
     {
         return $this->belongsTo(CodingChallengeRevision::class, 'revision_id');
     }
 
+    /** @return BelongsTo<CodingChallenge, $this> */
     public function challenge(): BelongsTo
     {
         return $this->belongsTo(CodingChallenge::class, 'challenge_id');

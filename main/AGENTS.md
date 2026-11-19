@@ -23,6 +23,12 @@ cash-window sums and caps the projection at 16 queries. Keep its historical open
 read, exact signed amounts, expense reversals, read-only snapshot and bounded
 private registers. Device optimization and live release evidence remain separate.
 
+The [challenge read follow-up](docs/challenge-problem-reads-2026-11-18.md) uses the
+standard publication checked by admission and preserves the weekly event's pinned
+revision, including category/concept metadata. Keep narrow public projections,
+SQL-filtered samples and fresh submission revision checks; never reuse a stale
+route-bound publication pointer after admission.
+
 The owner's 2026-10-26 maintainability pass is tracked in the
 [refactoring review](docs/refactoring-review-2026-10-26.md). Reuse Account-owned
 `CredentialDocuments` for qualification availability and audited downloads.

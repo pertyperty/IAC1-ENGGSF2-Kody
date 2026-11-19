@@ -15,6 +15,9 @@ parameters:
         - app/Services/Administration/ReviewInbox.php
         - app/Services/Administration/ReportFinancials.php
         - app/Http/Controllers/Administration/ReviewInboxController.php
+        - app/Http/Controllers/Challenges/PublishedChallengeController.php
+        - app/Http/Controllers/Challenges/WeeklyChallengeController.php
+        - app/Models/WeeklyEvent.php
     tmpDir: storage/framework/cache/phpstan
     checkModelProperties: true
     # Enum/date casts live in model casts() methods, not constant PHPDoc shapes.

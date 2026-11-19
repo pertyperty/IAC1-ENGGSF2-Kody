@@ -74,6 +74,10 @@ work stays in the [deferred register](deferred-features.md) and
 The [financial-report follow-up](financial-report-reads-2026-11-18.md) adds the
 report projection to the same level-5 check, expanding the scope from 23 to 24
 files without ignores. Its focused record owns the additional regression results.
+The [challenge-read follow-up](challenge-problem-reads-2026-11-18.md) adds both
+problem controllers and their weekly-event model to the level-5 scope, from 23
+to 26 files. Relationship annotations retain actual revision/challenge types;
+the focused record owns its additional regression evidence.
 The 23-file results above describe the initial tooling revision.
 
 ## npm advisory gate

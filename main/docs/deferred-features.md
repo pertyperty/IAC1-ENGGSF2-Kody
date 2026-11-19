@@ -38,6 +38,11 @@ coverage remains incremental. Further floors, engines, animation variants
 and new progression/currency systems are paused during consolidation. None of
 these optional additions is a substitute for legal, curriculum or operations work.
 
+The [challenge-read correction](challenge-problem-reads-2026-11-18.md) aligns standard
+problems with the admitted publication and restores pinned weekly metadata. It
+does not activate Judge0 execution or weekly competitions; their live verification
+requirements below remain open.
+
 18 November security follow-up: the [tooling PR's fresh npm audit](static-analysis-2026-11-18.md#npm-advisory-gate)
 is blocked by unpatched picomatch advisory GHSA-fc5q-39xc-vjpf in the inherited
 Vite toolchain. No patched registry version is published. Keep the CI audit gate;

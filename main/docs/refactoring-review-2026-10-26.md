@@ -93,3 +93,9 @@ the remaining application still needs incremental coverage. The [navigation
 batch](navigation-discovery-2026-11-18.md) also completes the optional Tower list and
 filtered pending staff inbox. Measured report/bundle optimization, human curriculum
 review and staged provider/operations verification remain separate work.
+
+The [challenge-read follow-up](challenge-problem-reads-2026-11-18.md) resolves a
+standard route-binding/publication mismatch and missing pinned weekly metadata.
+It keeps direct, narrow public queries rather than introducing a shared service
+for trivial duplication. This completes the problem-read review proposed above;
+evaluation orchestration still requires measurement before any refactor.
