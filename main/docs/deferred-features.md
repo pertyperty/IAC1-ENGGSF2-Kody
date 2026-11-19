@@ -38,11 +38,14 @@ gaps are addressed; staged operation and curriculum effectiveness still need the
 evidence listed in the [release index](release-evidence-index.md).
 
 The [navigation discovery batch](navigation-discovery-2026-11-18.md) implements
-optional Tower list navigation and a filtered staff review inbox. The
+optional Tower list navigation and a filtered staff review inbox. Measured
+JavaScript splitting still needs representative device measurements. The
 [19 November page-loading batch](page-specific-assets-2026-11-19.md) separates
 shared, play, Tower and authoring scripts with measured per-page delivery.
-Reporting-query consolidation still needs representative measurements.
-The [scoped static-analysis check](static-analysis-2026-11-18.md)
+The [financial-report batch](financial-report-reads-2026-11-18.md) measures and
+consolidates repeated cash-window sums; other reporting optimizations remain
+measurement-led. Reporting-query consolidation still needs representative
+measurements. The [scoped static-analysis check](static-analysis-2026-11-18.md)
 starts at the authorization, operations, credentials and inbox boundaries; wider
 coverage remains incremental. Further floors, engines, animation variants
 and new progression/currency systems are paused during consolidation. None of
