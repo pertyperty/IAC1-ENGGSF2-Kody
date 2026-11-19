@@ -42,7 +42,9 @@ test('D01 new reading and capstone examples save valid editable drafts', functio
 test('C01 original challenge examples support each approved language and do not save on opening', function (string $slug, string $language) {
     moduleSignIn($this, moduleAccount(Role::Contributor));
     $example = config('challenge-examples.'.$slug);
-    $this->get(route('challenges.create', ['example' => $slug, 'language' => $language]))->assertOk()->assertSee($example['title'])->assertSee('It has not been saved or published');
+    $this->get(route('challenges.create', ['example' => $slug, 'language' => $language]))->assertOk()->assertSee($example['title'])
+        ->assertSee('Example loaded. Edit the problem and test cases before saving. Nothing is published yet.')
+        ->assertViewHas('starter', fn (array $starter): bool => $starter['title'] === $example['title'] && $starter['language'] === $language);
     $this->assertDatabaseCount('coding_challenges', 0);
     $this->post(route('challenges.store'), $example + ['record_version' => 1, 'language' => $language, 'difficulty' => 'Easy', 'cpu_time_ms' => 1000, 'memory_kib' => 262144])->assertRedirect();
     $challenge = CodingChallenge::sole();
