@@ -51,6 +51,7 @@ export function evaluatePuzzle(game, program) {
 
 export function renderPuzzle(game, state, world, node, button, add) {
     world.classList.add('puzzle-world');
+    world.classList.toggle('stack-world', game.template === 'memory-trail');
     if (game.template === 'logic-switchboard') {
         const inputs = node('div', '', 'switch-bank');
         state.inputs.forEach((value, index) => {
@@ -65,13 +66,21 @@ export function renderPuzzle(game, state, world, node, button, add) {
         const gate = node('div', game.scenario.gate.toUpperCase(), 'logic-gate');
         const lamp = node('div', '', `signal-lamp ${signal ? 'is-on' : ''}`); lamp.append(node('small', 'OUTPUT'), node('b', signal ? 'TRUE' : 'FALSE'), node('small', `Target: ${game.scenario.target ? 'TRUE' : 'FALSE'}`)); world.append(inputs, gate, lamp);
     } else {
-        for (const [label, value] of [['YOUR STATE', game.template === 'string-forge' ? state.text : state.stack], ['TARGET', game.scenario.target]]) {
+        for (const [label, value] of [['Your state', game.template === 'string-forge' ? state.text : state.stack], ['Target', game.scenario.target]]) {
             const panel = node('div', '', 'puzzle-state'); panel.append(node('h3', label));
             const strip = node('div', '', 'value-strip');
             const values = typeof value === 'string' ? [...value] : value;
-            if (!values.length) strip.append(node('span', 'Empty stack', 'field-hint'));
-            values.forEach(item => strip.append(node('span', item === ' ' ? '␠' : String(item), 'value-cell')));
-            panel.append(strip); if (game.template === 'memory-trail') panel.append(node('small', 'Bottom → Top')); world.append(panel);
+            if (!values.length) strip.append(node('span', game.template === 'memory-trail' ? 'Empty stack' : 'Empty text', 'field-hint'));
+            values.forEach((item, index) => {
+                const cell = node('span', item === ' ' ? 'space' : String(item), `value-cell${item === ' ' ? ' space-cell' : ''}`);
+                if (game.template === 'memory-trail' && index === values.length - 1) {
+                    cell.classList.add('stack-top');
+                    cell.append(node('small', 'TOP'));
+                }
+                strip.append(cell);
+            });
+            panel.append(strip);
+            world.append(panel);
         }
     }
 }

@@ -556,7 +556,6 @@ test('interactive games edit and preview locally; confirmed runs save through th
     page.on('request', request => { if (request.method() === 'POST' && request.url() === completion) saves++; });
     await garden.focus();
     for (const key of ['ArrowRight', 'ArrowUp', 'ArrowRight', 'ArrowRight', 'ArrowRight']) await page.keyboard.press(key);
-    await garden.getByText('Arrange instructions', { exact: true }).click();
     await garden.getByRole('button', { name: 'Step 2: up', exact: true }).focus();
     await page.keyboard.press('Alt+ArrowRight');
     await expect(garden.getByRole('button', { name: 'Step 3: up', exact: true })).toBeFocused();
@@ -582,8 +581,9 @@ test('interactive games edit and preview locally; confirmed runs save through th
     await page.getByRole('button', { name: 'Paint column 1, row 1; currently blank', exact: true }).click();
     await page.getByRole('button', { name: 'Paint with peach', exact: true }).click();
     await page.getByRole('button', { name: 'Paint column 2, row 2; currently blank', exact: true }).click();
-    await expect(page.locator('[data-arcade-preview-status]')).toContainText('Preview only');
+    await expect(page.locator('[data-execution-label]')).toHaveText('Preview');
     expect(JSON.parse(fixture('snapshot', 'interactive@browser.example.test'))).toMatchObject({ xp: 20 });
+    await page.screenshot({ path: 'storage/app/private/game-workspace-evidence/after-lesson-pixel-320.png', fullPage: true });
     await audit(page);
     await page.getByRole('button', { name: 'Run program' }).click();
     await expect(page.locator('[data-arcade-output]')).toContainText('saved');
@@ -600,7 +600,7 @@ test('interactive games edit and preview locally; confirmed runs save through th
         await prompt.fill(command); await prompt.press('Enter');
         await expect(prompt).toBeEnabled();
     }
-    await expect(page.locator('[data-arcade-preview-status]')).toContainText('Preview only');
+    await expect(page.locator('[data-execution-label]')).toHaveText('Preview');
     expect(JSON.parse(fixture('snapshot', 'interactive@browser.example.test'))).toMatchObject({ xp: 100 });
     await page.getByRole('button', { name: 'Run program' }).click();
     await expect(page.locator('[data-arcade-output]')).toContainText('saved');

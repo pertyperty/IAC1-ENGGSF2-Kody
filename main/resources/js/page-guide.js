@@ -4,7 +4,7 @@ const game = [
     guide('.lesson-briefing', 'Understand the idea first', 'Read your learning goal, actual task and success condition. Open the different worked example if this idea is new.'),
     guide('[data-arcade-world], [data-game-board], [data-practice-quiz]', 'Meet the challenge', 'Read the objective and inspect the starting state. A quiz asks you to choose an answer; games let you build and test an idea.'),
     guide('[data-arcade-controls], [data-game-controls], .game-controls', 'Build your idea', 'Use the controls or the program editor to prepare your answer. Changing your program is a preview, not a saved win.'),
-    guide('.learning-trace', 'Follow your own program', 'Read the pseudocode, predict the next state and use Step. Replay and Restart stay local; they never save a completion.'),
+    guide('[data-readable-program]', 'Follow your program', 'Your instructions stay visible as pseudocode. Open Step through program to inspect each change before Run. Previews never save a completion.'),
     guide('[data-arcade-run], [data-game-run], [data-practice-quiz] button[type="submit"]', 'Try, adjust, then run', 'Run checks your answer. Published lessons save eligible results only after server validation; arcade practice stays local.'),
 ];
 const lesson = [
@@ -32,7 +32,7 @@ const profiles = [
         guide('[data-tower-present]', 'Find your next step', 'Jump to your current floor. The arrows explore higher and lower floors without changing your progress.'),
     ] },
     { match: /^tower\.(show|preview)/, steps: [guide('.tower-stage-tabs', 'One stage at a time', 'Follow this floor’s stages. Clear the current stage to unlock the next; the final validated stage clears the floor.'), ...game] },
-    { match: /^arcade$/, steps: [guide('.practice-picker', 'Choose a concept', 'Choose the concept you want to practise, then open its activity.'), guide('#arcade-station', 'Your practice station', 'This is the selected game. Experiment freely; these local results never grant XP, KodeBits or saved lesson progress.'), ...game] },
+    { match: /^arcade$/, steps: [guide('.practice-options', 'Choose a concept', 'Open Change activity to choose another concept and practise its task.'), guide('#arcade-station', 'Your practice station', 'This is the selected game. Experiment freely; these local results never grant XP, KodeBits or saved lesson progress.'), ...game] },
     { match: /^(modules\.show|course-learning\.lesson|learning\.show|courses\.preview)$/, steps: lesson },
     { match: /^(learning\.catalog|course-learning\.catalog|challenges\.catalog)$/, steps: catalog },
     { match: /^course-learning\.mine$/, steps: [guide('.journey-cards', 'Your journeys, at a glance', 'See saved progress, enrollment and completion dates, then continue an available lesson.'), guide('.journey-card-actions', 'Pick up where you left off', 'Continue opens the next currently available lesson. Completed and unavailable lessons remain clearly distinguished.')] },
