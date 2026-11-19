@@ -12,6 +12,7 @@
     @include('layouts.theme-head')
     @fonts
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @stack('page-scripts')
 </head>
 <body class="@yield('page-class', 'learning-page')" data-icon-sprite="{{ asset('images/navigation.svg') }}" data-kodebit-icon="{{ asset(config('branding.assets.kodebit')) }}" style="--kody-mascot: url('{{ asset(config('branding.assets.mascot')) }}')">
     @include('layouts.feedback')

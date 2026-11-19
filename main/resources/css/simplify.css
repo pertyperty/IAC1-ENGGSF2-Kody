@@ -190,7 +190,7 @@ body { font-size: 16px; line-height: 1.6; }
 .creator-editor textarea[name=description] { height: 5rem; }
 .creator-editor textarea[name=content] { height: 14rem; }
 .creator-editor .creator-media-panel { border: 0; border-radius: 0; padding: 0; margin-top: 1.5rem; background: transparent; }
-.creator-editor .creator-publish-pane > .studio-actions { position: static; border: 0; padding: 1rem 0; background: transparent; }
+.creator-editor > fieldset > .studio-actions { position: static; border: 0; padding: 1rem 0; background: transparent; }
 .creator-editor .access-options > summary { padding: .75rem 0; }
 .creator-editor .access-options:not([open]) { margin-block: 1.5rem; }
 .creator-editor [data-guided-summary] { margin-top: 1rem; }
@@ -214,3 +214,11 @@ body { font-size: 16px; line-height: 1.6; }
 
 .trace-source .trace-placeholder { list-style: none; font-family: var(--font-sans); color: var(--muted); }
 .creator-media-panel > summary { font-weight: 600; padding-block: .5rem; }
+
+.creator-editor .challenge-case { padding-block: 1.25rem; border-bottom: 1px solid var(--border); }
+.creator-editor .challenge-case legend { padding: 0; font-size: 1.0625rem; }
+.creator-editor .challenge-case button { margin-top: .75rem; }
+.creator-editor [data-add-case] { margin-top: 1rem; }
+.creator-editor .access-options { margin-block: 1.25rem; }
+.creator-editor .access-options + button { margin-top: 1rem; }
+.review-page:has(.challenge-editor) .editor-jumps a { font-size: .9375rem; }

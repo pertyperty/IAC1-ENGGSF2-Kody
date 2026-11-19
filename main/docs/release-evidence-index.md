@@ -14,6 +14,10 @@ UI, guided-assessment, registration and migration evidence, including the exact
 source revisions and full-run/targeted-run limits. It does not supply the human
 pilot or production sign-offs below.
 
+The [19 November creator follow-up](creator-workflow-clarity-2026-11-19.md) records
+local challenge/preset form, validation, keyboard and preview checks. These are
+workflow evidence, not a curriculum, usability or release sign-off.
+
 ## Candidate
 
 | Field | Value |
@@ -50,9 +54,11 @@ evidence, not an attestation that these staged checks passed.
 | Accessibility / target devices | Partial local automation only | Real-device and screen-reader sessions plus automated workflow evidence at candidate revision |
 | SRS load, latency and availability | Unmeasured in target environment | Relevant capacity/latency tests and observation period; a small pilot does not prove 500 users or 99.9% availability |
 
-The [18 November npm advisory disposition](static-analysis-2026-11-18.md#npm-advisory-gate)
-records an open unpatched build-tool dependency gate. PHP audits pass, but fresh
-npm audit fails; the dependency-security row cannot be signed off from earlier CI.
+The [19 November npm recheck](static-analysis-2026-11-18.md#19-november-advisory-recheck)
+records passing installed-package and lock-file audits after the upstream advisory
+was withdrawn. No lock change or suppression was made. The initial failure is
+retained as historical evidence. The dependency-security row still requires fresh
+candidate CI; local checks and earlier CI do not sign off a release.
 
 ## Separate activation gates
 

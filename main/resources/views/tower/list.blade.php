@@ -1,6 +1,9 @@
 @extends('layouts.learning')
 @section('title', 'Tower levels - Kody')
 @section('content')
+@pushOnce('page-scripts', 'tower-page')
+    @vite('resources/js/tower-page.js')
+@endPushOnce
 <section class="page-width tower-list-page" aria-labelledby="tower-list-heading" data-tower-list @guest data-guest-tower @endguest>
     <div class="workspace-heading">
         <div><p class="overline">Kody Tower</p><h1 id="tower-list-heading">Tower levels</h1></div>

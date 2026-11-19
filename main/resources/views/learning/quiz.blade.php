@@ -1,3 +1,6 @@
+@pushOnce('page-scripts', 'play')
+    @vite('resources/js/play.js')
+@endPushOnce
 <section class="practice-quiz" data-practice-quiz="{{ json_encode($quiz, JSON_THROW_ON_ERROR) }}" @if(isset($completionUrl) || isset($module)) data-completion-url="{{ $completionUrl ?? route('play.quiz', $module) }}" @endif aria-label="Practice quiz">
     <div class="game-heading"><div><p class="overline">Concept check</p><h2>{{ $quiz['title'] }}</h2></div></div>
     @include('learning.briefing', ['game' => $quiz])

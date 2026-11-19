@@ -1,6 +1,9 @@
 @extends('layouts.learning')
 @section('title', 'Edit tower level '.$level->position.' — Kody')
 @section('content')
+@pushOnce('page-scripts', 'authoring')
+    @vite('resources/js/authoring.js')
+@endPushOnce
 <section class="review-page page-width">
     <p class="overline">TOWER STUDIO · LEVEL {{ $level->position }}</p>
     <h1>Build a meaningful challenge.</h1>
