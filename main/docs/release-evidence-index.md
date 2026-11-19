@@ -14,6 +14,10 @@ UI, guided-assessment, registration and migration evidence, including the exact
 source revisions and full-run/targeted-run limits. It does not supply the human
 pilot or production sign-offs below.
 
+The [19 November creator follow-up](creator-workflow-clarity-2026-11-19.md) records
+local challenge/preset form, validation, keyboard and preview checks. These are
+workflow evidence, not a curriculum, usability or release sign-off.
+
 ## Candidate
 
 | Field | Value |

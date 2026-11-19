@@ -11,6 +11,12 @@ aligns command help with pinned task rules, removes repeated answer-check playba
 and clarifies lesson publication actions. It does not close the human learning,
 editorial, legal or staged operations gates below.
 
+The [19 November creator follow-up](creator-workflow-clarity-2026-11-19.md)
+simplifies challenge/preset setup and corrects collapsed-field and test-case
+keyboard focus. Those local interface fixes do not close the human pilot or
+platform-wide UX review. Shared feedback duplication and remaining staff-screen
+copy are still candidates for focused consolidation; provider work stays paused.
+
 The owner delegated remaining business decisions and implementation on 2026-10-04.
 The [economy/launch amendment](economy-and-launch-decisions.md) supersedes earlier
 pricing, XP, rewards, payout and creator-deletion deferrals. Their code and

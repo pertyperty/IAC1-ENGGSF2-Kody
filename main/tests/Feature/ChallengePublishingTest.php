@@ -43,7 +43,7 @@ function challengeFixture(bool $published = false, Role $role = Role::Contributo
 test('C01 Contributors and Instructors save complete owned immutable challenge drafts', function (Role $role) {
     $author = User::factory()->create(['account_role' => $role]);
     moduleSignIn($this, $author);
-    $this->get(route('challenges.create'))->assertOk()->assertSee('Turn a problem into possibility');
+    $this->get(route('challenges.create'))->assertOk()->assertSee('Create coding challenge');
     $this->post(route('challenges.store'), challengeData(['created_by' => 999, 'status' => 'Published', 'published_revision_id' => 999]))->assertRedirect();
     $challenge = CodingChallenge::sole();
     expect($challenge->created_by)->toBe($author->id)->and($challenge->status)->toBe('Draft')->and($challenge->published_revision_id)->toBeNull();

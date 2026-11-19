@@ -1,9 +1,28 @@
 export function mountFormGuidance(document) {
     let sequence = 0;
+    const reveal = field => {
+        let panel = field.closest('details');
+        while (panel) {
+            panel.open = true;
+            panel = panel.parentElement?.closest('details');
+        }
+    };
     const eligible = field => field.name && field.type !== 'hidden' && !field.closest('[data-coding-game], [data-arcade-game], [data-practice-quiz]');
     const pageFields = [...document.querySelectorAll('form input, form select, form textarea')].filter(eligible);
     const errorName = field => field.name.replace(/\[([^\]]+)\]/g, '.$1');
     for (const form of document.querySelectorAll('form')) {
+        let firstInvalid = null;
+        // Native validation must be able to focus fields inside collapsed settings.
+        form.addEventListener('invalid', event => {
+            reveal(event.target);
+            if (firstInvalid) return;
+            firstInvalid = event.target;
+            // WebKit needs the opened panels laid out before focus can enter them.
+            document.defaultView.requestAnimationFrame(() => {
+                firstInvalid.focus();
+                firstInvalid = null;
+            });
+        }, true);
         const fields = [...form.querySelectorAll('input, select, textarea')].filter(eligible);
         for (const field of fields) {
             if (!field.id) field.id = `form-field-${++sequence}`;
@@ -30,11 +49,17 @@ export function mountFormGuidance(document) {
             // An ambiguous summary stays readable instead of pointing at the wrong action.
             if (matches.length !== 1 || !fields.includes(matches[0])) continue;
             const field = matches[0];
+            reveal(field);
             if (!error.id) error.id = `form-error-${++sequence}`;
             field.setAttribute('aria-invalid', 'true');
             field.setAttribute('aria-describedby', [field.getAttribute('aria-describedby'), error.id].filter(Boolean).join(' '));
             const link = document.createElement('a'); link.href = `#${field.id}`; link.className = 'quiet-link'; link.textContent = error.textContent;
-            link.addEventListener('click', event => { event.preventDefault(); field.focus(); }); error.replaceChildren(link);
+            link.addEventListener('click', event => {
+                event.preventDefault();
+                reveal(field);
+                document.defaultView.requestAnimationFrame(() => field.focus());
+            });
+            error.replaceChildren(link);
         }
     }
 }

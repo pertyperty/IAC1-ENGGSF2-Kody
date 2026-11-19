@@ -9,6 +9,13 @@ isolated browser harness. Use concise action labels, visible programs, one clear
 goal and contextual help. Prefer spacing over nested cards; keep borders where
 they explain inputs, game cells or important state.
 
+The [19 November creator follow-up](docs/creator-workflow-clarity-2026-11-19.md)
+uses challenge/test-case wording and expandable secondary settings. Keep closed
+settings enabled for submission, reveal error ancestors and defer focus until
+layout for WebKit. Test-case deletion retains keyboard focus and exact text.
+Presets retain fixed server-validated rewards and immutable saved lesson versions.
+Creator Save actions must not overlay editable fields.
+
 The [19 November page-loading consolidation](docs/page-specific-assets-2026-11-19.md)
 uses the base shell's page-script stack. Game components and Tower/authoring views
 declare their entry once; keep shared controls independent of editor imports.
