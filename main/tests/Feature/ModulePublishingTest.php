@@ -57,7 +57,7 @@ function moduleSignIn($test, User $user): void
 test('D01 instructors create owned drafts with allowlisted template data and escaped previews', function () {
     $author = User::factory()->create(['account_role' => Role::Instructor]);
     moduleSignIn($this, $author);
-    $this->get(route('studio.create'))->assertOk()->assertSee('Start with a spark');
+    $this->get(route('studio.create'))->assertOk()->assertSee('Create a lesson');
     $this->post(route('studio.store'), moduleData(['title' => '<script>bad()</script>', 'created_by' => 999,
         'status' => 'Published', 'published_revision_id' => 999, 'assessment' => ['source' => 'bad()']]))->assertRedirect();
     $module = LearningModule::sole();
@@ -244,7 +244,7 @@ test('D03 owner confirms archive and learner access stops while history survives
     $learner = moduleAccount(Role::Learner);
     app(LearningProgression::class)->recordModule($learner, 'module-test-session', $module->id, $module->published_revision_id, 'game', ['program' => ['right', 'right', 'up', 'right', 'right']]);
     moduleSignIn($this, User::find($module->created_by));
-    $this->get(route('studio.archive-confirmation', $module))->assertOk()->assertSee('Confirm archive');
+    $this->get(route('studio.archive-confirmation', $module))->assertOk()->assertSee('Archive lesson');
     $this->postJson(route('studio.archive', $module), ['record_version' => 3])->assertUnprocessable();
     $this->postJson(route('studio.archive', $module), ['record_version' => 2, 'confirmed' => true])->assertUnprocessable();
     $this->post(route('studio.archive', $module), ['record_version' => 3, 'confirmed' => true])->assertRedirect();

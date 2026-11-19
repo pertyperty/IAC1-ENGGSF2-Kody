@@ -10,5 +10,5 @@
     <x-kody-art name="celebration" class="result-mascot" size="96" data-result-art data-celebration="{{ asset(config('branding.assets.celebration')) }}" data-thinking="{{ asset(config('branding.assets.thinking')) }}"/><p class="overline" data-result-saved></p>
     <h2 id="game-result-title" data-result-title>Your result</h2><p id="game-result-message" data-result-message></p>
     <div data-result-reactions hidden></div>
-    <div class="result-actions"><a class="button button-play" data-result-next hidden>Next lesson <x-action-icon name="right"/></a><button type="button" class="button button-secondary" data-result-return><x-action-icon name="refresh"/> Return to lesson</button></div>
+    <div class="result-actions"><a class="button button-play" data-result-next hidden>Next lesson</a><button type="button" class="button button-secondary" data-result-return><x-action-icon name="refresh"/> Return to lesson</button></div>
 </dialog>

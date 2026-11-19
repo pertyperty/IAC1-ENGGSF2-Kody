@@ -38,7 +38,7 @@ test('favicon and page guides stay specific across Help Arcade weekly quests wal
     expect((await image.body()).subarray(0, 8).toString('hex')).toBe('89504e470d0a1a0a');
     expect(await page.evaluate(async () => { const img = new Image(); img.src = document.querySelector('link[rel="icon"][sizes="32x32"]').href; await img.decode(); return [img.naturalWidth, img.naturalHeight]; })).toEqual([32, 32]);
     await guide(page, 'Find a helpful answer');
-    await page.goto('/playground'); await guide(page, 'Choose your game cabinet');
+    await page.goto('/playground'); await guide(page, 'Choose a concept');
     await login(page, 'questlearner');
     await page.goto('/weekly'); await guide(page, 'This week’s shared adventure');
     await page.setViewportSize({ width: 1920, height: 1000 }); await page.goto('/weekly'); await audit(page);
@@ -62,7 +62,7 @@ test('favicon and page guides stay specific across Help Arcade weekly quests wal
 test('arcade lobby quiz cabinet automatically checks choices blanks and matching without mutation requests', async ({ page }) => {
     const writes = []; page.on('request', request => { if (!['GET', 'HEAD'].includes(request.method())) writes.push(request.method()); });
     await page.setViewportSize({ width: 1920, height: 1000 }); await page.goto('/playground?game=quiz-lab');
-    await expect(page.locator('.arcade-cabinet')).toHaveCount(8); await audit(page);
+    await expect(page.locator('#practice-game option')).toHaveCount(8); await audit(page);
     await page.screenshot({ path: 'storage/app/browser-results/arcade-cabinet-lobby.png', fullPage: true });
     const quiz = page.locator('[data-practice-quiz]');
     await quiz.getByLabel('True', { exact: true }).check(); await quiz.getByLabel('Your short answer').fill(' IF ');

@@ -58,7 +58,7 @@ test('authoring warns on leave, preserves cancelled edits and allows unchanged o
     // File inputs with no selected file must not make an untouched form dirty.
     await page.goto('/dashboard');
     await page.goto('/create/modules/new?example=programming-check');
-    const title = page.getByLabel('Adventure title');
+    const title = page.getByLabel('Lesson title');
     const initial = await title.inputValue();
     await title.click();
     await title.fill('Unsaved lesson title');

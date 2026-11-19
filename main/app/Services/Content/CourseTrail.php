@@ -17,7 +17,7 @@ class CourseTrail
             $ready = $accessible && $available && $unlocked->get($slot->id);
 
             return ['id' => $slot->id, 'position' => $slot->position,
-                'title' => $slot->module->isWithdrawn() ? 'Adventure unavailable' : $slot->revision->title,
+                'title' => $slot->module->isWithdrawn() ? 'Lesson unavailable' : $slot->revision->title,
                 'kind' => $slot->revision->assessment ? 'Play & clear' : 'Read & reflect',
                 'state' => ! $available ? 'Unavailable' : (! $accessible ? 'Join to play' : ($completed ? 'Cleared' : ($ready ? 'Ready' : 'Locked'))),
                 'completed' => $completed, 'visited' => $progress->has($slot->id), 'url' => $ready ? route('course-learning.lesson', [$course, $slot->id]) : null];

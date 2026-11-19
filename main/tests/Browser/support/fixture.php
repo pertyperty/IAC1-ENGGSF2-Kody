@@ -64,7 +64,7 @@ try {
         $options = ['--force' => true];
         if ($operation === 'migrate-baseline') {
             $options += ['--realpath' => true, '--path' => array_values(array_filter(glob(database_path('migrations/*.php')),
-                fn (string $path) => ! str_ends_with($path, '2026_10_05_000038_add_challenge_discovery_metadata.php') && ! str_contains(basename($path), '2026_10_10_') && ! str_contains(basename($path), '2026_10_11_') && ! str_contains(basename($path), '2026_10_12_') && ! str_contains(basename($path), '2026_10_18_') && ! str_contains(basename($path), '2026_10_25_') && ! str_contains(basename($path), '2026_11_17_')))];
+                fn (string $path) => ! str_ends_with($path, '2026_10_05_000038_add_challenge_discovery_metadata.php') && ! str_contains(basename($path), '2026_10_10_') && ! str_contains(basename($path), '2026_10_11_') && ! str_contains(basename($path), '2026_10_12_') && ! str_contains(basename($path), '2026_10_18_') && ! str_contains(basename($path), '2026_10_25_') && ! str_contains(basename($path), '2026_11_17_') && ! str_contains(basename($path), '2026_11_18_')))];
         }
         if (Artisan::call('migrate', $options) !== 0) {
             throw new RuntimeException('Browser migrations failed.');
@@ -200,6 +200,7 @@ try {
         $revision = CodingChallengeRevision::where('title', 'Upgrade history quest')->sole();
         $learner = User::where('email', 'learner@browser.example.test')->sole();
         if ($revision->category !== 'foundations' || $revision->tags !== []
+            || DB::table('users')->whereNotNull('terms_version')->orWhereNotNull('terms_accepted_at')->exists()
             || DB::table('tower_levels')->count() !== 80 || DB::table('tower_revisions')->count() !== 80
             || DB::table('module_revisions')->where('attachments', '!=', '[]')->exists()
             || VerificationDelivery::where('user_id', $learner->id)->sole()->token !== str_repeat('a', 64)
@@ -221,7 +222,7 @@ try {
             $row = 'to_jsonb(t)';
             if ($operation === 'fingerprint-legacy') {
                 $row .= match ($table->tablename) {
-                    'users' => " - 'profile_picture'", 'module_revisions' => " - 'attachments'", 'coding_challenge_revisions' => " - 'category' - 'tags'",
+                    'users' => " - 'profile_picture' - 'terms_version' - 'terms_accepted_at'", 'module_revisions' => " - 'attachments'", 'coding_challenge_revisions' => " - 'category' - 'tags'",
                     'email_verifications' => " - 'otp_hash' - 'otp_expires_at' - 'otp_attempts'", 'verification_deliveries' => " - 'otp'", default => '',
                 };
             }

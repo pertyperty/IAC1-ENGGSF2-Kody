@@ -7,13 +7,13 @@
 <p>{{ ucfirst($kind) }} #{{ $item->id }} · {{ $item->status }} · {{ $item->isWithdrawn() ? 'Staff withdrawal active' : 'No staff block' }}</p>
 <p>{{ $revision?->description }}</p>
 @if($kind === 'module')<pre class="lesson-note">{{ $revision?->content }}</pre><p>{{ $revision?->video_url }}</p><pre class="lesson-note">{{ json_encode($revision?->assessment, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</pre>
-@elseif($kind === 'course')<h2>Pinned adventures</h2>@foreach($revision?->modules ?? [] as $slot)<p>{{ $slot->position }}. {{ $slot->revision->title }} · Module #{{ $slot->module_id }} · Revision #{{ $slot->module_revision_id }}</p>@endforeach
+@elseif($kind === 'course')<h2>Saved lesson versions</h2>@foreach($revision?->modules ?? [] as $slot)<p>{{ $slot->position }}. {{ $slot->revision->title }} · Module #{{ $slot->module_id }} · Revision #{{ $slot->module_revision_id }}</p>@endforeach
 @elseif($kind === 'challenge')<p>{{ $revision?->language }} · {{ $revision?->rules }}</p><pre class="lesson-note">Input: {{ $revision?->input_format }}
 Output: {{ $revision?->output_format }}</pre><h2>Approved revision test cases · Staff only</h2>@foreach($revision?->testCases ?? [] as $case)<pre class="lesson-note">{{ $case->hidden ? 'Hidden' : 'Sample' }} case {{ $case->position }}
 Input: {{ $case->input }}
 Expected: {{ $case->expected_output }}</pre>@endforeach
 @endif
-<p><a class="quiet-link" href="{{ match($kind) { 'module' => route('module-reviews.show', $item), 'course' => route('course-reviews.show', $item), 'challenge' => route('challenge-reviews.show', $item) } }}">Inspect revision details and existing publication review <x-action-icon name="right"/></a></p>
+<p><a class="quiet-link" href="{{ match($kind) { 'module' => route('module-reviews.show', $item), 'course' => route('course-reviews.show', $item), 'challenge' => route('challenge-reviews.show', $item) } }}">Inspect revision details and existing publication review</a></p>
 <p>Withdrawal stops learner access, including enrolled course access and pinned lessons. Content, revisions, progress, audit and committed coding evaluations remain intact. Restoration removes only the staff block; existing lifecycle rules still apply.</p>
 <form method="POST" action="{{ route('content-moderation.change', [$kind, $item->id]) }}" class="account-form">@csrf
 <input type="hidden" name="record_version" value="{{ $item->record_version }}"><input type="hidden" name="action" value="{{ $item->isWithdrawn() ? 'Restored' : 'Withdrawn' }}">

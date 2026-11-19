@@ -5,7 +5,7 @@
             @include('games.quiz-question-fields')
         @endforeach
     </div>
-    <button type="button" class="button button-dark" data-add-question>Add a question +</button>
+    <button type="button" class="button button-dark" data-add-question>Add question</button>
     <p class="field-hint" data-quiz-editor-status role="status">Changes stay in your draft until you save and receive approval.</p>
     <template data-question-template>@include('games.quiz-question-fields', ['questionIndex' => 0, 'question' => ['id' => '', 'question' => '', 'options' => [['id' => 'a', 'label' => ''], ['id' => 'b', 'label' => '']], 'answer' => '', 'explanation' => '']])</template>
     <template data-option-template>@include('games.quiz-option-fields', ['questionIndex' => 0, 'optionIndex' => 0, 'option' => ['id' => '', 'label' => '']])</template>

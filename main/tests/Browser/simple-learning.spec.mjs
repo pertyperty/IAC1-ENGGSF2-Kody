@@ -28,7 +28,7 @@ test('@cross-browser pseudocode stays visible and bounded as the program fills',
     for (let i = 0; i < limit; i++) await game.getByRole('button', { name: 'Add right', exact: true }).click();
     await expect(code).toContainText('MOVE RIGHT');
     expect(Math.abs((await code.boundingBox()).height - before.height)).toBeLessThan(2);
-    await game.getByRole('button', { name: 'Step preview', exact: true }).click();
+    await game.getByRole('button', { name: 'Step', exact: true }).click();
     await expect(code.locator('[aria-current="step"]')).toHaveCount(1);
     for (const width of [1280, 390]) {
         await page.setViewportSize({ width, height: 1000 });
@@ -45,6 +45,17 @@ test('@cross-browser Help controls have space and account forms stay accessible'
     await audit(page);
     await page.goto('/register');
     await expect(page.getByLabel('Username (required)')).toBeVisible();
+    await audit(page);
+});
+
+test('@cross-browser a long activity explanation stays keyboard scrollable on mobile', async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 740 });
+    await page.goto('/playground?game=number-machine');
+    await page.getByText('How it works', { exact: true }).click();
+    const explanation = page.getByRole('region', { name: 'Activity explanation', exact: true });
+    await explanation.focus();
+    await page.keyboard.press('End');
+    await expect.poll(() => explanation.evaluate(element => element.scrollTop)).toBeGreaterThan(0);
     await audit(page);
 });
 

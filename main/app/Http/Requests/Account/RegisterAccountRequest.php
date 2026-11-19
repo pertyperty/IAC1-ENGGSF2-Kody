@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Account;
 
 use App\Support\AccountPasswords;
+use App\Support\RegistrationTerms;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -34,6 +35,7 @@ class RegisterAccountRequest extends FormRequest
             'role' => ['prohibited'],
             'permissions' => ['prohibited'],
             'institution_name' => ['prohibited'], 'specialization' => ['prohibited'], 'credential_document' => ['prohibited'],
-        ];
+            'terms_accepted_at' => ['prohibited'],
+        ] + RegistrationTerms::rules();
     }
 }

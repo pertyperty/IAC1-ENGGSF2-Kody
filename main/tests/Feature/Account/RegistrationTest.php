@@ -6,6 +6,7 @@ use App\Enums\Role;
 use App\Models\EmailVerification;
 use App\Models\User;
 use App\Models\VerificationDelivery;
+use App\Support\RegistrationTerms;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
@@ -20,7 +21,7 @@ function registrationData(array $overrides = []): array
     return array_replace([
         'username' => 'learnerone', 'email' => 'learner@example.test',
         'password' => 'StrongPass12!', 'password_confirmation' => 'StrongPass12!',
-        'account_type' => 'learner',
+        'account_type' => 'learner', 'terms_accepted' => true, 'terms_version' => RegistrationTerms::VERSION,
     ], $overrides);
 }
 

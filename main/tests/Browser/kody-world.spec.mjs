@@ -103,7 +103,7 @@ test('contextual guides explain all five role workspaces without submitting form
     test.setTimeout(150000);
     for (const [role, path, expected] of [
         ['guidewallet', '/wallet', 'Know what is available'],
-        ['guideinstructor', '/create/modules/new', 'Give the idea a playground'],
+        ['guideinstructor', '/create/modules/new', 'Check understanding'],
         ['guidecontributor', '/create/challenges/new', 'Check the important cases'],
         ['guidemoderator', '/manage/accounts', 'Find the right account'],
         ['guideadministrator', '/manage/accounts', 'Find the right account'],

@@ -44,6 +44,7 @@ class ArcadeGames
                 'scenario.files.*' => ['required', 'array:name,content'], 'scenario.files.*.name' => ['required', 'string', 'distinct', 'regex:/^[a-z][a-z0-9_-]{0,19}\.[a-z]{1,5}$/D'],
                 'scenario.files.*.content' => ['required', 'string', 'max:300', 'not_regex:/[\r\n]/'], 'scenario.destination' => ['required', 'string', 'regex:/^[a-z][a-z0-9_-]{0,19}\.[a-z]{1,5}$/D'],
                 'scenario.content' => ['required', 'string', 'max:300', 'not_regex:/[\r\n]/']],
+            default => $this->invalid(),
         };
         Validator::make(['scenario' => $scenario], $rules)->validate();
         // Reject JSON numeric strings/floats: interpreter state uses integer arithmetic.
@@ -76,7 +77,8 @@ class ArcadeGames
 
     public function succeeds(array $instance, array $program): bool
     {
-        if (! $this->supports($instance) || ! array_is_list($program) || $program === [] || count($program) > 12) {
+        if (! $this->supports($instance) || ! array_is_list($program) || $program === [] || count($program) > 12
+            || ! app(AssessmentChallenges::class)->allows($instance, $program)) {
             return false;
         }
         if (in_array($instance['template'], PuzzleGames::TEMPLATES, true)) {
@@ -145,6 +147,7 @@ class ArcadeGames
         return match ($instance['template']) {
             'pixel-studio' => $pixels === $targetPixels, 'number-machine' => $number === $scenario['target'],
             'sort-lab' => $items === $targetItems, 'terminal-quest' => $readDestination && ($files[$scenario['destination']] ?? null) === $scenario['content'],
+            default => false,
         };
     }
 

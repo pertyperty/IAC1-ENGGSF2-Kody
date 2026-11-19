@@ -11,7 +11,7 @@
     <div data-scenario-panel="string-forge"><label>Starting text<input data-scenario-text-start maxlength="40"></label><label>Target text<input data-scenario-text-target maxlength="40"></label><p class="field-hint">Letters, digits, spaces, underscores and hyphens. Targets must be reachable through case changes, reversal, trimming and appending.</p></div>
     <div data-scenario-panel="memory-trail"><label>Starting stack (0–9, separated by commas; empty allowed)<input data-scenario-stack-start maxlength="30"></label><label>Target stack (up to six values)<input data-scenario-stack-target maxlength="30"></label><p class="field-hint">Rightmost value is on top. The learner can push, pop, duplicate and swap the top two values.</p></div>
     </details><button type="button" class="game-reset" data-scenario-reset>Reset to example</button>
-    <button type="button" class="button button-dark" data-scenario-preview>Try your scenario</button>
+    <button type="button" class="button button-dark" data-scenario-preview>Preview activity</button>
     <p data-scenario-status class="field-hint" role="status"></p><div data-scenario-preview-host></div>
     <template>@include('learning.arcade-game', ['game' => config('arcade.pixel-studio'), 'completionUrl' => null])</template>
 </section>

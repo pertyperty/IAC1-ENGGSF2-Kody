@@ -16,6 +16,7 @@ class CompleteGameRequest extends FormRequest
     {
         return ['program' => ['required', 'array', 'list', 'min:1', 'max:12'],
             'program.*' => $this->routeIs('play.game') ? ['required', 'string', Rule::in(['up', 'down', 'left', 'right'])] : ['required', 'string', 'max:100'],
-            'repeat' => ['sometimes', 'boolean'], 'conditional' => ['sometimes', 'boolean']];
+            'repeat' => ['sometimes', 'boolean'], 'conditional' => ['sometimes', 'boolean'],
+            'assessment_answer' => ['sometimes', 'string', 'max:30']];
     }
 }

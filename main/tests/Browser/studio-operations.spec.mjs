@@ -28,15 +28,16 @@ test('visual scenario editors preserve typed content focus and previews without 
     const steps = page.locator('.editor-jumps'); await steps.getByRole('link').last().click();
     const stepBox = await steps.boundingBox(), backBox = await page.locator('.page-navigation').boundingBox();
     expect(backBox.y + backBox.height).toBeLessThanOrEqual(stepBox.y + 1);
+    await page.getByLabel('Assessment task').selectOption('');
     await page.getByLabel('Game template').selectOption('terminal-quest');
     const content = visual.getByLabel('File 1 contents');
     await content.fill('Typed once, used immediately.');
     await expect(content).toBeFocused();
     await visual.getByRole('button', { name: 'Use contents as goal' }).first().click();
     await expect.poll(async () => JSON.parse(await scenario.inputValue()).content).toBe('Typed once, used immediately.');
-    await page.getByRole('button', { name: 'Try your scenario' }).click();
+    await page.getByRole('button', { name: 'Preview activity' }).click();
     await expect(page.locator('[data-scenario-preview-host] [data-arcade-run]')).toHaveCount(1);
-    await page.getByRole('button', { name: 'Try your scenario' }).click();
+    await page.getByRole('button', { name: 'Preview activity' }).click();
     await expect(page.locator('[data-scenario-preview-host] [data-arcade-run]')).toHaveCount(1);
     await audit(page); await page.screenshot({ path: 'storage/app/browser-results/visual-creator-desktop.png', fullPage: true });
     await page.setViewportSize({ width: 390, height: 844 }); await audit(page);

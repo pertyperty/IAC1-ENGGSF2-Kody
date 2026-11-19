@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\BrowseModulesRequest;
 use App\Models\ModuleRevision;
 use App\Services\Content\LearningHistory;
+use App\Services\Games\AssessmentChallenges;
 use App\Services\Gamification\LearningProgression;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -19,7 +20,12 @@ class LearningController extends Controller
 
     public function arcade(Request $request): Response
     {
-        $cabinets = config('arcade') + config('practice-quizzes');
+        $tasks = app(AssessmentChallenges::class)->catalog();
+        $cabinets = [];
+        foreach (config('arcade') as $template => $game) {
+            $cabinets[$template] = collect($tasks)->firstWhere('template', $template) ?? $game;
+        }
+        $cabinets += config('practice-quizzes');
         $selected = $request->validate(['game' => ['sometimes', 'string', Rule::in(array_keys($cabinets))]])['game'] ?? 'pixel-studio';
 
         return response()->view('learning.arcade', ['selected' => $selected, 'game' => $cabinets[$selected], 'cabinets' => $cabinets]);

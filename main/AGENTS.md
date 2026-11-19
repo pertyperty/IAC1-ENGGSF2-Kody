@@ -1,5 +1,23 @@
 # Kody Engineering Agent Guidelines
 
+The owner's 2026-11-18 major rework prioritizes learner clarity and assessment
+quality. See [learner-first rework](docs/learner-first-rework-2026-11-18.md). Freeze
+new third-party/API integration work until the owner resumes it; Judge0 is the
+first intended later activation. Compare significant UI changes with screenshots
+and actual behavior of public learning projects, and verify Kody through its
+isolated browser harness. Use concise action labels, visible programs, one clear
+goal and contextual help. Prefer spacing over nested cards; keep borders where
+they explain inputs, game cells or important state.
+
+The owner authorized original registration terms using the University of Baguio
+correspondence address. The dated public text and atomic server-owned acceptance
+supersede the earlier draft-only restriction below. Never fabricate acceptance
+for existing accounts or imply university operation/endorsement. Preserve the
+accepted version, paired timestamp and additive migration; future text gets a new
+version. Guided assessment tasks pin their limits, commands and concept check in
+the immutable lesson revision. Keep legacy/custom games, replay validation,
+preview isolation and existing rewards; reference solutions remain test data.
+
 The 2026-11-17 owner continuation prioritizes consolidation over expansion. See
 [security and operations](docs/consolidation-security-and-operations.md) and the
 [system review](docs/system-scope-review-2026-11-13.md). Keep every produced queue

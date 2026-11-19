@@ -56,7 +56,7 @@ test('D01 malformed unsafe and impossible garden data are rejected without write
 test('D01 D02 garden designer saves custom worlds with live preview and preserves publication during edits', function () {
     $author = moduleAccount(Role::Instructor);
     moduleSignIn($this, $author);
-    $this->get(route('studio.create'))->assertOk()->assertSee('Build a little world')->assertSee('data-garden-designer', false)
+    $this->get(route('studio.create'))->assertOk()->assertSee('Customize the activity')->assertSee('data-garden-designer', false)
         ->assertSee('data-designer-preview-host', false)->assertDontSee('data-completion-url', false);
     $this->post(route('studio.store'), moduleData(['game_layout' => customGardenLayout()]))->assertRedirect();
     $module = LearningModule::sole();

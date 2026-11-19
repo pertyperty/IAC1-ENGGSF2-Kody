@@ -16,6 +16,7 @@ class CompleteTowerRequest extends FormRequest
     {
         return ['program' => ['sometimes', 'array', 'list', 'min:1', 'max:12'], 'program.*' => ['required', 'string', 'max:100'],
             'repeat' => ['sometimes', 'boolean'], 'conditional' => ['sometimes', 'boolean'],
+            'assessment_answer' => ['sometimes', 'string', 'max:30'],
             'answer' => ['sometimes', 'string', 'max:30'], 'answers' => ['sometimes', 'array', 'min:1', 'max:10'], 'answers.*' => app(QuizQuestions::class)->answerRules()];
     }
 }

@@ -1,6 +1,6 @@
 <div class="lesson-workspace" data-resource-workspace><div class="lesson-primary">
 <div class="lesson-reader">@unless($headingShown ?? false)@if($preview ?? false)<h2>{{ $revision->title }}</h2>@else<h1>{{ $revision->title }}</h1><x-creator-byline :creator="$revision->module?->creator"/>@endif @endunless<p>{{ $revision->description }}</p>
-    @if($revision->assessment)<details class="lesson-reading"><summary>Read the lesson before you play</summary>@endif
+    @if($revision->assessment)<details class="lesson-reading" open><summary>Lesson</summary>@endif
     <div class="lesson-text lesson-copy">{{ $revision->content }}</div>
     @include('content.media')
     @if($revision->assessment)</details>@endif

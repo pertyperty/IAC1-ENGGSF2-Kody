@@ -84,6 +84,8 @@ Route::middleware(['auth', 'account.session'])->group(function (): void {
         ->middleware('throttle:30,1,role-update-ack:')->name('account.role-update.acknowledge');
 });
 Route::view('/contact', 'contact')->middleware(OptionalAccountSession::class)->name('contact');
+Route::view('/terms/2026-11-18', 'legal.terms-2026-11-18')->middleware(OptionalAccountSession::class)->name('legal.terms');
+Route::view('/privacy/2026-11-18', 'legal.privacy-2026-11-18')->middleware(OptionalAccountSession::class)->name('legal.privacy');
 Route::middleware(['auth', 'account.session'])->prefix('manage/site')->name('site-management.')->group(function (): void {
     Route::get('/', [SiteManagementController::class, 'index'])->name('index');
     Route::put('/announcement', [SiteManagementController::class, 'update'])->middleware('throttle:6,1,site-announcement:')->name('update');

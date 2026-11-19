@@ -99,3 +99,13 @@ standard route-binding/publication mismatch and missing pinned weekly metadata.
 It keeps direct, narrow public queries rather than introducing a shared service
 for trivial duplication. This completes the problem-read review proposed above;
 evaluation orchestration still requires measurement before any refactor.
+
+
+## Learner-first product rework
+
+The [18 November product rework](learner-first-rework-2026-11-18.md) pauses new
+provider/API implementation and prioritizes comprehension and assessment quality.
+It records public screenshot/interaction comparisons, simpler shared surfaces,
+guided tasks and owner-authorized registration terms. Preserve its immutable
+assessment rules and acceptance evidence. Further engine expansion or cosmetic
+variants are not the next step; validate learning tasks with real learners.

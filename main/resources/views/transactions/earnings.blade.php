@@ -23,6 +23,6 @@
 <p><strong>{{ $closure['wallet_kb'] }} wallet KB · PHP {{ \App\Support\ExactMoney::decimal($closure['cash_minor']) }} cash earnings · {{ \App\Support\ExactMoney::milli($closure['creator_kb_milli']) }} earned KB</strong></p>
 <form class="studio-form" method="post" action="{{ route('earnings.relinquish') }}">@csrf<input type="hidden" name="fingerprint" value="{{ $closure['fingerprint'] }}"><label>Type RELINQUISH MY BALANCES<input name="confirmation_phrase" required autocomplete="off" maxlength="50"></label>@include('transactions.password-confirmation')<button class="button button-danger">Permanently relinquish these balances</button></form></details>
 @endif
-@if(auth()->user()->account_role === \App\Enums\Role::Administrator)<p><a class="quiet-link" href="{{ route('finance.index') }}">Review financial requests <x-action-icon name="right"/></a></p>@endif
+@if(auth()->user()->account_role === \App\Enums\Role::Administrator)<p><a class="quiet-link" href="{{ route('finance.index') }}">Review financial requests</a></p>@endif
 </section>
 @endsection

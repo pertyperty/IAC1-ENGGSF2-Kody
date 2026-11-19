@@ -35,7 +35,7 @@ test('B03 B04 approved sequential paths unlock only after explicit reading or va
     $learner = User::factory()->create();
     moduleSignIn($this, $learner);
     $this->post(route('course-learning.enroll', $course), ['revision_id' => $course->published_revision_id, 'sequential' => false])->assertRedirect();
-    $this->get(route('course-learning.show', $course))->assertOk()->assertSee('Locked')->assertSee('0 of 2 adventures completed');
+    $this->get(route('course-learning.show', $course))->assertOk()->assertSee('Locked')->assertSee('0 of 2 lessons completed');
     $this->get(route('course-learning.lesson', [$course, $game->id]))->assertForbidden();
     $this->postJson(route('course-learning.game', [$course, $game->id]), courseWin())->assertForbidden();
     $this->postJson(route('course-learning.read', [$course, $reading->id]), ['confirmed' => true])->assertConflict();
@@ -54,9 +54,9 @@ test('B03 B04 approved sequential paths unlock only after explicit reading or va
     $this->get(route('course-learning.lesson', [$course, $game->id]))->assertOk();
     $this->postJson(route('course-learning.read', [$course, $game->id]), ['confirmed' => true])->assertConflict();
     $this->postJson(route('course-learning.game', [$course, $game->id]), ['program' => ['right']])->assertUnprocessable();
-    $this->get(route('course-learning.show', $course))->assertSee('1 of 2 adventures completed');
+    $this->get(route('course-learning.show', $course))->assertSee('1 of 2 lessons completed');
     $this->postJson(route('course-learning.game', [$course, $game->id]), courseWin())->assertOk();
-    $this->get(route('course-learning.show', $course))->assertSee('2 of 2 adventures completed');
+    $this->get(route('course-learning.show', $course))->assertSee('2 of 2 lessons completed');
     expect(app(ContributorEligibility::class)->snapshot($learner)['completed_modules_count'])->toBe(1);
 });
 
@@ -68,7 +68,7 @@ test('B04 reading completion rechecks ownership status withdrawal and archived m
     $this->get(route('course-learning.lesson', [$course, $slot->id]))->assertOk();
     $module->forceFill(['staff_withdrawn_at' => now()])->save();
     $game->forceFill(['staff_withdrawn_at' => now()])->save();
-    $this->get(route('course-learning.show', $course))->assertOk()->assertDontSee('First read')->assertDontSee('Then play')->assertSee('Adventure unavailable');
+    $this->get(route('course-learning.show', $course))->assertOk()->assertDontSee('First read')->assertDontSee('Then play')->assertSee('Lesson unavailable');
     $this->postJson(route('course-learning.read', [$course, $slot->id]), ['confirmed' => true])->assertNotFound();
     $module->forceFill(['staff_withdrawn_at' => null, 'status' => 'Archived'])->save();
     $this->postJson(route('course-learning.read', [$course, $slot->id]), ['confirmed' => true])->assertNotFound();

@@ -101,7 +101,7 @@ test('workspace navigation sticks on short desktops and touch layouts; expanded 
 async function solveGarden(page, saved = true) {
     const game = page.locator('[data-coding-game]');
     for (const direction of ['right', 'right', 'up', 'right', 'right']) await game.getByRole('button', { name: `Add ${direction}`, exact: true }).click();
-    await game.getByRole('button', { name: 'Run my code', exact: true }).click();
+    await game.getByRole('button', { name: 'Run program', exact: true }).click();
     await expect(game.locator('[data-game-success]')).toBeVisible();
     if (saved) await expect(game.locator('[data-game-feedback]')).toContainText('saved');
     await expect(page.locator('[data-game-result]')).toBeVisible(); await page.locator('[data-result-return]').click();
@@ -201,6 +201,7 @@ test('A01 A02 B03 B05: guest trial, registration, verified play, reading and cou
     await page.getByLabel(/^Password/).fill('BrowserStrong12!');
     await page.getByLabel(/^Confirm password/).fill('BrowserStrong12!');
     await audit(page);
+    await page.getByLabel('I agree to the Terms and conditions.').check();
     await page.getByRole('button', { name: 'Create account' }).click();
     await expect(page).toHaveURL(/\/email\/verify/);
     const token = fixture('verify-token', email);
@@ -228,7 +229,7 @@ test('A01 A02 B03 B05: guest trial, registration, verified play, reading and cou
     await expect(page.locator('[data-game-feedback]')).toContainText('saved');
     const course = manifest.courses['first-programs'];
     await page.goto(`/learn/courses/${course.id}`);
-    await page.getByRole('button', { name: 'Join this journey' }).click();
+    await page.getByRole('button', { name: 'Enroll in course' }).click();
     await page.goto(`/learn/courses/${course.id}/modules/${course.slots[0]}`);
     await page.getByRole('button', { name: 'Mark as read' }).click();
     expect(JSON.parse(fixture('snapshot', email))).toMatchObject({ xp: 60, completed_lessons: 1 });
@@ -237,7 +238,7 @@ test('A01 A02 B03 B05: guest trial, registration, verified play, reading and cou
     expect((await page.locator('[data-coding-game]').boundingBox()).width).toBeGreaterThan(800);
     await solveGarden(page);
     await expect(page.locator('[data-journey-next]')).toHaveAttribute('href', new RegExp(`/modules/${course.slots[2]}$`));
-    await expect(page.locator('[data-journey-count]')).toHaveText('2 of 5 adventures completed.');
+    await expect(page.locator('[data-journey-count]')).toHaveText('2 of 5 lessons completed.');
     await page.locator('[data-course-journey]').scrollIntoViewIfNeeded();
     await page.screenshot({ path: 'storage/app/browser-results/saved-course-next-step.png' });
     await page.reload();
@@ -315,11 +316,11 @@ test('Administrator rail pulls and pins labels; tower drafts preview without pub
     await expect(preview.getByRole('heading', { name: 'Draft garden adventure' })).toBeVisible();
     await expect(preview.locator('[data-completion-url]')).toHaveCount(0);
     for (const direction of ['right', 'right', 'up', 'right', 'right']) await preview.getByRole('button', { name: `Add ${direction}`, exact: true }).click();
-    await preview.getByRole('button', { name: 'Run my code', exact: true }).click();
+    await preview.getByRole('button', { name: 'Run program', exact: true }).click();
     await expect(preview.locator('[data-game-success]')).toBeVisible();
     await expect(page.locator('[data-game-result]')).toBeVisible(); await page.locator('[data-result-return]').click();
     await page.screenshot({ path: 'storage/app/browser-results/tower-stage-editor.png', fullPage: true });
-    await page.getByRole('button', { name: '+ A quick idea check', exact: true }).click();
+    await page.getByRole('button', { name: 'Add quiz stage', exact: true }).click();
     const quizStage = page.locator('.tower-stage-summary').last();
     await quizStage.getByText('Customize stage 2', { exact: true }).click();
     await quizStage.getByLabel('Question', { exact: true }).fill('Can instruction order change the result?');
@@ -348,7 +349,8 @@ test('D01 D05 D07: creator draft, staff review, course composition and learner p
         for (const context of [creator, staff, learner]) await context.route('**/*', route => new URL(route.request().url()).origin === process.env.KODY_BROWSER_BASE_URL ? route.continue() : route.abort());
         await login(authorPage, 'instructor');
         await authorPage.goto('/create/modules/new?example=programming-check');
-        await authorPage.getByLabel('Adventure title').fill('Browser review adventure');
+        await authorPage.getByLabel('Lesson title').fill('Browser review adventure');
+        await authorPage.locator('.creator-media-panel > summary').click();
         await authorPage.getByLabel('Add PDF, DOCX or PPTX resources').setInputFiles({ name: 'browser-notes.docx', mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', buffer: Buffer.from(fixture('office-fixture'), 'base64') });
         await authorPage.getByLabel('Video or media link (optional)').fill('https://youtu.be/dQw4w9WgXcQ');
         await audit(authorPage);
@@ -362,9 +364,9 @@ test('D01 D05 D07: creator draft, staff review, course composition and learner p
         await reviewerPage.getByRole('button', { name: 'Approve and publish' }).click();
         await authorPage.goto('/create/courses/new');
         await authorPage.getByLabel('Course title').fill('Browser reviewed journey');
-        await authorPage.getByLabel('The big idea').fill('An original programming knowledge check.');
+        await authorPage.getByLabel('Course summary').fill('An original programming knowledge check.');
         await authorPage.getByLabel('Category', { exact: true }).fill('Programming basics');
-        await authorPage.getByRole('combobox', { name: 'Adventure 1', exact: true }).selectOption(moduleId);
+        await authorPage.getByRole('combobox', { name: 'Lesson 1', exact: true }).selectOption(moduleId);
         await authorPage.getByRole('button', { name: 'Save course draft', exact: true }).click();
         await expect(authorPage).toHaveURL(/\/create\/courses\/\d+$/);
         const courseId = new URL(authorPage.url()).pathname.split('/').at(-1);
@@ -381,10 +383,10 @@ test('D01 D05 D07: creator draft, staff review, course composition and learner p
         await login(learnerPage, 'learner');
         await learnerPage.goto(`/learn/courses/${courseId}`);
         await expect(learnerPage.getByRole('heading', { name: 'Browser reviewed journey' })).toBeVisible();
-        await learnerPage.getByRole('button', { name: 'Join this journey' }).click();
+        await learnerPage.getByRole('button', { name: 'Enroll in course' }).click();
         await audit(learnerPage);
         await learnerPage.locator(`a[href*="/learn/courses/${courseId}/modules/"]`).first().click();
-        await learnerPage.getByText('Read the lesson before you play', { exact: true }).click();
+        await expect(learnerPage.locator('.lesson-reading')).toHaveAttribute('open', '');
         await expect(learnerPage.locator('.lesson-video iframe')).toHaveAttribute('src', 'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ');
         await learnerPage.setViewportSize({ width: 1920, height: 1000 });
         const before = await learnerPage.locator('.lesson-primary').boundingBox();
@@ -423,9 +425,9 @@ test('empty catalogs offer clear next actions on narrow screens in both themes',
     await page.setViewportSize({ width: 320, height: 740 });
     for (const dark of [false, true]) {
         for (const [path, title, action] of [
-            ['/learn', 'No lessons found', 'See all modules'],
+            ['/learn', 'No lessons found', 'See all lessons'],
             ['/learn/courses', 'No courses found', 'Browse lessons'],
-            ['/challenges', 'No coding quests found', 'Explore adventures'],
+            ['/challenges', 'No coding challenges found', 'Browse lessons'],
         ]) {
             await page.goto(`${path}?q=zzzz-no-matching-content`);
             const toggle = page.locator('[data-theme-toggle]');
@@ -475,7 +477,7 @@ test('B05: four creator arcade assessments and a multi-question quiz save valida
         'sort-lab': 'swap 1 2\nswap 2 3', 'terminal-quest': 'ls\ncat hello.txt\ncp hello.txt release.txt\ncat release.txt' };
     for (const [slug, program] of Object.entries(programs)) {
         await page.goto(`/learn/modules/${manifest.modules[slug]}`);
-        await page.locator('.arcade-source > summary').click();
+        await page.locator('.program-arrange > summary').click();
         await page.getByLabel('Your program', { exact: true }).fill(program);
         await audit(page);
         await page.getByRole('button', { name: 'Run program' }).click();
@@ -488,7 +490,7 @@ test('B05: four creator arcade assessments and a multi-question quiz save valida
     }
     await page.getByRole('button', { name: 'Check answers' }).click();
     await expect(page.locator('[data-quiz-feedback]')).toContainText('try again');
-    await expect(page.locator('[data-game-result]')).toBeVisible(); await page.locator('[data-result-return]').click();
+    await expect(page.locator('[data-game-result]')).toBeHidden();
     expect(JSON.parse(fixture('snapshot', 'arcadelearner@browser.example.test'))).toMatchObject({ xp: 160, xp_awards: 4 });
     await audit(page);
     await page.getByRole('radio', { name: 'The robot may end up somewhere different', exact: true }).check();
@@ -499,8 +501,8 @@ test('B05: four creator arcade assessments and a multi-question quiz save valida
 });
 
 for (const [role, destination, link] of [
-    ['learner', '/learn', 'Learning catalog'], ['contributor', '/create/challenges', 'Quest studio'],
-    ['instructor', '/create', 'Module studio'], ['moderator', '/manage/reviews', 'Review inbox'],
+    ['learner', '/learn', 'Learning catalog'], ['contributor', '/create/challenges', 'Challenge studio'],
+    ['instructor', '/create', 'Lesson studio'], ['moderator', '/manage/reviews', 'Review inbox'],
     ['administrator', '/manage/accounts', 'Community'],
 ]) {
     test(`${role} workspace has focused navigation and usable desktop/mobile surfaces in both themes`, async ({ page }) => {
@@ -509,8 +511,8 @@ for (const [role, destination, link] of [
             await page.setViewportSize({ width, height: 1000 });
             const nav = page.getByRole('navigation', { name: width === 1440 ? 'Your workspace' : 'Mobile workspace', exact: true });
             if (width === 320) await page.locator('.mobile-workspace > summary').click();
-            await expect(nav.getByRole('link', { name: 'Module studio', exact: true })).toHaveCount(role === 'instructor' ? 1 : 0);
-            await expect(nav.getByRole('link', { name: 'Quest studio', exact: true })).toHaveCount(['instructor', 'contributor'].includes(role) ? 1 : 0);
+            await expect(nav.getByRole('link', { name: 'Lesson studio', exact: true })).toHaveCount(role === 'instructor' ? 1 : 0);
+            await expect(nav.getByRole('link', { name: 'Challenge studio', exact: true })).toHaveCount(['instructor', 'contributor'].includes(role) ? 1 : 0);
             await expect(nav.getByRole('link', { name: 'Weekly planning', exact: true })).toHaveCount(role === 'moderator' ? 1 : 0);
             await expect(nav.getByRole('link', { name: 'Accounting', exact: true })).toHaveCount(role === 'administrator' ? 1 : 0);
             await nav.getByRole('link', { name: link, exact: true }).click();
@@ -564,12 +566,12 @@ test('interactive games edit and preview locally; confirmed runs save through th
     expect(saves).toBe(0);
     expect(JSON.parse(fixture('snapshot', 'interactive@browser.example.test'))).toMatchObject({ xp: 0, levels: 0 });
     await page.route(completion, route => route.fulfill({ status: 503, contentType: 'application/json', body: '{}' }), { times: 1 });
-    await garden.getByRole('button', { name: 'Run my code', exact: true }).click();
+    await garden.getByRole('button', { name: 'Run program', exact: true }).click();
     await expect(garden.locator('[data-game-feedback]')).toContainText('wasn’t saved');
     await expect(page.locator('[data-game-result]')).toBeVisible(); await page.locator('[data-result-return]').click();
     await expect(garden.getByRole('button', { name: 'Add right', exact: true })).toBeEnabled();
     expect(JSON.parse(fixture('snapshot', 'interactive@browser.example.test'))).toMatchObject({ xp: 0 });
-    await garden.getByRole('button', { name: 'Run my code', exact: true }).click();
+    await garden.getByRole('button', { name: 'Run program', exact: true }).click();
     await expect(garden.locator('[data-game-feedback]')).toContainText('saved');
     expect(saves).toBe(2);
     expect(JSON.parse(fixture('snapshot', 'interactive@browser.example.test'))).toMatchObject({ xp: 20, levels: 1 });

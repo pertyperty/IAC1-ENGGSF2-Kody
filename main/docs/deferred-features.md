@@ -1,5 +1,16 @@
 # Deferred-feature register
 
+18 November owner direction: pause additional third-party/API implementation
+until the learner-first rework is validated; Judge0 is the first planned later
+integration. [The rework](learner-first-rework-2026-11-18.md) adds registration
+terms/acceptance, simpler shared screens and guided assessments. Existing provider
+code remains disabled; local fake-provider tests are preservation checks.
+
+The [assessment guidance follow-up](assessment-guidance-followup-2026-11-18.md)
+aligns command help with pinned task rules, removes repeated answer-check playback
+and clarifies lesson publication actions. It does not close the human learning,
+editorial, legal or staged operations gates below.
+
 The owner delegated remaining business decisions and implementation on 2026-10-04.
 The [economy/launch amendment](economy-and-launch-decisions.md) supersedes earlier
 pricing, XP, rewards, payout and creator-deletion deferrals. Their code and
@@ -10,9 +21,8 @@ these private keys again.
 Reviewed 22 October 2026: see the [prioritized improvement review](improvement-review-2026-10-22.md)
 for code checks, current local setup status and implementation acceptance criteria.
 The rows below include unresolved launch requirements, optional product policies
-and environmental verification. They are not all missing implementations: Terms
-acceptance still needs code after text approval, whereas provider adapters already
-exist. The three-track Expert curriculum supersedes its earlier content deferral.
+and environmental verification. They are not all missing implementations: Registration acceptance is now implemented for the owner-authorized dated Terms;
+production legal/retention and existing-user change decisions remain, while provider adapters already exist. The three-track Expert curriculum supersedes its earlier content deferral.
 
 The [25 October implementation](simple-learning-and-creator-credibility.md) adds
 the personal review list, worker/scheduler probes and automated Firefox/WebKit
@@ -56,7 +66,7 @@ callback contracts, execution-provider drills and staging remain deferred below.
 
 | Deferred scope | Current preparation | Needed before activation/completion |
 | --- | --- | --- |
-| Published Terms / Privacy and acceptance | Short original drafts in docs/legal, with source review and known facts separated. | Actual legal operator/postal contact, reviewed text, age/geographic policy and retention schedule; publish immutable versions and implement server-owned acceptance before public launch. Drafts are not an agreement. |
+| Published Terms / Privacy and acceptance | Owner-authorized dated text and atomic new-user acceptance are implemented in the [learner rework](learner-first-rework-2026-11-18.md). Original drafts remain historical. | Production operator/legal review, eligibility and retention decisions, deployment verification and an existing-user material-change policy. |
 | Learning-effectiveness / placement evidence | [80-floor three-track curriculum](tower-skill-expansion.md), including actual Expert algorithm reasoning, teaching notes, previews and server-verified references. | Human pilot evidence and any separately approved diagnostic placement or secure coding examination. Track labels and formative completions do not certify general mastery. |
 | AWS / staging / production operations | Worker/log examples, private RDS/versioned S3 template, budgets, responder configuration, launch/ledger checks and local restore evidence. | Regional quote, named humans, staged HTTPS/IAM/encryption/PITR/version erasure, managed restore, alerts, measured load and rollback. No resources purchased or deployed. |
 | Xendit live purchases/payouts/refunds | Disabled GCash adapter/storefront, verified callback/retrieval, exact FIFO ledger, settlement reservations, refunds and reconciliation. | Merchant onboarding, sandbox credentials, verified fee/tax contract, products/channels, callback/redirect checks, tax setup and end-to-end success/failure/reversal/timeout drills with passing staging operations. No real payment enabled. |

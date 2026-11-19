@@ -2,6 +2,7 @@
 
 use App\Enums\Role;
 use App\Models\User;
+use App\Support\RegistrationTerms;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 
@@ -14,6 +15,7 @@ test('A01 Argon2id preserves every byte of valid multibyte passwords', function 
     $data = [
         'username' => 'unicodelearner', 'email' => 'unicode@example.test',
         'password' => $password, 'password_confirmation' => $password,
+        'terms_accepted' => true, 'terms_version' => RegistrationTerms::VERSION,
     ];
     $this->postJson(route('register.store'), $data)->assertCreated();
     $hash = User::sole()->password;

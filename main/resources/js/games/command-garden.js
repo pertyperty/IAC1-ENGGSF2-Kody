@@ -1,7 +1,7 @@
 import { mountLearningTrace } from './learning-trace.js';
 import { createIcon } from '../icons.js';
-import { publishFeedback } from '../feedback.js';
 import { saveCompletion } from './save-completion.js';
+import { programRuleError, mountConceptCheck } from './assessment-challenges.js';
 
 const moves = Object.freeze({ up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] });
 const key = ([x, y]) => `${x},${y}`;
@@ -33,15 +33,17 @@ export function runProgram(instance, program, { repeat = false, conditional = fa
     const crystals = new Set(instance.crystals.map(key));
     const trace = [];
     const result = (success, message) => ({ success, message, trace, position, crystals: [...crystals] });
-    if (!Array.isArray(program) || program.length === 0) return result(false, 'Add a few arrows first. That will be your program.');
+    if (!Array.isArray(program) || program.length === 0) return result(false, 'Add a move, then run your program.');
     if (program.length > instance.maxCommands || program.some((command) => !Object.hasOwn(moves, command))) return result(false, 'This program has too many steps or an unknown instruction.');
+    const ruleError = programRuleError(instance, program);
+    if (ruleError) return result(false, ruleError);
     if (instance.mode === 'loop' && !repeat) return result(false, 'Try repeating your pattern twice. That’s what a loop does.');
     const path = new Set(instance.path.map(key));
     for (let cycle = 0; cycle < (instance.mode === 'loop' && repeat ? 2 : 1); cycle++) {
         for (const [index, command] of program.entries()) {
             const move = moves[command];
             const next = [position[0] + move[0], position[1] + move[1]];
-            if (!path.has(key(next))) return result(false, `Oops, step ${trace.length + 1} leaves the path. Change your arrows and try again!`);
+            if (!path.has(key(next))) return result(false, `Step ${trace.length + 1} leaves the path. Check that move and try again.`);
             const before = [...position];
             const crystalHere = crystals.has(key(next));
             position = next;
@@ -49,9 +51,9 @@ export function runProgram(instance, program, { repeat = false, conditional = fa
             trace.push({ position: [...position], crystals: [...crystals], index, before, cycle: cycle + 1, crystalHere });
         }
     }
-    if (key(position) !== key(instance.goal)) return result(false, 'A good start! You haven’t reached the flag yet. Try changing your program.');
-    if (crystals.size > 0) return result(false, 'You found the flag! Now add the crystal rule so your program collects the crystals along the way.');
-    return result(true, 'You reached the flag! Your code brought this little world to life.');
+    if (key(position) !== key(instance.goal)) return result(false, 'The program ends before the flag. Check its final position and remaining moves.');
+    if (crystals.size > 0) return result(false, 'Crystals remain. Enable the collection rule and make sure your route visits them.');
+    return result(true, 'Goal reached.');
 }
 
 const mountedGardens = new WeakSet();
@@ -65,6 +67,7 @@ export function mountGarden(root) {
     const board = root.querySelector('[data-game-board]');
     const programTrack = root.querySelector('[data-game-program]');
     const success = root.querySelector('[data-game-success]');
+    const conceptCheck = mountConceptCheck(root, instance);
     const progress = root.querySelector('[data-game-progress]');
     const objectives = root.querySelector('[data-game-objectives]');
     const earlier = root.querySelector('[data-step-earlier]');
@@ -112,7 +115,7 @@ export function mountGarden(root) {
     const renderProgram = () => {
         programTrack.replaceChildren();
         if (program.length === 0) {
-            const empty = document.createElement('span'); empty.textContent = 'Add an arrow to start your program'; programTrack.append(empty);
+            const empty = document.createElement('span'); empty.textContent = 'Add a move to start your program'; programTrack.append(empty);
         }
         program.forEach((command, index) => {
             const step = document.createElement('button');
@@ -132,7 +135,7 @@ export function mountGarden(root) {
         progress.textContent = `${program.length} / ${instance.maxCommands} instructions`;
         updateTools();
     };
-    const changed = () => { root.dataset.playState = 'ready'; success.hidden = true; renderProgram(); renderBoard(); tiles.forEach(({ tile }) => tile.classList.remove('visited-tile')); inspector?.refresh(); };
+    const changed = () => { conceptCheck.reset(); root.dataset.playState = 'ready'; success.hidden = true; renderProgram(); renderBoard(); tiles.forEach(({ tile }) => tile.classList.remove('visited-tile')); inspector?.refresh(); };
     root.querySelectorAll('[data-game-repeat], [data-game-conditional]').forEach(input => input.addEventListener('change', () => {
         if (!running) { changed(); feedback.textContent = 'Rule updated. Run your program to test it.'; }
     }));
@@ -164,7 +167,7 @@ export function mountGarden(root) {
         changed();
         feedback.textContent = 'A fresh start. Build a new program and give it a try.';
     });
-    root.querySelector('[data-game-hint]').addEventListener('click', () => { feedback.textContent = instance.hint; publishFeedback(root, instance.hint); });
+    root.querySelector('[data-game-hint]').addEventListener('click', () => { feedback.textContent = instance.hint; feedback.focus({ preventScroll: true }); });
     root.addEventListener('keydown', (event) => {
         // Shortcuts belong to the focused game, never the page or an editable field.
         if (event.target !== root || event.altKey || event.ctrlKey || event.metaKey) return;
@@ -175,34 +178,48 @@ export function mountGarden(root) {
     });
     root.querySelector('[data-game-run]').addEventListener('click', async () => {
         if (running) return;
+        const checkingAnswer = root.dataset.playState === 'checking';
         inspector.cancel();
-        running = true; success.hidden = true; renderBoard(); tiles.forEach(({ tile }) => tile.classList.remove('visited-tile'));
+        running = true;
+        success.hidden = true;
+        if (!checkingAnswer) {
+            renderBoard();
+            tiles.forEach(({ tile }) => tile.classList.remove('visited-tile'));
+        }
         root.dataset.playState = 'running'; root.setAttribute('aria-busy', 'true');
         const result = runProgram(instance, program, { repeat: root.querySelector('[data-game-repeat]')?.checked, conditional: root.querySelector('[data-game-conditional]')?.checked });
         root.querySelectorAll('button, input').forEach((control) => { control.disabled = true; });
-        feedback.textContent = 'Kody is following your instructions…';
+        if (!checkingAnswer) feedback.textContent = 'Kody is following your instructions…';
         const delay = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 280;
         try {
-            for (const frame of result.trace) {
-                if (delay) await new Promise((resolve) => setTimeout(resolve, delay));
+            for (const frame of checkingAnswer ? result.trace.slice(-1) : result.trace) {
+                if (delay && !checkingAnswer) await new Promise((resolve) => setTimeout(resolve, delay));
                 renderBoard(frame.position, frame.crystals);
                 tiles.find(({ point }) => key(point) === key(frame.position))?.tile.classList.add('visited-tile');
                 programTrack.querySelectorAll('.program-step').forEach((step, index) => step.classList.toggle('executing', index === frame.index));
             }
             feedback.textContent = result.message; success.hidden = !result.success;
             root.dataset.playState = result.success ? 'success' : 'retry';
-            if (!result.success) publishFeedback(root, result.message, 'info', false, null, null, true);
-            if (result.success) {
-                const saved = await saveCompletion(root, { program, repeat: !!root.querySelector('[data-game-repeat]')?.checked, conditional: !!root.querySelector('[data-game-conditional]')?.checked });
+            if (!result.success) feedback.focus({ preventScroll: true });
+            if (result.success && conceptCheck.verify()) {
+                const saved = await saveCompletion(root, { program, assessment_answer: conceptCheck.answer(), repeat: !!root.querySelector('[data-game-repeat]')?.checked, conditional: !!root.querySelector('[data-game-conditional]')?.checked });
                 if (saved) feedback.textContent = `${result.message} ${saved}`;
+            } else if (result.success && instance.assessment) {
+                success.hidden = true;
+                root.dataset.playState = 'checking';
+                feedback.textContent = 'Program complete. Finish the concept check.';
             }
-            progress.textContent = result.success ? 'Adventure complete' : 'Try another idea';
+            progress.textContent = root.dataset.playState === 'checking' ? 'Concept check' : result.success ? 'Activity complete' : 'Try again';
         } finally {
             running = false;
             root.setAttribute('aria-busy', 'false');
             root.querySelectorAll('button, input').forEach((control) => { control.disabled = false; });
             updateTools();
             inspector.refresh();
+            if (root.dataset.playState === 'checking') {
+                const check = root.querySelector('[data-concept-check]');
+                (check.querySelector('input:checked') ?? check.querySelector('input'))?.focus({ preventScroll: true });
+            }
             programTrack.querySelectorAll('.program-step').forEach((step) => step.classList.remove('executing'));
         }
     });

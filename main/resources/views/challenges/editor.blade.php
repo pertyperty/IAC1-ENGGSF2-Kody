@@ -1,5 +1,5 @@
 @extends('layouts.learning')
-@section('title', 'Shape a coding quest — Kody')
+@section('title', 'Shape a coding challenge — Kody')
 @section('content')
 
 
@@ -39,13 +39,13 @@
 <label>Visibility<select name="test_cases[{{ $index }}][hidden]" data-case-field="hidden"><option value="0" @selected(!($case['hidden'] ?? false))>Sample · Learners can see this</option><option value="1" @selected($case['hidden'] ?? false)>Hidden · Creator and reviewers only</option></select></label><button type="button" class="game-reset" data-remove-case>Remove check</button></fieldset>
 @endforeach</div>
 <template data-test-case-template><fieldset class="challenge-case" data-test-case><legend>Check <span data-case-number></span></legend><label>Input<textarea data-case-field="input" rows="3" maxlength="{{ config('challenges.authoring.max_case_characters') }}"></textarea></label><label>Expected output<textarea data-case-field="expected_output" rows="3" maxlength="{{ config('challenges.authoring.max_case_characters') }}"></textarea></label><label>Visibility<select data-case-field="hidden"><option value="0">Sample · Learners can see this</option><option value="1" selected>Hidden · Creator and reviewers only</option></select></label><button type="button" class="game-reset" data-remove-case>Remove check</button></fieldset></template>
-<button type="button" class="button button-dark button-small" data-add-case>Add a check +</button><p data-case-feedback role="status" class="field-hint"></p></section>
+<button type="button" class="button button-dark button-small" data-add-case>Add check</button><p data-case-feedback role="status" class="field-hint"></p></section>
 @include('transactions.access-settings', ['accessKind' => 'challenge'])
 <div class="studio-actions" id="draft-save"><button class="button button-play">Save challenge draft</button><a class="quiet-link" href="{{ route('challenges.index') }}">Cancel</a></div></fieldset></form>
-@if($revision?->review_status === 'Draft' && $challenge?->status !== 'Archived')<form method="post" action="{{ route('challenges.submit', $challenge) }}" class="studio-actions">@csrf<input type="hidden" name="record_version" value="{{ $challenge->record_version }}"><button class="button button-dark">Submit saved challenge for review <x-action-icon name="right"/></button></form>@endif
+@if($revision?->review_status === 'Draft' && $challenge?->status !== 'Archived')<form method="post" action="{{ route('challenges.submit', $challenge) }}" class="studio-actions">@csrf<input type="hidden" name="record_version" value="{{ $challenge->record_version }}"><button class="button button-dark">Submit saved challenge for review</button></form>@endif
 @can('archive', $challenge)<p><a class="quiet-link" href="{{ route('challenges.archive-confirmation', $challenge) }}">Archive this challenge</a></p>@endcan
 @if($challenge?->status === 'Archived')<p class="lesson-note">This challenge is archived. Its revisions and review history are preserved.</p>@endif
-<p class="field-hint">Approved quests appear in the coding catalog. Full code evaluation will open when the platform's execution service is ready.</p>@if($challenge)@can('delete', $challenge)<p><a class="quiet-link" href="{{ route('content-deletion.show', ['challenge', $challenge->id]) }}">Delete this challenge <x-action-icon name="right"/></a></p>@endcan
+<p class="field-hint">Approved quests appear in the coding catalog. Full code evaluation will open when the platform's execution service is ready.</p>@if($challenge)@can('delete', $challenge)<p><a class="quiet-link" href="{{ route('content-deletion.show', ['challenge', $challenge->id]) }}">Delete this challenge</a></p>@endcan
 @endif
 </section>
 @endsection

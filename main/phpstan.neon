@@ -18,6 +18,12 @@ parameters:
         - app/Http/Controllers/Challenges/PublishedChallengeController.php
         - app/Http/Controllers/Challenges/WeeklyChallengeController.php
         - app/Models/WeeklyEvent.php
+        - app/Support/RegistrationTerms.php
+        - app/Actions/Account/RegisterAccount.php
+        - app/Services/Games/AssessmentChallenges.php
+        - app/Services/Games/GameAssessment.php
+        - app/Services/Games/ArcadeGames.php
+        - app/Services/Games/CommandGarden.php
     tmpDir: storage/framework/cache/phpstan
     checkModelProperties: true
     # Enum/date casts live in model casts() methods, not constant PHPDoc shapes.

@@ -46,7 +46,8 @@ class PlayController extends Controller
     public function game(CompleteGameRequest $request, string $level, LearningProgression $progression): JsonResponse
     {
         abort_unless(array_key_exists($level, config('learning.instances')), 404);
-        $input = ['program' => $request->validated('program'), 'repeat' => $request->boolean('repeat'), 'conditional' => $request->boolean('conditional')];
+        $input = ['program' => $request->validated('program'), 'repeat' => $request->boolean('repeat'), 'conditional' => $request->boolean('conditional'),
+            'assessment_answer' => $request->validated('assessment_answer')];
 
         return response()->json($progression->record($request->user(), $request->session()->getId(), $level, 'game', $input))->header('Cache-Control', 'no-store');
     }

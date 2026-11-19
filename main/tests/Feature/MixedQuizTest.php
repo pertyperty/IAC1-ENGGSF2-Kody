@@ -47,7 +47,7 @@ test('D01 mixed questions reject unsupported and ambiguous author content withou
         'oversized' => $questions[1]['accepted'] = [str_repeat('x', 101)],
         'blank-answer' => $questions[1]['accepted'] = [' '],
         'duplicate-pair' => $questions[2]['pairs'][1]['id'] = 'loop',
-        'ambiguous-pair' => $questions[2]['pairs'][1]['right'] = 'Repeats instructions',
+        'ambiguous-pair' => $questions[2]['pairs'][1]['right'] = $questions[2]['pairs'][0]['right'],
         'nested-answer' => $questions[1]['accepted'] = [['if']],
     };
     moduleSignIn($this, moduleAccount(Role::Instructor));

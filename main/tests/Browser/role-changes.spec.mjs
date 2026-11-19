@@ -16,7 +16,7 @@ const document = resolve('database/fixtures/lesson-resources/programming-foundat
 test('ready Learner 4 applies through the real form and Moderator approval reveals the Contributor mascot transition live', async ({page,browser}) => {
     await login(page,'kody_learner_4'); await page.goto('/account/contributor-application');
     await expect(page.getByText('Local role-review demonstration')).toBeVisible();
-    await page.getByLabel('Why would you like to contribute?').fill('LOCAL DEMO: I want to build coding quests. The attached Kody worksheet is a mock supporting file.');
+    await page.getByLabel('Why would you like to contribute?').fill('LOCAL DEMO: I want to build coding challenges. The attached Kody worksheet is a mock supporting file.');
     await page.getByLabel('Supporting credentials').setInputFiles(document); await page.getByLabel('I confirm these application details.').check();
     await page.getByRole('button',{name:'Submit for review'}).click(); await expect(page.locator('.toast')).toContainText('awaiting review');
     const context=await browser.newContext(); const staff=await context.newPage();
@@ -29,7 +29,7 @@ test('ready Learner 4 applies through the real form and Moderator approval revea
         await expect(dialog.getByRole('heading',{name:'You’re now a Contributor'})).toBeVisible();
         await expect(dialog.locator('img')).toHaveAttribute('src',/celebration.webp$/); await audit(page);
         await page.screenshot({path:'storage/app/browser-results/contributor-role-celebration.png'});
-        await dialog.getByRole('button',{name:'Explore your quest studio'}).click(); await expect(page).toHaveURL(/\/create\/challenges$/);
+        await dialog.getByRole('button',{name:'Open challenge studio'}).click(); await expect(page).toHaveURL(/\/create\/challenges$/);
         await expect(page.locator('[data-role-update]')).not.toBeVisible(); await page.reload(); await expect(page.locator('[data-role-update]')).not.toBeVisible();
         await page.goto('/updates'); await expect(page.getByText('Contributor access approved',{exact:true})).toBeVisible();
     } finally { await context.close(); }

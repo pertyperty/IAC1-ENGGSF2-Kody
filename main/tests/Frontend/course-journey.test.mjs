@@ -26,11 +26,11 @@ test('only confirmed server course feedback updates the next action, with text r
     listener({ detail: { progressSaved: false, journey: saved } });
     assert.equal(nodes.count.textContent, 'old');
     listener({ detail: { progressSaved: true, journey: { ...saved, next: { ...saved.next, title: '<script>text</script>' } } } });
-    assert.equal(nodes.count.textContent, '1 of 2 adventures completed.');
+    assert.equal(nodes.count.textContent, '1 of 2 lessons completed.');
     assert.equal(nodes.next.hidden, false);
-    assert.equal(nodes.next['aria-label'], 'Next adventure: <script>text</script>');
+    assert.equal(nodes.next['aria-label'], 'Next lesson: <script>text</script>');
     listener({ detail: { progressSaved: true, journey: { ...saved, completed: 2, finished: true, next: null } } });
-    assert.equal(nodes.title.textContent, 'Journey cleared!');
+    assert.equal(nodes.title.textContent, 'Course complete');
     assert.equal(nodes.next.hidden, true);
     assert.equal(nodes.next.href, undefined);
     assert.equal(nodes.overview.href, 'https://kody.test/learn/courses');

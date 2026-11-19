@@ -49,7 +49,7 @@ export function mountLearningTrace(root, game, getProgram, buildTrace, render, i
     const statePanel = document.createElement('details');
     const stateSummary = document.createElement('summary'); stateSummary.textContent = 'Program state'; statePanel.append(stateSummary, state);
     source.tabIndex = 0;
-    const status = document.createElement('p'); status.className = 'field-hint'; status.setAttribute('role', 'status');
+    const status = document.createElement('p'); status.className = 'field-hint'; status.setAttribute('role', 'status'); status.tabIndex = 0;
     const actions = document.createElement('div'); actions.className = 'trace-actions';
     let trace, cursor = 0, replayToken = 0;
     const show = () => {
@@ -61,8 +61,8 @@ export function mountLearningTrace(root, game, getProgram, buildTrace, render, i
         render(current);
     };
     const button = (text, action) => { const item = document.createElement('button'); item.type = 'button'; item.className = 'button button-ghost'; item.textContent = text; item.addEventListener('click', () => { if (!isBusy()) action(); }); actions.append(item); return item; };
-    const step = button('Step preview', () => { replayToken++; cursor = Math.min(cursor + 1, trace.frames.length); show(); });
-    button('Replay preview', async () => {
+    const step = button('Step', () => { replayToken++; cursor = Math.min(cursor + 1, trace.frames.length); show(); });
+    button('Replay', async () => {
         const token = ++replayToken; cursor = 0; show();
         const reduced = document.defaultView.matchMedia('(prefers-reduced-motion: reduce)').matches;
         while (cursor < trace.frames.length && token === replayToken && !isBusy()) {
@@ -71,7 +71,7 @@ export function mountLearningTrace(root, game, getProgram, buildTrace, render, i
             cursor++; show();
         }
     });
-    button('Restart preview', () => { replayToken++; cursor = 0; show(); });
+    button('Restart', () => { replayToken++; cursor = 0; show(); });
     panel.append(note, source, actions, status, statePanel);
     const controls = root.querySelector('.game-controls');
     controls.insertBefore(panel, controls.querySelector('.game-toolbar'));
@@ -80,8 +80,9 @@ export function mountLearningTrace(root, game, getProgram, buildTrace, render, i
         const program = getProgram(); trace = buildTrace(program); cursor = 0;
         source.replaceChildren();
         if (game.template === 'command-garden' && game.mode === 'loop') { const line = document.createElement('li'); line.textContent = root.querySelector('[data-game-repeat]')?.checked ? 'REPEAT the following body 2 TIMES' : 'Repeat is off; this level requires it.'; line.className = 'trace-rule'; line.value = 0; source.append(line); }
+        if (!program.length) { const placeholder = document.createElement('li'); placeholder.className = 'trace-placeholder'; placeholder.textContent = 'Add an instruction to build your program.'; source.append(placeholder); }
         program.slice(0, 12).forEach(command => { const line = document.createElement('li'); line.textContent = readableInstruction(game.template, command); if (game.template === 'command-garden' && game.mode === 'conditional' && root.querySelector('[data-game-conditional]')?.checked) line.textContent += '; IF crystal here THEN COLLECT'; source.append(line); });
-        state.textContent = `Initial state\n${stateText(game, trace.initial)}`; status.textContent = trace.message; step.disabled = !trace.frames.length || isBusy();
+        state.textContent = `Initial state\n${stateText(game, trace.initial)}`; status.textContent = program.length ? trace.message : ''; step.disabled = !trace.frames.length || isBusy();
         if (paint) show();
     };
     // Do not replace the learner's program or initiate a network request.
