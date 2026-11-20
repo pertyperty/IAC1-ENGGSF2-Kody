@@ -165,6 +165,7 @@ test('creators request one private qualifications review without granting themse
     $staff = moduleAccount(Role::Moderator);
     moduleSignIn($this, $staff);
     $this->get(route('review-inbox', ['category' => 'badges']))->assertOk()->assertSee($creator->username);
+    $this->get(route('creator-badges.show', $creator))->assertOk()->assertSee('Decline badge request')->assertSee('Open approved application and private documents');
     $request = DB::table('creator_badge_requests')->sole();
     $this->put(route('creator-badges.update', $creator), badgeData(['decision' => 'decline', 'requested_at' => $request->requested_at]))->assertRedirect();
     expect(DB::table('creator_badge_requests')->sole()->resolved_at)->not->toBeNull();

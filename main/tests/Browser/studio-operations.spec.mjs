@@ -92,7 +92,7 @@ test('Administrator account browser defaults to ten and reports export formatted
     await login(page, 'polishadmin'); await page.goto('/manage/accounts?reset=1');
     await expect(page.locator('.account-results .account-result')).toHaveCount(10);
     await page.getByRole('combobox', { name: 'Browse', exact: true }).selectOption('all');
-    await page.getByRole('combobox', { name: 'Results per page', exact: true }).selectOption('20'); await page.getByRole('button', { name: 'Apply filters' }).click();
+    await page.getByRole('combobox', { name: 'Results per page (all accounts)', exact: true }).selectOption('20'); await page.getByRole('button', { name: 'Apply filters' }).click();
     await expect(page.locator('.account-results .account-result')).toHaveCount(20);
     await page.goto('/manage/reports?type=overview'); await expect(page.locator('.report-insight')).toHaveCount(4);
     for (const [name, extension] of [['PDF', 'pdf'], ['CSV', 'csv'], ['Excel', 'xlsx']]) {

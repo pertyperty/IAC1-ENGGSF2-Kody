@@ -324,7 +324,7 @@ dialog.proficiency-choice::backdrop { background: rgb(10 25 50 / .6); }
 /* Focused staff tools use spacing and separators rather than nested panels. */
 .account-shell-wide:has(.governance-filters) { background: transparent; border: 0; border-radius: 0; }
 .account-results { display: block; }
-.account-result { border: 0; border-bottom: 1px solid var(--border); border-radius: 0; margin: 0; padding-block: 1rem; }
+.account-shell .account-result { border: 0; border-bottom: 1px solid var(--border); border-radius: 0; margin: 0; padding-block: 1rem; }
 .account-form.governance-filters { background: transparent; border: 0; padding: 1rem 0; }
 .account-form.governance-filters .primary-button { width: auto; }
 .account-shell section[id^="account-"] { margin-block: 2rem; scroll-margin-top: calc(var(--navigation-offset, 100px) + 1rem); }

@@ -10,7 +10,8 @@
 <input type="hidden" name="requested_at" value="{{ $badgeRequest?->requested_at }}">
 <input type="hidden" name="record_version" value="{{ $badge?->record_version ?? 0 }}">
 <input type="hidden" name="application_id" value="{{ $proof?->id }}"><input type="hidden" name="application_version" value="{{ $proof?->record_version }}">
-<label for="badge-decision">Decision</label><select id="badge-decision" name="decision" required><option value="">Choose</option>@if($badgeRequest)<option value="decline">Decline badge request</option>@endif@if($proof)<option value="grant">Grant qualifications badge</option>@endif @if($badge)<option value="revoke">Revoke badge</option>@endif</select>
+<label for="badge-decision">Decision</label><select id="badge-decision" name="decision" required><option value="">Choose</option>@if($badgeRequest)<option value="decline">Decline badge request</option>@endif
+@if($proof)<option value="grant">Grant qualifications badge</option>@endif @if($badge)<option value="revoke">Revoke badge</option>@endif</select>
 <label class="review-check"><input type="checkbox" name="qualifications_reviewed" value="1"> I checked the supporting qualifications. Required when granting a badge.</label>
 <label>Private review reason<textarea name="reason" minlength="5" maxlength="500" rows="3" required>{{ old('reason') }}</textarea></label>
 @include('transactions.password-confirmation')
