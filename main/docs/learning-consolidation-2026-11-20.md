@@ -253,3 +253,31 @@ Chromium, Firefox and WebKit (54.9 seconds), including sidebar navigation/reload
 profile previews and companion opt-in. Ignored evidence: `ci53-layout-frontend.log`,
 `ci53-layout-build.log` and `ci53-layout-browser.log` under `storage/app/private`.
 The full CI pipeline must validate the new application source.
+
+
+### Completed candidate CI and notification navigation
+
+GitHub Actions run [44737790756](https://github.com/pertyperty/IAC1-ENGGSF2-Kody/actions/runs/44737790756)
+passed on ef6b2f6fa5212629c296cd0fdf6891f70e328df7. Dependency audits,
+formatting/static analysis, frontend tests/build, clean migrations, backend and
+cached-configuration tests, Chromium/accessibility, cross-engine learning checks
+and populated upgrade/restore all passed. This closes the CI follow-up above for
+that revision; it does not establish production operations or human learning
+outcomes. PR 53 remains draft and unmerged.
+
+The notification follow-up preserves the selected Read/Unread filter and page
+after Mark as read. If removing the last unread item empties a page, navigation
+returns to the last populated page; clearing the last unread item keeps the
+Unread empty state. The redirect uses only validated local filter/page values.
+Existing ownership, active-session locking and idempotent read handling remain.
+First-page actions avoid an extra count query; pagination and page correction
+share one page-size constant. The controller joins the scoped level-5 PHPStan
+check. No migration, provider or visual layout change is needed.
+
+Local follow-up verification on 20 November: all 10 focused notification,
+ownership and publishing regressions pass (98 assertions) against disposable
+PostgreSQL on port 51629; production assets, Pint and scoped PHPStan pass.
+Evidence is ignored under `storage/app/private/notification-build.log` and
+`notification-tests.log`. The new revision still requires its own CI result.
+No additional browser run was performed for these hidden form-context fields
+and server redirect changes.

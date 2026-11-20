@@ -4,7 +4,8 @@ The [20 November learning consolidation](learning-consolidation-2026-11-20.md)
 records the game startup fix, viewport workspaces, persisted Tower preference,
 private qualifications requests, author links, preset usage, Library bookmarks,
 live profile previews, combined Help editing and preserved sidebar scroll.
-Final candidate checks are tracked there; provider activation stays paused.
+Full candidate CI passed on ef6b2f6 in run 44737790756; evidence and the
+notification filter/page follow-up are tracked there. Provider activation stays paused.
 
 Start here for current scope, detailed evidence and the next useful improvements.
 This index consolidates the feature summaries previously repeated in README.

@@ -15,7 +15,14 @@
             @if(isset($notification->data['decision']))<p>{{ $notification->data['decision'] }}</p>@endif
             <time datetime="{{ $notification->created_at->toIso8601String() }}">{{ $notification->created_at->setTimezone('Asia/Manila')->format('M j, Y - g:i A') }} Manila</time>
             @if($feedbackUrl)<p><a class="quiet-link" href="{{ $feedbackUrl }}">View details</a></p>@endif</div>
-            @unless($notification->read_at)<form method="post" action="{{ route('notifications.read', $notification->id) }}">@csrf<button class="button button-secondary button-small">Mark as read</button></form>@endunless
+            @unless($notification->read_at)
+                <form method="post" action="{{ route('notifications.read', $notification->id) }}">
+                    @csrf
+                    <input type="hidden" name="state" value="{{ $state }}">
+                    <input type="hidden" name="page" value="{{ $notifications->currentPage() }}">
+                    <button class="button button-secondary button-small">Mark as read</button>
+                </form>
+            @endunless
         </li>
     @empty<li class="empty-state"><h2>{{ $state === 'unread' ? 'All caught up' : 'No notifications here' }}</h2><p>New account and learning updates will appear here.</p></li>@endforelse
     </ol>
