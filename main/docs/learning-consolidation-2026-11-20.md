@@ -207,3 +207,24 @@ weekly-event and dashboard tests pass (311 assertions) on disposable PostgreSQL
 port 51629. No schema, reward, admission or integration changes. The full CI
 pipeline must rerun on the correction; later browser/restore stages were skipped
 in the failed run and have no new CI result yet.
+
+
+### Sidebar CI assertion follow-up
+
+Run 44730496168 on 49e87aa passed all 1398 backend tests (11023 assertions)
+and 1037 cached-configuration tests (7953 assertions). Chromium passed 100 of
+101 browser cases; the sidebar test expected an offset above 743 and received
+730. Later cross-engine and restore stages did not run.
+
+The old sidebar assertion compared against the offset before Playwright activated
+the link and assumed identical scroll bounds on both pages. The test now waits
+for fonts, records the actual activation offset and compares it with the
+destination's valid range. A second check reloads from an interior offset and
+requires exact restoration within three pixels, so a reset still fails. No
+application behavior or persistence safeguards are changed. The original case
+passed locally in Chromium, Firefox and WebKit; this does not reproduce the CI
+runner's exact geometry.
+
+The corrected navigation/reload case passes in all three local engines (3 tests,
+33.1 seconds). JavaScript syntax and whitespace checks pass. Logs are ignored at
+`storage/app/private/ci53-rail-final.log`; no new full-suite pass is claimed.

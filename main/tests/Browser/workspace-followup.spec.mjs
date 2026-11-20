@@ -19,12 +19,35 @@ test('sidebar preserves its own scroll after link navigation @cross-browser', as
     await page.setViewportSize({ width: 1280, height: 650 });
     await login(page, 'followupadmin');
     const nav = page.locator('[data-navigation-rail] .workspace-nav');
+    await page.evaluate(() => document.fonts.ready);
     await nav.evaluate(element => { element.scrollTop = element.scrollHeight; });
-    const before = await nav.evaluate(element => element.scrollTop);
-    expect(before).toBeGreaterThan(0);
-    await nav.getByRole('link', { name: 'Help', exact: true }).click();
+    const help = nav.getByRole('link', { name: 'Help', exact: true });
+    await help.scrollIntoViewIfNeeded();
+    // Capture the position at activation, after native focus/automation scrolling.
+    await nav.evaluate(element => {
+        element.addEventListener('click', () => {
+            sessionStorage.setItem('test-navigation-scroll', String(element.scrollTop));
+        }, { capture: true, once: true });
+    });
+    await help.click();
     await expect(page.getByRole('heading', { name: 'Help and FAQs' })).toBeVisible();
-    await expect.poll(() => nav.evaluate(element => element.scrollTop)).toBeGreaterThan(before - 3);
+    await page.evaluate(() => document.fonts.ready);
+    const saved = await page.evaluate(() => Number(sessionStorage.getItem('test-navigation-scroll')));
+    expect(saved).toBeGreaterThan(0);
+    // The destination's scroll range can shrink; browsers clamp to its new maximum.
+    await expect.poll(() => nav.evaluate((element, position) =>
+        Math.abs(element.scrollTop - Math.min(position, element.scrollHeight - element.clientHeight)), saved)).toBeLessThan(3);
+
+    // Also check an interior position, where clamping cannot hide a reset.
+    const interior = await nav.evaluate(element => {
+        element.scrollTop = Math.floor((element.scrollHeight - element.clientHeight) / 2);
+        element.dispatchEvent(new Event('scroll'));
+        return element.scrollTop;
+    });
+    expect(interior).toBeGreaterThan(0);
+    await page.reload();
+    await expect(page.getByRole('heading', { name: 'Help and FAQs' })).toBeVisible();
+    await expect.poll(() => nav.evaluate((element, position) => Math.abs(element.scrollTop - position), interior)).toBeLessThan(3);
     await audit(page);
 });
 test('account preview follows typing without publishing private details @cross-browser', async ({ page }) => {
