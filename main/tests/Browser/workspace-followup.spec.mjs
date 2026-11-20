@@ -80,3 +80,14 @@ test('Library combines module and Tower bookmarks and filters their titles', asy
     await audit(page);
     await page.screenshot({ path: `${evidence}/library-bookmarks-mobile.png`, fullPage: true });
 });
+
+test('companion stays out of mobile controls until requested @cross-browser', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/help');
+    await expect(page.locator('[data-companion]')).toBeHidden();
+    await page.getByRole('button', { name: 'Kody guide and companion' }).click();
+    await page.getByRole('button', { name: 'Skip tutorial' }).click();
+    await expect(page.locator('[data-companion]')).toBeVisible();
+    await page.reload();
+    await expect(page.locator('[data-companion]')).toBeVisible();
+});
