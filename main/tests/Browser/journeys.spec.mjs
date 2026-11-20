@@ -90,7 +90,11 @@ test('workspace navigation sticks on short desktops and touch layouts; expanded 
         // reveal state rather than taking a stale visibility snapshot immediately.
         await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
         const workspace = page.locator('.mobile-workspace');
-        if (await page.locator('[data-navigation-reveal]').isVisible()) await page.locator('[data-navigation-reveal]').click();
+        if (await page.locator('[data-navigation-reveal]').isVisible()) {
+            await page.locator('[data-navigation-reveal]').hover();
+            await expect(page.locator('[data-navigation-reveal]')).toBeVisible();
+            await page.locator('[data-navigation-reveal]').click();
+        }
         await expect(workspace.locator('summary')).toBeInViewport();
         await test.step('open touch hamburger', async () => { await workspace.locator('summary').click(); });
         await expect(workspace).toHaveAttribute('open', '');

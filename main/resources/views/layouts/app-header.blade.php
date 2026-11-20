@@ -1,5 +1,4 @@
 <div class="app-header-shell" data-scroll-navigation>
-<span class="header-hover-edge" aria-hidden="true"></span>
 <button type="button" class="navigation-reveal" data-navigation-reveal hidden>Show navigation <span aria-hidden="true"><x-action-icon name="chevron"/></span></button>
 <header class="app-header {{ auth()->check() ? 'is-signed-in' : '' }}">
     @auth<details class="mobile-workspace"><summary aria-label="Explore your workspace"><svg width="22" height="22" aria-hidden="true"><use href="{{ asset('images/navigation.svg') }}#menu"/></svg><span class="sr-only">Explore your workspace</span></summary><div class="mobile-workspace-panel"><h2>Your workspace</h2>@include('layouts.workspace-nav', ['mobile' => true])</div></details>@endauth

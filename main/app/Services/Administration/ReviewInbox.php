@@ -16,7 +16,7 @@ class ReviewInbox
 {
     public const CATEGORIES = [
         'badges' => ['label' => 'Qualifications badges', 'route' => 'creator-badges.show', 'index' => 'account-governance.index', 'model' => User::class],
-        'lessons' => ['label' => 'Lessons', 'route' => 'module-reviews.show', 'index' => 'module-reviews.index', 'model' => LearningModule::class],
+        'lessons' => ['label' => 'Modules', 'route' => 'module-reviews.show', 'index' => 'module-reviews.index', 'model' => LearningModule::class],
         'courses' => ['label' => 'Courses', 'route' => 'course-reviews.show', 'index' => 'course-reviews.index', 'model' => LearningCourse::class],
         'challenges' => ['label' => 'Coding challenges', 'route' => 'challenge-reviews.show', 'index' => 'challenge-reviews.index', 'model' => CodingChallenge::class],
         'instructors' => ['label' => 'Instructor applications', 'route' => 'instructor-reviews.show', 'index' => 'instructor-reviews.index', 'model' => InstructorApplication::class],

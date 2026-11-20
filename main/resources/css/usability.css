@@ -43,7 +43,6 @@ a.quiet-link:hover, .secondary-link a:hover, main p a:not(.button):not(.primary-
 .progress-today { color: var(--muted); padding-left: 8px; }
 .progress-rank { color: var(--accent-text); }
 .progress-strip button { background: var(--surface-soft); color: var(--text); border: 1px solid var(--border); padding: 6px 10px; cursor: pointer; }
-.app-header-shell:has(.progress-strip) .header-hover-edge { top: var(--progress-height, 44px); }
 .app-header-shell:has(.progress-strip) .navigation-reveal { top: var(--progress-height, 44px); }
 .toast-region { position: fixed; right: 24px; bottom: 24px; z-index: 70; width: min(420px, calc(100% - 32px)); max-height: min(40dvh, 420px); overflow: auto; display: grid; gap: 8px; pointer-events: none; }
 .toast { display: flex; align-items: start; gap: 12px; padding: 14px 12px 14px 16px; border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 10px; background: var(--surface); color: var(--text); box-shadow: 0 4px 16px var(--shadow); font-size: 14px; line-height: 1.6; pointer-events: auto; }

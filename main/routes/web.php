@@ -248,8 +248,6 @@ Route::middleware(['auth', 'account.session'])->prefix('manage/faqs')->name('faq
 });
 Route::middleware(['auth', 'account.session'])->prefix('manage/game-presets')->name('game-presets.')->group(function (): void {
     Route::get('/', [GamePresetController::class, 'index'])->name('index');
-    Route::get('/create', [GamePresetController::class, 'create'])->name('create');
-    Route::post('/', [GamePresetController::class, 'store'])->middleware('throttle:10,1,game-presets:')->name('store');
     Route::get('/{preset}/edit', [GamePresetController::class, 'edit'])->whereNumber('preset')->name('edit');
     Route::put('/{preset}', [GamePresetController::class, 'update'])->whereNumber('preset')->middleware('throttle:10,1,game-presets:')->name('update');
     Route::post('/{preset}/inactivate', [GamePresetController::class, 'inactivate'])->whereNumber('preset')->middleware('throttle:10,1,game-presets:')->name('inactivate');

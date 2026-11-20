@@ -1,5 +1,15 @@
 # Release evidence index
 
+The [20 November learner stabilization](learner-stabilization-2026-11-20.md)
+tracks the audit follow-up: navigation reveal, mobile goal/program ordering,
+preset browse/edit-only HTTP routes and clearer terminology. It preserves the
+audit snapshot and records fresh verification separately.
+
+The [20 November website audit](website-audit-2026-11-20.md) records the current
+candidate/main gap, fresh dependency/frontend checks, 100/101 Chromium result
+and repeated mobile navigation reveal failure. It prioritizes stabilization before
+a restricted Judge0 trial; it does not grant provider or public-release approval.
+
 The [20 November learning consolidation](learning-consolidation-2026-11-20.md)
 records the game startup fix, viewport workspaces, persisted Tower preference,
 private qualifications requests, author links, preset usage, Library bookmarks,

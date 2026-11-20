@@ -21,8 +21,8 @@
     @endforeach
     </div>
     <div class="tower-victory" data-tower-victory hidden><span aria-hidden="true"><x-action-icon name="spark"/></span><div><h2>Another step up!</h2><p data-tower-result></p></div><a class="button button-play" data-tower-next href="{{ route('home') }}">Continue climbing</a></div>
-    <aside class="tower-study"><div><b>More on {{ $revision->concept }}</b></div><a class="button button-secondary" href="{{ route('learning.catalog', ['q' => $revision->concept]) }}">Explore lessons</a></aside>
+    <aside class="tower-study"><div><b>More on {{ $revision->concept }}</b></div><a class="button button-secondary" href="{{ route('learning.catalog', ['q' => $revision->concept]) }}">Browse modules</a></aside>
     <p class="field-hint">@guest These trials stay in this browser and grant no saved progress or rewards. @else Kody validates each stage before saving the clearance. Complete the final stage for daily streak credit; tower clears grant no additional XP or KodeBits. @endguest</p>
-    <p><a class="quiet-link" href="{{ route('contact', ['lesson' => 'Tower level '.$level->position, 'revision' => $revision->id]) }}">Report a lesson issue</a></p>
+    <p><a class="quiet-link" href="{{ route('contact', ['lesson' => 'Tower level '.$level->position, 'revision' => $revision->id]) }}">Report an issue</a></p>
 </section>
 @endsection

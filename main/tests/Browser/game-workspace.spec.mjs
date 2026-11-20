@@ -83,6 +83,11 @@ test('Garden instructions are readable, editable and bounded @cross-browser', as
     await expect(source.locator('code')).toHaveCount(limit - 1);
     await expect(source.getByRole('button', { name: 'Step 2: right', exact: true })).toBeFocused();
     await expect(game.locator('[data-execution-label]')).toHaveText('Not run');
+    await game.getByText('Edit steps', { exact: true }).click();
+    const undo = game.getByRole('button', { name: 'Remove last instruction', exact: true });
+    expect((await undo.boundingBox()).height).toBeGreaterThanOrEqual(44);
+    await undo.click();
+    await expect(source.locator('code')).toHaveCount(limit - 2);
     await audit(page);
     await page.screenshot({path: `${evidence}/after-garden.png`, fullPage: true});
 });

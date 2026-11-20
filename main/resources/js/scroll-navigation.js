@@ -35,10 +35,7 @@ export function mountScrollNavigation(doc, win) {
     win.addEventListener('pageshow', restore);
     doc.addEventListener('kody:tour-start', show);
     doc.addEventListener('kody:minimize-navigation', () => setHidden(true));
-    shell.addEventListener('pointerenter', event => {
-        // Let the reveal receive its click; hovering it must not remove its own hit target.
-        if (event.pointerType !== 'touch' && !reveal.contains(doc.elementFromPoint(event.clientX, event.clientY))) show();
-    });
+    // Restore through explicit activation or keyboard focus, keeping the click target stable.
     header.addEventListener('focusin', show);
     header.addEventListener('toggle', event => { if (event.target.open) show(); }, true);
     const activate = () => {

@@ -18,6 +18,7 @@ use App\Services\Content\CoursePublishing;
 use App\Services\Content\CreatorExamples;
 use App\Services\Content\ModulePublishing;
 use App\Services\Engagement\ContentFeedback;
+use App\Services\Games\GamePresets;
 use App\Services\Gamification\LearningProgression;
 use App\Services\Gamification\WeeklyEvents;
 use App\Services\Transactions\ContentAccess;
@@ -96,6 +97,13 @@ try {
                 'active_session_hash' => hash('sha256', 'browser-seed-session'), 'active_session_expires_at' => now()->addHour()]);
         }
         $manifest = ['courses' => [], 'modules' => []];
+        // Provision an existing preset through the internal service, never an HTTP creation form.
+        app(GamePresets::class)->save($accounts['administrator'], 'browser-seed-session', [
+            'name' => 'Browser movement preset', 'record_version' => 1, 'basis' => 'sequences',
+            'title' => 'Movement practice', 'instructions' => 'Reach the flag.', 'hint' => 'Follow the path.',
+            'learning_idea' => 'Instructions run in order.', 'reward_mode' => 'Deferred',
+        ]);
+
         if (Schema::hasTable('creator_profiles')) {
             $credentialPath = 'instructor-credentials/browser-'.Str::uuid().'.pdf';
             Storage::disk('local')->put($credentialPath, '%PDF-1.4 synthetic qualification for browser review only');

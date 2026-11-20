@@ -374,3 +374,16 @@ dialog.proficiency-choice::backdrop { background: rgb(10 25 50 / .6); }
     .faq-editor { position: sticky; top: calc(var(--navigation-offset, 100px) + 1rem); max-height: calc(100dvh - var(--navigation-offset, 100px) - 2rem); overflow-y: auto; padding-inline: .5rem; }
 }
 @media (max-width: 700px) { .faq-result { flex-wrap: wrap; }.faq-result details { flex-basis: 100%; } }
+
+/* Mobile follows goal, program, result; the desktop scene stays beside the editor. */
+.game-card > .lesson-briefing { margin: 0 0 1rem; padding: 0; border: 0; background: transparent; }
+@media (max-width: 999px) {
+    .game-card :is(.arcade-workbench, .garden-workbench) { grid-template-columns: minmax(0, 1fr); }
+    .game-card .game-controls { order: -1; }
+    .game-card .trace-source { height: 7rem; min-height: 0; }
+}
+.game-card.workspace-fluid .game-controls { order: -1; }
+
+.game-controls > .activity-reference { margin-bottom: .75rem; }
+
+.game-card .program-edit-tools { flex-wrap: wrap; }

@@ -19,7 +19,7 @@ for (const template of ['pixel-studio', 'number-machine', 'sort-lab', 'terminal-
         const game = page.locator('[data-arcade-game]');
         const instance = JSON.parse(await game.getAttribute('data-arcade-game'));
         const task = tasks[instance.assessment.id];
-        await game.getByText('Edit as text', { exact: true }).click();
+        await game.getByText('Edit commands as text', { exact: true }).click();
         await game.getByLabel('Your program', { exact: true }).fill(task.reference.program.join('\n'));
         await game.getByRole('button', { name: 'Run', exact: true }).click();
         await expect(game.locator('[data-execution-label]')).toHaveText('Goal reached');
@@ -68,4 +68,23 @@ test('guided games mount without crypto.randomUUID on HTTP development hosts @cr
     await game.getByRole('button', { name: 'Add instruction', exact: true }).click();
     await expect(game.locator('[data-instruction-index]')).toHaveCount(1);
     expect(errors).toEqual([]);
+});
+
+// Goal and execution should be discoverable before mobile learners inspect the scene.
+test('mobile games put the goal and Run before the scene @cross-browser', async ({ page }) => {
+    for (const path of ['/playground?game=number-machine', '/playground?game=pixel-studio', '/tower/1']) {
+        for (const width of [320, 390, 900]) {
+            await page.setViewportSize({ width, height: 900 });
+            await page.goto(path);
+            const game = page.locator('[data-arcade-game], [data-coding-game]').first();
+            const goal = game.locator('.activity-goal');
+            const run = game.getByRole('button', { name: 'Run', exact: true });
+            const scene = game.locator('.arcade-scene, .game-world');
+            expect((await goal.boundingBox()).y).toBeLessThan((await run.boundingBox()).y);
+            expect((await run.boundingBox()).y).toBeLessThan((await scene.boundingBox()).y);
+            await expect(run).toBeInViewport();
+            await audit(page);
+            await page.screenshot({ path: `${evidence}/mobile-first-${path.includes('pixel') ? 'pixels' : path.includes('tower') ? 'garden' : 'numbers'}-${width}.png`, fullPage: true });
+        }
+    }
 });

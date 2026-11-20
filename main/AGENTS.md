@@ -1,3 +1,10 @@
+The [20 November learner stabilization](docs/learner-stabilization-2026-11-20.md)
+anchors Show navigation to the viewport and removes automatic hover restoration.
+Mobile games show the goal and program before the scene; desktop reference help
+stays in the scrolling controls pane. Preset HTTP creation is removed: browse/edit
+existing presets and preserve internal provisioning, pinned revisions and audit.
+Third-party activation remains paused.
+
 # Kody Engineering Agent Guidelines
 
 The [20 November learning consolidation](docs/learning-consolidation-2026-11-20.md)

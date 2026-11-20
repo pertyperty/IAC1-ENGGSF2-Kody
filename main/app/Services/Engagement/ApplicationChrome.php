@@ -21,7 +21,7 @@ class ApplicationChrome
         $user = $request->user();
         $focused = $request->routeIs('account.edit', 'account.google', 'account.archive', 'account.delete',
             'studio.create', 'studio.edit', 'courses.create', 'courses.edit', 'challenges.create', 'challenges.edit',
-            'game-presets.create', 'game-presets.edit', 'module-media.show', 'site-management.*');
+            'game-presets.edit', 'module-media.show', 'site-management.*');
         // Only the dashboard controller supplies these owned, already-computed snapshots.
         $dashboard = $request->routeIs('dashboard') ? ($viewData['dashboard'] ?? null) : null;
         $progress = null;

@@ -27,13 +27,6 @@ class GamePresetController extends Controller
         return response()->view('games.preset-index', compact('presets', 'filters'))->header('Cache-Control', 'no-store, private');
     }
 
-    public function create(): Response
-    {
-        Gate::authorize('create', GamePreset::class);
-
-        return response()->view('games.preset-editor', ['preset' => null, 'instance' => null, 'history' => null, 'uses' => 0])->header('Cache-Control', 'no-store, private');
-    }
-
     public function edit(GamePreset $preset): Response
     {
         Gate::authorize('viewAny', GamePreset::class);
@@ -48,13 +41,6 @@ class GamePresetController extends Controller
             ->orderByDesc('revision.id')->paginate(10, ['*'], 'usage_page')->withQueryString();
 
         return response()->view('games.preset-editor', compact('preset', 'instance', 'history', 'uses', 'usage'))->header('Cache-Control', 'no-store, private');
-    }
-
-    public function store(SaveGamePresetRequest $request, GamePresets $presets): RedirectResponse
-    {
-        $preset = $presets->save($request->user(), $request->session()->getId(), $request->validated());
-
-        return redirect()->route('game-presets.edit', $preset)->with('status', 'Preset created. Creators can now use its saved defaults.');
     }
 
     public function update(SaveGamePresetRequest $request, GamePreset $preset, GamePresets $presets): RedirectResponse
