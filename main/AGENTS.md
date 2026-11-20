@@ -5,7 +5,8 @@ adds viewport-fitted game panes, named pseudocode calls, verified learner track
 preferences, owned notification/list filters, linked creator attribution, private
 badge-review requests, preset usage browsing, a combined Library, live profile
 previews and Help/FAQ editing. Sidebar scroll is per-user tab session state;
-bookmarks never grant learning access or rewards. Preserve replay validation,
+bookmarks never grant learning access or rewards. The floating companion is
+opt-in until a show/hide preference is saved; retain the guide button. Preserve replay validation,
 private proof, current-session locks, immutable versions and mobile rail hiding.
 No provider activation is authorized.
 

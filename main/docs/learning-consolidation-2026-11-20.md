@@ -108,6 +108,9 @@ Administrators read and edit FAQs on Help, beside a live plain-text preview.
 Existing policy gates, version conflicts, audited changes and delete confirmation
 remain in force. Guests and other roles receive published answers only. Legacy
 management routes render the combined interface, preserving existing links.
+Screenshot review also found the floating companion covering a mobile filter.
+It now starts hidden until requested, while preserving saved show/hide choices
+and the guide button. Existing drag, keyboard and tutorial controls remain.
 Account and public creator forms offer optional live previews. They use text nodes
 rather than HTML, never submit automatically and omit private names/email from
 the public identity preview. Badges reflect existing reviewed status only.
@@ -155,5 +158,35 @@ passed with a process-local 512 MB limit (the first default-memory run exhausted
 selectors, a wheel test targeting the newly independent pane, and a mobile rail
 breakpoint regression. It is not a full-suite pass.
 
-Final candidate verification: pending. Human teaching quality, real-device
-performance, staged operations and live providers remain separate release evidence.
+Follow-up local evidence (20 November 2026; reviewer: Codex): application source
+`f8c0af26127109d8dce9758ae2aaee5d722a8ddc`, disposable PostgreSQL and Playwright
+browsers; no owner database or live providers. Evidence-only follow-ups preserve
+this application source. Backend checks ran on ecf0c16; the later companion
+default changes only frontend behavior. The PR identifies the final immutable candidate.
+
+- Production asset build and all 66 frontend tests pass.
+- Broader backend batch: 161 tests / 1507 assertions pass. Final focused batch,
+  including Library, FAQ, profile, history and course paths: 134 / 1321 pass.
+  Another account/profile-inclusive batch passed 130 / 1219. These sets overlap;
+  their counts must not be added. Before this follow-up, the full backend suite
+  passed 1394 / 10955; it was not rerun in full for the latest source.
+- Pint and configured level-5 PHPStan pass. Five touched controllers now join the
+  explicit analysis scope; no ignores or baseline were introduced.
+- Broad Chromium diagnostic: 91 pass / 4 fail across 95 cases. Three failures were
+  obsolete labels and one exposed stale Help tour selectors. After correction,
+  all 10 affected UI reruns pass, including the four failures, course feedback,
+  live previews and Library. This is not a single clean full-suite result.
+- Final companion-default build: 16 workspace/guide/Library/creator regressions
+  pass, preserving the five pre-existing workspace regressions in a separate spec.
+- 48 focused cross-engine cases pass in Chromium, Firefox and WebKit: all seven
+  Arcade execution/reset flows, bounded scrolling, HTTP startup fallback, saved
+  proficiency, staff filters, Help spacing, sidebar scroll and profile preview.
+- Populated legacy upgrade and an 87-table PostgreSQL dump/restore pass, including
+  retained row fingerprints, encrypted fixtures, progress and ledger checks.
+  Restore took 5194 ms locally; this does not establish production recovery time.
+
+Logs remain ignored under `storage/app/private/followup-*`; current screenshots
+include `help-edit-preview.png`, `profile-live-preview.png` and
+`library-bookmarks.png`. GitHub Actions must validate the pushed PR head before
+review readiness. Human teaching quality, real-device performance, staged
+operations and live providers remain separate release evidence.
