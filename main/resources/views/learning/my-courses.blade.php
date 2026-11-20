@@ -1,24 +1,29 @@
 @extends('layouts.learning')
-@section('title', 'Your journeys — Kody')
+@section('title', 'Library — Kody')
 @section('content')
-<section class="review-page page-width journey-library"><div class="section-heading"><div><p class="overline">YOUR SAVED LEARNING</p><h1>My learning</h1><p>Your lessons, progress and next steps in one place.</p></div><a class="button button-play" href="{{ route('course-learning.catalog') }}">Browse courses</a></div>
-<h2>My courses</h2><x-list-filters :filters="$filters" search-label="Search joined courses"/><div class="journey-cards">
+<section class="review-page page-width journey-library"><div class="section-heading"><div><p class="overline">YOUR SAVED LEARNING</p><h1>Library</h1><p>Your courses, opened modules and bookmarks.</p></div><a class="button button-play" href="{{ route('course-learning.catalog') }}">Browse courses</a></div>
+<form method="get" action="{{ route('course-learning.mine') }}" class="catalog-search catalog-filter-panel"><div class="filter-grid"><label>Search library<input name="q" maxlength="80" value="{{ $filters['q'] ?? '' }}" placeholder="Search titles"></label><div><label for="library-type">Show</label><select id="library-type" name="type">@foreach(['all' => 'Everything', 'courses' => 'Courses', 'modules' => 'Modules', 'bookmarks' => 'Bookmarks'] as $value => $label)<option value="{{ $value }}" @selected(($filters['type'] ?? 'all') === $value)>{{ $label }}</option>@endforeach</select></div></div><div class="filter-actions"><button class="button button-dark">Apply filters</button>@if(array_filter($filters))<a class="quiet-link" href="{{ route('course-learning.mine') }}">Clear filters</a>@endif</div></form>
+@if(in_array($filters['type'] ?? 'all', ['all', 'courses'], true))<h2>Courses</h2><div class="journey-cards">
 @forelse($enrollments as $enrollment)
     @php($saved = $courseProgress->get($enrollment->id))
     <article class="journey-card">
-    @if($enrollment->course->isWithdrawn())<h3>Journey temporarily unavailable</h3><p>Staff withdrawal is active. Your enrollment and progress are retained.</p>
+    @if($enrollment->course->isWithdrawn())<h3>Course temporarily unavailable</h3><p>Staff withdrawal is active. Your enrollment and progress are retained.</p>
     @else<h3>{{ $enrollment->revision->title }}</h3><p class="field-hint">{{ $enrollment->revision->difficulty }} · {{ $enrollment->sequential ? 'Sequential trail' : 'Open exploration' }}@if($enrollment->course->status === 'Archived') · Archived · Your access is retained @endif</p>@endif
     @include('learning.saved-progress', ['saved' => $saved])
-    <dl class="journey-dates"><div><dt>Joined</dt><dd>{{ $enrollment->enrolled_at->timezone('Asia/Manila')->format('M j, Y') }}</dd></div><div><dt>Last activity</dt><dd>{{ $saved['last_activity'] ? \Carbon\CarbonImmutable::parse($saved['last_activity'])->timezone('Asia/Manila')->format('M j, Y · g:i A') : 'No lessons opened yet' }}</dd></div></dl>
-    @if(!$enrollment->course->isWithdrawn())<div class="journey-card-actions">@if($saved['next'])<a class="button button-play button-small" href="{{ $saved['next']['url'] }}">Continue lesson</a>@endif<a class="button button-secondary button-small" href="{{ route('course-learning.show', $enrollment->course_id) }}">{{ $saved['accessible'] ? 'View course' : 'Review access' }}</a></div>@endif
+    <dl class="journey-dates"><div><dt>Joined</dt><dd>{{ $enrollment->enrolled_at->timezone('Asia/Manila')->format('M j, Y') }}</dd></div><div><dt>Last activity</dt><dd>{{ $saved['last_activity'] ? \Carbon\CarbonImmutable::parse($saved['last_activity'])->timezone('Asia/Manila')->format('M j, Y · g:i A') : 'No modules opened yet' }}</dd></div></dl>
+    @if(!$enrollment->course->isWithdrawn())<div class="journey-card-actions">@if($saved['next'])<a class="button button-play button-small" href="{{ $saved['next']['url'] }}">Continue module</a>@endif<a class="button button-secondary button-small" href="{{ route('course-learning.show', $enrollment->course_id) }}">{{ $saved['accessible'] ? 'View course' : 'Review access' }}</a></div>@endif
     </article>
 @empty<x-empty-state title="No matching courses" description="Browse courses or clear your search." :action-url="route('course-learning.catalog')" action-label="Browse courses" />@endforelse
 </div>{{ $enrollments->links() }}
-<h2>Recent modules</h2><p class="field-hint">Includes lessons opened inside your courses. Reading counts toward course completion; assessment wins qualify play progress.</p><div class="journey-cards">
+@endif
+@if(in_array($filters['type'] ?? 'all', ['all', 'modules'], true))<h2>Recent modules</h2><p class="field-hint">Your latest 12 opened modules, including those in courses.</p><div class="journey-cards">
 @forelse($recentModules as $module)
-    <article class="journey-card">@if($module->isWithdrawn() || $module->status !== 'Published')<h3>Lesson unavailable</h3><p>Your saved history is retained.</p>@else<h3>{{ $module->publishedRevision->title }}</h3>@endif
+    <article class="journey-card">@if($module->isWithdrawn() || $module->status !== 'Published')<h3>Module unavailable</h3><p>Your saved history is retained.</p>@else<h3>{{ $module->publishedRevision->title }}</h3>@endif
     @if($moduleProgress->has($module->id))@php($saved = $moduleProgress->get($module->id))@include('learning.saved-progress', ['saved' => $saved])<p class="field-hint">Latest recorded activity: {{ $saved['last_activity'] ? \Carbon\CarbonImmutable::parse($saved['last_activity'])->timezone('Asia/Manila')->format('M j, Y') : 'Not recorded' }}</p>@endif
     @if(!$module->isWithdrawn() && $module->status === 'Published')<a class="button button-secondary button-small" href="{{ route('modules.show', $module) }}">View module</a>@endif</article>
-@empty<p>Open a lesson to start your recent learning history.</p>@endforelse
-</div></section>
+@empty<p>Open a module to start your recent learning history.</p>@endforelse
+</div>
+@endif
+@if(in_array($filters['type'] ?? 'all', ['all', 'bookmarks'], true)) @include('learning.bookmarks') @endif
+</section>
 @endsection

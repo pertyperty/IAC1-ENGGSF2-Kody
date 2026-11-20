@@ -47,8 +47,8 @@ class PlatformDashboard
         }
         $creator = [];
         foreach ([
-            [LearningModule::class, 'learning_modules', 'module_revisions', 'module_id', 'Adventures', 'studio.index'],
-            [LearningCourse::class, 'learning_courses', 'course_revisions', 'course_id', 'Journeys', 'courses.index'],
+            [LearningModule::class, 'learning_modules', 'module_revisions', 'module_id', 'Modules', 'studio.index'],
+            [LearningCourse::class, 'learning_courses', 'course_revisions', 'course_id', 'Courses', 'courses.index'],
             [CodingChallenge::class, 'coding_challenges', 'coding_challenge_revisions', 'challenge_id', 'Coding challenges', 'challenges.index'],
         ] as [$model, $table, $revisions, $foreign, $label, $route]) {
             if (! $gate->allows('create', $model)) {

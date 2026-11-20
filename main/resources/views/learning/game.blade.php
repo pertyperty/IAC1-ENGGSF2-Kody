@@ -24,7 +24,7 @@
         <p class="game-feedback" data-game-feedback role="status" aria-live="polite" tabindex="0">Add instructions, then run your program.</p>
         <div class="game-extras"><details class="game-help"><summary>Keyboard & tips</summary><p>Focus the game, then use arrow keys to add moves and Enter to run. Select an instruction to move or remove it. With an instruction focused, Alt + Left/Right reorders it and Delete removes it.</p></details></div>
         <div class="game-success" data-game-success hidden><p><b>Goal reached. <x-action-icon name="spark"/></b><span>{{ $game['learningIdea'] }}</span></p>@if(isset($module))<a href="{{ route('dashboard') }}" class="quiet-link">Continue playing <x-action-icon name="right"/></a>@elseif($trial ?? false)@auth<a href="{{ route('dashboard') }}" class="quiet-link">Continue your saved trail <x-action-icon name="right"/></a>@else<p>This trial stays here. Create an account to start saving your wins.</p><a href="{{ route('register') }}" class="quiet-link">Create an account <x-action-icon name="right"/></a><a href="{{ route('login') }}" class="quiet-link">Already joined? Sign in <x-action-icon name="right"/></a>@endauth
-@else<a href="{{ route('learning.catalog') }}" class="quiet-link">Find another lesson <x-action-icon name="right"/></a>@endif</div>
+@else<a href="{{ route('learning.catalog') }}" class="quiet-link">Find another module <x-action-icon name="right"/></a>@endif</div>
         <noscript><p class="game-feedback">Turn on JavaScript to play. You can still browse modules and create an account.</p></noscript>
     </div>
     </div>

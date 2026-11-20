@@ -40,7 +40,7 @@ test('@cross-browser pseudocode stays visible and bounded as the program fills',
 
 test('@cross-browser Help controls have space and account forms stay accessible', async ({ page }) => {
     await page.goto('/help');
-    const form = page.locator('.help-search form');
+    const form = page.locator('form.catalog-search');
     const search = await form.getByRole('button', { name: 'Search', exact: true }).boundingBox();
     const topic = await form.getByLabel('Topic', { exact: true }).boundingBox();
     expect(search.y - topic.y - topic.height).toBeGreaterThanOrEqual(8);
@@ -105,11 +105,11 @@ test('creator publishes a profile and staff explicitly grants then revokes the q
 test('learner saves a Tower concept for later without earning a clearance', async ({ page }) => {
     await login(page, 'reviewlearner');
     await page.goto('/tower/1');
-    await page.getByRole('button', { name: 'Review later', exact: true }).click();
-    await page.getByRole('link', { name: 'My review list', exact: true }).click();
-    await expect(page.locator('.review-list')).toContainText('First steps');
+    await page.getByRole('button', { name: 'Bookmark level', exact: true }).click();
+    await page.getByRole('link', { name: 'Bookmarks', exact: true }).click();
+    await expect(page.locator('.saved-learning-list')).toContainText('First steps');
     await expect(page.locator('[data-progress-level]')).toContainText('0 / 80');
-    await page.getByRole('button', { name: 'Remove', exact: true }).click();
-    await expect(page.locator('.review-list')).toContainText('No lessons saved');
+    await page.getByRole('button', { name: 'Remove bookmark', exact: true }).click();
+    await expect(page.locator('.saved-learning-list')).toContainText('No matching bookmarks');
     await audit(page);
 });

@@ -15,7 +15,7 @@
     @foreach($content as $label => $group)
     @continue($group['total'] === 0)
     <section><h2>{{ $label }} <span class="field-hint">{{ $group['total'] }} published</span></h2>
-    <ul class="review-list">@forelse($group['items'] as $item)<li><a href="{{ route(match($label) { 'Lessons' => 'modules.show', 'Courses' => 'course-learning.show', default => 'challenges.show' }, $item->id) }}">{{ $item->publishedRevision->title }}</a></li>@empty<li>No published content.</li>@endforelse</ul>
+    <ul class="review-list">@forelse($group['items'] as $item)<li><a href="{{ route(match($label) { 'Modules' => 'modules.show', 'Courses' => 'course-learning.show', default => 'challenges.show' }, $item->id) }}">{{ $item->publishedRevision->title }}</a></li>@empty<li>No published content.</li>@endforelse</ul>
     @if($group['total'] > 6)<p class="field-hint">Showing the six most recent publications.</p>@endif</section>@endforeach
 </article>
 @endsection

@@ -119,11 +119,11 @@ test('an instructor previews and saves a guided assessment without configuring a
     if (page.url().endsWith('/login/confirmation')) await page.getByRole('button', { name: 'End previous session and continue' }).click();
     await expect(page).toHaveURL(/\/dashboard$/);
     await page.goto('/create');
-    await expect(page.getByRole('heading', { name: 'Your lesson studio' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Module studio' })).toBeVisible();
     await page.screenshot({ path: 'storage/app/browser-results/lesson-studio-followup.png', fullPage: true });
-    await page.getByRole('link', { name: 'Create a lesson', exact: true }).click();
-    await page.getByLabel('Lesson title').fill('Reason about the top of a stack');
-    await page.getByLabel('Lesson summary').fill('Use stack operations and explain what TOP means.');
+    await page.getByRole('link', { name: 'Create module', exact: true }).click();
+    await page.getByLabel('Module title').fill('Reason about the top of a stack');
+    await page.getByLabel('Module summary').fill('Use stack operations and explain what TOP means.');
     await page.getByLabel('Explanation and examples').fill('A stack changes at TOP. In [2, 5], 5 is TOP. POP removes 5. DUPLICATE copies TOP.');
     const writes = [];
     page.on('request', request => { if (request.method() === 'POST') writes.push(request.url()); });

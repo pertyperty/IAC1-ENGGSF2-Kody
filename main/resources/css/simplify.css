@@ -340,3 +340,37 @@ dialog.proficiency-choice::backdrop { background: rgb(10 25 50 / .6); }
 
 .account-form label, .studio-form label, .catalog-search label { font-size: 1rem; }
 .workspace-nav a > .nav-label { font-size: .875rem; }
+
+/* Reading and editing share a surface; previews never replace saved content. */
+.profile-preview-layout { display: grid; gap: 2rem; align-items: start; }
+.live-preview-panel { min-width: 0; }
+.live-preview-panel > details > summary { cursor: pointer; color: var(--accent-text); min-height: 44px; padding-block: .5rem; }
+.profile-preview { padding-block: 1rem; }
+.profile-preview p, .faq-live-preview .faq-answer { white-space: pre-wrap; overflow-wrap: anywhere; }
+.profile-preview img { object-fit: cover; border-radius: 50%; margin-bottom: 1rem; }
+.help-reading-workspace { display: grid; gap: 2rem; align-items: start; }
+.faq-result { display: flex; align-items: start; justify-content: space-between; gap: 1rem; padding-block: 1.25rem; border-bottom: 1px solid var(--border); }
+.faq-result details { flex: 1; min-width: 0; }
+.faq-result summary { cursor: pointer; font-weight: 600; min-height: 44px; }
+.faq-result .faq-answer { white-space: pre-wrap; margin-block: 1rem; }
+.faq-editor .studio-form { padding: 0; border: 0; background: transparent; }
+.faq-live-preview { margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 2px solid var(--accent-line); }
+.faq-secondary { margin-block: 2rem; }
+.learning-stats { display: flex; flex-wrap: wrap; gap: 1.5rem 3rem; padding-block: 1.5rem; margin-block: 1rem; border-block: 1px solid var(--border); }
+.learning-stats dt { color: var(--muted); }
+.learning-stats dd { margin: .25rem 0 0; font-size: 1.5rem; font-weight: 650; }
+.progress-rules { margin-block: 1.5rem; max-width: 65ch; }
+.compact-activity, .saved-learning-list { list-style: none; padding: 0; margin: 0; }
+.compact-activity li, .saved-learning-list li { display: flex; justify-content: space-between; flex-wrap: wrap; gap: .5rem 1rem; padding-block: 1rem; border-bottom: 1px solid var(--border); }
+.compact-activity li > span { color: var(--muted); font-size: .9375rem; }
+.saved-learning-list h3 { font-size: 1.0625rem; margin: .25rem 0; }
+.bookmark-action { display: inline-block; margin: .5rem 0 1rem; }
+.preset-browser li.empty-state { display: block; }
+@media (min-width: 1101px) {
+    .profile-preview-layout:has(.live-preview-panel details[open]) { grid-template-columns: minmax(0, 1fr) minmax(260px, .65fr); }
+    .profile-preview-layout:has(.live-preview-panel details[open]) .profile-editor-grid { grid-template-columns: minmax(0, 1fr); }
+    .live-preview-panel { position: sticky; top: calc(var(--navigation-offset, 100px) + 1rem); }
+    .help-reading-workspace.is-editing { grid-template-columns: minmax(0, 1fr) minmax(340px, 1fr); }
+    .faq-editor { position: sticky; top: calc(var(--navigation-offset, 100px) + 1rem); max-height: calc(100dvh - var(--navigation-offset, 100px) - 2rem); overflow-y: auto; padding-inline: .5rem; }
+}
+@media (max-width: 700px) { .faq-result { flex-wrap: wrap; }.faq-result details { flex-basis: 100%; } }

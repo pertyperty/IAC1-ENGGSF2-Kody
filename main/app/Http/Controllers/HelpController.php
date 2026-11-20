@@ -5,13 +5,15 @@ namespace App\Http\Controllers;
 use App\Models\FaqEntry;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 
 class HelpController extends Controller
 {
     public function index(Request $request): Response
     {
-        $filters = $request->validate(['q' => ['nullable', 'string', 'max:80'], 'category' => ['nullable', Rule::in(array_keys(config('help.categories')))]]);
+        $filters = $request->validate(['q' => ['nullable', 'string', 'max:80'], 'category' => ['nullable', Rule::in(array_keys(config('help.categories')))], 'edit' => ['nullable', 'integer', 'min:1'], 'new' => ['nullable', 'boolean']]);
         $query = FaqEntry::where('status', 'Active');
         if (trim($filters['q'] ?? '') !== '') {
             $literal = '%'.addcslashes(trim($filters['q']), '%_\\').'%';
@@ -22,7 +24,17 @@ class HelpController extends Controller
         }
         $entries = $query->orderBy('category')->orderBy('id')->paginate(12)->appends($filters);
 
-        return response()->view('help.index', compact('entries', 'filters'))->header('Cache-Control', 'no-store, private');
+        $manage = Gate::allows('viewAny', FaqEntry::class);
+        $editing = $manage && (isset($filters['edit']) || ($filters['new'] ?? false));
+        $editorEntry = null;
+        $history = null;
+        if ($editing && isset($filters['edit'])) {
+            $editorEntry = FaqEntry::where('status', 'Active')->findOrFail($filters['edit']);
+            Gate::authorize('update', $editorEntry);
+            $history = DB::table('audit_events')->where('subject_type', 'faq_entry')->where('subject_id', (string) $editorEntry->id)->latest('created_at')->paginate(10, ['*'], 'history_page')->withQueryString();
+        }
+
+        return response()->view('help.index', compact('entries', 'filters', 'manage', 'editing', 'editorEntry', 'history'))->header('Cache-Control', 'no-store, private');
     }
 
     public function show(FaqEntry $entry): Response

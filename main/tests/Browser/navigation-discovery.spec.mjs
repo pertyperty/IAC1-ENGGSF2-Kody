@@ -63,7 +63,7 @@ test('Tower list supports guest trials, keyboard navigation and selected-track l
 test('review inbox filters a real submission and opens the existing review page', async ({ page }) => {
     await login(page, 'instructor');
     await page.goto('/create/modules/new?example=programming-check');
-    await page.getByLabel('Lesson title').fill('Navigation inbox lesson');
+    await page.getByLabel('Module title').fill('Navigation inbox lesson');
     await page.getByRole('button', { name: 'Save draft', exact: true }).click();
     await expect(page).toHaveURL(/\/create\/modules\/\d+$/);
     const id = new URL(page.url()).pathname.split('/').at(-1);

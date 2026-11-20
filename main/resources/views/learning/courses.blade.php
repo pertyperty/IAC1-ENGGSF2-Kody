@@ -4,9 +4,9 @@
 <section class="module-section page-width">
     <p class="overline">COURSES</p>
     <h1>Find a course</h1>
-    <p>Learn with a sequence of lessons from a creator.</p>
+    <p>Learn with a sequence of modules from a creator.</p>
     <div class="studio-actions">
-        <a class="button button-secondary button-small" href="{{ route('learning.catalog') }}"><x-action-icon name="book"/> Browse lessons</a>
+        <a class="button button-secondary button-small" href="{{ route('learning.catalog') }}"><x-action-icon name="book"/> Browse modules</a>
         @can('viewLearning', \App\Models\LearningCourse::class)
             <a class="button button-secondary button-small" href="{{ route('course-learning.mine') }}"><x-action-icon name="journey"/> Your courses</a>
         @endcan
@@ -48,7 +48,7 @@
                 </div>
             </article>
         @empty
-            <x-empty-state title="No courses found" description="Try another search or browse individual lessons." :action-url="route('learning.catalog')" action-label="Browse lessons" />
+            <x-empty-state title="No courses found" description="Try another search or browse individual lessons." :action-url="route('learning.catalog')" action-label="Browse modules" />
         @endforelse
     </div>
     {{ $courses->links() }}

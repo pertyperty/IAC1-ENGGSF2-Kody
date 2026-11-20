@@ -95,7 +95,7 @@ test('workspace navigation sticks on short desktops and touch layouts; expanded 
         await test.step('open touch hamburger', async () => { await workspace.locator('summary').click(); });
         await expect(workspace).toHaveAttribute('open', '');
         await test.step('audit expanded touch menu', async () => { await audit(page); });
-        await workspace.getByRole('link', { name: 'Help center', exact: true }).click();
+        await workspace.getByRole('link', { name: 'Help', exact: true }).click();
         await expect(page).toHaveURL(/\/help$/);
         await audit(page);
     } finally { await context.close(); }
@@ -212,7 +212,7 @@ test('A01 A02 B03 B05: guest trial, registration, verified play, reading and cou
     await expect(page).not.toHaveURL(/#/);
     await login(page, 'newplayer');
     await page.goto('/dashboard');
-    await expect(page.getByRole('heading', { name: 'Your next Tower level' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Next Tower level' })).toBeVisible();
     await page.setViewportSize({ width: 320, height: 900 });
     for (const dark of [false, true]) {
         const toggle = page.locator('[data-theme-toggle]');
@@ -240,7 +240,7 @@ test('A01 A02 B03 B05: guest trial, registration, verified play, reading and cou
     expect((await page.locator('[data-coding-game]').boundingBox()).width).toBeGreaterThan(800);
     await solveGarden(page);
     await expect(page.locator('[data-journey-next]')).toHaveAttribute('href', new RegExp(`/modules/${course.slots[2]}$`));
-    await expect(page.locator('[data-journey-count]')).toHaveText('2 of 5 lessons completed.');
+    await expect(page.locator('[data-journey-count]')).toHaveText('2 of 5 modules completed.');
     await page.locator('[data-course-journey]').scrollIntoViewIfNeeded();
     await page.screenshot({ path: 'storage/app/browser-results/saved-course-next-step.png' });
     await page.reload();
@@ -305,7 +305,7 @@ test('Administrator rail pulls and pins labels; tower drafts preview without pub
     for (const icon of await rail.locator('.nav-icon').all()) {
         expect((await icon.boundingBox()).width).toBeGreaterThanOrEqual(22);
     }
-    const tower = rail.getByRole('link', { name: 'Tower studio', exact: true });
+    const tower = rail.getByRole('link', { name: 'Tower', exact: true });
     await tower.hover();
     await expect.poll(async () => (await tower.boundingBox()).width).toBeGreaterThan(200);
     await rail.locator('[data-rail-toggle]').click();
@@ -351,7 +351,7 @@ test('D01 D05 D07: creator draft, staff review, course composition and learner p
         for (const context of [creator, staff, learner]) await context.route('**/*', route => new URL(route.request().url()).origin === process.env.KODY_BROWSER_BASE_URL ? route.continue() : route.abort());
         await login(authorPage, 'instructor');
         await authorPage.goto('/create/modules/new?example=programming-check');
-        await authorPage.getByLabel('Lesson title').fill('Browser review adventure');
+        await authorPage.getByLabel('Module title').fill('Browser review adventure');
         await authorPage.locator('.creator-media-panel > summary').click();
         await authorPage.getByLabel('Add PDF, DOCX or PPTX resources').setInputFiles({ name: 'browser-notes.docx', mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', buffer: Buffer.from(fixture('office-fixture'), 'base64') });
         await authorPage.getByLabel('Video or media link (optional)').fill('https://youtu.be/dQw4w9WgXcQ');
@@ -427,9 +427,9 @@ test('empty catalogs offer clear next actions on narrow screens in both themes',
     await page.setViewportSize({ width: 320, height: 740 });
     for (const dark of [false, true]) {
         for (const [path, title, action] of [
-            ['/learn', 'No lessons found', 'See all lessons'],
-            ['/learn/courses', 'No courses found', 'Browse lessons'],
-            ['/challenges', 'No coding challenges found', 'Browse lessons'],
+            ['/learn', 'No modules found', 'See all lessons'],
+            ['/learn/courses', 'No courses found', 'Browse modules'],
+            ['/challenges', 'No coding challenges found', 'Browse modules'],
         ]) {
             await page.goto(`${path}?q=zzzz-no-matching-content`);
             const toggle = page.locator('[data-theme-toggle]');
@@ -503,8 +503,8 @@ test('B05: four creator arcade assessments and a multi-question quiz save valida
 });
 
 for (const [role, destination, link] of [
-    ['learner', '/learn', 'Learning catalog'], ['contributor', '/create/challenges', 'Challenge studio'],
-    ['instructor', '/create', 'Lesson studio'], ['moderator', '/manage/reviews', 'Review inbox'],
+    ['learner', '/learn', 'Modules'], ['contributor', '/create/challenges', 'Studio'],
+    ['instructor', '/create', 'Studio'], ['moderator', '/manage/reviews', 'Reviews'],
     ['administrator', '/manage/accounts', 'Community'],
 ]) {
     test(`${role} workspace has focused navigation and usable desktop/mobile surfaces in both themes`, async ({ page }) => {
@@ -513,9 +513,8 @@ for (const [role, destination, link] of [
             await page.setViewportSize({ width, height: 1000 });
             const nav = page.getByRole('navigation', { name: width === 1440 ? 'Your workspace' : 'Mobile workspace', exact: true });
             if (width === 320) await page.locator('.mobile-workspace > summary').click();
-            await expect(nav.getByRole('link', { name: 'Lesson studio', exact: true })).toHaveCount(role === 'instructor' ? 1 : 0);
-            await expect(nav.getByRole('link', { name: 'Challenge studio', exact: true })).toHaveCount(['instructor', 'contributor'].includes(role) ? 1 : 0);
-            await expect(nav.getByRole('link', { name: 'Weekly planning', exact: true })).toHaveCount(role === 'moderator' ? 1 : 0);
+            await expect(nav.getByRole('link', { name: 'Studio', exact: true })).toHaveCount(['instructor', 'contributor'].includes(role) ? 1 : 0);
+            await expect(nav.getByRole('link', { name: 'Schedule', exact: true })).toHaveCount(role === 'moderator' ? 1 : 0);
             await expect(nav.getByRole('link', { name: 'Accounting', exact: true })).toHaveCount(role === 'administrator' ? 1 : 0);
             await nav.getByRole('link', { name: link, exact: true }).click();
             await expect(page).toHaveURL(new RegExp(`${destination}$`));

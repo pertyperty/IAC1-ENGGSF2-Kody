@@ -19,7 +19,7 @@ test('one Tower continuation is shown only to learners without granting progress
     moduleSignIn($this, $user);
     $response = $this->get(route('dashboard'))->assertOk();
     if ($role === Role::Learner) {
-        $response->assertSee('Your next Tower level')->assertSee('Continue level 1')->assertSee('Optional starter lessons');
+        $response->assertSee('Next Tower level')->assertSee('Continue level 1')->assertSee('Optional starter modules');
         expect(substr_count($response->getContent(), 'data-primary-continue'))->toBe(1);
     } else {
         $response->assertDontSee('data-primary-continue', false);

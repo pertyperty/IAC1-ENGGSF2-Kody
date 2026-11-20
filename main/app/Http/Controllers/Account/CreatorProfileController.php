@@ -27,7 +27,7 @@ class CreatorProfileController extends Controller
         abort_unless($profiles->visible($creator), 404);
         $profile = DB::table('creator_profiles')->where('user_id', $creator->id)->first();
         $content = [];
-        foreach (['Lessons' => LearningModule::class, 'Courses' => LearningCourse::class, 'Coding challenges' => CodingChallenge::class] as $label => $model) {
+        foreach (['Modules' => LearningModule::class, 'Courses' => LearningCourse::class, 'Coding challenges' => CodingChallenge::class] as $label => $model) {
             $query = $model::where('created_by', $creator->id)->where('status', 'Published')->whereNull('staff_withdrawn_at')
                 ->whereHas('publishedRevision', fn ($revision) => $revision->where('review_status', 'Approved'));
             $content[$label] = ['total' => (clone $query)->count(), 'items' => $query->select(['id', 'published_revision_id'])

@@ -3,7 +3,9 @@
 The [20 November learning consolidation](docs/learning-consolidation-2026-11-20.md)
 adds viewport-fitted game panes, named pseudocode calls, verified learner track
 preferences, owned notification/list filters, linked creator attribution, private
-badge-review requests and preset usage browsing. Preserve replay validation,
+badge-review requests, preset usage browsing, a combined Library, live profile
+previews and Help/FAQ editing. Sidebar scroll is per-user tab session state;
+bookmarks never grant learning access or rewards. Preserve replay validation,
 private proof, current-session locks, immutable versions and mobile rail hiding.
 No provider activation is authorized.
 

@@ -11,7 +11,7 @@
         @can('create', \App\Models\LearningModule::class)<a href="{{ route('studio.index') }}" @if(request()->routeIs('studio.*', 'courses.*', 'curriculum.*')) aria-current="page" @endif>Create</a>
         @elsecan('create', \App\Models\CodingChallenge::class)<a href="{{ route('challenges.index') }}" @if(request()->routeIs('challenges.*') && !request()->routeIs('challenges.catalog', 'challenges.show')) aria-current="page" @endif>Create</a>
         @endcan
-        @auth<a href="{{ route('dashboard') }}" @if(request()->routeIs('dashboard', 'course-learning.mine', 'review-queue.*')) aria-current="page" @endif>{{ auth()->user()->account_role === \App\Enums\Role::Learner ? 'My progress' : 'Overview' }}</a>@endauth
+        @auth<a href="{{ route('dashboard') }}" @if(request()->routeIs('dashboard', 'course-learning.mine', 'review-queue.*')) aria-current="page" @endif>{{ auth()->user()->account_role === \App\Enums\Role::Learner ? 'Progress' : 'Overview' }}</a>@endauth
         <a href="{{ route('help.index') }}" @if(request()->routeIs('help.*')) aria-current="page" @endif>Help</a>
     </nav>
     <div class="app-header-actions">

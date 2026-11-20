@@ -22,7 +22,7 @@
                     </article>
                 @endforeach
             </div>
-            @else<p class="notice">Purchases are unavailable. Your balances, history and refund support remain accessible.</p><p><a class="quiet-link" href="{{ route('learning.catalog') }}">Browse lessons</a></p>@endif
+            @else<p class="notice">Purchases are unavailable. Your balances, history and refund support remain accessible.</p><p><a class="quiet-link" href="{{ route('learning.catalog') }}">Browse modules</a></p>@endif
             @if($purchases->isNotEmpty())
                 <h2>Purchase status</h2><div class="wallet-history">
                 @foreach($purchases as $purchase)

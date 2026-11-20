@@ -44,6 +44,7 @@ use App\Http\Controllers\Engagement\ContentReactionController;
 use App\Http\Controllers\Gamification\LeaderboardController;
 use App\Http\Controllers\Gamification\WeeklyEventStudioController;
 use App\Http\Controllers\HelpController;
+use App\Http\Controllers\Learning\BookmarkController;
 use App\Http\Controllers\Learning\ReviewQueueController;
 use App\Http\Controllers\LearningController;
 use App\Http\Controllers\NotificationController;
@@ -63,6 +64,7 @@ Route::pattern('challenge', '[0-9]+');
 Route::pattern('weeklyEvent', '[0-9]+');
 
 Route::middleware(['auth', 'account.session'])->group(function (): void {
+    Route::post('/learn/bookmarks/{kind}/{content}', [BookmarkController::class, 'update'])->whereIn('kind', ['module', 'course'])->whereNumber('content')->middleware('throttle:30,1,bookmarks:')->name('bookmarks.update');
     Route::get('/learn/review', [ReviewQueueController::class, 'index'])->name('review-queue.index');
     Route::post('/learn/review/{level}', [ReviewQueueController::class, 'update'])->whereNumber('level')->middleware('throttle:20,1,review-queue:')->name('review-queue.update');
 });

@@ -1,6 +1,20 @@
 export function mountNavigationRail(doc, win) {
     const rail = doc.querySelector('[data-navigation-rail]');
     if (!rail) return;
+    const scroller = rail.querySelector('.workspace-nav');
+    const scrollKey = `kody-navigation-scroll:${rail.dataset.navigationUser}`;
+    const saveScroll = () => {
+        if (!scroller || scroller.clientHeight === 0) return;
+        try { win.sessionStorage.setItem(scrollKey, String(scroller.scrollTop)); } catch {}
+    };
+    let savedScroll = 0;
+    try { savedScroll = Number(win.sessionStorage.getItem(scrollKey)) || 0; } catch {}
+    if (scroller && Number.isFinite(savedScroll) && savedScroll >= 0) {
+        win.requestAnimationFrame(() => { scroller.scrollTop = savedScroll; });
+        scroller.addEventListener('scroll', saveScroll, { passive: true });
+        scroller.addEventListener('click', saveScroll, { capture: true });
+        win.addEventListener('pagehide', saveScroll);
+    }
     const toggle = rail.querySelector('[data-rail-toggle]');
     const links = [...rail.querySelectorAll('.workspace-nav a')];
     const expanded = () => doc.documentElement.dataset.rail === 'expanded';

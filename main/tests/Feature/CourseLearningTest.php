@@ -57,7 +57,7 @@ test('B03 Learner Contributor and Instructor confirm one free enrollment and get
     $this->get(route('dashboard'))->assertOk()->assertSee(route('course-learning.mine'));
     $this->get(route('course-learning.lesson', [$course, $slot->id]))->assertOk()->assertSee(route('course-learning.game', [$course, $slot->id]))->assertHeader('Cache-Control', 'no-store, private');
     $this->assertDatabaseCount('course_module_progress', 1);
-    $this->get(route('course-learning.show', $course))->assertSee('Continue lesson');
+    $this->get(route('course-learning.show', $course))->assertSee('Continue module');
 })->with([Role::Learner, Role::Contributor, Role::Instructor]);
 
 test('B03 reviewer roles cannot enroll or consume learner course access', function (Role $role) {

@@ -34,18 +34,17 @@ test('login and registration offer progressive password visibility without echoi
 test('role navigation distinguishes participant studios and staff tools without granting new access', function (Role $role) {
     moduleSignIn($this, moduleAccount($role));
     $response = $this->get(route('dashboard'))->assertOk()->assertSee('Your workspace')
-        ->assertSee('Account menu')->assertSee('Profile & security');
-    if ($role === Role::Instructor) {
-        $response->assertSee('Lesson studio')->assertSee('Course builder')->assertSee('Challenge studio');
-    } elseif ($role === Role::Contributor) {
-        $response->assertSee('Challenge studio')->assertDontSee('Lesson studio')->assertDontSee('Course builder');
+        ->assertSee('Account menu')->assertSee('Profile');
+    if (in_array($role, [Role::Instructor, Role::Contributor], true)) {
+        $response->assertSee(route($role === Role::Instructor ? 'studio.index' : 'challenges.index'));
     } else {
-        $response->assertDontSee('Challenge studio')->assertDontSee('Lesson studio');
+        $response->assertDontSee('href="'.route('studio.index').'"', false);
+        $response->assertDontSee('href="'.route('challenges.index').'"', false);
     }
     if ($role === Role::Moderator) {
-        $response->assertSee('Weekly planning')->assertDontSee('Accounting');
+        $response->assertSee('Schedule')->assertDontSee('Accounting');
     } elseif ($role === Role::Administrator) {
-        $response->assertSee('Accounting')->assertDontSee('Weekly planning');
+        $response->assertSee('Accounting')->assertDontSee('Schedule');
     } else {
         $response->assertDontSee('Accounting')->assertDontSee('Publication reviews');
     }

@@ -8,6 +8,6 @@
     <section id="arcade-station" class="arcade-station" aria-label="Selected practice game">
         @if($game['template'] === 'choice-quiz')@include('learning.quiz', ['quiz' => $game, 'module' => null])@else @include('learning.arcade-game', ['game' => $game, 'completionUrl' => null])@endif
     </section>
-    <div class="practice-footer"><p>Practice here is free. Account progress is saved in lessons and the Tower.</p><a href="{{ route('learning.catalog', ['template' => $game['template']]) }}">Find lessons on this concept</a></div>
+    <div class="practice-footer"><p>Practice here is free. Account progress is saved in modules and the Tower.</p><a href="{{ route('learning.catalog', ['template' => $game['template']]) }}">Find modules on this concept</a></div>
 </section>
 @endsection

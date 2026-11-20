@@ -67,7 +67,9 @@ class TowerController extends Controller
         }
         $done = $request->user() ? DB::table('tower_stage_completions')->where('user_id', $request->user()->id)->where('revision_id', $level->current_revision_id)->pluck('stage')->all() : [];
 
-        return response()->view('tower.level', ['level' => $level, 'revision' => $level->currentRevision, 'done' => $done])->header('Cache-Control', 'no-store, private');
+        $bookmarked = $request->user() && DB::table('tower_review_items')->where('user_id', $request->user()->id)->where('level_id', $level->id)->exists();
+
+        return response()->view('tower.level', ['level' => $level, 'revision' => $level->currentRevision, 'done' => $done, 'bookmarked' => $bookmarked])->header('Cache-Control', 'no-store, private');
     }
 
     public function complete(CompleteTowerRequest $request, TowerLevel $level, int $revision, int $stage, TowerProgression $tower): JsonResponse

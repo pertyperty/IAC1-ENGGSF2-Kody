@@ -172,8 +172,8 @@ test('course progress appears in both catalogs and centered results retain icon 
     await expect(page.locator('.module-card').filter({ hasText: /first programming adventures/i }).locator('progress')).toHaveAttribute('value', '1');
     await page.goto('/learn/courses/mine');
     await expect(page.getByRole('heading', { name: 'Recent modules' })).toBeVisible();
-    await expect(page.locator('.journey-card').filter({ hasText: /first programming adventures/i })).toContainText('1 / 5 lessons');
-    await page.getByRole('link', { name: 'Continue lesson', exact: false }).click();
+    await expect(page.locator('.journey-card').filter({ hasText: /first programming adventures/i })).toContainText('1 / 5 modules');
+    await page.getByRole('link', { name: 'Continue module', exact: false }).click();
     const game = page.locator('[data-coding-game]');
     for (const direction of ['right', 'right', 'up', 'right', 'right']) await game.getByRole('button', { name: `Add ${direction}`, exact: true }).click();
     await game.locator('[data-game-run]').click();

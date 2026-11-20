@@ -10,14 +10,17 @@ use App\Http\Requests\Learning\MarkLessonReadRequest;
 use App\Models\CourseEnrollment;
 use App\Models\CourseRevision;
 use App\Models\LearningCourse;
+use App\Models\LearningModule;
 use App\Services\Content\CourseLearning;
 use App\Services\Content\LearningHistory;
 use App\Services\Engagement\ContentFeedback;
+use App\Services\Gamification\TowerProgression;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 
 class CourseLearningController extends Controller
@@ -43,7 +46,7 @@ class CourseLearningController extends Controller
     public function mine(Request $request): Response
     {
         Gate::authorize('viewLearning', LearningCourse::class);
-        $filters = $request->validate(['q' => ['nullable', 'string', 'max:80', 'not_regex:/\x00/']]);
+        $filters = $request->validate(['q' => ['nullable', 'string', 'max:80', 'not_regex:/\x00/'], 'type' => ['nullable', 'in:all,courses,modules,bookmarks']]);
         $enrollments = CourseEnrollment::where('user_id', $request->user()->id)
             ->when($filters['q'] ?? null, fn ($query, $search) => $query->whereHas('revision', fn ($revision) => $revision->where('title', 'ilike', '%'.addcslashes($search, '%_\\').'%')))
             ->with('course', 'revision')->orderByDesc('enrolled_at')->orderByDesc('id')->paginate(15)->withQueryString();
@@ -51,9 +54,38 @@ class CourseLearningController extends Controller
         $participant = $history->participant($request);
         $courseProgress = app(CourseLearning::class)->summaries($participant, $enrollments->getCollection());
         $recentModules = $history->recentModules($participant);
+        if (trim($filters['q'] ?? '') !== '') {
+            $search = mb_strtolower(trim($filters['q']));
+            $recentModules = $recentModules->filter(fn ($module) => $module->status === 'Published' && ! $module->isWithdrawn() && str_contains(mb_strtolower($module->publishedRevision->title ?? ''), $search));
+        }
         $moduleProgress = $history->modules($participant, $recentModules->pluck('publishedRevision')->filter());
 
-        return response()->view('learning.my-courses', compact('enrollments', 'courseProgress', 'recentModules', 'moduleProgress', 'filters'))->header('Cache-Control', 'no-store, private');
+        $bookmarks = DB::table('learning_bookmarks')->where('user_id', $participant->id)->orderByDesc('created_at')->limit(100)->get();
+        $bookmarkContent = collect();
+        foreach (['module' => LearningModule::class, 'course' => LearningCourse::class] as $kind => $model) {
+            $items = $model::whereIn('id', $bookmarks->where('kind', $kind)->pluck('content_id'))->select(['id', 'status', 'staff_withdrawn_at', 'published_revision_id'])
+                ->with('publishedRevision:id,title')->get()->keyBy('id');
+            foreach ($bookmarks->where('kind', $kind) as $bookmark) {
+                $item = $items->get($bookmark->content_id);
+                $available = $item && $item->status === 'Published' && ! $item->isWithdrawn() && $item->publishedRevision;
+                $title = $available ? $item->publishedRevision->getAttribute('title') : ucfirst($kind).' unavailable';
+                if (trim($filters['q'] ?? '') !== '' && (! $available || ! str_contains(mb_strtolower($title), mb_strtolower(trim($filters['q']))))) {
+                    continue;
+                }
+                $bookmarkContent->push(['kind' => $kind, 'id' => $bookmark->content_id, 'title' => $title, 'available' => (bool) $available]);
+            }
+        }
+        $reviewItems = DB::table('tower_review_items')->where('user_id', $participant->id)->orderByDesc('created_at')->limit(100)->get();
+        $reviewLevels = $reviewItems->isEmpty() ? collect() : app(TowerProgression::class)->snapshot($participant->id)['steps']->keyBy(fn ($step) => $step['level']->id);
+        if (trim($filters['q'] ?? '') !== '') {
+            $reviewItems = $reviewItems->filter(function ($item) use ($filters, $reviewLevels) {
+                $step = $reviewLevels->get($item->level_id);
+
+                return $step && $step['unlocked'] && str_contains(mb_strtolower($step['level']->currentRevision->title), mb_strtolower(trim($filters['q'])));
+            });
+        }
+
+        return response()->view('learning.my-courses', compact('enrollments', 'courseProgress', 'recentModules', 'moduleProgress', 'filters', 'bookmarkContent', 'reviewItems', 'reviewLevels'))->header('Cache-Control', 'no-store, private');
     }
 
     public function show(Request $request, LearningCourse $course, CourseLearning $learning, ContentFeedback $feedback): Response
@@ -68,7 +100,7 @@ class CourseLearningController extends Controller
     {
         $learning->enroll($request->user(), $request->session()->getId(), $course->id, (int) $request->validated('revision_id'), $request->boolean('confirmed'));
 
-        return redirect()->route('course-learning.show', $course)->with('status', 'You have joined this journey. Pick an adventure to begin!');
+        return redirect()->route('course-learning.show', $course)->with('status', 'You have joined this course. Choose a module to begin.');
     }
 
     public function lesson(Request $request, LearningCourse $course, int $slot, CourseLearning $learning, ContentFeedback $feedback): Response
@@ -88,7 +120,7 @@ class CourseLearningController extends Controller
     {
         $learning->markRead($request->user(), $request->session()->getId(), $course->id, $slot);
 
-        return redirect()->route('course-learning.show', $course)->with('status', 'Lesson marked as read. Your course progress is saved.');
+        return redirect()->route('course-learning.show', $course)->with('status', 'Module marked as read. Your course progress is saved.');
     }
 
     public function quiz(CompleteQuizRequest $request, LearningCourse $course, int $slot, CourseLearning $learning): JsonResponse

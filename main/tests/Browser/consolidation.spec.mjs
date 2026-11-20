@@ -38,7 +38,7 @@ test('one primary Continue follows the selected track and supporting history sta
     const starters = page.locator('.optional-starter-lessons');
     await expect(starters).not.toHaveAttribute('open');
     await starters.locator('summary').click();
-    await expect(starters.getByRole('link', { name: /Open lesson|play/i }).first()).toBeVisible();
+    await expect(starters.getByRole('link', { name: /Open module|play/i }).first()).toBeVisible();
     await starters.locator('summary').click();
     for (const width of [1280, 390]) {
         await page.setViewportSize({ width, height: 1000 });
@@ -59,7 +59,7 @@ test('authoring warns on leave, preserves cancelled edits and allows unchanged o
     // File inputs with no selected file must not make an untouched form dirty.
     await page.goto('/dashboard');
     await page.goto('/create/modules/new?example=programming-check');
-    const title = page.getByLabel('Lesson title');
+    const title = page.getByLabel('Module title');
     const initial = await title.inputValue();
     await title.click();
     await title.fill('Unsaved lesson title');

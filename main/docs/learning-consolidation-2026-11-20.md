@@ -73,10 +73,10 @@ breakpoints. Repeated staff workspace panels are removed from account browsing.
 
 | Page family | Filtering decision |
 | --- | --- |
-| Lesson catalog | Existing literal title/concept and activity filters retained; linked attribution added. |
+| Module catalog | Existing literal title/concept and activity filters retained; linked attribution added. |
 | Course catalog | Existing search plus validated difficulty and clear action. |
 | Coding challenges | Existing language/difficulty/topic/concept filters retained; terminology and linked attribution clarified. |
-| Joined courses | Literal enrolled-title search with retained pagination; recent lesson history stays visible. |
+| Library | Literal enrolled-title search, latest 12 opened Modules, owned content/Tower bookmarks and type filters; enrollment pagination is retained. |
 | Lesson/course/challenge studios | Added owned literal title and lifecycle status filters with query-preserving pagination. |
 | Publication review queues | Added literal title search; exclude own content and superseded submissions so linked latest review matches the queue. |
 | Instructor/contributor review | Added applicant username and decision status filters; private documents remain authorized downloads. |
@@ -90,6 +90,32 @@ breakpoints. Repeated staff workspace panels are removed from account browsing.
 | Weekly, leaderboards, reports, finance, moderation, erasure | Retained specialized bounded period/state/category controls and server policies. |
 | Login, registration, verification, recovery, legal, contact, profile/edit/detail and decision forms | No artificial list filter; preserve contextual actions and field validation. |
 | Game, lesson, challenge and resource detail | Keep activity/input controls rather than adding unrelated search bars. |
+
+## Library, profile previews and Help follow-up
+
+The sidebar retains its own scroll position across navigation in per-user tab
+session storage. Mobile hidden rails do not overwrite it. Navigation uses short
+labels: Modules, Courses, Challenges, Progress, Library, Studio and Reviews.
+
+Library combines enrolled Courses, the latest 12 opened Modules, content bookmarks
+and the existing saved Tower levels. Title search and content-type controls share
+one location. The old Review later address redirects to Bookmarks. Saving is an
+owned, idempotent reminder: it grants no enrollment, access, XP or clearance.
+Draft/withdrawn content cannot be newly bookmarked; unavailable saved items hide
+content titles and remain removable. Account erasure removes owned bookmarks.
+
+Administrators read and edit FAQs on Help, beside a live plain-text preview.
+Existing policy gates, version conflicts, audited changes and delete confirmation
+remain in force. Guests and other roles receive published answers only. Legacy
+management routes render the combined interface, preserving existing links.
+Account and public creator forms offer optional live previews. They use text nodes
+rather than HTML, never submit automatically and omit private names/email from
+the public identity preview. Badges reflect existing reviewed status only.
+
+Progress keeps one Tower continuation, a compact activity summary and recent
+learning. Reward rules and optional starter history are expandable. Display copy
+uses Modules for individual units and Courses for collections; route/model names
+and versioned legal documents retain their existing identifiers.
 
 ## Visual comparison
 
@@ -106,13 +132,17 @@ Ignored local artifacts are under
 `storage/app/private/learning-consolidation-evidence/`: reference screenshots,
 desktop/mobile workspace, proficiency dialog, account, notification and preset
 screens. Browser tests also produce theme/narrow-layout evidence in their report.
+A rendered GitHub Docs Get started screenshot also provides a reference for
+short navigation labels, persistent sidebar navigation and expandable sections.
+Kody Help uses concise question rows and a separate editor/preview relationship;
+this is a visual comparison, not proof of equivalent usability.
 Some diagnostic screenshots predate the final layout corrections; final candidate
 verification below identifies the usable captures.
 
 ## Migration, deployment and verification
 
-Two additive migrations add nullable checked `users.coding_proficiency` and the
-owned `creator_badge_requests` table. Deploy migrations and the complete Vite build
+Three additive migrations add nullable checked `users.coding_proficiency`, the
+owned `creator_badge_requests` table and checked, uniquely owned `learning_bookmarks`. Deploy migrations and the complete Vite build
 together. The owner database on port 5432 has not been migrated or reset.
 Verification uses a disposable PostgreSQL cluster on port 51629 and independently
 created browser databases, with providers disabled. The sanitized PHP configuration

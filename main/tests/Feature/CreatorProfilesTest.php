@@ -57,7 +57,7 @@ test('public creator profiles hide inactive identities and exclude draft and wit
 test('public creator publication lists load titles without complete revision payloads', function () {
     $module = moduleFixture(true);
     $this->get(route('creators.show', $module->creator))->assertOk()->assertViewHas('content', function ($content) {
-        $item = $content['Lessons']['items']->sole();
+        $item = $content['Modules']['items']->sole();
         expect(array_keys($item->getAttributes()))->toBe(['id', 'published_revision_id']);
         expect(array_keys($item->publishedRevision->getAttributes()))->toBe(['id', 'title']);
 
