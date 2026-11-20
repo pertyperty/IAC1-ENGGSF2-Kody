@@ -10,7 +10,18 @@ export function mountNavigationRail(doc, win) {
     let savedScroll = 0;
     try { savedScroll = Number(win.sessionStorage.getItem(scrollKey)) || 0; } catch {}
     if (scroller && Number.isFinite(savedScroll) && savedScroll >= 0) {
-        win.requestAnimationFrame(() => { scroller.scrollTop = savedScroll; });
+        let interacted = false;
+        const cancelRestore = () => { interacted = true; };
+        const restore = () => { if (!interacted) scroller.scrollTop = savedScroll; };
+        for (const event of ['pointerdown', 'wheel', 'keydown']) {
+            scroller.addEventListener(event, cancelRestore, { once: true, passive: true });
+        }
+        win.requestAnimationFrame(restore);
+        // Font/header measurements can temporarily clamp the first restoration.
+        // Reapply after layout settles, unless the user has taken control.
+        Promise.resolve(doc.fonts?.ready).then(() => {
+            win.requestAnimationFrame(() => win.requestAnimationFrame(restore));
+        });
         scroller.addEventListener('scroll', saveScroll, { passive: true });
         scroller.addEventListener('click', saveScroll, { capture: true });
         win.addEventListener('pagehide', saveScroll);

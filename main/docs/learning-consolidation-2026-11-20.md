@@ -228,3 +228,28 @@ runner's exact geometry.
 The corrected navigation/reload case passes in all three local engines (3 tests,
 33.1 seconds). JavaScript syntax and whitespace checks pass. Logs are ignored at
 `storage/app/private/ci53-rail-final.log`; no new full-suite pass is claimed.
+
+
+### Sidebar restoration timing repair
+
+Run 44734111071 on 6d4b234 again passed 1398 backend and 1037 cached tests,
+but the stricter sidebar assertion still found a 16-pixel loss (100 other
+Chromium cases passed). The earlier test-only correction was insufficient.
+
+Restoring before font/header layout settles can clamp the saved offset to a
+temporarily smaller scroll range. Navigation now reapplies the original saved
+offset after font readiness and two layout frames. Pointer, wheel or keyboard
+input cancels this late restoration, preserving user control. Existing per-user
+session storage and hidden-mobile-rail protection remain unchanged.
+
+A deterministic frontend regression forces a temporary 730-pixel maximum before
+expanding it to 746; it fails against the original implementation and passes
+with this fix. Three additional cases preserve user input during late layout.
+All 70 frontend tests and the production build pass. No backend, schema, reward
+or provider changes are included.
+
+Final local browser verification: all 9 tagged workspace cases pass across
+Chromium, Firefox and WebKit (54.9 seconds), including sidebar navigation/reload,
+profile previews and companion opt-in. Ignored evidence: `ci53-layout-frontend.log`,
+`ci53-layout-build.log` and `ci53-layout-browser.log` under `storage/app/private`.
+The full CI pipeline must validate the new application source.
