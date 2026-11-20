@@ -42,6 +42,10 @@ class AccountGovernanceController extends Controller
         }
         $expanded = ($filters['scope'] ?? 'recent') === 'all' || ($filters['q'] ?? '') !== ''
             || ($filters['role'] ?? '') !== '' || ($filters['status'] ?? '') !== '';
+        if ($expanded) {
+            $filters['scope'] = 'all';
+            $request->session()->put('account_governance_filters', $filters);
+        }
         $query->orderByDesc('created_at')->orderByDesc('id');
         if ($expanded) {
             $accounts = $query->paginate((int) ($filters['per_page'] ?? 10))->appends($filters);

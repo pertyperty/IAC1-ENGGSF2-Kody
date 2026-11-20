@@ -117,7 +117,7 @@ export function mountGarden(root) {
         if (instance.mode === 'loop') {
             const rule = document.createElement('div');
             rule.className = 'trace-rule';
-            rule.textContent = root.querySelector('[data-game-repeat]')?.checked ? 'REPEAT 2 TIMES:' : 'Repeat is off.';
+            rule.textContent = root.querySelector('[data-game-repeat]')?.checked ? 'repeat 2 times:' : 'Repeat is off.';
             programTrack.append(rule);
         }
         if (program.length === 0) {
@@ -129,7 +129,7 @@ export function mountGarden(root) {
             const number = document.createElement('small'); number.textContent = index + 1;
             const instruction = document.createElement('code');
             instruction.textContent = readableInstruction('command-garden', command);
-            if (instance.mode === 'conditional' && root.querySelector('[data-game-conditional]')?.checked) instruction.textContent += '; IF crystal here: COLLECT';
+            if (instance.mode === 'conditional' && root.querySelector('[data-game-conditional]')?.checked) instruction.textContent += '\nif kody.on_crystal():\n    kody.collect()';
             step.dataset.instructionIndex = String(index);
             step.append(number, instruction);
             step.setAttribute('aria-label', `Step ${index + 1}: ${command}`);

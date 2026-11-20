@@ -1,5 +1,12 @@
 # Kody Engineering Agent Guidelines
 
+The [20 November learning consolidation](docs/learning-consolidation-2026-11-20.md)
+adds viewport-fitted game panes, named pseudocode calls, verified learner track
+preferences, owned notification/list filters, linked creator attribution, private
+badge-review requests and preset usage browsing. Preserve replay validation,
+private proof, current-session locks, immutable versions and mobile rail hiding.
+No provider activation is authorized.
+
 The [main integration/CI repair](docs/main-integration-ci-2026-11-19.md) verifies
 commit ancestry on fetched main before claiming a stacked PR is integrated.
 A merged child on a feature branch can remain absent from main. Browser fixture

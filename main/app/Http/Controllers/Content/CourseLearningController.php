@@ -24,10 +24,12 @@ class CourseLearningController extends Controller
 {
     public function catalog(Request $request): Response
     {
-        $query = $request->validate(['q' => ['nullable', 'string', 'max:80']])['q'] ?? '';
+        $filters = $request->validate(['q' => ['nullable', 'string', 'max:80', 'not_regex:/\x00/'], 'difficulty' => ['nullable', 'in:Beginner,Intermediate,Advanced']]);
+        $query = $filters['q'] ?? '';
         $courses = CourseRevision::select(['id', 'course_id', 'title', 'description', 'category', 'difficulty', 'estimated_duration', 'price_kb', 'minimum_xp'])
             ->with(['course.creator:id,username,account_role,account_status,email_verified_at', 'course.creator.creatorVerification'])->where('review_status', 'Approved')->whereHas('course', fn ($builder) => $builder->where('status', 'Published')->whereNull('staff_withdrawn_at')->whereColumn('published_revision_id', 'course_revisions.id'))
             ->when(trim($query) !== '', fn ($builder) => $builder->where(fn ($search) => $search->where('title', 'ilike', '%'.addcslashes(trim($query), '%_\\').'%')->orWhere('description', 'ilike', '%'.addcslashes(trim($query), '%_\\').'%')->orWhere('category', 'ilike', '%'.addcslashes(trim($query), '%_\\').'%')))
+            ->when($filters['difficulty'] ?? null, fn ($builder, $difficulty) => $builder->where('difficulty', $difficulty))
             ->orderByDesc('id')->paginate(12)->withQueryString();
 
         $participant = app(LearningHistory::class)->participant($request);
@@ -35,20 +37,23 @@ class CourseLearningController extends Controller
         $saved = $participant === null ? collect() : app(CourseLearning::class)->summaries($participant, $enrollments);
         $courseProgress = $enrollments->mapWithKeys(fn ($enrollment) => [$enrollment->course_id => $saved->get($enrollment->id) + ['edition' => $enrollment->course_revision_id]]);
 
-        return response()->view('learning.courses', compact('courses', 'query', 'courseProgress', 'participant'))->header('Cache-Control', 'no-store, private');
+        return response()->view('learning.courses', compact('courses', 'query', 'courseProgress', 'participant', 'filters'))->header('Cache-Control', 'no-store, private');
     }
 
     public function mine(Request $request): Response
     {
         Gate::authorize('viewLearning', LearningCourse::class);
-        $enrollments = CourseEnrollment::where('user_id', $request->user()->id)->with('course', 'revision')->orderByDesc('enrolled_at')->orderByDesc('id')->paginate(15);
+        $filters = $request->validate(['q' => ['nullable', 'string', 'max:80', 'not_regex:/\x00/']]);
+        $enrollments = CourseEnrollment::where('user_id', $request->user()->id)
+            ->when($filters['q'] ?? null, fn ($query, $search) => $query->whereHas('revision', fn ($revision) => $revision->where('title', 'ilike', '%'.addcslashes($search, '%_\\').'%')))
+            ->with('course', 'revision')->orderByDesc('enrolled_at')->orderByDesc('id')->paginate(15)->withQueryString();
         $history = app(LearningHistory::class);
         $participant = $history->participant($request);
         $courseProgress = app(CourseLearning::class)->summaries($participant, $enrollments->getCollection());
         $recentModules = $history->recentModules($participant);
         $moduleProgress = $history->modules($participant, $recentModules->pluck('publishedRevision')->filter());
 
-        return response()->view('learning.my-courses', compact('enrollments', 'courseProgress', 'recentModules', 'moduleProgress'))->header('Cache-Control', 'no-store, private');
+        return response()->view('learning.my-courses', compact('enrollments', 'courseProgress', 'recentModules', 'moduleProgress', 'filters'))->header('Cache-Control', 'no-store, private');
     }
 
     public function show(Request $request, LearningCourse $course, CourseLearning $learning, ContentFeedback $feedback): Response

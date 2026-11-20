@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Enums\Role;
 use App\Http\Requests\Learning\CompleteTowerRequest;
 use App\Models\TowerLevel;
+use App\Models\User;
+use App\Services\Account\CurrentAccountSession;
 use App\Services\Gamification\TowerProgression;
 use App\Services\Gamification\TowerTracks;
 use Illuminate\Http\JsonResponse;
@@ -22,7 +24,7 @@ class TowerController extends Controller
         }
 
         $choice = $request->query('track');
-        $track = is_string($choice) && array_key_exists($choice, app(TowerTracks::class)->all()) ? $choice : $request->session()->get('tower.track', 'beginner');
+        $track = is_string($choice) && array_key_exists($choice, app(TowerTracks::class)->all()) ? $choice : $request->session()->get('tower.track', $request->user()?->coding_proficiency ?? 'beginner');
         if ($request->user()) {
             $request->session()->put('tower.track', $track);
         } else {
@@ -36,6 +38,21 @@ class TowerController extends Controller
         }
 
         return response()->view('tower.'.$view, ['tower' => $tower->snapshot($request->user()?->id, $track)])->header('Cache-Control', 'no-store, private');
+    }
+
+    public function proficiency(Request $request, TowerProgression $tower): RedirectResponse
+    {
+        $data = $request->validate(['proficiency' => ['required', 'in:beginner,intermediate,expert']]);
+        DB::transaction(function () use ($request, $data): void {
+            $user = User::whereKey($request->user()->id)->lockForUpdate()->firstOrFail();
+            app(CurrentAccountSession::class)->assert($user, $request->session()->getId());
+            abort_unless($user->account_role === Role::Learner, 403);
+            $user->forceFill(['coding_proficiency' => $data['proficiency']])->save();
+        });
+        $request->session()->put('tower.track', $data['proficiency']);
+        $next = $tower->continuation($request->user()->id, $data['proficiency'])['next'];
+
+        return $next ? redirect($next['url']) : redirect()->route('home', ['track' => $data['proficiency']]);
     }
 
     public function show(Request $request, TowerLevel $level, TowerProgression $tower): Response|RedirectResponse

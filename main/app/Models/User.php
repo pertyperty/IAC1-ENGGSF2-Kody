@@ -13,7 +13,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 #[Fillable(['name', 'email', 'password', 'username', 'first_name', 'last_name'])]
-#[Hidden(['password', 'remember_token', 'active_session_hash', 'active_session_expires_at', 'failed_login_attempts', 'login_locked_until', 'moderator_prior_role', 'profile_picture', 'terms_version', 'terms_accepted_at'])]
+#[Hidden(['password', 'remember_token', 'active_session_hash', 'active_session_expires_at', 'failed_login_attempts', 'login_locked_until', 'moderator_prior_role', 'profile_picture', 'terms_version', 'terms_accepted_at', 'coding_proficiency'])]
 class User extends Authenticatable
 {
     public function creatorVerification(): HasOne

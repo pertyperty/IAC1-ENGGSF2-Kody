@@ -2,13 +2,13 @@
 export function readableInstruction(template, command) {
     const [operation, ...args] = command.split(' ');
     const rest = args.join(' ');
-    if (template === 'command-garden') return `MOVE ${command.toUpperCase()}`;
+    if (template === 'command-garden') return `kody.move_${command}()`;
     if (template === 'number-machine') return `value = value ${{ add: '+', subtract: '−', multiply: '×' }[operation] ?? '?'} ${rest}`;
-    if (template === 'pixel-studio') return `canvas[column ${args[0]}, row ${args[1]}] = ${args[2]}`;
-    if (template === 'sort-lab') return `SWAP items[position ${args[0]}], items[position ${args[1]}]`;
-    if (template === 'logic-switchboard') return `input[${rest}] = NOT input[${rest}]`;
+    if (template === 'pixel-studio') return `canvas.paint(${args[0]}, ${args[1]}, ${JSON.stringify(args[2])})`;
+    if (template === 'sort-lab') return `swap(items, ${args[0]}, ${args[1]})`;
+    if (template === 'logic-switchboard') return `inputs[${rest}] = not inputs[${rest}]`;
     if (template === 'string-forge') return operation === 'append' ? `text = text + ${JSON.stringify(rest)}` : `text = ${operation}(text)`;
-    if (template === 'memory-trail') return { push: `PUSH ${rest} ONTO stack`, pop: 'POP stack', duplicate: 'DUPLICATE TOP OF stack', swap: 'SWAP TOP TWO IN stack' }[operation] ?? command;
+    if (template === 'memory-trail') return { push: `stack.push(${rest})`, pop: 'stack.pop()', duplicate: 'stack.duplicate_top()', swap: 'stack.swap_top()' }[operation] ?? command;
     return command; // Terminal commands retain their real, limited simulator syntax.
 }
 

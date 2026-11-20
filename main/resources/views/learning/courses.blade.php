@@ -17,11 +17,11 @@
     </form>
     <div class="module-grid">
         @forelse($courses as $revision)
-            <a class="module-card mint" href="{{ route(auth()->user()?->can('viewAny', \App\Models\LearningCourse::class) ? 'course-reviews.show' : 'course-learning.show', $revision->course_id) }}">
+            <article class="module-card mint">
                 <div class="module-art" aria-hidden="true"><span class="module-symbol"><x-action-icon name="journey"/></span></div>
                 <div class="module-copy">
                     <div class="module-meta"><span>{{ $revision->category }}</span><span>{{ $revision->difficulty }} · {{ $revision->estimated_duration }} hours</span></div>
-                    <h2>{{ $revision->title }}</h2><x-creator-byline :creator="$revision->course->creator" :linked="false"/>
+                    <h2><a href="{{ route(auth()->user()?->can('viewAny', \App\Models\LearningCourse::class) ? 'course-reviews.show' : 'course-learning.show', $revision->course_id) }}">{{ $revision->title }}</a></h2><x-creator-byline :creator="$revision->course->creator"/>
                     @if($participant)
                         @if($courseProgress->has($revision->course_id))
                             @include('learning.saved-progress', ['saved' => $courseProgress->get($revision->course_id)])
@@ -37,16 +37,16 @@
                         @if($revision->minimum_xp > 0) · {{ $revision->minimum_xp }} XP to unlock @endif
                     </p>
                     <p>{{ \Illuminate\Support\Str::limit($revision->description, 180) }}</p>
-                    <span class="module-link">
+                    <a class="module-link" href="{{ route(auth()->user()?->can('viewAny', \App\Models\LearningCourse::class) ? 'course-reviews.show' : 'course-learning.show', $revision->course_id) }}">
                         @can('viewAny', \App\Models\LearningCourse::class)
                             Review this course
                         @else
                             @auth View course @else Sign in to explore @endauth
                         @endcan
 
-                    </span>
+                    </a>
                 </div>
-            </a>
+            </article>
         @empty
             <x-empty-state title="No courses found" description="Try another search or browse individual lessons." :action-url="route('learning.catalog')" action-label="Browse lessons" />
         @endforelse

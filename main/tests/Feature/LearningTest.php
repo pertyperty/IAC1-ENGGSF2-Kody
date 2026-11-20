@@ -9,7 +9,7 @@ use Illuminate\Support\Str;
 uses(RefreshDatabase::class);
 
 test('game-first amendment offers a public playable trial and separate learning tab', function () {
-    $this->get(route('welcome'))->assertOk()->assertSee('data-coding-game', false)->assertSee('Run program')->assertSee('Logic Garden')
+    $this->get(route('welcome'))->assertOk()->assertSee('data-coding-game', false)->assertSee('Run')->assertSee('Logic Garden')
         ->assertSee(route('learning.catalog'))->assertSee(route('login'))->assertSee('Save your progress with an account');
     $this->assertDatabaseCount('users', 0);
 });

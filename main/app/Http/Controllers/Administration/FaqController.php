@@ -8,18 +8,20 @@ use App\Http\Requests\Administration\SaveFaqRequest;
 use App\Models\FaqEntry;
 use App\Services\Administration\FaqManagement;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 
 class FaqController extends Controller
 {
-    public function index(): Response
+    public function index(Request $request): Response
     {
         Gate::authorize('viewAny', FaqEntry::class);
-        $entries = FaqEntry::where('status', 'Active')->orderByDesc('id')->paginate(20);
+        $filters = $request->validate(['q' => ['nullable', 'string', 'max:80', 'not_regex:/\x00/']]);
+        $entries = FaqEntry::where('status', 'Active')->when($filters['q'] ?? null, fn ($query, $search) => $query->where('question', 'ilike', '%'.addcslashes($search, '%_\\').'%'))->orderByDesc('id')->paginate(20)->withQueryString();
 
-        return response()->view('help.manage-index', compact('entries'))->header('Cache-Control', 'no-store, private');
+        return response()->view('help.manage-index', compact('entries', 'filters'))->header('Cache-Control', 'no-store, private');
     }
 
     public function create(): Response

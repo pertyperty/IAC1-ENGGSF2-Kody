@@ -1,5 +1,10 @@
 # Kody implementation map
 
+The [20 November learning consolidation](learning-consolidation-2026-11-20.md)
+records the game startup fix, viewport workspaces, persisted Tower preference,
+private qualifications requests, author links, preset usage and routed filter audit.
+Final candidate checks are tracked there; provider activation stays paused.
+
 Start here for current scope, detailed evidence and the next useful improvements.
 This index consolidates the feature summaries previously repeated in README.
 It does not replace approved requirements, decisions or the implementation records.

@@ -1,5 +1,10 @@
 # Release evidence index
 
+The [20 November learning consolidation](learning-consolidation-2026-11-20.md)
+records the game startup fix, viewport workspaces, persisted Tower preference,
+private qualifications requests, author links, preset usage and routed filter audit.
+Final candidate checks are tracked there; provider activation stays paused.
+
 The [19 November game workspace follow-up](game-workspace-rework-2026-11-19.md)
 records same-tab legal navigation, a single bounded pseudocode editor, clearer
 preview/run state and shared mobile game refinements. These are local interface

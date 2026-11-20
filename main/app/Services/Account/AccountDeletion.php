@@ -65,7 +65,7 @@ class AccountDeletion
                 app(CurrentAccountSession::class)->assert($user, $sessionId);
                 app(AccountSecurity::class)->revoke($user);
                 $this->removePrivateData($user);
-                $user->forceFill(['profile_picture' => null, 'name' => 'Deleted account', 'username' => null, 'first_name' => null, 'last_name' => null,
+                $user->forceFill(['profile_picture' => null, 'name' => 'Deleted account', 'username' => null, 'coding_proficiency' => null, 'first_name' => null, 'last_name' => null,
                     'email' => Str::uuid().'@deleted.invalid', 'password' => Str::random(64), 'remember_token' => null,
                     'email_verified_at' => null, 'account_status' => AccountStatus::Deleted, 'account_role' => Role::Learner,
                     'last_login_at' => null, 'login_locked_until' => null, 'failed_login_attempts' => 0,
@@ -97,6 +97,7 @@ class AccountDeletion
     private function removePrivateData(User $user): void
     {
         // Delete badge proof references before removing their private applications.
+        DB::table('creator_badge_requests')->where('user_id', $user->id)->delete();
         DB::table('creator_verifications')->where('user_id', $user->id)->delete();
         DB::table('creator_profiles')->where('user_id', $user->id)->delete();
         DB::table('tower_review_items')->where('user_id', $user->id)->delete();

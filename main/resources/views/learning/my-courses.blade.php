@@ -1,8 +1,8 @@
 @extends('layouts.learning')
 @section('title', 'Your journeys — Kody')
 @section('content')
-<section class="review-page page-width journey-library"><div class="section-heading"><div><p class="overline">YOUR SAVED LEARNING</p><h1>Keep your curiosity going.</h1><p>Your lessons, progress and next steps in one place.</p></div><a class="button button-play" href="{{ route('course-learning.catalog') }}">Find a new journey</a></div>
-<h2>My courses</h2><div class="journey-cards">
+<section class="review-page page-width journey-library"><div class="section-heading"><div><p class="overline">YOUR SAVED LEARNING</p><h1>My learning</h1><p>Your lessons, progress and next steps in one place.</p></div><a class="button button-play" href="{{ route('course-learning.catalog') }}">Browse courses</a></div>
+<h2>My courses</h2><x-list-filters :filters="$filters" search-label="Search joined courses"/><div class="journey-cards">
 @forelse($enrollments as $enrollment)
     @php($saved = $courseProgress->get($enrollment->id))
     <article class="journey-card">
@@ -12,7 +12,7 @@
     <dl class="journey-dates"><div><dt>Joined</dt><dd>{{ $enrollment->enrolled_at->timezone('Asia/Manila')->format('M j, Y') }}</dd></div><div><dt>Last activity</dt><dd>{{ $saved['last_activity'] ? \Carbon\CarbonImmutable::parse($saved['last_activity'])->timezone('Asia/Manila')->format('M j, Y · g:i A') : 'No lessons opened yet' }}</dd></div></dl>
     @if(!$enrollment->course->isWithdrawn())<div class="journey-card-actions">@if($saved['next'])<a class="button button-play button-small" href="{{ $saved['next']['url'] }}">Continue lesson</a>@endif<a class="button button-secondary button-small" href="{{ route('course-learning.show', $enrollment->course_id) }}">{{ $saved['accessible'] ? 'View course' : 'Review access' }}</a></div>@endif
     </article>
-@empty<x-empty-state title="No journeys yet" description="Choose a course and take your first step." :action-url="route('course-learning.catalog')" action-label="Browse courses" />@endforelse
+@empty<x-empty-state title="No matching courses" description="Browse courses or clear your search." :action-url="route('course-learning.catalog')" action-label="Browse courses" />@endforelse
 </div>{{ $enrollments->links() }}
 <h2>Recent modules</h2><p class="field-hint">Includes lessons opened inside your courses. Reading counts toward course completion; assessment wins qualify play progress.</p><div class="journey-cards">
 @forelse($recentModules as $module)

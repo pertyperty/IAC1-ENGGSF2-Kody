@@ -24,7 +24,7 @@ test('all seven arcade state displays and readable programs describe their bound
         assert.ok(stateText(game, initial).length);
     }
     assert.match(readableInstruction('string-forge', 'append Code'), /"Code"/);
-    assert.match(readableInstruction('sort-lab', 'swap 1 2'), /position 1.*position 2/);
+    assert.match(readableInstruction('sort-lab', 'swap 1 2'), /swap\(items, 1, 2\)/);
 });
 test('Garden trace distinguishes loop iterations and conditional checks without altering wins', () => {
     const loop = runProgram(instances.loops, ['right', 'up', 'right'], { repeat: true });
@@ -33,4 +33,10 @@ test('Garden trace distinguishes loop iterations and conditional checks without 
     assert.equal(conditional.trace[0].crystalHere, true);
     assert.equal(conditional.trace[1].crystalHere, false);
     assert.equal(conditional.success, true);
+});
+
+test('Garden and stack pseudocode uses explicit calls', () => {
+    assert.equal(readableInstruction('command-garden', 'right'), 'kody.move_right()');
+    assert.equal(readableInstruction('memory-trail', 'pop'), 'stack.pop()');
+    assert.equal(readableInstruction('pixel-studio', 'paint 1 2 mint'), 'canvas.paint(1, 2, "mint")');
 });

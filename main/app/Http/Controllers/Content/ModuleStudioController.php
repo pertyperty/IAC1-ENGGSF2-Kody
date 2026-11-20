@@ -20,9 +20,12 @@ class ModuleStudioController extends Controller
     public function index(Request $request): Response
     {
         Gate::authorize('create', LearningModule::class);
-        $modules = LearningModule::where('created_by', $request->user()->id)->with('latestRevision')->orderByDesc('id')->paginate(15);
+        $filters = $request->validate(['q' => ['nullable', 'string', 'max:80', 'not_regex:/\x00/'], 'status' => ['nullable', 'in:Draft,Published,Archived,Deleted']]);
+        $modules = LearningModule::where('created_by', $request->user()->id)->when($filters['q'] ?? null, fn ($query, $search) => $query->whereHas('latestRevision', fn ($revision) => $revision->where('title', 'ilike', '%'.addcslashes($search, '%_\\').'%')))
+            ->when($filters['status'] ?? null, fn ($query, $status) => $query->where('status', $status))
+            ->with('latestRevision')->orderByDesc('id')->paginate(15)->withQueryString();
 
-        return response()->view('content.studio', compact('modules'))->header('Cache-Control', 'no-store, private');
+        return response()->view('content.studio', compact('modules', 'filters'))->header('Cache-Control', 'no-store, private');
     }
 
     public function create(Request $request, CreatorExamples $examples): Response

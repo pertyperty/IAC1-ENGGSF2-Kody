@@ -24,7 +24,7 @@ class CreatorBadges
 
     public function decide(User $actor, string $sessionId, User $target, #[\SensitiveParameter] array $data): void
     {
-        if (! in_array($data['decision'] ?? null, ['grant', 'revoke'], true)
+        if (! in_array($data['decision'] ?? null, ['grant', 'revoke', 'decline'], true)
             || ! in_array($data['confirmed'] ?? null, [true, 1, '1', 'yes', 'on', 'true'], true)
             || ! is_string($data['reason'] ?? null) || mb_strlen(trim($data['reason'])) < 5 || mb_strlen($data['reason']) > 500) {
             throw ValidationException::withMessages(['decision' => 'Confirm your decision and provide a review reason.']);
@@ -41,6 +41,16 @@ class CreatorBadges
             $existing = DB::table('creator_verifications')->where('user_id', $creator->id)->first();
             if (($existing?->record_version ?? 0) !== (int) $data['record_version']) {
                 throw ValidationException::withMessages(['record_version' => 'The badge changed. Reload before reviewing.']);
+            }
+            if ($data['decision'] === 'decline') {
+                $pending = DB::table('creator_badge_requests')->where('user_id', $creator->id)->where('role', $creator->account_role->value)->whereNull('resolved_at')->first();
+                if ($pending === null || ($data['requested_at'] ?? null) !== $pending->requested_at) {
+                    throw ValidationException::withMessages(['decision' => 'The request changed. Reload before reviewing.']);
+                }
+                DB::table('creator_badge_requests')->where('user_id', $creator->id)->update(['resolved_at' => now()]);
+                app(AuditRecorder::class)->record($reviewer->id, $creator->id, 'creator_badge.declined', 'user', (string) $creator->id, ['reason' => $data['reason']]);
+
+                return;
             }
             $active = $data['decision'] === 'grant';
             $proof = $this->proof($creator);
@@ -63,6 +73,7 @@ class CreatorBadges
             DB::table('creator_verifications')->updateOrInsert(['user_id' => $creator->id], $fields + [
                 'active' => $active, 'reviewed_by' => $reviewer->id, 'reviewed_at' => now(), 'record_version' => ($existing?->record_version ?? 0) + 1,
             ]);
+            DB::table('creator_badge_requests')->where('user_id', $creator->id)->where('role', $creator->account_role->value)->whereNull('resolved_at')->update(['resolved_at' => now()]);
             app(AuditRecorder::class)->record($reviewer->id, $creator->id, $active ? 'creator_badge.granted' : 'creator_badge.revoked',
                 'user', (string) $creator->id, ['reason' => $data['reason'], 'role' => $creator->account_role->value,
                     'version' => ($existing?->record_version ?? 0) + 1, 'application_id' => $active ? $proof->id : null]);

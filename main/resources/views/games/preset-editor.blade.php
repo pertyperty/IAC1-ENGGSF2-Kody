@@ -5,7 +5,7 @@
     @vite('resources/js/authoring.js')
 @endPushOnce
 <section class="review-page page-width"><a class="quiet-link" href="{{ route('game-presets.index') }}"><x-action-icon name="left"/> Game presets</a><h1>{{ $preset ? 'Edit game preset' : 'Create game preset' }}</h1>
-<p>Save a reusable activity for lesson creators. Choose its type, set a goal, then try it.</p>
+<p>Edit the defaults used by new lesson drafts. Existing lessons keep their saved version.</p>
 
 @include('layouts.form-errors')
 @if($preset)<p class="step-pill">{{ $preset->status }} · {{ $uses }} saved lesson revisions using this preset</p>@endif
@@ -33,6 +33,7 @@
 @if($preset?->status === 'Active')<h2>Retire this preset</h2><p>Retiring removes it from new lesson drafts. Existing lessons and results keep their saved version.</p><form class="account-form" method="POST" action="{{ route('game-presets.inactivate', $preset) }}">@csrf<input type="hidden" name="record_version" value="{{ $preset->record_version }}"><label><input type="checkbox" name="confirmed" value="1" required> I want to retire this preset</label><button class="button button-dark">Retire preset</button></form>@endif
 @if($instance)<section class="studio-preview"><h2>Try the saved version</h2><p>Preview wins are local practice.</p>@if($instance['template'] !== 'choice-quiz')@include('learning.activity', ['game' => $instance, 'module' => null, 'completionUrl' => null, 'trial' => false])@else
 @include('learning.quiz', ['quiz' => $instance, 'module' => null, 'completionUrl' => null])@endif</section>@endif
+@if(isset($usage))<section aria-labelledby="preset-usage-heading"><h2 id="preset-usage-heading">Where this preset is used</h2><p>Saved lesson versions retain the preset version they were created with.</p><ul class="preset-browser">@forelse($usage as $entry)<li><div><b>{{ $entry->title }}</b><p>Lesson #{{ $entry->module_id }} | Lesson version {{ $entry->number }} | Preset version {{ $entry->preset_number }} | {{ $entry->review_status }}</p></div></li>@empty<li>No saved lessons use this preset yet.</li>@endforelse</ul>{{ $usage->links() }}</section>@endif
 @if($history)<h2>Version history</h2>@foreach($history as $entry)<p>Version {{ $entry->number }} · {{ $entry->instance['title'] }} · Administrator #{{ $entry->created_by }} · {{ $entry->created_at->setTimezone('Asia/Manila')->format('M j, Y g:i A') }} Asia/Manila</p>@endforeach{{ $history->links() }}@endif
 </section>
 @endsection

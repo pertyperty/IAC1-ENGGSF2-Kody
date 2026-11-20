@@ -71,6 +71,7 @@ Route::get('/creators/{creator}', [CreatorProfileController::class, 'show'])
     ->whereNumber('creator')->middleware(OptionalAccountSession::class)->name('creators.show');
 Route::middleware(['auth', 'account.session'])->group(function (): void {
     Route::get('/account/public-profile', [CreatorProfileController::class, 'edit'])->name('creator-profile.edit');
+    Route::post('/account/public-profile/badge-request', [CreatorProfileController::class, 'requestBadge'])->middleware('throttle:3,60,creator-badge-request:')->name('creator-profile.badge-request');
     Route::put('/account/public-profile', [CreatorProfileController::class, 'update'])->middleware('throttle:10,1,creator-profile:')->name('creator-profile.update');
     Route::get('/manage/creator-badges/{creator}', [CreatorBadgeController::class, 'show'])->whereNumber('creator')->name('creator-badges.show');
     Route::put('/manage/creator-badges/{creator}', [CreatorBadgeController::class, 'update'])->whereNumber('creator')->middleware('throttle:6,1,creator-badge:')->name('creator-badges.update');
@@ -90,6 +91,7 @@ Route::middleware(['auth', 'account.session'])->prefix('manage/site')->name('sit
     Route::get('/', [SiteManagementController::class, 'index'])->name('index');
     Route::put('/announcement', [SiteManagementController::class, 'update'])->middleware('throttle:6,1,site-announcement:')->name('update');
 });
+Route::post('/tower/proficiency', [TowerController::class, 'proficiency'])->middleware(['auth', 'account.session', 'throttle:10,1,tower-proficiency:'])->name('tower.proficiency');
 Route::get('/tower/{level}', [TowerController::class, 'show'])->whereNumber('level')->middleware(OptionalAccountSession::class)->name('tower.show');
 Route::post('/tower/{level}/revisions/{revision}/stages/{stage}', [TowerController::class, 'complete'])
     ->whereNumber(['level', 'revision', 'stage'])->middleware(['auth', 'account.session', 'throttle:30,1,tower:'])->name('tower.complete');

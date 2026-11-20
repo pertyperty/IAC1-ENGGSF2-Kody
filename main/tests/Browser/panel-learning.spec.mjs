@@ -10,7 +10,7 @@ test('Garden teaching is before the board and previews never submit or unlock gu
     const game = page.locator('[data-coding-game]');
     await expect(game.locator('.lesson-briefing .activity-goal')).toContainText('Reach column');
     await game.locator('[data-command=right]').click();
-    await expect(game.locator('.trace-source')).toContainText('MOVE RIGHT');
+    await expect(game.locator('.trace-source')).toContainText('kody.move_right()');
     const submissions = [];
     page.on('request', request => { if (request.method() === 'POST') submissions.push(request.url()); });
     await game.getByText('Step through program', { exact: true }).click();

@@ -33,7 +33,7 @@
                 </div>
             @endif
         </section>
-        <section class="content-panel"><h2>KodeBit history</h2><div class="wallet-history">
+        <section class="content-panel"><h2>KodeBit history</h2><form method="get" action="{{ route('wallet.index') }}" class="catalog-search"><label for="wallet-direction">Transactions</label><select id="wallet-direction" name="direction"><option value="">All transactions</option><option value="credit" @selected(($filters['direction'] ?? '') === 'credit')>KodeBits received</option><option value="debit" @selected(($filters['direction'] ?? '') === 'debit')>KodeBits spent</option></select><div class="filter-actions"><button class="button button-secondary">Apply filter</button>@if(array_filter($filters))<a class="quiet-link" href="{{ route('wallet.index') }}">Clear filter</a>@endif</div></form><div class="wallet-history">
             @forelse($operations as $operation)
                 <article class="wallet-transaction"><strong>{{ $operation->kind }}</strong><b class="{{ $operation->kodebits > 0 ? 'transaction-credit' : 'transaction-debit' }}">{{ $operation->kodebits > 0 ? '+' : '' }}{{ number_format($operation->kodebits) }} KB</b><p>{{ \Carbon\CarbonImmutable::parse($operation->created_at)->setTimezone('Asia/Manila')->format('M j, Y g:i A') }} Asia/Manila</p><p class="transaction-reference">{{ $operation->id }}</p></article>
             @empty<x-empty-state title="Your next lesson starts here" description="Verified purchases, learning access and rewards will appear in this ledger." />@endforelse

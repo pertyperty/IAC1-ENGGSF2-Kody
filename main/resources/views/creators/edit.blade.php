@@ -10,5 +10,12 @@
 <label>Experience and accomplishments<textarea name="accomplishments" maxlength="1000" rows="4">{{ old('accomplishments', $profile?->accomplishments) }}</textarea></label>
 <label class="review-check"><input type="checkbox" name="confirmed" value="1" required> Publish these details on my creator profile.</label>
 <button class="primary-button">Save public profile</button></form>
+@if(in_array(auth()->user()->account_role, [\App\Enums\Role::Instructor, \App\Enums\Role::Contributor], true))
+<section><h2>Qualifications badge</h2>
+@if(auth()->user()->hasCreatorBadge())<p class="notice">Your qualifications badge is active.</p>
+@elseif($badgeRequest)<p class="notice">Review requested. Staff will check your private supporting documents.</p>
+@else<p>Staff can review the credentials in your approved role application. Documents remain private; a badge is issued only after review.</p>
+<form class="account-form" method="post" action="{{ route('creator-profile.badge-request') }}">@csrf<label><input type="checkbox" name="confirmed" value="1" required> Ask staff to review my existing qualifications.</label><button class="primary-button">Request qualifications review</button></form>
+@endif</section>@endif
 <p><a href="{{ route('account.show') }}">Back to account</a></p>
 @endsection

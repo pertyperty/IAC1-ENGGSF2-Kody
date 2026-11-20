@@ -52,11 +52,11 @@ test('constrained practice checks answers without replay and clears them after p
     await expect(game.locator('.activity-goal')).toContainText('at most 4 instructions');
     await game.locator('.program-arrange summary').click();
     await game.getByLabel('Your program', { exact: true }).fill('add 16');
-    await game.getByRole('button', { name: 'Run program', exact: true }).click();
+    await game.getByRole('button', { name: 'Run', exact: true }).click();
     await expect(game.locator('[data-arcade-output]')).toContainText('provided for this task');
     await expect(page.locator('[data-game-result]')).not.toBeVisible();
     await game.getByLabel('Your program', { exact: true }).fill('add 3\nmultiply 2\nsubtract 1\nmultiply 2');
-    await game.getByRole('button', { name: 'Run program', exact: true }).click();
+    await game.getByRole('button', { name: 'Run', exact: true }).click();
     await expect(game.locator('[data-concept-check]')).toBeVisible();
     await expect(game).toHaveAttribute('data-play-state', 'checking');
     await recordPlayback(playback);
@@ -69,9 +69,9 @@ test('constrained practice checks answers without replay and clears them after p
     await game.getByLabel('Your program', { exact: true }).fill('add 3\nmultiply 2\nmultiply 2\nsubtract 1');
     await expect(game.locator('[data-concept-check]')).toBeHidden();
     await expect(game.locator('[data-concept-check] input:checked')).toHaveCount(0);
-    await expect(game.getByRole('button', { name: 'Run program', exact: true })).toBeVisible();
+    await expect(game.getByRole('button', { name: 'Run', exact: true })).toBeVisible();
     await game.getByLabel('Your program', { exact: true }).fill('add 3\nmultiply 2\nsubtract 1\nmultiply 2');
-    await game.getByRole('button', { name: 'Run program', exact: true }).click();
+    await game.getByRole('button', { name: 'Run', exact: true }).click();
     await expect(game.locator('[data-concept-check]')).toBeVisible();
     await recordPlayback(playback);
     await game.getByLabel('21', { exact: true }).check();
@@ -79,7 +79,7 @@ test('constrained practice checks answers without replay and clears them after p
     await expect(page.locator('[data-game-result]')).toBeVisible();
     await expectNoPlayback(playback, 'Running step');
     await page.locator('[data-result-return]').click();
-    await expect(game.getByRole('button', { name: 'Run program', exact: true })).toBeVisible();
+    await expect(game.getByRole('button', { name: 'Run', exact: true })).toBeVisible();
     expect(writes).toEqual([]);
     for (const width of [1440, 320]) {
         await page.setViewportSize({ width, height: 1000 });
@@ -105,7 +105,7 @@ test('guided command references match the instructions accepted by each task', a
         if (template === 'number-machine') await page.screenshot({ path: 'storage/app/browser-results/task-command-reference.png', fullPage: true });
         await game.locator('.program-arrange summary').click();
         await game.getByLabel('Your program', { exact: true }).fill(forbidden);
-        await game.getByRole('button', { name: 'Run program', exact: true }).click();
+        await game.getByRole('button', { name: 'Run', exact: true }).click();
         await expect(game.locator('[data-arcade-output]')).toContainText('provided for this task');
     }
 });
@@ -134,13 +134,13 @@ test('an instructor previews and saves a guided assessment without configuring a
     await expect(garden.locator('[data-game-conditional]').locator('..')).toBeHidden();
     await garden.getByLabel('Repeat my instructions 2 times').check();
     for (const direction of ['right', 'up', 'right']) await garden.getByRole('button', { name: `Add ${direction}`, exact: true }).click();
-    await expect(garden.locator('.trace-rule')).toHaveText('REPEAT 2 TIMES:');
+    await expect(garden.locator('.trace-rule')).toHaveText('repeat 2 times:');
     await garden.getByRole('button', { name: 'Step 2: up', exact: true }).focus();
     await page.keyboard.press('Alt+ArrowRight');
     await expect(garden.getByRole('button', { name: 'Step 3: up', exact: true })).toBeFocused();
     await page.keyboard.press('Alt+ArrowLeft');
     await expect(garden.getByRole('button', { name: 'Step 2: up', exact: true })).toBeFocused();
-    await garden.getByRole('button', { name: 'Run program', exact: true }).click();
+    await garden.getByRole('button', { name: 'Run', exact: true }).click();
     await expect(garden.locator('[data-concept-check]')).toBeVisible();
     const feedback = garden.locator('[data-game-feedback]');
     await recordPlayback(feedback);

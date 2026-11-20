@@ -262,3 +262,81 @@ body:has(.game-card) .kody-companion { display: none; }
 .creator-editor .access-options { margin-block: 1.25rem; }
 .creator-editor .access-options + button { margin-top: 1rem; }
 .review-page:has(.challenge-editor) .editor-jumps a { font-size: .9375rem; }
+
+/* Keep the scene in view while the learner reads and edits on desktop. */
+@media (min-width: 1000px) and (min-height: 650px) {
+    .game-card :is(.garden-workbench, .arcade-workbench) {
+        position: sticky;
+        top: calc(var(--navigation-offset, 100px) + 1rem);
+        height: var(--workspace-height, calc(100dvh - var(--navigation-offset, 100px) - 2rem));
+        min-height: 0;
+        align-items: stretch;
+    }
+    .game-card .game-controls {
+        overflow-y: auto;
+        overscroll-behavior-y: contain;
+        scrollbar-gutter: stable;
+        padding: 0 1rem 1rem 0;
+        min-height: 0;
+    }
+    .game-card :is(.game-world, .arcade-scene) { min-height: 0; overflow-y: auto; }
+    .game-card .game-board { max-height: calc(100dvh - var(--navigation-offset, 100px) - 13rem); width: min(100%, 28rem); margin-inline: auto; }
+}
+.game-controls .lesson-briefing { padding: 0 0 1rem; margin: 0 0 1rem; border: 0; background: transparent; }
+.game-card .trace-source code { color: var(--accent-text); }
+/* The rail scrolls inside its own column and cannot paint over the footer. */
+@media (min-width: 1101px) { .app-rail { display: flex; flex-direction: column; } }
+.app-rail .workspace-nav { min-height: 0; flex: 1; max-height: none; overflow-y: auto; padding-bottom: 1rem; }
+:where(input, textarea)::placeholder { color: var(--muted); opacity: 1; font-style: italic; }
+:where(input, select, textarea):focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+:where(input, select, textarea)[aria-invalid="true"] { border-color: var(--danger, #bd3349); }
+
+.notification-list { list-style: none; padding: 0; margin-block: 1.5rem; }
+.notification-item { display: flex; justify-content: space-between; align-items: start; flex-wrap: wrap; gap: 1rem; padding: 1.5rem 0; border-bottom: 1px solid var(--border); }
+.notification-item h2 { font-size: 1.125rem; margin-block: .5rem; }
+.notification-item time { font-size: .9375rem; color: var(--muted); }
+.notification-item.is-unread { border-left: 3px solid var(--accent); padding-left: 1rem; }
+.notification-page .catalog-search { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; }
+
+.proficiency-choice { position: relative; z-index: 2; background: var(--surface); padding: 1.5rem; }
+.proficiency-choice h2 { font-size: 1.5rem; }
+.proficiency-choice fieldset { border: 0; padding: 0; margin-block: 1rem; }
+.proficiency-choice label { display: flex; align-items: start; gap: .75rem; padding-block: .75rem; cursor: pointer; }
+.proficiency-choice label span span { display: block; color: var(--muted); }
+.proficiency-choice input { margin-top: .5rem; accent-color: var(--accent); }
+
+.preset-browser { list-style: none; padding: 0; }
+.preset-browser li { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; padding-block: 1.25rem; border-bottom: 1px solid var(--border); }
+.preset-browser h2 { margin: 0; font-size: 1.125rem; }
+
+.module-card h2 a { color: var(--text); text-decoration: none; }
+.module-card h2 a:hover { color: var(--accent-text); text-decoration: underline; }
+.module-card .module-link { color: var(--accent-text); text-decoration: underline; text-underline-offset: 3px; }
+
+dialog.proficiency-choice { color: var(--text); border: 1px solid var(--border); border-radius: 12px; width: min(38rem, calc(100% - 2rem)); max-height: calc(100dvh - 2rem); overflow-y: auto; margin: auto; }
+dialog.proficiency-choice::backdrop { background: rgb(10 25 50 / .6); }
+
+@media (min-width: 1000px) and (min-height: 650px) {
+    .game-card .arcade-world { min-height: 0; }
+    .game-card.workspace-fluid :is(.garden-workbench, .arcade-workbench) { height: auto; position: static; grid-template-columns: minmax(0, 1fr); }
+    .game-card.workspace-fluid .game-controls { overflow: visible; padding: 0; }
+}
+/* Focused staff tools use spacing and separators rather than nested panels. */
+.account-shell-wide:has(.governance-filters) { background: transparent; border: 0; border-radius: 0; }
+.account-results { display: block; }
+.account-result { border: 0; border-bottom: 1px solid var(--border); border-radius: 0; margin: 0; padding-block: 1rem; }
+.account-form.governance-filters { background: transparent; border: 0; padding: 1rem 0; }
+.account-form.governance-filters .primary-button { width: auto; }
+.account-shell section[id^="account-"] { margin-block: 2rem; scroll-margin-top: calc(var(--navigation-offset, 100px) + 1rem); }
+.notification-page .catalog-search select { width: auto; min-width: 14rem; }
+.notification-page .catalog-search label { font-size: 1rem; }
+
+.status-pill[data-status="Active"] { color: #17633c; background: #e9f6ef; }
+.status-pill[data-status="Suspended"] { color: #a32d42; background: #fff0f2; }
+.status-pill[data-status="Unverified"] { color: #805417; background: #fff5dc; }
+:root[data-theme="dark"] .status-pill[data-status="Active"] { color: #a2ecc0; background: #173d2c; }
+:root[data-theme="dark"] .status-pill[data-status="Suspended"] { color: #ffb9c5; background: #502535; }
+:root[data-theme="dark"] .status-pill[data-status="Unverified"] { color: #f4d591; background: #44351d; }
+
+.account-form label, .studio-form label, .catalog-search label { font-size: 1rem; }
+.workspace-nav a > .nav-label { font-size: .875rem; }

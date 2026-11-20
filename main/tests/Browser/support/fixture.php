@@ -64,7 +64,7 @@ try {
         $options = ['--force' => true];
         if ($operation === 'migrate-baseline') {
             $options += ['--realpath' => true, '--path' => array_values(array_filter(glob(database_path('migrations/*.php')),
-                fn (string $path) => ! str_ends_with($path, '2026_10_05_000038_add_challenge_discovery_metadata.php') && ! str_contains(basename($path), '2026_10_10_') && ! str_contains(basename($path), '2026_10_11_') && ! str_contains(basename($path), '2026_10_12_') && ! str_contains(basename($path), '2026_10_18_') && ! str_contains(basename($path), '2026_10_25_') && ! str_contains(basename($path), '2026_11_17_') && ! str_contains(basename($path), '2026_11_18_')))];
+                fn (string $path) => ! str_ends_with($path, '2026_10_05_000038_add_challenge_discovery_metadata.php') && ! str_contains(basename($path), '2026_10_10_') && ! str_contains(basename($path), '2026_10_11_') && ! str_contains(basename($path), '2026_10_12_') && ! str_contains(basename($path), '2026_10_18_') && ! str_contains(basename($path), '2026_10_25_') && ! str_contains(basename($path), '2026_11_17_') && ! str_contains(basename($path), '2026_11_18_') && ! str_contains(basename($path), '2026_11_20_')))];
         }
         if (Artisan::call('migrate', $options) !== 0) {
             throw new RuntimeException('Browser migrations failed.');
@@ -80,7 +80,7 @@ try {
             (new TowerLevelSeeder)->run();
         }
         $accounts = [];
-        foreach (['discoveryinstructor' => Role::Instructor, 'discoverymoderator' => Role::Moderator, 'discoverylearner' => Role::Learner, 'credinstructor' => Role::Instructor, 'credmoderator' => Role::Moderator, 'reviewlearner' => Role::Learner,
+        foreach (['newlearner_chromium' => Role::Learner, 'newlearner_firefox' => Role::Learner, 'newlearner_webkit' => Role::Learner, 'discoveryinstructor' => Role::Instructor, 'discoverymoderator' => Role::Moderator, 'discoverylearner' => Role::Learner, 'credinstructor' => Role::Instructor, 'credmoderator' => Role::Moderator, 'reviewlearner' => Role::Learner,
             'instructor' => Role::Instructor, 'moderator' => Role::Moderator, 'administrator' => Role::Administrator, 'learner' => Role::Learner, 'arcadelearner' => Role::Learner, 'tracklearner' => Role::Learner, 'expertlearner' => Role::Learner, 'experteditor' => Role::Administrator,
             'navlearner' => Role::Learner, 'navcontributor' => Role::Contributor, 'navinstructor' => Role::Instructor,
             'navmoderator' => Role::Moderator, 'navadministrator' => Role::Administrator, 'interactive' => Role::Learner,
@@ -92,6 +92,7 @@ try {
             'insightcreator' => Role::Instructor, 'insightreader' => Role::Learner, 'siteadmin' => Role::Administrator, 'appeallearner' => Role::Learner] as $name => $role) {
             $accounts[$name] = User::factory()->create(['username' => 'browser_'.$name, 'email' => $name.'@browser.example.test',
                 'password' => Hash::make('BrowserStrong12!'), 'account_role' => $role,
+                ...(Schema::hasColumn('users', 'coding_proficiency') ? ['coding_proficiency' => str_starts_with($name, 'newlearner') ? null : 'beginner'] : []),
                 'active_session_hash' => hash('sha256', 'browser-seed-session'), 'active_session_expires_at' => now()->addHour()]);
         }
         $manifest = ['courses' => [], 'modules' => []];
@@ -222,7 +223,7 @@ try {
             $row = 'to_jsonb(t)';
             if ($operation === 'fingerprint-legacy') {
                 $row .= match ($table->tablename) {
-                    'users' => " - 'profile_picture' - 'terms_version' - 'terms_accepted_at'", 'module_revisions' => " - 'attachments'", 'coding_challenge_revisions' => " - 'category' - 'tags'",
+                    'users' => " - 'profile_picture' - 'terms_version' - 'terms_accepted_at' - 'coding_proficiency'", 'module_revisions' => " - 'attachments'", 'coding_challenge_revisions' => " - 'category' - 'tags'",
                     'email_verifications' => " - 'otp_hash' - 'otp_expires_at' - 'otp_attempts'", 'verification_deliveries' => " - 'otp'", default => '',
                 };
             }

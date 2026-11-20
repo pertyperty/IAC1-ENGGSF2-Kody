@@ -1,9 +1,12 @@
 @extends('layouts.account')
 @section('title', 'Account governance — Kody')
+@section('shell-class', 'account-shell-wide')
 @section('content')
+<nav class="studio-wayfinding" aria-label="Account tools"><a href="#account-access">Account access</a><a href="#account-roles">Roles</a><a href="#account-profile">Profile support</a><a href="#account-history">History</a></nav>
 <h1>{{ $account->username ?? 'Account #'.$account->id }}</h1><p>{{ $account->account_role->name }} · {{ $account->account_status->value }}</p>
 
 @if($errors->any())<div class="form-errors" role="alert">@foreach($errors->all() as $error)<p>{{ $error }}</p>@endforeach</div>@endif
+<section id="account-access"><h2>Account access</h2>
 @can('manage', $account)
 @if(in_array($account->account_status, [\App\Enums\AccountStatus::Active, \App\Enums\AccountStatus::Suspended], true))
 <form class="account-form" method="POST" action="{{ route('account-governance.enforce', $account) }}">@csrf
@@ -14,6 +17,7 @@
 <button class="primary-button">{{ $account->account_status === \App\Enums\AccountStatus::Active ? 'Confirm suspension' : 'Confirm reinstatement' }}</button></form>
 @endif
 @endcan
+</section><section id="account-roles">
 @can('changeModeratorRole', $account)
 <h2>{{ $account->account_role === \App\Enums\Role::Moderator ? 'Remove Moderator appointment' : 'Appoint a Moderator' }}</h2>
 <form class="account-form" method="POST" action="{{ route('account-governance.moderator', $account) }}">@csrf
@@ -24,8 +28,9 @@
 <label>Your current Administrator password<input type="password" name="current_password" maxlength="1024" autocomplete="current-password" required></label>
 <label><input type="checkbox" name="confirmed" value="1" required> I confirm this Moderator role action.</label><button class="primary-button">Confirm role action</button></form>
 @endcan
-<h2>Moderator appointment history</h2>@forelse($roleHistory as $change)<p>{{ $change->action }} · {{ $change->previous_role }} {{ $change->resulting_role }} · Staff account #{{ $change->actor_id }} · {{ \Carbon\CarbonImmutable::parse($change->created_at)->setTimezone('Asia/Manila')->format('M j, Y g:i A') }} Asia/Manila</p>@empty<p>No recorded Moderator appointments.</p>@endforelse
+</section><section id="account-history"><h2>Moderator appointment history</h2>@forelse($roleHistory as $change)<p>{{ $change->action }} · {{ $change->previous_role }} {{ $change->resulting_role }} · Staff account #{{ $change->actor_id }} · {{ \Carbon\CarbonImmutable::parse($change->created_at)->setTimezone('Asia/Manila')->format('M j, Y g:i A') }} Asia/Manila</p>@empty<p>No recorded Moderator appointments.</p>@endforelse
 {{ $roleHistory->links() }}
+</section><section id="account-profile">
 @can('correctProfile', $account)
 <h2>Help with profile details</h2>
 <form class="account-form" method="POST" action="{{ route('account-governance.profile', $account) }}">@csrf @method('PATCH')
@@ -39,9 +44,10 @@
 <label><input type="checkbox" name="confirmed" value="1" required> I confirm this profile correction.</label>
 <button class="primary-button">Save support correction</button></form>
 @endcan
-<h2>Support correction history</h2>@forelse($supportHistory as $correction)<p>Profile correction · Staff account #{{ $correction->actor_id }} · {{ \Carbon\CarbonImmutable::parse($correction->created_at)->setTimezone('Asia/Manila')->format('M j, Y g:i A') }} Asia/Manila</p>@empty<p>No recorded support corrections.</p>@endforelse
+</section><section><h2>Support correction history</h2>@forelse($supportHistory as $correction)<p>Profile correction · Staff account #{{ $correction->actor_id }} · {{ \Carbon\CarbonImmutable::parse($correction->created_at)->setTimezone('Asia/Manila')->format('M j, Y g:i A') }} Asia/Manila</p>@empty<p>No recorded support corrections.</p>@endforelse
 {{ $supportHistory->links() }}
 <h2>Enforcement history</h2>@forelse($history as $event)<p>{{ $event->action }} · Staff account #{{ $event->actor_id }} · {{ \Carbon\CarbonImmutable::parse($event->created_at)->setTimezone('Asia/Manila')->format('M j, Y g:i A') }} Asia/Manila</p>@empty<p>No recorded enforcement actions.</p>@endforelse
 {{ $history->links() }}<p class="secondary-link"><a href="{{ route('account-governance.index') }}">Back to accounts</a></p>
 @can('verifyCreator', $account)<p><a href="{{ route('creator-badges.show', $account) }}">Review qualifications badge</a></p>@endcan
+</section>
 @endsection
