@@ -190,3 +190,20 @@ include `help-edit-preview.png`, `profile-live-preview.png` and
 `library-bookmarks.png`. GitHub Actions must validate the pushed PR head before
 review readiness. Human teaching quality, real-device performance, staged
 operations and live providers remain separate release evidence.
+
+
+### PR 53 CI repair
+
+CI run 44695189708 on b028692 stopped at the backend suite: 1396 passed,
+two failed. The Progress label changed to Streak, leaving an obsolete assertion;
+the redesign also dropped the current weekly challenge link while still loading
+its authorized summary. Restore that link inside the collapsed Challenge results
+section. Verify the current streak data and labels, and assert that archived
+weekly events have no dashboard link. Judge0 remains disabled; preview navigation
+must not consume an attempt or call a provider.
+
+Local verification: production asset build and Pint pass; all 43 progression,
+weekly-event and dashboard tests pass (311 assertions) on disposable PostgreSQL
+port 51629. No schema, reward, admission or integration changes. The full CI
+pipeline must rerun on the correction; later browser/restore stages were skipped
+in the failed run and have no new CI result yet.

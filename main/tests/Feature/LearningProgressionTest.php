@@ -36,7 +36,8 @@ test('approved ladder clears each game in order and saves real hub state', funct
     $this->get(route('learning.show', 'loops'))->assertOk();
     $this->postJson(route('play.game', 'loops'), ['program' => ['right', 'up', 'right'], 'repeat' => true])->assertOk();
     $this->postJson(route('play.game', 'conditions'), sequenceSolution() + ['conditional' => true])->assertOk()->assertJsonPath('progress.completed_count', 3);
-    $this->get(route('dashboard'))->assertOk()->assertSee('Cleared')->assertSee('Daily streak')->assertSee('Play again');
+    $this->get(route('dashboard'))->assertOk()->assertSee('Cleared')->assertSeeInOrder(['Streak', 'Best streak'])->assertSee('Play again')
+        ->assertViewHas('progress', fn (array $progress) => $progress['current_streak'] === 1);
     $this->assertDatabaseCount('learning_level_completions', 3);
     $this->assertDatabaseHas('learning_progress', ['user_id' => $user->id, 'current_streak' => 1]);
 });
