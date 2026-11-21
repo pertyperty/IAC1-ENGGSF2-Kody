@@ -15,12 +15,15 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ContributorReviewController extends Controller
 {
-    public function index(): Response
+    public function index(Request $request): Response
     {
         Gate::authorize('viewAny', ContributorApplication::class);
-        $applications = ContributorApplication::with('user')->orderByRaw("CASE WHEN approval_status = 'Pending' THEN 0 ELSE 1 END")->latest('id')->paginate(15);
+        $filters = $request->validate(['q' => ['nullable', 'string', 'max:80', 'not_regex:/\x00/'], 'status' => ['nullable', 'in:Pending,Approved,Rejected']]);
+        $applications = ContributorApplication::with('user')->when($filters['status'] ?? null, fn ($query, $status) => $query->where('approval_status', $status))
+            ->when($filters['q'] ?? null, fn ($query, $search) => $query->whereHas('user', fn ($user) => $user->where('username', 'ilike', '%'.addcslashes($search, '%_\\').'%')))
+            ->orderByRaw("CASE WHEN approval_status = 'Pending' THEN 0 ELSE 1 END")->latest('id')->paginate(15)->withQueryString();
 
-        return response()->view('account.contributor-reviews', compact('applications'))->header('Cache-Control', 'no-store, private');
+        return response()->view('account.contributor-reviews', compact('applications', 'filters'))->header('Cache-Control', 'no-store, private');
     }
 
     public function show(ContributorApplication $application): Response

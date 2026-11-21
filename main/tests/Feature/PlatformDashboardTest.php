@@ -22,8 +22,8 @@ test('B01 dashboard consolidates owned progress recent learning and unread notic
     $otherCourse = courseFixture(true, overrides: ['title' => 'Other learner private journey']);
     joinCourse($otherCourse, $other);
     moduleSignIn($this, $user);
-    $this->get(route('dashboard'))->assertOk()->assertSee('Garden journey')->assertSee('1 of 1 lessons completed')
-        ->assertSee('Pick up where you left off')->assertSee('0 unread')->assertDontSee('Other learner private journey')
+    $this->get(route('dashboard'))->assertOk()->assertSee('Garden journey')->assertSee('1 / 1 modules')
+        ->assertSee('Recent modules')->assertSee('0 unread')->assertDontSee('Other learner private journey')
         ->assertHeader('Cache-Control', 'no-store, private');
     $this->assertDatabaseCount('learning_activity_days', 1);
 });
@@ -37,7 +37,7 @@ test('B01 dashboard hides withdrawn lesson details and preserves saved progress 
     $course->forceFill(['staff_withdrawn_at' => now()])->save();
     moduleSignIn($this, $user);
     $this->get(route('dashboard'))->assertOk()->assertDontSee('Hidden course title')->assertDontSee('Robot picnic')
-        ->assertSee('Your progress is retained');
+        ->assertSee('Progress retained');
 });
 
 test('B01 creator summary scopes publication and pending counts to the current owner', function () {

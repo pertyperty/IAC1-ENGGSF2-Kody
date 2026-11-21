@@ -19,7 +19,9 @@ class CreatorBadgeController extends Controller
         $proof = $badges->proof($creator);
         $badge = DB::table('creator_verifications')->where('user_id', $creator->id)->first();
 
-        return response()->view('creators.verify', compact('creator', 'proof', 'badge'))->header('Cache-Control', 'no-store, private');
+        $badgeRequest = DB::table('creator_badge_requests')->where('user_id', $creator->id)->where('role', $creator->account_role->value)->whereNull('resolved_at')->first();
+
+        return response()->view('creators.verify', compact('creator', 'proof', 'badge', 'badgeRequest'))->header('Cache-Control', 'no-store, private');
     }
 
     public function update(DecideCreatorBadgeRequest $request, User $creator, CreatorBadges $badges): RedirectResponse

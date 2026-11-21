@@ -29,21 +29,21 @@ test('D01 example selection preserves role restrictions and rejects unknown exam
     $this->get(route('studio.create', ['example' => 'sequences']))->assertForbidden();
     moduleSignIn($this, moduleAccount(Role::Instructor));
     $this->getJson(route('studio.create', ['example' => 'executable']))->assertUnprocessable()->assertJsonValidationErrors('example');
-    $this->get(route('studio.index'))->assertOk()->assertSee('Start from a lesson example')
+    $this->get(route('studio.index'))->assertOk()->assertSee('Start from a module example')
         ->assertSee(route('studio.create', ['example' => 'sequences']));
 });
 
 test('B05 optional starter history and daily feedback preserve the primary Tower continuation', function () {
     $this->seed(TowerLevelSeeder::class);
     $user = signInForLearning($this);
-    $this->get(route('dashboard'))->assertOk()->assertSee('Continue level 1')->assertSee('Optional starter lessons');
+    $this->get(route('dashboard'))->assertOk()->assertSee('Continue level 1')->assertSee('Optional starter modules');
     expect(app(LearningProgression::class)->snapshot($user->id))->toMatchArray(['next_level' => 'sequences', 'active_today' => false]);
     $this->postJson(route('play.quiz', 'sequences'), ['answer' => 'order'])->assertOk()->assertJsonPath('progress.next_level', 'sequences');
-    $this->get(route('dashboard'))->assertSee('Today’s practice is saved');
+    $this->get(route('dashboard'))->assertSee('Today is complete.');
     $this->postJson(route('play.game', 'sequences'), sequenceSolution())->assertOk()->assertJsonPath('progress.next_level', 'loops');
     $this->postJson(route('play.game', 'loops'), ['program' => ['right', 'up', 'right'], 'repeat' => true])->assertOk();
     $this->postJson(route('play.game', 'conditions'), sequenceSolution() + ['conditional' => true])->assertOk()->assertJsonPath('progress.next_level', null);
-    $this->get(route('dashboard'))->assertSee('Continue level 1')->assertSee('Optional starter lessons');
+    $this->get(route('dashboard'))->assertSee('Continue level 1')->assertSee('Optional starter modules');
     $this->assertDatabaseCount('tower_clearances', 0);
     $this->travel(2)->days();
     expect(app(LearningProgression::class)->snapshot($user->id))->toMatchArray(['next_level' => null, 'active_today' => false, 'current_streak' => 0]);

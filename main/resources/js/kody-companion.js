@@ -38,7 +38,7 @@ export function mountKodyCompanion(doc, win) {
         pet.classList.toggle('bubble-below', below > above);
     };
     const setBubble = open => { bubble.hidden = !open; handle.setAttribute('aria-expanded', String(open)); };
-    pet.hidden = preference?.hidden === true;
+    pet.hidden = preference?.hidden !== false;
     positionPet();
     handle.addEventListener('pointerdown', event => {
         if (event.button !== 0) return;

@@ -4,6 +4,12 @@ includes:
 parameters:
     level: 5
     paths:
+        - app/Http/Controllers/NotificationController.php
+        - app/Http/Controllers/Learning/BookmarkController.php
+        - app/Http/Controllers/Learning/ReviewQueueController.php
+        - app/Http/Controllers/HelpController.php
+        - app/Http/Controllers/Administration/FaqController.php
+        - app/Http/Controllers/Content/CourseLearningController.php
         - app/Enums
         - app/Policies
         - app/Services/Operations

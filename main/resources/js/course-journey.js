@@ -23,18 +23,18 @@ export function mountCourseJourney(root, doc, win) {
         const state = journeyValues(event.detail.journey, courseId, win.location.origin);
         if (!state) return;
         root.classList.toggle('journey-finished', state.finished);
-        root.querySelector('[data-journey-title]').textContent = state.finished ? 'Course complete' : 'Your next lesson is ready.';
-        root.querySelector('[data-journey-count]').textContent = `${state.completed} of ${state.total} lessons completed.`;
+        root.querySelector('[data-journey-title]').textContent = state.finished ? 'Course complete' : 'Your next module is ready.';
+        root.querySelector('[data-journey-count]').textContent = `${state.completed} of ${state.total} modules completed.`;
         const progress = root.querySelector('[data-journey-progress]');
         progress.value = state.completed; progress.max = state.total;
         root.querySelector('[data-journey-note]').textContent = state.finished
-            ? 'Your progress is saved. Review a lesson or find another course.'
-            : state.next ? 'Your progress is saved. Your next lesson is ready.' : 'Your progress is saved. View the course to check your remaining lessons.';
+            ? 'Your progress is saved. Review a module or find another course.'
+            : state.next ? 'Your progress is saved. Your next module is ready.' : 'Your progress is saved. View the course to check your remaining modules.';
         const next = root.querySelector('[data-journey-next]');
         next.hidden = !state.next;
         if (state.next) {
             next.href = state.next.url;
-            next.setAttribute('aria-label', `Next lesson: ${state.next.title}`);
+            next.setAttribute('aria-label', `Next module: ${state.next.title}`);
         } else next.removeAttribute('href');
         const overview = root.querySelector('[data-journey-overview]');
         overview.href = state.finished ? `${win.location.origin}/learn/courses` : `${win.location.origin}/learn/courses/${courseId}`;

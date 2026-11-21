@@ -44,6 +44,7 @@ use App\Http\Controllers\Engagement\ContentReactionController;
 use App\Http\Controllers\Gamification\LeaderboardController;
 use App\Http\Controllers\Gamification\WeeklyEventStudioController;
 use App\Http\Controllers\HelpController;
+use App\Http\Controllers\Learning\BookmarkController;
 use App\Http\Controllers\Learning\ReviewQueueController;
 use App\Http\Controllers\LearningController;
 use App\Http\Controllers\NotificationController;
@@ -63,6 +64,7 @@ Route::pattern('challenge', '[0-9]+');
 Route::pattern('weeklyEvent', '[0-9]+');
 
 Route::middleware(['auth', 'account.session'])->group(function (): void {
+    Route::post('/learn/bookmarks/{kind}/{content}', [BookmarkController::class, 'update'])->whereIn('kind', ['module', 'course'])->whereNumber('content')->middleware('throttle:30,1,bookmarks:')->name('bookmarks.update');
     Route::get('/learn/review', [ReviewQueueController::class, 'index'])->name('review-queue.index');
     Route::post('/learn/review/{level}', [ReviewQueueController::class, 'update'])->whereNumber('level')->middleware('throttle:20,1,review-queue:')->name('review-queue.update');
 });
@@ -71,6 +73,7 @@ Route::get('/creators/{creator}', [CreatorProfileController::class, 'show'])
     ->whereNumber('creator')->middleware(OptionalAccountSession::class)->name('creators.show');
 Route::middleware(['auth', 'account.session'])->group(function (): void {
     Route::get('/account/public-profile', [CreatorProfileController::class, 'edit'])->name('creator-profile.edit');
+    Route::post('/account/public-profile/badge-request', [CreatorProfileController::class, 'requestBadge'])->middleware('throttle:3,60,creator-badge-request:')->name('creator-profile.badge-request');
     Route::put('/account/public-profile', [CreatorProfileController::class, 'update'])->middleware('throttle:10,1,creator-profile:')->name('creator-profile.update');
     Route::get('/manage/creator-badges/{creator}', [CreatorBadgeController::class, 'show'])->whereNumber('creator')->name('creator-badges.show');
     Route::put('/manage/creator-badges/{creator}', [CreatorBadgeController::class, 'update'])->whereNumber('creator')->middleware('throttle:6,1,creator-badge:')->name('creator-badges.update');
@@ -90,6 +93,7 @@ Route::middleware(['auth', 'account.session'])->prefix('manage/site')->name('sit
     Route::get('/', [SiteManagementController::class, 'index'])->name('index');
     Route::put('/announcement', [SiteManagementController::class, 'update'])->middleware('throttle:6,1,site-announcement:')->name('update');
 });
+Route::post('/tower/proficiency', [TowerController::class, 'proficiency'])->middleware(['auth', 'account.session', 'throttle:10,1,tower-proficiency:'])->name('tower.proficiency');
 Route::get('/tower/{level}', [TowerController::class, 'show'])->whereNumber('level')->middleware(OptionalAccountSession::class)->name('tower.show');
 Route::post('/tower/{level}/revisions/{revision}/stages/{stage}', [TowerController::class, 'complete'])
     ->whereNumber(['level', 'revision', 'stage'])->middleware(['auth', 'account.session', 'throttle:30,1,tower:'])->name('tower.complete');
@@ -244,8 +248,6 @@ Route::middleware(['auth', 'account.session'])->prefix('manage/faqs')->name('faq
 });
 Route::middleware(['auth', 'account.session'])->prefix('manage/game-presets')->name('game-presets.')->group(function (): void {
     Route::get('/', [GamePresetController::class, 'index'])->name('index');
-    Route::get('/create', [GamePresetController::class, 'create'])->name('create');
-    Route::post('/', [GamePresetController::class, 'store'])->middleware('throttle:10,1,game-presets:')->name('store');
     Route::get('/{preset}/edit', [GamePresetController::class, 'edit'])->whereNumber('preset')->name('edit');
     Route::put('/{preset}', [GamePresetController::class, 'update'])->whereNumber('preset')->middleware('throttle:10,1,game-presets:')->name('update');
     Route::post('/{preset}/inactivate', [GamePresetController::class, 'inactivate'])->whereNumber('preset')->middleware('throttle:10,1,game-presets:')->name('inactivate');

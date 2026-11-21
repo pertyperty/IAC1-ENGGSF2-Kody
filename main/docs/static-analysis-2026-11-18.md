@@ -15,6 +15,10 @@ The Laravel extension enables model-property checking and parses model `casts()`
 methods so enum/date comparisons reflect Laravel runtime types. Its result cache
 stays under ignored `storage/framework/cache/phpstan`.
 
+The 20 November learning consolidation adds the Bookmark, ReviewQueue, Help,
+FAQ and CourseLearning controllers to the checked paths. Their dynamic published
+revision projection retains selected title fields without loading full payloads.
+
 The scope is deliberately explicit. There is no baseline, blanket ignore rule or
 file exclusion hiding errors inside those paths. The rest of the application is
 not claimed to pass static analysis. Add coherent services/controllers to `paths`

@@ -10,7 +10,7 @@ test('Garden teaching is before the board and previews never submit or unlock gu
     const game = page.locator('[data-coding-game]');
     await expect(game.locator('.lesson-briefing .activity-goal')).toContainText('Reach column');
     await game.locator('[data-command=right]').click();
-    await expect(game.locator('.trace-source')).toContainText('MOVE RIGHT');
+    await expect(game.locator('.trace-source')).toContainText('kody.move_right()');
     const submissions = [];
     page.on('request', request => { if (request.method() === 'POST') submissions.push(request.url()); });
     await game.getByText('Step through program', { exact: true }).click();
@@ -100,7 +100,7 @@ test('Intermediate practice is independently enterable while its later levels st
     await expect(page).toHaveURL(/\/tower\/26$/);
     const game = page.locator('[data-arcade-game]');
     await game.getByRole('button', { name: 'Flip input 1', exact: true }).click();
-    await expect(game.locator('.trace-source')).toContainText('input[1] = NOT input[1]');
+    await expect(game.locator('.trace-source')).toContainText('inputs[1] = not inputs[1]');
     await game.getByText('Step through program', { exact: true }).click();
     await game.getByRole('button', { name: 'Step', exact: true }).click();
     await expect(game.locator('.trace-state')).toContainText('TRUE AND TRUE AND FALSE = FALSE');

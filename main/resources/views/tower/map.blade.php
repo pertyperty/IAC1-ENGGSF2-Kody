@@ -4,6 +4,7 @@
 @section('main-class', 'tower-map-main')
 @section('footer')@endsection
 @section('content')
+@include('tower.proficiency')
 @pushOnce('page-scripts', 'tower-page')
     @vite('resources/js/tower-page.js')
 @endPushOnce
@@ -14,7 +15,7 @@
     <div class="tower-heading tower-overlay">
         <div class="tower-title-row"><h1>Kody Tower</h1>
             <a class="quiet-link tower-list-switch" href="{{ route('home', ['track' => $tower['selected_track'], 'view' => 'list']) }}">List view</a>
-            <details class="tower-guide"><summary aria-label="Tower guide"><span aria-hidden="true">i</span></summary><div><h2>Your climb</h2><p>Start small. Climb higher. Code your way through {{ $tower['total'] }} discoveries.</p><p>Scroll up, use arrow keys or press Higher to explore. Select a numbered level to play; select its information button for a preview.</p><p>Boss checkpoints every 10 levels. @guest Trial progress stays in this browser; create an account to save your climb. @else Confirmed tower wins keep your daily streak going. Tower play awards no extra XP or KodeBits. @endguest</p><a class="button button-secondary button-small" href="{{ route('help.index') }}">Visit Help</a></div></details>
+            <details class="tower-guide"><summary aria-label="Tower guide"><x-action-icon name="info"/></summary><div><h2>Your climb</h2><p>Start small. Climb higher. Code your way through {{ $tower['total'] }} discoveries.</p><p>Scroll up, use arrow keys or press Higher to explore. Select a numbered level to play; select its information button for a preview.</p><p>Boss checkpoints every 10 levels. @guest Trial progress stays in this browser; create an account to save your climb. @else Confirmed tower wins keep your daily streak going. Tower play awards no extra XP or KodeBits. @endguest</p><a class="button button-secondary button-small" href="{{ route('help.index') }}">Visit Help</a></div></details>
         </div>
         <div class="tower-overview">@auth<b>{{ $tower['completed_count'] }} / {{ $tower['total'] }}</b><span>levels cleared</span>@else<b>3 free trials</b><span>Join to save your climb</span>@endauth</div>
         @auth<p class="tower-track-status"><x-action-icon name="target"/> {{ $tower['tracks'][$tower['selected_track']]['label'] }} <span>{{ $tower['track_counts'][$tower['selected_track']]['completed'] }} / {{ $tower['track_counts'][$tower['selected_track']]['total'] }} cleared</span></p>@endauth
@@ -38,7 +39,7 @@
             <a class="tower-node" href="{{ route('tower.show', $level) }}" @if(auth()->check() && !$step['unlocked']) aria-disabled="true" tabindex="-1" @endif aria-label="Level {{ $level->position }}: {{ $level->currentRevision->title }}{{ $step['completed'] ? ', cleared' : '' }}{{ auth()->check() && !$step['unlocked'] ? ', locked' : '' }}">
                 @if($level->position % 10 === 0)<span class="boss-crown" aria-hidden="true"><x-action-icon name="crown"/></span>@endif<span>{{ $level->position }}</span><i aria-hidden="true">@if($step['completed'])<x-action-icon name="check"/>@else{{ $level->position % 10 === 0 ? 'BOSS' : 'PLAY' }}@endif</i>
             </a>
-            <button type="button" class="tower-info" aria-label="About level {{ $level->position }}" aria-expanded="false" aria-controls="tower-detail-{{ $level->position }}">i</button>
+            <button type="button" class="tower-info" aria-label="About level {{ $level->position }}" aria-expanded="false" aria-controls="tower-detail-{{ $level->position }}"><x-action-icon name="info"/></button>
             <div class="tower-label" id="tower-detail-{{ $level->position }}"><small>{{ $tower['tracks'][$step['track']]['label'] }}</small><b>{{ $level->currentRevision->title }}</b><span>{{ $level->currentRevision->concept }}</span><p>{{ $level->currentRevision->description }}</p></div>
         </div>
         @if($level->position % 5 === 0)<div class="tower-chapter"><span>{{ str_pad((string) (int) ceil($level->position / 5), 2, '0', STR_PAD_LEFT) }}</span><h2>{{ ['First sparks','Logic lands','Data district','The algorithm vault','The next horizon','Signal station','Memory islands','Systems workshop','Code constellation','The summit','Foundation trails','Foundation workshop','Strategy garden','Strategy observatory','Algorithm frontier','Proof and possibility'][(int) ceil($level->position / 5) - 1] ?? 'Higher ground' }}</h2></div>@endif

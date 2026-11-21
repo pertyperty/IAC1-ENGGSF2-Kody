@@ -1,9 +1,16 @@
 # Kody implementation map
 
+The [20 November learning consolidation](learning-consolidation-2026-11-20.md)
+records the game startup fix, viewport workspaces, persisted Tower preference,
+private qualifications requests, author links, preset usage, Library bookmarks,
+live profile previews, combined Help editing and preserved sidebar scroll.
+Full candidate CI passed on ef6b2f6 in run 44737790756; evidence and the
+notification filter/page follow-up are tracked there. Provider activation stays paused.
+
 Start here for current scope, detailed evidence and the next useful improvements.
 This index consolidates the feature summaries previously repeated in README.
 It does not replace approved requirements, decisions or the implementation records.
-Last reviewed: 2026-11-19.
+Last reviewed: 2026-11-20.
 The [main integration/CI repair](main-integration-ci-2026-11-19.md) records the
 missing #51 ancestry after its feature-branch merge, stale creator-example
 assertions and browser fixture-session corrections. PR #52 targets main directly;

@@ -66,6 +66,9 @@ test('tower pans from land to space and the icon target restores the present flo
 test('companion supports bounded drag keyboard movement hide and restoration across pages', async ({ page }) => {
     await returning(page); await page.goto('/help');
     const pet = page.locator('[data-companion]'); const handle = pet.locator('[data-companion-handle]');
+    await expect(pet).toBeHidden();
+    await page.getByRole('button', { name: 'Kody guide and companion' }).click();
+    await page.getByRole('button', { name: 'Skip tutorial' }).click();
     await expect(handle).toBeVisible();
     const box = await handle.boundingBox();
     await page.mouse.move(box.x + 30, box.y + 30); await page.mouse.down(); await page.mouse.move(260, 210, { steps: 8 }); await page.mouse.up();

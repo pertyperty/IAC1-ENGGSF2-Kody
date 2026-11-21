@@ -1,3 +1,4 @@
+import { mountLivePreviews } from './live-preview.js';
 import { mountFormGuidance } from './form-guidance.js';
 import { mountChallengeStatus } from './challenge-status.js';
 import { mountContentReactions } from './content-reactions.js';
@@ -60,3 +61,5 @@ document.querySelectorAll('[data-role-update]').forEach(dialog => mountRoleUpdat
 mountPageLoader(document, window);
 decorateCurrency(document);
 document.addEventListener('kody:feedback', () => requestAnimationFrame(() => decorateCurrency(document, document.querySelector('[data-toast-region]'))));
+
+mountLivePreviews(document, window);

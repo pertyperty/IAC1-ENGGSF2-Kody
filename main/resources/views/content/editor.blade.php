@@ -1,5 +1,5 @@
 @extends('layouts.learning')
-@section('title', 'Create a lesson — Kody')
+@section('title', 'Create module — Kody')
 @section('content')
 @pushOnce('page-scripts', 'authoring')
     @vite('resources/js/authoring.js')
@@ -9,7 +9,7 @@
 <section class="review-page page-width">
 @if($module?->isWithdrawn())<p class="lesson-note">Staff withdrawal is active. Learner access is blocked. Draft corrections, publication review and creator archival do not lift this block; only staff restoration can do that.</p>@endif
 
-    <h1>{{ $module ? 'Edit lesson' : 'Create a lesson' }}</h1>
+    <h1>{{ $module ? 'Edit lesson' : 'Create module' }}</h1>
     <p>Explain one concept, choose an assessment, then submit your draft for review.</p>
     <nav class="editor-jumps" aria-label="Lesson setup"><a href="#lesson-edit"><span>01</span> Lesson</a><a href="#assessment-edit"><span>02</span> Activity</a><a href="#access-settings"><span>03</span> Access</a><a href="#draft-save"><span>04</span> Save & review</a></nav>
     @if(!empty($starter))<p class="lesson-note">Your example is ready to customize. It has not been saved or published yet.</p>@endif
@@ -35,8 +35,8 @@
         <fieldset @disabled($revision?->review_status === 'Pending' || $module?->status === 'Archived')>
             <legend>Your lesson</legend>
             <h2 id="lesson-edit">1. Explain the concept</h2>
-            <label for="title">Lesson title</label><input id="title" name="title" value="{{ old('title', $fields['title']) }}" maxlength="150" required>
-            <label for="description">Lesson summary</label><textarea id="description" name="description" rows="3" maxlength="5000" required>{{ old('description', $fields['description']) }}</textarea>
+            <label for="title">Module title</label><input id="title" name="title" value="{{ old('title', $fields['title']) }}" maxlength="150" required>
+            <label for="description">Module summary</label><textarea id="description" name="description" rows="3" maxlength="5000" required>{{ old('description', $fields['description']) }}</textarea>
             <label for="type">Lesson format</label><select id="type" name="type">@foreach(['Article','Interactive','Video'] as $type)<option @selected(old('type', $revision?->type ?? $starter['type'] ?? 'Interactive') === $type)>{{ $type }}</option>@endforeach</select>
             <label for="content">Explanation and examples</label><p class="field-hint">Write your explanation and code examples as plain text. Your learners will see exactly what you write.</p><textarea id="content" name="content" rows="10" maxlength="50000" required>{{ old('content', $fields['content']) }}</textarea>
             <details class="creator-media-panel"><summary>Resources and video (optional)</summary><label for="attachments">Add PDF, DOCX or PPTX resources</label><input id="attachments" name="attachments[]" type="file" accept=".pdf,.docx,.pptx" multiple><p class="field-hint">Up to 5 files, 20 MB each. Only authorized learners can open published resources.</p>

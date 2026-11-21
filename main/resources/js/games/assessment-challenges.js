@@ -12,6 +12,9 @@ export function conceptAnswerCorrect(game, answer) {
     return !game.assessment || answer === game.assessment.check.answer;
 }
 
+// Radio groups need a document-local identifier, not a secure-context browser API.
+let conceptCheckSequence = 0;
+
 export function mountConceptCheck(root, game) {
     const host = root.querySelector('[data-concept-check]');
     if (!game.assessment || !host) return { verify: () => true, answer: () => undefined, reset: () => {} };
@@ -21,7 +24,7 @@ export function mountConceptCheck(root, game) {
     const legend = doc.createElement('legend');
     legend.textContent = check.question;
     group.append(legend);
-    const name = `concept-${globalThis.crypto.randomUUID()}`;
+    const name = `concept-${++conceptCheckSequence}`;
     Object.entries(check.options).forEach(([value, text]) => {
         const label = doc.createElement('label');
         const input = doc.createElement('input');

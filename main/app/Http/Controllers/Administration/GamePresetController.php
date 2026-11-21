@@ -8,25 +8,23 @@ use App\Http\Requests\Administration\SaveGamePresetRequest;
 use App\Models\GamePreset;
 use App\Services\Games\GamePresets;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 
 class GamePresetController extends Controller
 {
-    public function index(): Response
+    public function index(Request $request): Response
     {
         Gate::authorize('viewAny', GamePreset::class);
-        $presets = GamePreset::with('currentRevision')->orderByDesc('id')->paginate(20);
+        $filters = $request->validate(['q' => ['nullable', 'string', 'max:100', 'not_regex:/\\x00/'], 'status' => ['nullable', 'in:Active,Inactive']]);
+        $presets = GamePreset::with('currentRevision')->withCount('lessonRevisions')
+            ->when($filters['q'] ?? null, fn ($query, $search) => $query->where('name', 'ilike', '%'.str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $search).'%'))
+            ->when($filters['status'] ?? null, fn ($query, $status) => $query->where('status', $status))
+            ->orderBy('name')->orderBy('id')->paginate(20)->withQueryString();
 
-        return response()->view('games.preset-index', compact('presets'))->header('Cache-Control', 'no-store, private');
-    }
-
-    public function create(): Response
-    {
-        Gate::authorize('create', GamePreset::class);
-
-        return response()->view('games.preset-editor', ['preset' => null, 'instance' => null, 'history' => null, 'uses' => 0])->header('Cache-Control', 'no-store, private');
+        return response()->view('games.preset-index', compact('presets', 'filters'))->header('Cache-Control', 'no-store, private');
     }
 
     public function edit(GamePreset $preset): Response
@@ -36,14 +34,13 @@ class GamePresetController extends Controller
         $history = $preset->revisions()->orderByDesc('number')->paginate(10);
         $uses = DB::table('module_revisions')->whereIn('game_preset_revision_id', $preset->revisions()->select('id'))->count();
 
-        return response()->view('games.preset-editor', compact('preset', 'instance', 'history', 'uses'))->header('Cache-Control', 'no-store, private');
-    }
+        $usage = DB::table('module_revisions as revision')
+            ->join('game_preset_revisions as preset_revision', 'preset_revision.id', '=', 'revision.game_preset_revision_id')
+            ->where('preset_revision.preset_id', $preset->id)
+            ->select(['revision.module_id', 'revision.title', 'revision.number', 'revision.review_status', 'preset_revision.number as preset_number'])
+            ->orderByDesc('revision.id')->paginate(10, ['*'], 'usage_page')->withQueryString();
 
-    public function store(SaveGamePresetRequest $request, GamePresets $presets): RedirectResponse
-    {
-        $preset = $presets->save($request->user(), $request->session()->getId(), $request->validated());
-
-        return redirect()->route('game-presets.edit', $preset)->with('status', 'Preset created. Creators can now use its saved defaults.');
+        return response()->view('games.preset-editor', compact('preset', 'instance', 'history', 'uses', 'usage'))->header('Cache-Control', 'no-store, private');
     }
 
     public function update(SaveGamePresetRequest $request, GamePreset $preset, GamePresets $presets): RedirectResponse

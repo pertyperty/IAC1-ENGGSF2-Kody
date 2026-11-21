@@ -15,7 +15,8 @@ use Illuminate\Support\Facades\Gate;
 class ReviewInbox
 {
     public const CATEGORIES = [
-        'lessons' => ['label' => 'Lessons', 'route' => 'module-reviews.show', 'index' => 'module-reviews.index', 'model' => LearningModule::class],
+        'badges' => ['label' => 'Qualifications badges', 'route' => 'creator-badges.show', 'index' => 'account-governance.index', 'model' => User::class],
+        'lessons' => ['label' => 'Modules', 'route' => 'module-reviews.show', 'index' => 'module-reviews.index', 'model' => LearningModule::class],
         'courses' => ['label' => 'Courses', 'route' => 'course-reviews.show', 'index' => 'course-reviews.index', 'model' => LearningCourse::class],
         'challenges' => ['label' => 'Coding challenges', 'route' => 'challenge-reviews.show', 'index' => 'challenge-reviews.index', 'model' => CodingChallenge::class],
         'instructors' => ['label' => 'Instructor applications', 'route' => 'instructor-reviews.show', 'index' => 'instructor-reviews.index', 'model' => InstructorApplication::class],
@@ -49,6 +50,13 @@ class ReviewInbox
             $queries[] = DB::table($table.' as application')->join('users as creator', 'creator.id', '=', 'application.user_id')
                 ->where('application.'.$status, 'Pending')->where('application.user_id', '!=', $user->id)
                 ->selectRaw('? as kind, application.id as target_id, creator.username as title, creator.username, null::integer as number, application.updated_at as submitted_at', [$kind]);
+        }
+        if (($category === 'all' || $category === 'badges') && Gate::forUser($user)->allows('viewAny', User::class)) {
+            $queries[] = DB::table('creator_badge_requests as request')->join('users as creator', 'creator.id', '=', 'request.user_id')
+                ->whereNull('request.resolved_at')->whereColumn('request.role', 'creator.account_role')
+                ->where('creator.account_status', 'Active')->whereNotNull('creator.email_verified_at')->whereIn('creator.account_role', ['Instructor', 'Contributor'])
+                ->where('creator.id', '!=', $user->id)
+                ->selectRaw("'badges' as kind, creator.id as target_id, creator.username as title, creator.username, null::integer as number, request.requested_at as submitted_at");
         }
         $union = array_shift($queries);
         abort_if($union === null, 403);

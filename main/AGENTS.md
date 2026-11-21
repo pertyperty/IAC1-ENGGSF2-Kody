@@ -1,4 +1,21 @@
+The [20 November learner stabilization](docs/learner-stabilization-2026-11-20.md)
+anchors Show navigation to the viewport and removes automatic hover restoration.
+Mobile games show the goal and program before the scene; desktop reference help
+stays in the scrolling controls pane. Preset HTTP creation is removed: browse/edit
+existing presets and preserve internal provisioning, pinned revisions and audit.
+Third-party activation remains paused.
+
 # Kody Engineering Agent Guidelines
+
+The [20 November learning consolidation](docs/learning-consolidation-2026-11-20.md)
+adds viewport-fitted game panes, named pseudocode calls, verified learner track
+preferences, owned notification/list filters, linked creator attribution, private
+badge-review requests, preset usage browsing, a combined Library, live profile
+previews and Help/FAQ editing. Sidebar scroll is per-user tab session state;
+bookmarks never grant learning access or rewards. The floating companion is
+opt-in until a show/hide preference is saved; retain the guide button. Preserve replay validation,
+private proof, current-session locks, immutable versions and mobile rail hiding.
+No provider activation is authorized.
 
 The [main integration/CI repair](docs/main-integration-ci-2026-11-19.md) verifies
 commit ancestry on fetched main before claiming a stacked PR is integrated.

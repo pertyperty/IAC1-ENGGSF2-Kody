@@ -1,6 +1,31 @@
 export function mountNavigationRail(doc, win) {
     const rail = doc.querySelector('[data-navigation-rail]');
     if (!rail) return;
+    const scroller = rail.querySelector('.workspace-nav');
+    const scrollKey = `kody-navigation-scroll:${rail.dataset.navigationUser}`;
+    const saveScroll = () => {
+        if (!scroller || scroller.clientHeight === 0) return;
+        try { win.sessionStorage.setItem(scrollKey, String(scroller.scrollTop)); } catch {}
+    };
+    let savedScroll = 0;
+    try { savedScroll = Number(win.sessionStorage.getItem(scrollKey)) || 0; } catch {}
+    if (scroller && Number.isFinite(savedScroll) && savedScroll >= 0) {
+        let interacted = false;
+        const cancelRestore = () => { interacted = true; };
+        const restore = () => { if (!interacted) scroller.scrollTop = savedScroll; };
+        for (const event of ['pointerdown', 'wheel', 'keydown']) {
+            scroller.addEventListener(event, cancelRestore, { once: true, passive: true });
+        }
+        win.requestAnimationFrame(restore);
+        // Font/header measurements can temporarily clamp the first restoration.
+        // Reapply after layout settles, unless the user has taken control.
+        Promise.resolve(doc.fonts?.ready).then(() => {
+            win.requestAnimationFrame(() => win.requestAnimationFrame(restore));
+        });
+        scroller.addEventListener('scroll', saveScroll, { passive: true });
+        scroller.addEventListener('click', saveScroll, { capture: true });
+        win.addEventListener('pagehide', saveScroll);
+    }
     const toggle = rail.querySelector('[data-rail-toggle]');
     const links = [...rail.querySelectorAll('.workspace-nav a')];
     const expanded = () => doc.documentElement.dataset.rail === 'expanded';

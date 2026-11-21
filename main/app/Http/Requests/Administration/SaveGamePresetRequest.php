@@ -11,7 +11,7 @@ class SaveGamePresetRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->route('preset') === null ? Gate::allows('create', GamePreset::class) : Gate::allows('update', $this->route('preset'));
+        return $this->route('preset') instanceof GamePreset && Gate::allows('update', $this->route('preset'));
     }
 
     public function rules(): array

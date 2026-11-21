@@ -225,7 +225,7 @@ test('archived challenges stop new weekly access and scheduler records unavailab
     expect(DB::table('audit_events')->where('event', 'weekly.unavailable')->count())->toBe(1);
     moduleSignIn($this, User::factory()->create());
     $this->get(route('weekly-events.show', $event))->assertNotFound();
-    $this->get(route('dashboard'))->assertDontSee("Explore this week's quest");
+    $this->get(route('dashboard'))->assertOk()->assertDontSee(route('weekly-events.show', $event));
 });
 
 test('disabled Judge0 still allows weekly configuration and previews without consuming an attempt', function () {

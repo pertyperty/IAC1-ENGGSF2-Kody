@@ -24,10 +24,10 @@ class LessonBriefings
                     'loop' => 'Trace a repeated sequence and identify the current iteration.', 'conditional' => 'Predict when an IF action runs and when it is skipped.', default => 'Explain how ordered movement instructions change a position.'
                 },
                 'Instructions run from top to bottom. Columns increase to the right; rows increase downward. Coordinates shown to you start at 1. '.match ($mode) {
-                    'loop' => 'REPEAT runs the entire chosen body exactly twice.', 'conditional' => 'With the crystal rule enabled, IF is checked after every successful move.', default => 'Each MOVE changes one coordinate by one tile.'
+                    'loop' => 'repeat runs the entire chosen body exactly twice.', 'conditional' => 'With the crystal rule enabled, IF is checked after every successful move.', default => 'Each movement call changes one coordinate by one tile.'
                 },
                 match ($mode) {
-                    'loop' => 'Different example: REPEAT 2 TIMES { MOVE RIGHT } moves two columns right, if both tiles are on the path.', 'conditional' => 'Different example: after a MOVE onto an empty tile, IF CRYSTAL HERE is false. COLLECT is skipped; movement continues.', default => 'Different example: from (1,1), MOVE RIGHT then MOVE DOWN ends at (2,2), if those tiles are on the path.'
+                    'loop' => 'Different example: repeat 2 times: kody.move_right() moves two columns right, if both tiles are on the path.', 'conditional' => 'Different example: after a move onto an empty tile, kody.on_crystal() is false. kody.collect() is skipped; movement continues.', default => 'Different example: from (1,1), kody.move_right() then kody.move_down() ends at (2,2), if those tiles are on the path.'
                 },
                 'Reach column '.($game['goal'][0] + 1).', row '.($game['goal'][1] + 1).(count($game['crystals']) ? ' and collect all '.count($game['crystals']).' crystals' : '').' without leaving the path.',
                 'Finish on the flag with no crystals remaining, using at most '.$game['maxCommands'].' body instructions.'.($mode === 'loop' ? ' Enable repeat: the body must run twice.' : ''),

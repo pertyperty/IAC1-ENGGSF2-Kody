@@ -3,39 +3,40 @@
 namespace App\Http\Controllers\Administration;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\HelpController;
 use App\Http\Requests\Administration\DeleteFaqRequest;
 use App\Http\Requests\Administration\SaveFaqRequest;
 use App\Models\FaqEntry;
 use App\Services\Administration\FaqManagement;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 
 class FaqController extends Controller
 {
-    public function index(): Response
+    public function index(Request $request): Response
     {
         Gate::authorize('viewAny', FaqEntry::class);
-        $entries = FaqEntry::where('status', 'Active')->orderByDesc('id')->paginate(20);
 
-        return response()->view('help.manage-index', compact('entries'))->header('Cache-Control', 'no-store, private');
+        return app(HelpController::class)->index($request);
     }
 
-    public function create(): Response
+    public function create(Request $request): Response
     {
         Gate::authorize('create', FaqEntry::class);
+        $request->merge(['new' => true]);
 
-        return response()->view('help.editor', ['entry' => null, 'history' => null])->header('Cache-Control', 'no-store, private');
+        return app(HelpController::class)->index($request);
     }
 
-    public function edit(FaqEntry $entry): Response
+    public function edit(Request $request, FaqEntry $entry): Response
     {
         abort_unless($entry->status === 'Active', 404);
         Gate::authorize('update', $entry);
-        $history = DB::table('audit_events')->where('subject_type', 'faq_entry')->where('subject_id', (string) $entry->id)->latest('created_at')->paginate(10);
+        $request->merge(['edit' => $entry->id]);
 
-        return response()->view('help.editor', compact('entry', 'history'))->header('Cache-Control', 'no-store, private');
+        return app(HelpController::class)->index($request);
     }
 
     public function store(SaveFaqRequest $request, FaqManagement $faqs): RedirectResponse

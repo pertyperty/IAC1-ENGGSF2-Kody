@@ -31,12 +31,12 @@ function presetFixture(array $data = []): GamePreset
     return app(GamePresets::class)->save(moduleAccount(Role::Administrator), 'module-test-session', presetData($data));
 }
 
-test('G08 administrator creates typed reusable preset rules audit and escaped local preview', function (string $basis) {
-    $admin = User::factory()->create(['account_role' => Role::Administrator]);
+test('G08 administrator browses provisioned typed presets with audit and escaped local preview', function (string $basis) {
+    $admin = moduleAccount(Role::Administrator);
+    $preset = app(GamePresets::class)->save($admin, 'module-test-session', presetData(['basis' => $basis, 'title' => '<script>bad()</script>']));
     moduleSignIn($this, $admin);
-    $this->get(route('game-presets.create'))->assertOk();
-    $this->post(route('game-presets.store'), presetData(['basis' => $basis, 'title' => '<script>bad()</script>']))->assertRedirect();
-    $preset = GamePreset::sole();
+    $this->get('/manage/game-presets/create')->assertNotFound();
+    $this->post('/manage/game-presets', presetData())->assertStatus(405);
     $revision = $preset->currentRevision;
     expect($preset->created_by)->toBe($admin->id)->and($revision->reward_mode)->toBe('Deferred')
         ->and($revision->scoring)->toBe('ValidatedWin')->and($revision->participation)->toBe('VerifiedActiveParticipants');
@@ -56,9 +56,9 @@ test('G08 G09 G10 all nonadministrator roles are denied administration and direc
     $user = moduleAccount($role);
     moduleSignIn($this, $user);
     $this->get(route('game-presets.index'))->assertForbidden();
-    $this->get(route('game-presets.create'))->assertForbidden();
+    $this->get('/manage/game-presets/create')->assertNotFound();
     $this->get(route('game-presets.edit', $preset))->assertForbidden();
-    $this->postJson(route('game-presets.store'), presetData())->assertForbidden();
+    $this->postJson('/manage/game-presets', presetData())->assertStatus(405);
     $this->putJson(route('game-presets.update', $preset), presetData())->assertForbidden();
     $this->postJson(route('game-presets.inactivate', $preset), ['record_version' => 1, 'confirmed' => true])->assertForbidden();
     $user->forceFill(['active_session_hash' => hash('sha256', 'module-test-session'), 'active_session_expires_at' => now()->addHour()])->save();
@@ -70,8 +70,10 @@ test('G08 G09 G10 all nonadministrator roles are denied administration and direc
 test('G08 configuration rejects unsupported mechanics conflicting choices and injected privilege or rewards', function (array $override, string $field) {
     $admin = User::factory()->create(['account_role' => Role::Administrator]);
     moduleSignIn($this, $admin);
-    $this->postJson(route('game-presets.store'), presetData($override))->assertUnprocessable()->assertJsonValidationErrors($field);
-    $this->assertDatabaseCount('game_presets', 0);
+    $preset = presetFixture();
+    $this->putJson(route('game-presets.update', $preset), presetData($override))->assertUnprocessable()->assertJsonValidationErrors($field);
+    $this->assertDatabaseCount('game_presets', 1);
+    $this->assertDatabaseCount('game_preset_revisions', 1);
 })->with([
     [['basis' => 'javascript'], 'basis'], [['title' => str_repeat('x', 101)], 'title'], [['name' => '   '], 'name'],
     [['instructions' => ''], 'instructions'], [['reward_mode' => 'XP'], 'reward_mode'], [['reward_points' => 1000], 'reward_points'],
@@ -184,10 +186,11 @@ test('G08 expired suspended and unverified administrators cannot mutate presets'
 
 test('G08 guest csrf and missing resource protections apply', function () {
     $this->get(route('game-presets.index'))->assertRedirect(route('login'));
+    $preset = presetFixture();
     moduleSignIn($this, User::factory()->create(['account_role' => Role::Administrator]));
     $this->get(route('game-presets.edit', 999))->assertNotFound();
     $this->app->detectEnvironment(fn () => 'local');
-    $this->postJson(route('game-presets.store'), presetData())->assertStatus(419);
+    $this->putJson(route('game-presets.update', $preset), presetData())->assertStatus(419);
 });
 
 test('G09 PostgreSQL prevents overwriting preset revisions or conflicting cross-preset pointers', function (string $violation) {

@@ -1,6 +1,7 @@
 @extends('layouts.learning')
 @section('title', 'Tower levels - Kody')
 @section('content')
+@include('tower.proficiency')
 @pushOnce('page-scripts', 'tower-page')
     @vite('resources/js/tower-page.js')
 @endPushOnce

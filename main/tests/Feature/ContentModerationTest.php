@@ -131,7 +131,7 @@ test('G06 course withdrawal blocks existing and new enrollment pinned lessons an
     $this->get(route('course-learning.lesson', [$course, $slot->id]))->assertNotFound();
     $this->postJson(route('course-learning.game', [$course, $slot->id]), courseWin())->assertNotFound();
     $this->post(route('course-learning.enroll', $course), ['revision_id' => $course->published_revision_id])->assertNotFound();
-    $this->get(route('course-learning.mine'))->assertOk()->assertSee('Journey temporarily unavailable')->assertDontSee(route('course-learning.show', $course));
+    $this->get(route('course-learning.mine'))->assertOk()->assertSee('Course temporarily unavailable')->assertDontSee(route('course-learning.show', $course));
     $this->assertDatabaseCount('course_enrollments', 1);
     $this->assertDatabaseCount('course_module_progress', 1);
     $this->assertDatabaseCount('learning_activity_days', 0);

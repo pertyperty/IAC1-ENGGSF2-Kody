@@ -20,13 +20,15 @@ test('owned review lists are idempotent access checked and never issue clears re
     for ($i = 0; $i < 2; $i++) {
         $this->post(route('review-queue.update', $level), ['action' => 'add'])->assertRedirect();
     }
-    $this->get(route('review-queue.index'))->assertOk()->assertSee($level->currentRevision->title);
+    $this->get(route('review-queue.index'))->assertRedirect(route('course-learning.mine', ['type' => 'bookmarks']));
+    $this->get(route('course-learning.mine', ['type' => 'bookmarks']))->assertOk()->assertSee($level->currentRevision->title);
     $this->assertDatabaseCount('tower_review_items', 1);
     $this->assertDatabaseCount('tower_clearances', 0);
     $this->assertDatabaseCount('learning_activity_days', 0);
     $this->assertDatabaseCount('xp_awards', 0);
     moduleSignIn($this, moduleAccount(Role::Learner));
-    $this->get(route('review-queue.index'))->assertOk()->assertDontSee($level->currentRevision->title);
+    $this->get(route('review-queue.index'))->assertRedirect(route('course-learning.mine', ['type' => 'bookmarks']));
+    $this->get(route('course-learning.mine', ['type' => 'bookmarks']))->assertOk()->assertDontSee($level->currentRevision->title);
     $this->post(route('review-queue.update', $level), ['action' => 'remove'])->assertRedirect();
     $this->assertDatabaseCount('tower_review_items', 1);
     moduleSignIn($this, $user);

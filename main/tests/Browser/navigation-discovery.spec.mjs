@@ -63,7 +63,7 @@ test('Tower list supports guest trials, keyboard navigation and selected-track l
 test('review inbox filters a real submission and opens the existing review page', async ({ page }) => {
     await login(page, 'instructor');
     await page.goto('/create/modules/new?example=programming-check');
-    await page.getByLabel('Lesson title').fill('Navigation inbox lesson');
+    await page.getByLabel('Module title').fill('Navigation inbox lesson');
     await page.getByRole('button', { name: 'Save draft', exact: true }).click();
     await expect(page).toHaveURL(/\/create\/modules\/\d+$/);
     const id = new URL(page.url()).pathname.split('/').at(-1);
@@ -90,4 +90,26 @@ test('review inbox filters a real submission and opens the existing review page'
     await page.locator('.review-list').getByRole('link', { name: /Navigation inbox lesson/ }).click();
     await expect(page).toHaveURL(new RegExp(`/manage/modules/${id}$`));
     await expect(page.getByRole('button', { name: 'Approve and publish' })).toBeVisible();
+});
+
+
+test('Show navigation remains fixed while hovering and clicking on narrow screens @cross-browser', async ({ page }) => {
+    await login(page, 'learner');
+    await page.setViewportSize({ width: 320, height: 740 });
+    await page.goto('/learn/sequences');
+    await page.evaluate(() => window.scrollTo(0, 450));
+    const reveal = page.locator('[data-navigation-reveal]');
+    await expect(reveal).toBeVisible();
+    const position = await page.evaluate(() => window.scrollY);
+    await reveal.hover();
+    await expect(reveal).toBeVisible();
+    expect(await page.evaluate(() => window.scrollY)).toBe(position);
+    await reveal.click();
+    const workspace = page.locator('.mobile-workspace');
+    await expect(workspace.locator('summary')).toBeInViewport();
+    await workspace.locator('summary').click();
+    await expect(workspace).toHaveAttribute('open', '');
+    await workspace.getByRole('link', { name: 'Help', exact: true }).click();
+    await expect(page).toHaveURL(/\/help$/);
+    await audit(page);
 });

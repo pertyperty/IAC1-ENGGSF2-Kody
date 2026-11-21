@@ -49,18 +49,18 @@ class ChallengeSubmissions
             $event = $weeklyEvent === null ? null : app(WeeklyEvents::class)->admit($weeklyEvent->id, $current);
             $revisionId = $event?->revision_id ?? $current->published_revision_id;
             if ($current->status !== 'Published' || $current->isWithdrawn() || $revisionId !== (int) $data['revision_id']) {
-                throw ValidationException::withMessages(['revision_id' => 'This quest changed or is unavailable. Reload before submitting.']);
+                throw ValidationException::withMessages(['revision_id' => 'This coding challenge changed or is unavailable. Reload before submitting.']);
             }
             $revision = CodingChallengeRevision::whereKey($revisionId)->where('challenge_id', $current->id)->where('review_status', 'Approved')->firstOrFail();
             if ($data['language'] !== $revision->language || ! array_key_exists($data['language'], config('challenges.languages'))
                 || strlen($data['source_code']) > config('judge0.source_bytes') || trim($data['source_code']) === '' || str_contains($data['source_code'], "\0")
                 || ! Str::isUuid($data['confirmation_id']) || ! in_array($data['confirmed'] ?? null, [true, 1, '1', 'yes', 'on', 'true'], true)
                 || isset($data['weekly_event_id'])) {
-                throw ValidationException::withMessages(['source_code' => 'Confirm valid code in the quest language within the source-size limit.']);
+                throw ValidationException::withMessages(['source_code' => 'Confirm valid code in the challenge language within the source-size limit.']);
             }
             if ($participation !== null && ($participation->active_submission_id !== null || $participation->attempts >= 3)) {
                 throw ValidationException::withMessages(['challenge' => $participation->active_submission_id !== null
-                    ? 'Wait for your active attempt to finish before submitting again.' : ($event === null ? 'All three attempts for this quest have been used.' : 'All three attempts for this weekly event have been used.')]);
+                    ? 'Wait for your active attempt to finish before submitting again.' : ($event === null ? 'All three attempts for this coding challenge have been used.' : 'All three attempts for this weekly event have been used.')]);
             }
             $profile = app(ProviderReadiness::class)->profile($revision);
             if ($profile === null) {
@@ -71,7 +71,7 @@ class ChallengeSubmissions
             }
             $cases = $revision->testCases()->get(['id', 'revision_id']);
             if ($cases->isEmpty()) {
-                throw ValidationException::withMessages(['challenge' => 'This quest is unavailable. No attempt was used.']);
+                throw ValidationException::withMessages(['challenge' => 'This coding challenge is unavailable. No attempt was used.']);
             }
             app(BudgetAdmission::class)->assert('challenge');
             $userSubmissions = ChallengeSubmission::whereIn('participation_id', DB::table('challenge_participations')->where('user_id', $user->id)->select('id'));

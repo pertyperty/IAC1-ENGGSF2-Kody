@@ -10,19 +10,16 @@ use App\Services\Account\CurrentAccountSession;
 use App\Services\Gamification\TowerProgression;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 
 class ReviewQueueController extends Controller
 {
-    public function index(Request $request, TowerProgression $tower): Response
+    public function index(Request $request): RedirectResponse
     {
         Gate::authorize('viewLearning', LearningCourse::class);
-        $levels = $tower->snapshot($request->user()->id)['steps']->keyBy(fn ($step) => $step['level']->id);
-        $items = DB::table('tower_review_items')->where('user_id', $request->user()->id)->orderByDesc('created_at')->limit(100)->get();
 
-        return response()->view('learning.review-queue', compact('items', 'levels'))->header('Cache-Control', 'no-store, private');
+        return redirect()->route('course-learning.mine', ['type' => 'bookmarks']);
     }
 
     public function update(Request $request, TowerLevel $level, TowerProgression $tower): RedirectResponse
@@ -41,11 +38,11 @@ class ReviewQueueController extends Controller
             $current = TowerLevel::whereKey($level->id)->lockForUpdate()->firstOrFail();
             abort_unless($current->current_revision_id !== null, 404);
             $tower->assertUnlocked($user, $current);
-            abort_if(! $query->exists() && DB::table('tower_review_items')->where('user_id', $user->id)->count() >= 100, 422, 'Your review list is full. Remove an item first.');
+            abort_if(! $query->exists() && DB::table('tower_review_items')->where('user_id', $user->id)->count() >= 100, 422, 'Your Tower bookmarks are full. Remove an item first.');
             DB::table('tower_review_items')->updateOrInsert(['user_id' => $user->id, 'level_id' => $current->id],
                 ['revision_id' => $current->current_revision_id, 'created_at' => now()]);
         });
 
-        return back()->with('status', $data['action'] === 'add' ? 'Added to your review list.' : 'Removed from your review list.');
+        return back()->with('status', $data['action'] === 'add' ? 'Bookmarked. Find it in your Library.' : 'Bookmark removed.');
     }
 }

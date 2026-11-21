@@ -5,7 +5,7 @@
 <p class="eyebrow">MAKE IT YOURS</p><h1>Your player profile</h1>
 <p class="intro">Update your name and username. Changing your email or password requires your current password and ends your signed-in sessions.</p>
 @if($errors->any())<div class="notice" role="alert">@foreach($errors->all() as $error)<p>{{ $error }}</p>@endforeach</div>@endif
-<div class="profile-editor-grid"><section id="profile-picture" class="profile-picture-editor lesson-note">
+<div data-live-preview class="profile-preview-layout"><div class="profile-editor-grid"><section id="profile-picture" class="profile-picture-editor lesson-note">
 <h2>Your profile picture</h2>
 @include('layouts.avatar', ['avatarUser' => auth()->user(), 'avatarClass' => 'profile-avatar'])
 <p>Choose a JPEG or PNG. We crop it to a square and remove image metadata. Your picture is visible to signed-in Kody members.</p>
@@ -19,7 +19,7 @@
 <form class="account-form" method="POST" action="{{ route('account.update') }}">@csrf @method('PATCH')
 <input type="hidden" name="profile_version" value="{{ $profile['profile_version'] }}">
 <label for="username">Username</label><input id="username" name="username" value="{{ old('username', $profile['username']) }}" minlength="6" maxlength="30" autocomplete="username" required>
-<p class="field-hint">Your username is your public identity. Personal names below are optional, are not displayed as your public creator name, and can be cleared. Use letters, spaces, apostrophes or hyphens, up to 50 characters each.</p>
+<p class="field-hint">Your username is public. Personal names are optional and private.</p>
 <label for="first_name">First name (optional)</label><input id="first_name" name="first_name" value="{{ old('first_name', $profile['first_name']) }}" maxlength="50" autocomplete="given-name">
 <label for="last_name">Last name (optional)</label><input id="last_name" name="last_name" value="{{ old('last_name', $profile['last_name']) }}" maxlength="50" autocomplete="family-name">
 <label for="email">Email</label><input id="email" type="email" name="email" value="{{ old('email', $profile['email']) }}" maxlength="100" autocomplete="email" required>
@@ -30,5 +30,6 @@
 <label for="password_confirmation">Confirm new password</label><input id="password_confirmation" type="password" name="password_confirmation" maxlength="32" autocomplete="new-password">
 <button class="primary-button" type="submit">Save your profile</button></form>
 </div>
+<aside class="live-preview-panel"><details><summary>Preview profile</summary><section class="profile-preview" aria-label="Profile preview"><p class="overline">UNSAVED PREVIEW</p><img data-preview-picture hidden width="96" height="96" alt="Selected profile picture"><h2 data-preview-value="username" data-preview-placeholder="Your username"></h2><span class="creator-role">{{ auth()->user()->account_role->name }}</span><p>Your public identity. Email and personal names stay private.</p></section></details></aside></div>
 <p class="secondary-link"><a href="{{ route('account.show') }}">Back to your profile</a></p>
 @endsection

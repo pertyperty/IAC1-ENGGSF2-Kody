@@ -111,7 +111,8 @@ test('challenge settings reveal invalid fields and preserve drafts and exact tes
 
 test('preset authoring switches quiz fields and mounts a local game preview @cross-browser', async ({ page }) => {
     await login(page, 'administrator');
-    await page.goto('/manage/game-presets/create');
+    await page.goto('/manage/game-presets');
+    await page.getByRole('link', { name: 'View preset and usage', exact: true }).first().click();
     const form = page.locator('[data-preset-editor]');
     await expect(form.locator('[name="reward_mode"]')).toHaveValue('Deferred');
     await expect(form.getByLabel('Reward mode', { exact: true })).toHaveCount(0);

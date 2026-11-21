@@ -57,7 +57,7 @@ test('public creator profiles hide inactive identities and exclude draft and wit
 test('public creator publication lists load titles without complete revision payloads', function () {
     $module = moduleFixture(true);
     $this->get(route('creators.show', $module->creator))->assertOk()->assertViewHas('content', function ($content) {
-        $item = $content['Lessons']['items']->sole();
+        $item = $content['Modules']['items']->sole();
         expect(array_keys($item->getAttributes()))->toBe(['id', 'published_revision_id']);
         expect(array_keys($item->publishedRevision->getAttributes()))->toBe(['id', 'title']);
 
@@ -152,4 +152,33 @@ test('retained Instructor qualification versions stay private scoped and audited
     $this->get(route('instructor-reviews.version-credential', [$other, 1]))->assertNotFound();
     $this->get(route('instructor-reviews.version-credential', [$proof, 1]))->assertOk()->assertHeader('Cache-Control', 'no-store, private');
     expect(DB::table('audit_events')->where('event', 'instructor_application.credential_downloaded')->count())->toBe(1);
+});
+
+test('creators request one private qualifications review without granting themselves a badge', function () {
+    $creator = moduleAccount(Role::Instructor);
+    approvedBadgeProof($creator);
+    moduleSignIn($this, $creator);
+    $this->post(route('creator-profile.badge-request'), ['confirmed' => true])->assertRedirect();
+    $this->post(route('creator-profile.badge-request'), ['confirmed' => true])->assertRedirect();
+    $this->assertDatabaseCount('creator_badge_requests', 1);
+    expect($creator->fresh()->hasCreatorBadge())->toBeFalse();
+    $staff = moduleAccount(Role::Moderator);
+    moduleSignIn($this, $staff);
+    $this->get(route('review-inbox', ['category' => 'badges']))->assertOk()->assertSee($creator->username);
+    $this->get(route('creator-badges.show', $creator))->assertOk()->assertSee('Decline badge request')->assertSee('Open approved application and private documents');
+    $request = DB::table('creator_badge_requests')->sole();
+    $this->put(route('creator-badges.update', $creator), badgeData(['decision' => 'decline', 'requested_at' => $request->requested_at]))->assertRedirect();
+    expect(DB::table('creator_badge_requests')->sole()->resolved_at)->not->toBeNull();
+    expect($creator->fresh()->hasCreatorBadge())->toBeFalse();
+    $this->get(route('review-inbox', ['category' => 'badges']))->assertDontSee($creator->username);
+});
+
+test('learners and creators without approved proof cannot request a qualifications badge', function () {
+    foreach ([Role::Learner, Role::Instructor] as $role) {
+        $user = moduleAccount($role);
+        moduleSignIn($this, $user);
+        $response = $this->postJson(route('creator-profile.badge-request'), ['confirmed' => true]);
+        $role === Role::Learner ? $response->assertForbidden() : $response->assertUnprocessable();
+    }
+    $this->assertDatabaseCount('creator_badge_requests', 0);
 });
