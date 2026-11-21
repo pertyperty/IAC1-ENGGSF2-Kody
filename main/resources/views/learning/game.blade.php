@@ -5,7 +5,7 @@
     <div class="game-heading"><div><span class="game-kicker">{{ $game['concept'] }}</span><h2>{{ $game['title'] }}</h2></div></div>
     @include('learning.briefing')
     <div class="garden-workbench">
-    <div class="game-world">
+    <div class="game-world" tabindex="0" role="region" aria-label="Game scene">
         <div class="scene-heading"><h3>Game board</h3><span data-execution-label>Not run</span></div>
         <div class="world-label"><span class="world-mission"><span aria-hidden="true"><x-action-icon name="flag"/></span> Reach the flag</span><span data-game-objectives>{{ count($game['crystals']) }} crystals left</span></div>
         <div class="game-board" data-game-board role="img" aria-label="Garden with {{ $game['width'] }} columns and {{ $game['height'] }} rows. Start: column {{ $game['start'][0] + 1 }}, row {{ $game['start'][1] + 1 }}. Goal: column {{ $game['goal'][0] + 1 }}, row {{ $game['goal'][1] + 1 }}. Path coordinates: {{ implode('; ', array_map(fn($p) => ($p[0] + 1).','.($p[1] + 1), $game['path'])) }}. Crystal coordinates: {{ implode('; ', array_map(fn($p) => ($p[0] + 1).','.($p[1] + 1), $game['crystals'])) ?: 'none' }}."></div>

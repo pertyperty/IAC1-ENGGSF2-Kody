@@ -26,8 +26,8 @@ test('visual scenario editors preserve typed content focus and previews without 
     const scenario = page.locator('input[name="game_scenario"]');
     await expect.poll(async () => JSON.parse(await scenario.inputValue()).pixels).toContain('3 3 peach');
     const steps = page.locator('.editor-jumps'); await steps.getByRole('link').last().click();
-    const stepBox = await steps.boundingBox(), backBox = await page.locator('.page-navigation').boundingBox();
-    expect(backBox.y + backBox.height).toBeLessThanOrEqual(stepBox.y + 1);
+    await expect(page.locator('.page-navigation')).toHaveCount(0);
+    await expect(steps).toBeInViewport();
     await page.getByLabel('Assessment task').selectOption('');
     await page.getByLabel('Game template').selectOption('terminal-quest');
     const content = visual.getByLabel('File 1 contents');

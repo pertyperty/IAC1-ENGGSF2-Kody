@@ -4,10 +4,7 @@
 .garden-game .garden-kody { background-image: var(--kody-mascot); }
 .header-tour { width: 44px; height: 44px; padding: 4px; display: grid; place-items: center; border-radius: 12px; border: 1px solid var(--border); background: var(--surface); cursor: pointer; }
 .header-tour:hover { background: var(--accent-soft); }
-.button { transition: background .18s ease, border-color .18s ease, transform .18s ease; }
-.button:hover { transform: translateY(-1px); }
 .button:active { transform: translateY(1px); }
-.button-play { border-bottom-width: 3px; }
 .app-rail .workspace-nav a .nav-label { transform: translateX(calc(-18px * (1 - var(--pull)))); }
 .tower-map-page .tower-page, .tower-map-page .tower-page.has-interactive-grid { background: var(--surface-soft); }
 .tower-scenery { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }

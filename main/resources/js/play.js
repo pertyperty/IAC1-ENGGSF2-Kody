@@ -7,7 +7,7 @@ document.querySelectorAll('[data-coding-game]').forEach(mountGarden);
 document.querySelectorAll('[data-practice-quiz]').forEach(mountQuiz);
 document.querySelectorAll('[data-arcade-game]').forEach(mountArcade);
 
-document.querySelectorAll('[data-coding-game], [data-arcade-game]').forEach(mountGameWorkspace);
+document.querySelectorAll('[data-coding-game], [data-arcade-game], [data-practice-quiz]').forEach(mountGameWorkspace);
 
 // Practice continuation changes difficulty only; it grants no saved completion.
 document.addEventListener('kody:completed', event => {

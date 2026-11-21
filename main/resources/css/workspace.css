@@ -99,7 +99,7 @@
 .continue-card h2 { font-size: 28px; }
 .dashboard-panel { border-radius: 20px; box-shadow: none; }
 .site-footer { font-size: 12px; }
-.learning-page button:disabled { opacity: .5; cursor: wait; }
+.learning-page button:disabled { opacity: .6; cursor: not-allowed; }
 @media (max-width: 1100px) {
     .app-frame.has-workspace { grid-template-columns: 1fr; }
     .app-rail { display: none; }

@@ -6,6 +6,9 @@ export function mountGameResult(doc, win) {
     if (!dialog?.showModal) return;
     const reactionHost = dialog.querySelector('[data-result-reactions]');
     const next = dialog.querySelector('[data-result-next]');
+    next.addEventListener('click', () => {
+        if (next.hash && new URL(next.href).pathname === win.location.pathname) dialog.close();
+    });
     let reactions = null, placeholder = null, focus = null;
     const restore = () => {
         // Native close events are queued. Do not steal focus from the next control
@@ -18,11 +21,22 @@ export function mountGameResult(doc, win) {
         focus = null;
     };
     dialog.addEventListener('close', restore);
-    dialog.querySelector('[data-result-return]').addEventListener('click', () => dialog.close());
+    const returnToActivity = () => {
+        const target = focus;
+        dialog.close();
+        // WebKit may restore the underlying modal's first control after nested results.
+        // Restore now, so the queued close event cannot take a later user's focus.
+        if (target?.isConnected) target.focus({ preventScroll: true });
+    };
+    dialog.querySelector('[data-result-return]').addEventListener('click', returnToActivity);
+    dialog.addEventListener('cancel', event => {
+        event.preventDefault();
+        returnToActivity();
+    });
     doc.addEventListener('kody:feedback', event => {
         const detail = event.detail;
         if (!detail?.result || typeof detail.message !== 'string' || !detail.message.trim()) return;
-        if (!dialog.open) focus = detail.source?.querySelector?.('[data-game-run], [data-arcade-run], form button') ?? doc.activeElement;
+        if (!dialog.open) focus = detail.source?.querySelector?.('[data-game-run], [data-arcade-run], form button[type="submit"]') ?? doc.activeElement;
         dialog.querySelector('[data-result-title]').textContent = detail.kind === 'success' ? 'Nicely done!' : 'Give it another try';
         dialog.querySelector('[data-result-message]').textContent = detail.message;
         dialog.querySelector('[data-result-saved]').textContent = detail.progressSaved ? 'Saved to your account' : detail.kind === 'success' ? 'Practice result' : 'Your program is still here';

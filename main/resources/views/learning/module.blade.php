@@ -1,7 +1,7 @@
 @extends('layouts.learning')
 @section('title', $lesson['title'].' — Kody')
 @section('content')
-<section class="module-play page-width play-stage">
+<section class="module-play page-width play-stage" data-focus-default>
     <div class="lesson-breadcrumb"><a class="quiet-link" href="{{ route('dashboard') }}"><x-action-icon name="left"/> Your level ladder</a><span class="step-pill">{{ $lesson['concept'] }} · Beginner</span></div>
     <div class="play-stage-heading"><div><h1>{{ $lesson['title'] }}</h1><p>{{ $lesson['description'] }}</p></div><span class="stage-marker"><span aria-hidden="true"><x-action-icon name="spark"/></span> Learn by doing</span></div>
     @include('learning.game', ['trial' => false])

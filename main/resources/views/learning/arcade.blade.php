@@ -1,7 +1,7 @@
 @extends('layouts.learning')
 @section('title', 'Practice - Kody')
 @section('content')
-<section class="page-width arcade-page">
+<section class="page-width arcade-page" data-focus-default>
     <header class="practice-header"><div><h1>{{ $game['title'] }}</h1></div>
         <details class="practice-options"><summary>Change activity</summary><form method="get" action="{{ route('arcade') }}" class="practice-picker" data-practice-picker><input type="hidden" name="level" value="{{ $level }}"><label for="practice-game">Choose a concept</label><select id="practice-game" name="game">@foreach($cabinets as $slug => $instance)<option value="{{ $slug }}" @selected($selected === $slug)>{{ $instance['concept'] }}</option>@endforeach</select><button type="submit" class="button button-secondary">Open activity</button></form></details>
     </header>

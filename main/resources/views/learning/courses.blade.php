@@ -18,7 +18,7 @@
     <div class="module-grid">
         @forelse($courses as $revision)
             <article class="module-card mint">
-                <div class="module-art" aria-hidden="true"><span class="module-symbol"><x-action-icon name="journey"/></span></div>
+
                 <div class="module-copy">
                     <div class="module-meta"><span>{{ $revision->category }}</span><span>{{ $revision->difficulty }} · {{ $revision->estimated_duration }} hours</span></div>
                     <h2><a href="{{ route(auth()->user()?->can('viewAny', \App\Models\LearningCourse::class) ? 'course-reviews.show' : 'course-learning.show', $revision->course_id) }}">{{ $revision->title }}</a></h2><x-creator-byline :creator="$revision->course->creator"/>

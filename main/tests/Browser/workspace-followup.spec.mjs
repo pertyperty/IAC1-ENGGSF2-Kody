@@ -86,9 +86,15 @@ test('administrator edits Help beside an escaped live preview', async ({ page })
 test('Library combines module and Tower bookmarks and filters their titles', async ({ page }) => {
     await login(page, 'followuplearner');
     await page.goto(`/learn/modules/${manifest.modules['number-machine']}`);
+    await page.getByRole('button', { name: 'Exit focus', exact: true }).click();
+    await expect(page.locator('.focus-game-shell')).toHaveCount(0);
     await page.getByRole('button', { name: 'Bookmark', exact: true }).click();
+    await page.getByRole('button', { name: 'Exit focus', exact: true }).click();
+    await expect(page.locator('.focus-game-shell')).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'Bookmarked', exact: true })).toBeVisible();
     await page.goto('/tower/1');
+    await page.getByRole('button', { name: 'Exit focus', exact: true }).click();
+    await expect(page.locator('.focus-game-shell')).toHaveCount(0);
     await page.getByRole('button', { name: 'Bookmark level', exact: true }).click();
     await page.goto('/learn/courses/mine?type=bookmarks');
     await expect(page.getByRole('heading', { name: 'Bookmarks', exact: true })).toBeVisible();

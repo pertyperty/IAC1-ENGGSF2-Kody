@@ -7,9 +7,6 @@
 .page-width { max-width: 1240px; padding: 0 36px; margin: auto; }
 .play-brand { display: inline-flex; align-items: center; gap: 9px; font-size: 32px; font-weight: 800; letter-spacing: -1.5px; color: var(--text); }
 .brand-mark { background: var(--accent-soft); width: 35px; height: 35px; display: grid; place-items: center; font-size: 27px; transform: rotate(-10deg); border-radius: 10px; margin-right: 3px; }
-.button { display: inline-flex; align-items: center; justify-content: center; gap: 24px; padding: 16px 22px; border-radius: 12px; font-size: 14px; font-weight: 650; border: 0; }
-.button-dark { color: var(--on-accent); background: var(--accent); box-shadow: none; }
-.button-small { padding: 12px 18px; font-size: 13px; }
 .quiet-link { color: var(--text); font-size: 14px; font-weight: 650; }
 .quiet-link:hover { text-decoration: underline; text-underline-offset: 4px; }
 .hero { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; padding-top: 45px; padding-bottom: 48px; align-items: center; }
@@ -77,14 +74,6 @@
 @media (max-width: 760px) { .page-width { padding-inline: 22px; }.play-brand { font-size: 27px; }.brand-mark { width: 30px; height: 30px; font-size: 24px; }.hero { grid-template-columns: 1fr; padding-top: 25px; gap: 35px; }.hero h1 { font-size: clamp(37px, 8.5vw, 57px); letter-spacing: -1.8px; }.hero-copy { max-width: 530px; }.hero-description { max-width: 500px; font-size: 15px; }.hero-note { margin-bottom: 25px; }.hero-game { max-width: 560px; width: 100%; margin: auto; }.garden-tile { height: 46px; }.game-instructions p { font-size: 12px; }.game-feedback { font-size: 11px; }.game-reset { font-size: 11px; }.world-label { font-size: 9px; }.learning-ribbon > div { flex-wrap: wrap; justify-content: center; font-size: 11px; }.ribbon-spark { display: none; }.learning-ribbon b { margin-right: 5px; }.journey-section, .creator-section { grid-template-columns: 1fr; gap: 30px; padding-top: 45px; }.creator-section { padding-top: 10px; }.creator-art { order: 2; }.journey-section h2, .creator-section h2 { font-size: 33px; }.site-footer { flex-wrap: wrap; padding: 25px 22px; gap: 15px; }.site-footer > a:last-child { display: none; }.section-heading { display: block; }.section-heading h1 { font-size: 36px; }.module-grid { grid-template-columns: 1fr; }.module-card { max-width: 530px; width: 100%; }.module-art { height: 145px; }.module-copy p { min-height: 0; }.module-play h1 { font-size: 40px; } }
 @media (max-width: 380px) {.brand-mark { display: none; }.game-toolbar { gap: 12px; } }
 @media (prefers-reduced-motion: reduce) { .learning-page *, .learning-page *::before, .learning-page *::after { transition: none !important; scroll-behavior: auto !important; } }
-.practice-quiz { margin-top: 30px; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; }
-.practice-quiz .overline { margin-bottom: 12px; }
-.practice-quiz h2 { font-size: 21px; margin: 0 0 18px; }
-.practice-quiz fieldset { border: 0; padding: 0; margin: 0 0 18px; }
-.practice-quiz legend { font-size: 13px; line-height: 1.7; margin-bottom: 16px; }
-.practice-quiz label { display: flex; align-items: flex-start; gap: 10px; margin-top: 9px; border: 1px solid var(--border); border-radius: 9px; padding: 12px; font-size: 12px; line-height: 1.7; }
-.practice-quiz input { margin-top: 4px; accent-color: var(--focus); }
-.practice-quiz [data-quiz-feedback] { font-size: 12px; line-height: 1.8; color: var(--muted); margin-bottom: 0; }
 .quiz-correct { background: var(--accent-soft); }
 .learning-page button { font-family: inherit; }
 .game-toolbar .button-play { font-size: 12px; }

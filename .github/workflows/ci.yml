@@ -129,6 +129,7 @@ jobs:
           path: |
             main/storage/app/browser-report/
             main/storage/app/browser-results/
+            main/storage/app/private/styles-audit-2026-11-22/*.png
           if-no-files-found: ignore
           retention-days: 7
       - name: Record verified Git revision

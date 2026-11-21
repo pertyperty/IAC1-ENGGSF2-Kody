@@ -4,7 +4,7 @@
 @pushOnce('page-scripts', 'tower-page')
     @vite('resources/js/tower-page.js')
 @endPushOnce
-<section class="tower-level page-width" data-tower-level="{{ $level->position }}" data-map-url="{{ route('home', ['track' => app(\App\Services\Gamification\TowerTracks::class)->key($level)]) }}" data-welcome-url="{{ route('welcome') }}" @guest data-guest-tower @endguest>
+<section class="tower-level page-width" data-focus-default data-tower-level="{{ $level->position }}" data-map-url="{{ route('home', ['track' => app(\App\Services\Gamification\TowerTracks::class)->key($level)]) }}" data-welcome-url="{{ route('welcome') }}" @guest data-guest-tower @endguest>
     <p class="field-hint">{{ app(\App\Services\Gamification\TowerTracks::class)->for($level)['label'] }} · Level {{ $level->position }}</p>
     <div class="section-heading"><div><p class="overline">{{ $level->position % 10 === 0 ? 'BOSS CHECKPOINT' : 'TOWER LEVEL' }} {{ $level->position }}</p><h1>{{ $revision->title }}</h1></div><div class="tower-level-actions"><a class="button button-secondary button-small" href="{{ route('home', ['track' => app(\App\Services\Gamification\TowerTracks::class)->key($level)]) }}"><x-action-icon name="left"/> Level map</a>@include('tower.proficiency')</div></div>
 

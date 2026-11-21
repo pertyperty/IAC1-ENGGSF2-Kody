@@ -1,3 +1,12 @@
+The [22 November style audit](docs/style-audit-2026-11-22.md) makes learner
+activities focused by default, with explicit Menu, Learn and Exit focus controls.
+Keep authoring/staff previews embedded. The global sticky Back/Home strip is
+removed; use header/sidebar and contextual navigation. Shared primitives belong
+in design-system.css, loaded once after components; avoid another override file.
+Quizzes show one question at a time while retaining all answers and explicit
+server-validated completion. Preserve semantic colors, 44px controls, keyboard
+focus, immutable snapshots and private data. Provider activation remains paused.
+
 The [21 November game overhaul](docs/game-overhaul-2026-11-21.md) uses direct
 pseudocode instruction buttons, mission comparisons, visible Undo, bounded quiz
 navigation and practice-only Warm-up/Challenge/Stretch variations. Focus game
