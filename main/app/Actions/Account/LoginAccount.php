@@ -4,6 +4,7 @@ namespace App\Actions\Account;
 
 use App\Enums\AccountStatus;
 use App\Enums\LoginOutcome;
+use App\Enums\Role;
 use App\Models\User;
 use App\Support\AccountPasswords;
 use Illuminate\Contracts\Session\Session;
@@ -156,6 +157,8 @@ class LoginAccount
 
     private function authenticate(User $user, Session $session): LoginOutcome
     {
+        $session->put('tower.first_play', $user->account_role === Role::Learner
+            && $user->last_login_at === null && $user->coding_proficiency === null);
         // SessionGuard rotates the session ID and CSRF token before recording its fingerprint.
         Auth::login($user);
         $user->forceFill([

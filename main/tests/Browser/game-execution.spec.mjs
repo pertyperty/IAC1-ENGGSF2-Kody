@@ -31,7 +31,7 @@ for (const template of ['pixel-studio', 'number-machine', 'sort-lab', 'terminal-
         await game.getByRole('button', { name: 'Reset', exact: true }).click();
         await expect(game.locator('[data-instruction-index]')).toHaveCount(0);
         await expect(game.locator('[data-concept-check]')).toBeHidden();
-        await expect(game.getByRole('button', { name: 'Run', exact: true })).toBeEnabled();
+        await expect(game.getByRole('button', { name: 'Run', exact: true })).toBeDisabled();
         expect(errors).toEqual([]);
     });
 }
@@ -70,8 +70,8 @@ test('guided games mount without crypto.randomUUID on HTTP development hosts @cr
     expect(errors).toEqual([]);
 });
 
-// Goal and execution should be discoverable before mobile learners inspect the scene.
-test('mobile games put the goal and Run before the scene @cross-browser', async ({ page }) => {
+// A learner needs to see the target/board before building a program on mobile.
+test('mobile games show the goal and board before the program @cross-browser', async ({ page }) => {
     for (const path of ['/playground?game=number-machine', '/playground?game=pixel-studio', '/tower/1']) {
         for (const width of [320, 390, 900]) {
             await page.setViewportSize({ width, height: 900 });
@@ -81,7 +81,10 @@ test('mobile games put the goal and Run before the scene @cross-browser', async 
             const run = game.getByRole('button', { name: 'Run', exact: true });
             const scene = game.locator('.arcade-scene, .game-world');
             expect((await goal.boundingBox()).y).toBeLessThan((await run.boundingBox()).y);
-            expect((await run.boundingBox()).y).toBeLessThan((await scene.boundingBox()).y);
+            expect((await goal.boundingBox()).y).toBeLessThan((await scene.boundingBox()).y);
+            expect((await scene.boundingBox()).y).toBeLessThan((await game.locator('.game-controls').boundingBox()).y);
+            await expect(run).toBeDisabled();
+            await run.scrollIntoViewIfNeeded();
             await expect(run).toBeInViewport();
             await audit(page);
             await page.screenshot({ path: `${evidence}/mobile-first-${path.includes('pixel') ? 'pixels' : path.includes('tower') ? 'garden' : 'numbers'}-${width}.png`, fullPage: true });

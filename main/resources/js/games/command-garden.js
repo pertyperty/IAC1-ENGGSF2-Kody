@@ -108,6 +108,7 @@ export function mountGarden(root) {
         if (objectives) objectives.textContent = crystals.length ? `${crystals.length} crystals left` : (instance.crystals.length ? 'All crystals collected' : 'Follow the path to the flag');
     };
     const updateTools = () => {
+        root.querySelector('[data-game-run]').disabled = running || program.length === 0;
         if (earlier) earlier.disabled = running || selected <= 0;
         if (later) later.disabled = running || selected < 0 || selected >= program.length - 1;
         if (remove) remove.disabled = running || selected < 0;

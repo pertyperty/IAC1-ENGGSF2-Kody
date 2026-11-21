@@ -23,6 +23,11 @@ class TowerController extends Controller
             return redirect()->route('dashboard');
         }
 
+        if ($request->session()->pull('tower.first_play', false)
+            && ! $request->hasAny(['track', 'view'])) {
+            return redirect()->route('tower.start');
+        }
+
         $choice = $request->query('track');
         $track = is_string($choice) && array_key_exists($choice, app(TowerTracks::class)->all()) ? $choice : $request->session()->get('tower.track', $request->user()?->coding_proficiency ?? 'beginner');
         if ($request->user()) {
@@ -53,6 +58,17 @@ class TowerController extends Controller
         $next = $tower->continuation($request->user()->id, $data['proficiency'])['next'];
 
         return $next ? redirect($next['url']) : redirect()->route('home', ['track' => $data['proficiency']]);
+    }
+
+    public function start(Request $request, TowerProgression $tower): RedirectResponse
+    {
+        if (! in_array($request->user()->account_role, [Role::Learner, Role::Instructor], true)) {
+            return redirect()->route('dashboard');
+        }
+        $next = $tower->continuation($request->user()->id,
+            $request->session()->get('tower.track', $request->user()->coding_proficiency))['next'];
+
+        return $next ? redirect($next['url']) : redirect()->route('home');
     }
 
     public function show(Request $request, TowerLevel $level, TowerProgression $tower): Response|RedirectResponse
