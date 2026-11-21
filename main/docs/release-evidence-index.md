@@ -3,7 +3,9 @@
 The [21 November first-play follow-up](learner-stabilization-2026-11-20.md#first-play-follow-up-21-november)
 records direct first-login Tower play, optional track choice, board-first mobile
 games, clearer actions and responsive shared controls. It supersedes the earlier
-mobile ordering. Human learning and staged operational evidence remain separate.
+mobile ordering. Its candidate CI browser follow-up records outdated login and
+command-label assertions from run `44883163008`; complete candidate CI remains
+required. Human learning and staged operational evidence remain separate.
 
 The [20 November learner stabilization](learner-stabilization-2026-11-20.md)
 tracks the audit follow-up: navigation reveal, mobile goal/program ordering,

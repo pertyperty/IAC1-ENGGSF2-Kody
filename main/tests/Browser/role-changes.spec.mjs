@@ -1,3 +1,4 @@
+import { finishSignIn } from './support/sign-in.mjs';
 import { test, expect } from '@playwright/test';
 import { resolve } from 'node:path';
 import { audit } from './support/audit.mjs';
@@ -8,8 +9,8 @@ test.beforeEach(async ({ page }) => {
 });
 async function login(page, identifier) {
     await page.goto('/login'); await page.getByLabel('Email or username').fill(identifier); await page.getByLabel(/^Password/).fill('BrowserStrong12!');
-    await page.getByRole('button', {name:/Sign in/}).click(); await page.waitForURL(/\/(?:dashboard|login\/confirmation)?$/);
-    if (page.url().endsWith('/login/confirmation')) await page.getByRole('button', {name:'End previous session and continue'}).click();
+    await page.getByRole('button', {name:/Sign in/}).click();
+    await finishSignIn(page);
 }
 const document = resolve('database/fixtures/lesson-resources/programming-foundations.pdf');
 

@@ -186,3 +186,33 @@ limits, isolated workers, compile/runtime errors, wrong answers, timeout/outage
 handling, deduplication and attempt/spend limits. Public release still needs named
 operations/backup owners, staged mail, private storage, alerts, restore evidence
 and reviewed operator/legal facts. Payments and Google remain separate releases.
+
+### Candidate CI browser follow-up, 21 November
+
+PR #54 at `9a87f15` failed the Chromium step in CI run `44883163008`.
+Backend tests, cached configuration/routes, dependency audits, formatting,
+scoped analysis and asset builds passed before that failure. Cross-engine and
+recovery steps were skipped, so this run does not verify them.
+
+The uploaded browser evidence identified four outdated assertions: the new-account
+journey and both role-review journeys assumed login always ended at the map;
+the guided-command test expected raw transport commands as option labels.
+Role-review tests now use the shared sign-in helper, including real session
+confirmation. The learning journey accepts an admitted Tower game for learners
+while retaining the staff dashboard assertion. The guided-command test checks
+explicit pseudocode labels separately from unchanged accepted command values
+and continues rejecting instructions outside each task's allowed set.
+
+No application behavior, authentication protection, reward checks or provider
+settings changed in this follow-up. Complete candidate CI remains required.
+
+
+The complete local Chromium suite passed all 106 tests after these corrections,
+including all four failed workflows, onboarding, seven game types, publishing,
+private resources, moderation, accessibility and responsive-layout checks.
+Verification used the disposable PostgreSQL cluster on port 51629. The private
+log is `storage/app/private/pr54-ci/browser-full.log`; the cluster was stopped
+afterward. JavaScript syntax checks and the focused diff whitespace check passed.
+No PHP, frontend asset or dependency changes required rebuilding or repeating
+backend tests in this test-only repair. Fresh CI will rerun those gates and the
+cross-engine and recovery steps skipped by the failed candidate.
