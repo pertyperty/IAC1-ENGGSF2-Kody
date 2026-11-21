@@ -22,7 +22,6 @@
 .tower-track-finished { padding: 10px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; }
 .tower-track-picker a[aria-current] { border-color: var(--accent-text); border-left-width: 4px; background: var(--accent-soft); }
 .tower-stop[data-skill-track="expert"] .tower-node { outline: 2px solid var(--accent-line); outline-offset: 5px; }
-.practice-quiz legend { white-space: pre-line; overflow-wrap: anywhere; line-height: 1.7; }
 .tower-label small { display: block; font-weight: 700; color: var(--accent-text); margin-bottom: 6px; }
 @media (min-width: 900px) { .tower-level .garden-workbench { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(320px, 1fr); } }
 @media (max-width: 680px) { .lesson-briefing { padding: 14px 16px; grid-template-columns: 1fr; } .tower-map-tools .tower-track-picker { width: auto; } .tower-track-picker > summary { font-size: 11px; padding: 10px; } }

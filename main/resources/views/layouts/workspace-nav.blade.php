@@ -3,8 +3,8 @@
     @if(in_array(auth()->user()->account_role, [\App\Enums\Role::Learner, \App\Enums\Role::Instructor], true))<a href="{{ route('home') }}" @if(request()->routeIs('home', 'tower.*')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'tower', 'label' => 'Tower'])</a>@endif
     <a href="{{ route('arcade') }}" @if(request()->routeIs('arcade')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'game', 'label' => 'Arcade'])</a>
     <p class="rail-label">Learn</p>
-    <a href="{{ route('learning.catalog') }}" @if(request()->routeIs('learning.catalog', 'modules.*', 'learning.show')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'book', 'label' => 'Modules'])</a>
-    <a href="{{ route('course-learning.catalog') }}" @if(request()->routeIs('course-learning.catalog', 'course-learning.show', 'course-learning.lesson')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'book', 'label' => 'Courses'])</a>
+    <a href="{{ route('learning.catalog') }}" @if(request()->routeIs('learning.catalog', 'modules.*', 'learning.show')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'module', 'label' => 'Modules'])</a>
+    <a href="{{ route('course-learning.catalog') }}" @if(request()->routeIs('course-learning.catalog', 'course-learning.show', 'course-learning.lesson')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'course', 'label' => 'Courses'])</a>
     <a href="{{ route('challenges.catalog') }}" @if(request()->routeIs('challenges.catalog', 'challenges.show', 'challenges.attempt')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'code', 'label' => 'Challenges'])</a>
     <p class="rail-label">My progress</p>
     <a href="{{ route('dashboard') }}" @if(request()->routeIs('dashboard')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'panel', 'label' => auth()->user()->account_role === \App\Enums\Role::Learner ? 'Progress' : 'Overview'])</a>

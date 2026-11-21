@@ -107,7 +107,9 @@ test('every arcade scene remains readable on desktop, mobile and dark theme', as
             await page.screenshot({path: `${evidence}/after-${template}-${width}.png`, fullPage: true});
         }
     }
-    await page.locator('[data-theme-toggle]').click();
+    await page.getByText('Menu', { exact: true }).click();
+    await page.getByRole('navigation', { name: 'Game navigation' }).getByRole('button', { name: 'Dark mode', exact: true }).click();
+    await page.getByText('Menu', { exact: true }).click();
     await audit(page);
     await page.screenshot({path: `${evidence}/after-stack-dark.png`, fullPage: true});
 });
@@ -115,6 +117,7 @@ test('every arcade scene remains readable on desktop, mobile and dark theme', as
 
 test('practice activity switching remains an explicit form action', async ({ page }) => {
     await page.goto('/playground?game=number-machine');
+    await page.getByRole('button', { name: 'Exit focus', exact: true }).click();
     await expect(page.getByRole('combobox', { name: 'Choose a concept' })).toBeHidden();
     await page.getByText('Change activity', { exact: true }).click();
     await page.getByRole('combobox', { name: 'Choose a concept' }).selectOption('memory-trail');

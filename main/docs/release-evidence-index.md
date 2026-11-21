@@ -1,5 +1,9 @@
 # Release evidence index
 
+The [22 November style audit](style-audit-2026-11-22.md) records shared CSS
+ownership, removal of global quick-navigation overlays, default focused learner
+activities, distinct learning icons and stepped quizzes.
+
 The [21 November game overhaul](game-overhaul-2026-11-21.md) covers all existing
 engines, direct instructions, target comparisons, Focus game, quiz navigation and
 thirty practice tasks. Automated task completion remains distinct from human

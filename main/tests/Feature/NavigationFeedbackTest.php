@@ -18,14 +18,15 @@ test('shared navigation exposes progress only to participants and hides it durin
         $this->getJson(route('play.progress'))->assertStatus(in_array($role, [Role::Contributor, Role::Instructor], true) ? 200 : 403);
     }
     $this->get(route('account.edit'))->assertOk()->assertDontSee('data-progress-strip', false)
-        ->assertSee('Back to my account');
+        ->assertSee('Back to your profile')->assertDontSee('class="page-navigation"', false);
     $this->assertDatabaseCount('learning_level_completions', 0);
     $this->assertDatabaseCount('xp_awards', 0);
 })->with(Role::cases());
 
-test('guest account pages have an explicit home button and public courses never point back to private journeys', function () {
+test('guest pages retain header home navigation without a duplicate quick-action strip', function () {
     foreach (['login', 'register', 'recovery.request', 'course-learning.catalog'] as $name) {
-        $this->get(route($name))->assertOk()->assertSee('Back to home')->assertDontSee('Back to my journeys');
+        $this->get(route($name))->assertOk()->assertSee('class="play-brand"', false)->assertSee('href="'.route('home').'"', false)
+            ->assertDontSee('class="page-navigation"', false)->assertDontSee('Back to my journeys');
     }
     $this->get(route('play.progress'))->assertRedirect(route('login'));
 });

@@ -4,7 +4,6 @@
 @import './theme.css';
 @import './workspace.css';
 @import './game-play.css';
-@import './design-system.css';
 @import './usability.css';
 @import './journeys.css';
 @import './tower-studio.css';
@@ -28,3 +27,6 @@
 @import './simplify.css';
 
 @import './game-missions.css';
+
+/* Shared primitives load once after page components. */
+@import './design-system.css';

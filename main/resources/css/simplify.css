@@ -6,9 +6,7 @@ body { font-size: 16px; line-height: 1.6; }
 .game-card .program-heading b, .game-card .program-heading > span { font-size: .9375rem; line-height: 1.6; }
 .field-guide, .account-form small, .studio-form .field-hint, .workspace-grid > a > span:last-child,
 .game-option, .board-legend, .game-help, .site-footer, .review-list > a > span { font-size: .875rem; line-height: 1.6; }
-.account-form, .studio-form { overflow-wrap: anywhere; }
-.practice-quiz label, .practice-quiz [data-quiz-feedback], .practice-quiz [data-question-feedback],
-.quiz-progress-note, .notice, .form-errors { font-size: .9375rem; line-height: 1.6; }
+.account-form, .studio-form { overflow-wrap: anywhere; }.quiz-progress-note, .notice, .form-errors { font-size: .9375rem; line-height: 1.6; }
 .quiz-progress-note { margin-top: .75rem; }
 .quiz-progress-note p { margin-top: .5rem; }
 .garden-game .board-legend-help { color: #294334; font-size: .875rem; }
@@ -23,7 +21,6 @@ body { font-size: 16px; line-height: 1.6; }
 .tower-level > .field-hint:first-child { margin-block: 0 .25rem; }
 .step-pill, .status-pill, .game-card .step-pill, .game-card .game-badge,
 .game-card .game-kicker, .module-meta, .overline { font-size: .8125rem; }
-.button, .primary-button { min-height: 44px; }
 .help-search { display: flex; flex-direction: column; gap: 1.5rem; }
 .help-search .studio-form { display: grid; gap: .75rem; }
 .help-topics { display: flex; flex-wrap: wrap; gap: .75rem; margin: 0; }
@@ -91,9 +88,7 @@ body { font-size: 16px; line-height: 1.6; }
 .module-card .orbit, .module-card .art-star, .module-card .art-dot { display: none; }
 .module-card .module-copy { padding: 1rem 0; }
 .module-card h2 { font-size: 1.25rem; }
-.page-width > .section-heading > p { max-width: 55ch; }
-.page-navigation, .editor-jumps { border: 0; border-radius: 0; background: transparent; box-shadow: none; }
-.page-navigation { padding-inline: 0; }
+.page-width > .section-heading > p { max-width: 55ch; }.editor-jumps { border: 0; border-radius: 0; background: transparent; box-shadow: none; }
 .help-grid { display: block; }
 .help-grid .lesson-note { border-bottom: 1px solid var(--border); padding: 1.25rem 0; }
 .help-search { padding: 0; border: 0; background: transparent; }
@@ -112,7 +107,6 @@ body { font-size: 16px; line-height: 1.6; }
 .practice-header h1 { margin: 0; font-size: 1.5rem; }
 .arcade-page { padding-top: 1rem; }
 .arcade-page .game-heading .game-kicker { display: none; }
-.learning-page:has(.arcade-page) .page-navigation { position: static; margin-bottom: 0; }
 .practice-picker { display: grid; grid-template-columns: minmax(12rem, 20rem) auto; gap: .5rem .75rem; align-items: end; }
 .practice-picker label { grid-column: 1 / -1; }
 .practice-options > summary { min-height: 44px; padding-block: .5rem; cursor: pointer; color: var(--accent-text); }
@@ -120,9 +114,7 @@ body { font-size: 16px; line-height: 1.6; }
 .practice-options .practice-picker { margin-block: .75rem; }
 .practice-picker select { min-width: 0; max-width: 100%; padding: .65rem; background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: 6px; }
 .arcade-station { margin-top: 0; padding-top: 0; border-top: 0; }
-.practice-footer { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-top: 1.5rem; color: var(--muted); font-size: .9375rem; }
-.game-card, .practice-quiz { border: 0; border-radius: 0; box-shadow: none; background: transparent; overflow: visible; }
-.game-card .game-heading, .practice-quiz .game-heading { border: 0; padding: 0 0 1rem; background: transparent; }
+.practice-footer { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-top: 1.5rem; color: var(--muted); font-size: .9375rem; }.game-card { border: 0; border-radius: 0; box-shadow: none; background: transparent; overflow: visible; }.game-card .game-heading { border: 0; padding: 0 0 1rem; background: transparent; }
 .game-card .game-heading h2 { font-size: 1.5rem; }
 .game-card .game-kicker { font-size: .9375rem; letter-spacing: 0; color: var(--muted); }
 .game-card .terminal-mission .game-kicker { color: var(--terminal-text); }
@@ -204,10 +196,6 @@ body:has(.game-card) .kody-companion { display: none; }
 .concept-check label { display: flex; align-items: start; gap: .75rem; padding: .5rem 0; cursor: pointer; }
 .concept-check input { margin-top: .3rem; flex-shrink: 0; }
 .concept-check p { margin-top: .5rem; font-size: .9375rem; }
-.practice-quiz { padding: 0; }
-.practice-quiz fieldset { border: 0; border-bottom: 1px solid var(--border); border-radius: 0; padding: 1rem 0; }
-.practice-quiz fieldset legend { font-size: 1.0625rem; }
-.practice-quiz form > button { margin-top: 1rem; }
 .review-page:has(.creator-editor) { max-width: 960px; }
 .creator-editor.studio-form { display: block; padding: 0; border: 0; border-radius: 0; background: transparent; }
 .creator-editor > fieldset { padding: 0; margin: 2rem 0; border: 0; border-radius: 0; background: transparent; }
@@ -417,7 +405,6 @@ dialog.proficiency-choice::backdrop { background: rgb(10 25 50 / .6); }
     .page-width, .has-workspace .page-width { padding-inline: 1rem; }
     .section-heading { flex-wrap: wrap; gap: 1rem; }
     .section-heading > div { min-width: 0; }
-    .button { gap: .5rem; }
     .catalog-search { gap: .75rem; }
     .catalog-search > label, .catalog-search > input, .catalog-search > select { flex: 1 1 100%; min-width: 0; width: 100%; }
     :is(.catalog-search, .account-form, .studio-form) :is(input, select, textarea) { font-size: 1rem; }

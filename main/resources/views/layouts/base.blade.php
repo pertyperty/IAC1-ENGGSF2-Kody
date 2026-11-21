@@ -16,12 +16,12 @@
 </head>
 <body class="@yield('page-class', 'learning-page')" data-icon-sprite="{{ asset('images/navigation.svg') }}" data-kodebit-icon="{{ asset(config('branding.assets.kodebit')) }}" style="--kody-mascot: url('{{ asset(config('branding.assets.mascot')) }}')">
     @include('layouts.feedback')
+    @include('layouts.focus-navigation')
     <a class="skip-link" href="#main-content">Skip to content</a>
     @include('layouts.app-header')
     <div class="app-frame {{ auth()->check() ? 'has-workspace' : '' }}">
         @include('layouts.workspace')
         <main id="main-content" tabindex="-1" class="@yield('main-class')">
-            @include('layouts.page-navigation')
             @if($chrome['announcement'])<aside class="site-announcement" aria-label="Kody announcement"><x-action-icon name="updates"/><div><b>{{ $chrome['announcement']->title }}</b><p>{{ $chrome['announcement']->message }}</p></div>@if($chrome['announcement']->destination !== 'none')<a class="quiet-link" href="{{ route(['help' => 'help.index', 'contact' => 'contact', 'learn' => 'learning.catalog'][$chrome['announcement']->destination]) }}">{{ ['help' => 'Help center', 'contact' => 'Contact Kody', 'learn' => 'Explore learning'][$chrome['announcement']->destination] }}</a>@endif</aside>@endif
             @if(session('status'))<details class="action-receipt" open><summary>Latest update</summary><p>{{ session('status') }}</p></details>@endif
             @yield('content')

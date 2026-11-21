@@ -99,7 +99,7 @@ test('focused games fit the screen, keep the board still and restore the program
         await page.goto('/playground?game=number-machine');
         const game = page.locator('[data-arcade-game]');
         await game.locator('[data-add-command="add 3"]').click();
-        await game.getByRole('button', { name: 'Focus game', exact: true }).click();
+        await expect(page.getByRole('dialog', { name: 'Focused game workspace' })).toBeVisible();
         const dialog = page.getByRole('dialog', { name: 'Focused game workspace' });
         await expect(dialog).toBeVisible();
         await expect(dialog).toBeInViewport({ ratio: .99 });
@@ -125,7 +125,7 @@ test('every game exposes usable focused board and program panes @cross-browser',
     for (const { template } of cases.filter(item => item.level === 'challenge')) {
         await page.goto(`/playground?game=${template}`);
         const game = page.locator('[data-arcade-game], [data-coding-game]');
-        await game.getByRole('button', { name: 'Focus game', exact: true }).click();
+        await expect(page.getByRole('dialog', { name: 'Focused game workspace' })).toBeVisible();
         await expect(game.locator('.arcade-scene, .game-world')).toBeInViewport({ ratio: .99 });
         await expect(game.locator('.game-controls')).toBeInViewport({ ratio: .99 });
         if (template === 'pixel-studio') {

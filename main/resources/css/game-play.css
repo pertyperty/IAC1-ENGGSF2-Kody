@@ -63,9 +63,9 @@
 .game-card .game-instructions p { font-size: 13px; line-height: 1.7; }
 .game-card .step-pill { font-size: 10px; white-space: nowrap; border-radius: 8px; padding: 7px 10px; }
 .garden-game .command-buttons { gap: 8px; margin-bottom: 20px; }
-.garden-game .command-buttons button { min-width: 44px; width: 48px; height: 48px; font-size: 24px; border-radius: 12px; color: var(--accent-text); background: var(--accent-soft); box-shadow: 0 3px 0 var(--accent-line); transition: transform .15s, background .15s; }
+.garden-game .command-buttons button { min-width: 44px; width: 48px; height: 48px; font-size: 24px; border-radius: 12px; color: var(--accent-text); background: var(--accent-soft); box-shadow: none; transition: background .15s; }
 .garden-game .command-buttons .undo-command { width: auto; margin-left: auto; font-size: 12px; color: var(--muted); box-shadow: none; }
-.garden-game .command-buttons button:active { transform: translateY(2px); box-shadow: none; }
+.garden-game .command-buttons button:active { transform: none; box-shadow: none; }
 .program-heading { display: flex; justify-content: space-between; gap: 12px; align-items: center; margin-bottom: 10px; }
 .program-heading b { font-size: 13px; }
 .program-heading > span { color: var(--muted); font-size: 10px; }
@@ -94,15 +94,12 @@
 .lesson-companion h2 { margin: 0 0 16px; font-size: 25px; letter-spacing: -.7px; }
 .lesson-companion p:not(.overline) { font-size: 14px; color: var(--muted); line-height: 1.8; }
 .lesson-companion details { font-size: 13px; border-block: 1px solid var(--border); margin: 20px 0; }
-.lesson-support-grid .practice-quiz { margin: 0; border-radius: 20px; }
 .lesson-reader { margin: 24px 0; color: var(--muted); font-size: 14px; line-height: 1.8; }
 .lesson-reader > p { max-width: 72ch; }
 .lesson-reader h1, .lesson-reader h2 { color: var(--text); }
 .lesson-reading { padding: 0 20px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); }
 .lesson-reading > summary { cursor: pointer; min-height: 48px; padding: 14px 0; font-size: 13px; color: var(--accent-text); font-weight: 650; }
 .lesson-reader .lesson-text { max-width: 78ch; padding: 20px 0; white-space: pre-wrap; }
-.practice-quiz legend { font-size: 14px; font-weight: 600; }
-.practice-quiz label { font-size: 13px; padding: 14px; border-radius: 12px; }
 .arcade-game { max-width: none; margin: 24px 0; }
 .arcade-workbench { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); }
 .arcade-scene { min-width: 0; padding: 26px; background: var(--surface-soft); }
@@ -222,3 +219,9 @@
     .machine-arrow { font-size: 16px; }
     .sort-stack { flex-wrap: wrap; }.arcade-game .sort-tile { flex-basis: 60px; }
 }
+
+/* Scene artwork stays below the later brand asset rules in the cascade. */
+.garden-game .garden-kody { width: 78%; height: 85%; max-width: 64px; max-height: 64px; padding: 0; border: 0; border-radius: 0; background: url('../../public/images/kody-explorer.svg') center / contain no-repeat; color: transparent; font-size: 0; letter-spacing: 0; box-shadow: none; transform: none; }
+.garden-game .garden-kody::after { display: none; }
+.garden-game .goal-tile .tile-actor:not(.garden-kody), .garden-game .crystal-tile .tile-actor:not(.garden-kody) { width: 72%; height: 72%; background: url('../../public/images/garden-flag.svg') center / contain no-repeat; font-size: 0; }
+.garden-game .crystal-tile .tile-actor:not(.garden-kody) { background-image: url('../../public/images/garden-crystal.svg'); }

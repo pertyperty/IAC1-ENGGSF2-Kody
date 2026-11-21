@@ -19,7 +19,6 @@
 .profile-avatar { width: 88px; height: 88px; margin-block: 12px; font-size: 32px; }
 .profile-picture-editor { margin-block: 24px; }
 .profile-picture-editor form + form { margin-top: 12px; }
-.page-navigation { position: sticky; top: calc(var(--navigation-offset, 105px) + 8px); z-index: 25; width: fit-content; max-width: 100%; background: var(--surface); padding: 6px; border: 1px solid var(--border); border-radius: 10px; margin-bottom: 20px; transition: top .2s ease; }
 .action-receipt { border: 1px solid var(--success-text); background: var(--success-soft); color: var(--success-text); border-radius: 10px; padding: 12px 16px; margin: 12px auto; max-width: 1400px; }
 .action-receipt summary { cursor: pointer; font-size: 13px; font-weight: 650; }
 .action-receipt p { margin: 8px 0 0; font-size: 14px; }
@@ -29,7 +28,6 @@
 .site-footer { width: 100%; max-width: none; border-top: 1px solid var(--border); padding-inline: clamp(20px, 4vw, 60px); margin-inline: 0; }
 .lesson-copy { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--accent-line); border-radius: 10px; padding: clamp(18px, 3vw, 32px); line-height: 1.8; }
 .lesson-copy::before { content: 'LEARNING NOTES'; display: block; font-size: 10px; font-weight: 750; letter-spacing: .14em; color: var(--muted); margin-bottom: 18px; }
-:is(.practice-quiz, .arcade-game, .coding-game) { border-color: var(--accent-line); }
 :is(button, .button, input, textarea, select, summary) { transition: background-color .18s ease, border-color .18s ease, color .18s ease; }
 .account-menu[open] > nav, .mobile-workspace[open] .mobile-workspace-panel, .toast { animation: panel-reveal .18s ease; }
 @keyframes panel-reveal { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
@@ -125,8 +123,6 @@
     .mobile-player-name { display: inline; font-weight: 700; color: var(--text); max-width: 100px; overflow: hidden; text-overflow: ellipsis; flex-shrink: 0; }
     .header-page-context { display: flex; gap: 4px; order: 3; flex: 1 0 100%; max-width: none; font-size: 11px; line-height: 1.4; padding-left: 2px; }
     .app-header.is-signed-in .app-primary-nav { display: none; }
-    .page-navigation { gap: 4px; margin-inline: 12px; }
-    .page-navigation .button { font-size: 11px; padding: 8px 10px; }
     .site-footer { flex-wrap: wrap; gap: 16px; padding: 24px 18px; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }

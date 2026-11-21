@@ -16,7 +16,8 @@ async function login(page, name) {
 
 async function answerQuiz(quiz) {
     const instance = JSON.parse(await quiz.getAttribute('data-practice-quiz'));
-    for (const question of instance.questions) {
+    for (const [index, question] of instance.questions.entries()) {
+        await quiz.getByRole('button', { name: new RegExp(`^Go to question ${index + 1},`) }).click();
         const group = quiz.locator(`[data-quiz-question="${question.id}"]`);
         if (question.type === 'blank') await group.locator('input').fill(question.accepted[0]);
         else if (question.type === 'matching') for (const pair of question.pairs) await group.locator(`[data-match-answer="${pair.id}"]`).selectOption(pair.id);
@@ -40,7 +41,7 @@ test('Expert map resumes the chosen track and a mixed quiz saves exactly the ver
     }
     await page.locator('[data-tower-continue]').click();
     const quiz = page.locator('[data-practice-quiz]');
-    await quiz.getByText('How it works', { exact: true }).click();
+    await page.getByRole('button', { name: 'Learn', exact: true }).click();
     await expect(quiz.locator('.activity-reference')).toContainText('candidate interval is [lo,hi)');
     const submissions = [];
     page.on('request', request => { if (request.method() === 'POST' && request.url().includes('/tower/')) submissions.push(request.url()); });

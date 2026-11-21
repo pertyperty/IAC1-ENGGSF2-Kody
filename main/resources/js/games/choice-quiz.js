@@ -50,20 +50,67 @@ export function mountQuiz(root) {
     const navigation = root.querySelector('[data-quiz-navigation]');
     const groups = navigation ? [...root.querySelectorAll('[data-quiz-question]')] : [];
     let updateNavigation = () => {};
+    let showQuestion = () => {};
     if (navigation && root.ownerDocument) {
         const doc = root.ownerDocument;
+        const form = root.querySelector('form');
+        let current = 0;
         navigation.replaceChildren();
-        const progress = doc.createElement('span'); navigation.append(progress);
+        const progress = doc.createElement('span');
+        progress.setAttribute('role', 'status');
+        navigation.append(progress);
+        const step = doc.createElement('p');
+        step.className = 'quiz-current-question';
+        step.setAttribute('aria-live', 'polite');
+        form.prepend(step);
+        const actions = doc.createElement('div');
+        actions.className = 'quiz-step-actions';
+        const previous = doc.createElement('button');
+        previous.type = 'button';
+        previous.className = 'button button-secondary';
+        previous.textContent = 'Previous question';
+        const next = doc.createElement('button');
+        next.type = 'button';
+        next.className = 'button button-play';
+        next.textContent = 'Next question';
+        actions.append(previous, next);
+        const submit = form.querySelector('button[type="submit"]');
+        const footer = doc.createElement('div');
+        footer.className = 'quiz-footer';
+        submit.before(footer);
+        footer.append(actions, submit);
         const jumps = groups.map((group, index) => {
-            const jump = doc.createElement('button'); jump.type = 'button'; jump.className = 'quiz-jump'; jump.textContent = String(index + 1); jump.setAttribute('aria-label', `Go to question ${index + 1}`);
-            jump.addEventListener('click', () => group.querySelector('input, select')?.focus());
-            navigation.append(jump); return jump;
+            const jump = doc.createElement('button');
+            jump.type = 'button';
+            jump.className = 'quiz-jump';
+            jump.textContent = String(index + 1);
+            jump.addEventListener('click', () => showQuestion(index));
+            navigation.append(jump);
+            return jump;
         });
+        showQuestion = (index, focus = true) => {
+            current = Math.max(0, Math.min(groups.length - 1, index));
+            groups.forEach((group, position) => { group.hidden = position !== current; });
+            jumps.forEach((jump, position) => {
+                if (position === current) jump.setAttribute('aria-current', 'step');
+                else jump.removeAttribute('aria-current');
+            });
+            step.textContent = `Question ${current + 1} of ${groups.length}`;
+            previous.disabled = current === 0;
+            previous.hidden = current === 0;
+            submit.classList.toggle('button-secondary', current < groups.length - 1);
+            next.hidden = current === groups.length - 1;
+            actions.hidden = groups.length < 2;
+            if (focus) groups[current].querySelector('input, select')?.focus();
+        };
+        previous.addEventListener('click', () => showQuestion(current - 1));
+        next.addEventListener('click', () => showQuestion(current + 1));
         updateNavigation = () => {
             let completed = 0;
             groups.forEach((group, index) => {
                 const controls = [...group.querySelectorAll('input, select')];
-                const answered = controls.some(control => control.type === 'radio') ? controls.some(control => control.checked)
+                const answered = controls.some(control => control.type === 'radio')
+                    ? controls.some(control => control.checked)
                     : controls.length > 0 && controls.every(control => control.value.trim());
                 jumps[index].dataset.answered = String(Boolean(answered));
                 jumps[index].setAttribute('aria-label', `Go to question ${index + 1}${answered ? ', answered' : ', unanswered'}`);
@@ -79,7 +126,9 @@ export function mountQuiz(root) {
             feedback.textContent = 'Answer changed. Check your answers again.';
             updateNavigation();
         }));
+        root.classList.add('quiz-stepped');
         updateNavigation();
+        showQuestion(0, false);
     }
     root.querySelector('form').addEventListener('submit', async (event) => {
         event.preventDefault();
@@ -102,7 +151,9 @@ export function mountQuiz(root) {
         if (!result.correct) {
             const incorrect = result.results?.find(item => !item.correct);
             const group = incorrect ? root.querySelector(`[data-quiz-question="${incorrect.id}"]`) : root;
-            group.querySelector('input, select')?.focus({ preventScroll: true });
+            const index = groups.indexOf(group);
+            if (index >= 0) showQuestion(index);
+            else group.querySelector('input, select')?.focus({ preventScroll: true });
         }
         if (result.correct) {
             busy = true;
@@ -116,6 +167,8 @@ export function mountQuiz(root) {
                 busy = false;
                 controls.forEach((control) => { control.disabled = false; });
                 root.setAttribute('aria-busy', 'false');
+                const active = groups.findIndex(group => !group.hidden);
+                if (active >= 0) showQuestion(active, false);
             }
         }
     });

@@ -83,16 +83,33 @@
 .practice-levels a { display: block; padding: .625rem 1rem; color: var(--muted); border-radius: 6px; text-decoration: none; min-height: 44px; }
 .practice-levels a[aria-current] { background: var(--accent-soft); color: var(--accent-text); font-weight: 650; box-shadow: inset 0 -2px var(--accent); }
 .practice-level-note { margin: .5rem 0 1.25rem; color: var(--muted); font-size: .9375rem; }
+.practice-quiz { margin-block: 1.5rem; padding: 0; border: 0; border-radius: 0; background: transparent; color: var(--text); }
+.practice-quiz .game-heading { padding-bottom: 1rem; border: 0; background: transparent; }
+/* One question at a time, with large answer targets and an explicit final check. */
 .practice-quiz [data-quiz-navigation] { display: flex; align-items: center; flex-wrap: wrap; gap: .5rem; margin: 1rem 0; }
+.practice-quiz [data-quiz-navigation] > span { flex-basis: 100%; font-size: .9375rem; color: var(--muted); }
 .quiz-jump { min-width: 44px; min-height: 44px; border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 6px; cursor: pointer; }
 .quiz-jump[data-answered="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent-text); }
-.practice-quiz form { max-height: 30rem; overflow-y: auto; overscroll-behavior: contain; padding: .25rem .75rem .75rem .25rem; scroll-padding-block: 1rem; }
-.practice-quiz form > fieldset { margin-bottom: 1.5rem; padding: 1rem 0; border: 0; border-bottom: 1px solid var(--border); }
-.practice-quiz fieldset legend { font-size: 1.125rem; line-height: 1.5; }
-.practice-quiz fieldset label { min-height: 48px; padding: .75rem; border-radius: 6px; cursor: pointer; }
-.practice-quiz fieldset label:has(input:checked) { background: var(--accent-soft); color: var(--accent-text); }
+.quiz-jump[aria-current] { outline: 2px solid var(--accent); outline-offset: 2px; }
+.practice-quiz form { display: block; background: transparent; max-height: 38rem; overflow-y: auto; overscroll-behavior: contain; padding: .25rem .75rem 1rem .25rem; scroll-padding-block: 1rem; }
+.practice-quiz form > fieldset { margin: 0 0 1.5rem; padding: 0; border: 0; border-radius: 0; background: transparent; min-width: 0; }
+.practice-quiz fieldset legend { font-size: clamp(1.25rem, 2.5vw, 1.75rem); line-height: 1.4; margin-bottom: 1.25rem; font-weight: 650; max-width: 60ch; }
+.practice-quiz fieldset label { display: flex; align-items: start; gap: .75rem; margin: .5rem 0 0; min-height: 60px; padding: 1rem; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; font-size: 1rem; line-height: 1.5; background: var(--surface); color: var(--text); }
+.practice-quiz fieldset label:has(input[type="radio"]) { border-left: 4px solid var(--accent); align-items: center; gap: .75rem; }
+.practice-quiz fieldset label:nth-of-type(2) { border-left-color: var(--violet-text); }
+.practice-quiz fieldset label:nth-of-type(3) { border-left-color: var(--warm-text); }
+.practice-quiz fieldset label:hover { background: var(--surface-hover); }
+.practice-quiz fieldset label:has(input:checked) { border-color: var(--accent); background: var(--accent-soft); color: var(--accent-text); box-shadow: inset 0 0 0 1px var(--accent); }
+.practice-quiz input[type="radio"] { width: 20px; height: 20px; flex: 0 0 20px; margin: 0; }
+.practice-quiz :is(input[type="text"], select) { min-height: 44px; width: 100%; padding: .5rem .75rem; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text); font-size: 1rem; }
+.practice-quiz .quiz-match-row, .practice-quiz label:has([data-blank-answer]) { display: grid; gap: .75rem; }
+.quiz-current-question { font-weight: 650; color: var(--accent-text); margin-bottom: .75rem; }
+.quiz-footer { position: sticky; bottom: 0; display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; padding: .75rem 0; background: var(--surface); border-top: 1px solid var(--border); }
+.quiz-footer .quiz-step-actions { margin: 0; }
+.quiz-step-actions { display: flex; flex-wrap: wrap; gap: .75rem; margin: 1rem 0; }
 .practice-quiz [data-question-feedback]:not(:empty) { padding: .75rem; background: var(--warm-soft); color: var(--warm-text); }
 .practice-quiz .question-correct [data-question-feedback]:not(:empty) { background: var(--accent-soft); color: var(--accent-text); }
+.learning-concept { color: var(--accent-text); font-weight: 650; }
 @media(max-width: 800px) {
     .mission-flow { gap: .5rem 1rem; margin-bottom: 1rem; }
     .mission-flow li { font-size: .8125rem; }
@@ -154,4 +171,34 @@
     .focus-game-shell .game-card .arcade-world:has(.pixel-grid) { flex: 0 0 auto; overflow: visible; }
     .focus-game-shell .game-card button.pixel-tile { min-height: 44px; }
     .focus-game-shell .stack-world .value-cell { min-height: 28px; padding: .25rem; font-size: .9375rem; }
+}
+
+/* Focus is the learner default; settings and the full page remain one click away. */
+body:has(.focus-game-shell[open]) { overflow: hidden; }
+.focus-header-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; }
+.focus-navigation { position: relative; }
+.focus-navigation > summary { display: flex; align-items: center; min-height: 44px; padding: .65rem .75rem; border: 1px solid var(--border); border-radius: .5rem; cursor: pointer; font-size: .9375rem; font-weight: 650; background: var(--surface); }
+.focus-navigation nav { position: absolute; right: 0; top: calc(100% + .5rem); z-index: 5; display: grid; min-width: 12rem; max-height: 60dvh; overflow: auto; padding: .5rem; border: 1px solid var(--border); border-radius: .5rem; background: var(--surface); box-shadow: 0 8px 24px var(--shadow); }
+.focus-navigation :is(a, button) { display: block; width: 100%; text-align: left; background: transparent; border: 0; font: inherit; cursor: pointer; padding: .65rem .75rem; min-height: 44px; color: var(--text); text-decoration: none; border-radius: .25rem; }
+.focus-navigation :is(a, button):hover { background: var(--accent-soft); color: var(--accent-text); }
+.focus-game-shell .activity-reference[open] { padding: 1rem; background: var(--surface-soft); border-left: 3px solid var(--accent); }
+.focus-game-shell .activity-reference > div { max-height: 18rem; }
+.focus-game-shell .practice-quiz { flex: 1; min-height: 0; display: flex; flex-direction: column; margin: 0; padding: 0; overflow-y: auto; }
+.focus-quiz-shell .lesson-briefing, .focus-quiz-shell .quiz-progress-note, .focus-quiz-shell .quiz-current-question, .focus-quiz-shell .practice-quiz > .activity-reference:not([open]) { display: none; }
+.focus-quiz-shell .practice-quiz form { max-height: none; flex: 1; min-height: 12rem; scroll-padding-bottom: 7rem; }
+.focus-quiz-shell .practice-quiz > .activity-reference { flex: 0 0 auto; }
+.focus-quiz-shell .quiz-progress-note { margin-block: .5rem; }
+@media(min-width: 760px) {
+    .quiz-stepped fieldset:has(input[type="radio"]) { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; }
+    .quiz-stepped fieldset [data-question-feedback] { grid-column: 1 / -1; }
+    .quiz-stepped fieldset label { margin: 0; }
+}
+@media(max-width: 600px) {
+    .focus-game-shell > header { flex-wrap: wrap; gap: .5rem; }
+    .focus-game-shell > header h2 { flex-basis: 100%; }
+    .focus-header-actions { margin-left: auto; }
+    .focus-game-shell .lesson-briefing { padding-bottom: .25rem; }
+    .focus-game-shell .activity-goal p { max-height: 4.5rem; font-size: .9375rem; }
+    .practice-quiz form { padding-right: .25rem; }
+    .practice-quiz fieldset legend { font-size: 1.25rem; }
 }
