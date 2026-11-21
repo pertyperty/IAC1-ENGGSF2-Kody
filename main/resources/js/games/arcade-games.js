@@ -3,6 +3,7 @@ import { createIcon } from '../icons.js';
 import { puzzleTemplates, validPuzzle, evaluatePuzzle, renderPuzzle } from './puzzle-games.js';
 import { saveCompletion } from './save-completion.js';
 import { programRuleError, mountConceptCheck, objectiveFeedback } from './assessment-challenges.js';
+import { mountMission } from './mission.js';
 
 export const arcadeTemplates = ['pixel-studio', 'number-machine', 'sort-lab', 'terminal-quest', ...puzzleTemplates];
 
@@ -36,9 +37,11 @@ export function evaluateArcade(game, program) {
     const state = { number: scenario.start ?? 0, items: [...(scenario.items ?? [])], pixels: {}, files: Object.fromEntries((scenario.files ?? []).map((file) => [file.name, file.content])) };
     const output = [];
     let readDestination = false;
-    const failure = (message) => ({ state, output, success: false, error: message });
+    let instructionIndex = -1;
+    const failure = (message) => ({ state, output, success: false, error: message, failedStep: instructionIndex });
     if (!arcadeTemplates.includes(game.template) || game.version !== 1 || !Array.isArray(program) || program.length < 1 || program.length > 12) return failure('Use between 1 and 12 instructions.');
     for (const command of program) {
+        instructionIndex++;
         if (typeof command !== 'string' || command.length > 100 || command.trim() !== command) return failure('Check the instruction format.');
         let match;
         switch (game.template) {
@@ -102,6 +105,7 @@ export function mountArcade(root) {
     const firstPlayCue = root.querySelector('[data-first-play-cue]');
     const conceptCheck = mountConceptCheck(root, game);
     const limit = game.assessment?.limit ?? 12;
+    const mission = mountMission(root, game);
     let busy = false;
     let inspector;
     let selectedColor = 'mint';
@@ -130,6 +134,7 @@ export function mountArcade(root) {
         return element;
     }
     function render(state) {
+        mission.update(state);
         world.replaceChildren();
         if (puzzleTemplates.includes(game.template)) {
             renderPuzzle(game, state, world, node, button, add);
@@ -146,6 +151,7 @@ export function mountArcade(root) {
                         ? button(`${x},${y}`, `pixel-tile pixel-${color}`, `Paint column ${x}, row ${y}; currently ${color}`, () => paint(x, y))
                         : node('span', `${x},${y}`, `pixel-tile pixel-${color}`);
                     if (label === 'Target picture') { tile.setAttribute('role', 'img'); tile.setAttribute('aria-label', tileLabel); }
+                    if (label === 'Your canvas') tile.dataset.match = color === (target[`${x} ${y}`] ?? 'blank') ? 'same' : 'different';
                     grid.append(tile);
                 }
                 panel.append(grid);
@@ -161,6 +167,14 @@ export function mountArcade(root) {
                 return element;
             };
             world.append(start, arrow(), current, arrow(), target);
+            const trail = node('ol', '', 'value-journey'); trail.setAttribute('aria-label', 'Value after each instruction');
+            lines().slice(0, 12).forEach((command, index) => {
+                const frame = evaluateArcade(game, lines().slice(0, index + 1));
+                const item = node('li', '', frame.error ? 'journey-error' : '');
+                item.append(node('small', `Step ${index + 1}`), node('code', readableInstruction(game.template, command)), node('b', frame.error ? 'Check instruction' : String(frame.state.number)));
+                trail.append(item);
+            });
+            const history = node('details', '', 'value-history'); history.append(node('summary', 'Trace changes'), trail); world.append(history);
         } else if (game.template === 'sort-lab') {
             const stack = node('div', '', 'sort-stack');
             state.items.forEach((value, index) => {
@@ -173,16 +187,22 @@ export function mountArcade(root) {
                     }
                 });
                 tile.setAttribute('aria-pressed', String(selectedPosition === index));
+                tile.dataset.match = value === [...game.scenario.items].sort((a, b) => a - b)[index] ? 'same' : 'different';
                 tile.append(node('b', String(value)), node('small', `position ${index + 1}`));
                 const bar = node('span', '', 'sort-bar'); bar.style.setProperty('--bar-height', `${30 + value / 99 * 60}%`); tile.append(bar);
                 stack.append(tile);
             });
-            world.append(stack, node('p', 'Tap two tiles to swap them. Put the smallest value first.', 'scene-instruction'));
+            const goal = node('p', `Target: [${[...game.scenario.items].sort((a, b) => a - b).join(', ')}]`, 'array-target');
+            world.append(goal, stack, node('p', 'Select two positions to add a swap.', 'scene-instruction'));
         } else {
             const mission = node('div', '', 'terminal-mission');
             mission.append(node('span', 'VIRTUAL WORKSPACE', 'game-kicker'), node('h3', `Make ${game.scenario.destination}`), node('p', `Copy a file containing “${game.scenario.content}”, then inspect the new file with cat.`));
             const files = node('ul', '', 'terminal-files');
-            Object.keys(state.files).forEach(name => files.append(node('li', name)));
+            Object.keys(state.files).forEach(name => {
+                const item = node('li', '');
+                item.append(button(name, 'file-inspect', `Read ${name}`, () => add(`cat ${name}`)));
+                files.append(item);
+            });
             world.append(mission, files, node('p', 'A safe simulator. Commands never access your computer.', 'scene-instruction'));
         }
     }
@@ -193,6 +213,8 @@ export function mountArcade(root) {
         const result = evaluateArcade(game, program);
         render(result.state);
         count.textContent = `${program.length} / ${limit} instructions`;
+        root.querySelector('[data-arcade-undo]').disabled = busy || !program.length;
+        root.querySelectorAll('[data-add-command]').forEach(control => { control.disabled = busy || program.length >= limit; });
         root.querySelector('[data-arcade-run]').disabled = busy || program.length === 0;
         programList.replaceChildren();
         if (!program.length) programList.append(node('li', 'Add an instruction to start.', 'trace-placeholder'));
@@ -203,13 +225,28 @@ export function mountArcade(root) {
             const remove = button('', 'instruction-remove', `Remove step ${index + 1}`, () => {
                 const updated = lines(); updated.splice(index, 1); code.value = updated.join('\n'); preview();
                 programList.querySelectorAll('button')[Math.min(index, updated.length - 1)]?.focus({ preventScroll: true });
-                if (!updated.length) root.querySelector('[data-arcade-run]').focus();
+                if (!updated.length) controls.querySelector('button:not(:disabled), input:not(:disabled)')?.focus();
             }); remove.append(createIcon(root.ownerDocument, 'close')); row.append(remove);
+            row.tabIndex = 0;
+            row.setAttribute('aria-label', `Step ${index + 1}: ${readableInstruction(game.template, command)}. Alt and arrow keys reorder; Delete removes.`);
+            row.addEventListener('keydown', event => {
+                if (busy || event.target !== row) return;
+                const updated = lines(); let destination = index;
+                if (event.key === 'Delete' || event.key === 'Backspace') { event.preventDefault(); updated.splice(index, 1); }
+                else if (event.altKey && ['ArrowUp', 'ArrowDown'].includes(event.key)) {
+                    event.preventDefault(); destination = index + (event.key === 'ArrowUp' ? -1 : 1);
+                    if (destination < 0 || destination >= updated.length) return;
+                    [updated[index], updated[destination]] = [updated[destination], updated[index]];
+                } else return;
+                code.value = updated.join('\n'); preview();
+                if (updated.length) programList.querySelectorAll('li')[Math.min(destination, updated.length - 1)]?.focus({ preventScroll: true });
+                else controls.querySelector('button:not(:disabled), input:not(:disabled)')?.focus();
+            });
             programList.append(row);
         });
         inspector?.refresh();
         root.dataset.playState = 'ready';
-        output.textContent = program.length ? 'Program changed. Run to check the goal.' : 'Add instructions, then run your program.';
+        output.textContent = program.length >= limit ? 'Instruction limit reached. Undo or remove a step to make changes.' : program.length ? 'Program changed. Run to check the goal.' : 'Add instructions, then run your program.';
         root.querySelector('[data-execution-label]').textContent = program.length ? 'Preview' : 'Not run';
         previewStatus.textContent = program.length ? 'Preview of your instructions. Run to check the goal.'
             : ['pixel-studio', 'sort-lab', 'logic-switchboard'].includes(game.template) ? firstSteps[game.template] : 'Your starting state. Build a program below.';
@@ -226,7 +263,7 @@ export function mountArcade(root) {
     }
     function commandAvailable(command) {
         if (game.assessment?.commands.length && !game.assessment.commands.includes(command)) {
-            output.textContent = 'That instruction is not available in this task. Choose one from Instruction.';
+            output.textContent = 'That instruction is not available in this task. Use the available instruction buttons.';
             output.focus({ preventScroll: true });
             return false;
         }
@@ -257,12 +294,15 @@ export function mountArcade(root) {
         'sort-lab': 'Tap two numbered tiles to add a swap. Run to check the order.',
         'logic-switchboard': 'Tap an input switch to add a flip. Run to check the output.',
         'terminal-quest': 'Add a command to your program, then select Run.',
-        'number-machine': 'Choose an instruction, select Add instruction, then Run.',
-        'string-forge': 'Choose an instruction, select Add instruction, then Run.',
-        'memory-trail': 'Choose an instruction, select Add instruction, then Run.',
+        'number-machine': 'Tap an instruction to add it. Run tests the complete program.',
+        'string-forge': 'Tap a transformation to add it. Order changes the result.',
+        'memory-trail': 'Tap an operation to add it. Only the top of the stack changes.',
     };
-    if (firstPlayCue) firstPlayCue.textContent = ['pixel-studio', 'sort-lab', 'logic-switchboard'].includes(game.template)
-        ? 'Your board actions become instructions below. Run to check the goal.' : firstSteps[game.template];
+    if (firstPlayCue) {
+        if (['pixel-studio', 'sort-lab', 'logic-switchboard'].includes(game.template)) firstPlayCue.textContent = 'Your board actions become instructions below. Run to check the goal.';
+        else if (game.template === 'terminal-quest' || game.assessment?.commands.length) firstPlayCue.textContent = firstSteps[game.template];
+        else firstPlayCue.textContent = 'Choose an operation, then select Add instruction.';
+    }
     if (game.template === 'pixel-studio') {
         const palette = node('div', '', 'paint-palette');
         palette.setAttribute('role', 'group'); palette.setAttribute('aria-label', 'Paint color');
@@ -277,8 +317,15 @@ export function mountArcade(root) {
         previewStatus.before(palette);
     }
     if (game.assessment?.commands.length) {
-        const instruction = select('Instruction', game.assessment.commands);
-        build = () => instruction.value;
+        const bank = node('div', '', 'instruction-bank'); bank.setAttribute('role', 'group'); bank.setAttribute('aria-label', 'Available instructions');
+        const meanings = { add: 'Increase the value', subtract: 'Decrease the value', multiply: 'Scale the value', trim: 'Remove outer spaces', upper: 'Uppercase all letters', lower: 'Lowercase all letters', reverse: 'Reverse the characters', append: 'Add text at the end', pop: 'Remove TOP', swap: 'Exchange the top two', duplicate: 'Copy TOP' };
+        game.assessment.commands.forEach(command => {
+            const control = button('', 'instruction-choice', `Add ${readableInstruction(game.template, command)}`, () => add(command));
+            control.dataset.addCommand = command;
+            control.append(node('code', readableInstruction(game.template, command)), node('small', meanings[command.split(' ')[0]] ?? 'Add this instruction'));
+            bank.append(control);
+        });
+        controls.append(bank);
     } else if (game.template === 'pixel-studio') {
         // Canvas taps add paint instructions using the palette above.
     } else if (game.template === 'number-machine') {
@@ -347,11 +394,13 @@ export function mountArcade(root) {
             if (!checkingAnswer && game.template !== 'terminal-quest') for (let step = 1; step <= Math.min(program.length, 12); step++) {
                 const frame = evaluateArcade(game, program.slice(0, step));
                 inspector.highlight(step - 1);
-                render(frame.state); previewStatus.textContent = `Running step ${step} of ${program.length}…`;
+                render(frame.state); previewStatus.textContent = `Step ${step} of ${program.length}: ${readableInstruction(game.template, program[step - 1])}`;
                 if (delay) await new Promise(resolve => setTimeout(resolve, delay));
                 if (frame.error) break;
             }
             const result = evaluateArcade(game, program); render(result.state);
+            if (result.success && showResult) mission.update({ ...result.state, verified: true });
+            if (result.error && result.failedStep >= 0) programList.querySelectorAll('li')[result.failedStep]?.classList.add('instruction-error');
             output.textContent = [...(game.template === 'terminal-quest' ? result.output : []), result.success ? `Program complete. ${game.learningIdea}` : objectiveFeedback(game, result)].join('\n');
             root.dataset.playState = result.success ? 'success' : 'retry';
             root.querySelector('[data-execution-label]').textContent = result.success ? 'Goal reached' : 'Needs changes';
@@ -373,6 +422,8 @@ export function mountArcade(root) {
             root.querySelectorAll('button, input, select, textarea').forEach(control => { control.disabled = false; });
             root.querySelector('[data-arcade-run]').disabled = lines().length === 0;
             syncOperand();
+            root.querySelector('[data-arcade-undo]').disabled = !lines().length;
+            root.querySelectorAll('[data-add-command]').forEach(control => { control.disabled = lines().length >= limit; });
             inspector.refresh();
             if (root.dataset.playState === 'checking') {
                 const check = root.querySelector('[data-concept-check]');
@@ -381,6 +432,9 @@ export function mountArcade(root) {
         }
     }
     root.querySelector('[data-arcade-run]').addEventListener('click', () => run(true));
+    root.querySelector('[data-arcade-undo]').addEventListener('click', () => {
+        if (!busy) { const program = lines(); program.pop(); code.value = program.join('\n'); preview(); }
+    });
     root.querySelector('[data-arcade-hint]').addEventListener('click', () => { output.textContent = game.hint; output.focus({ preventScroll: true }); });
     root.querySelector('[data-arcade-reset]').addEventListener('click', () => {
         if (!busy) { code.value = ''; history.length = 0; historyIndex = 0; if (terminalInput) terminalInput.value = ''; preview(); output.textContent = 'Ready when you are.'; }

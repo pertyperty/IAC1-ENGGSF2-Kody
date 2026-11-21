@@ -47,6 +47,40 @@ export function mountQuiz(root) {
     try { quiz = validateQuiz(JSON.parse(root.dataset.practiceQuiz)); }
     catch { feedback.textContent = 'This quiz is unavailable. Try another adventure.'; root.querySelector('button').disabled = true; return; }
     let busy = false;
+    const navigation = root.querySelector('[data-quiz-navigation]');
+    const groups = navigation ? [...root.querySelectorAll('[data-quiz-question]')] : [];
+    let updateNavigation = () => {};
+    if (navigation && root.ownerDocument) {
+        const doc = root.ownerDocument;
+        navigation.replaceChildren();
+        const progress = doc.createElement('span'); navigation.append(progress);
+        const jumps = groups.map((group, index) => {
+            const jump = doc.createElement('button'); jump.type = 'button'; jump.className = 'quiz-jump'; jump.textContent = String(index + 1); jump.setAttribute('aria-label', `Go to question ${index + 1}`);
+            jump.addEventListener('click', () => group.querySelector('input, select')?.focus());
+            navigation.append(jump); return jump;
+        });
+        updateNavigation = () => {
+            let completed = 0;
+            groups.forEach((group, index) => {
+                const controls = [...group.querySelectorAll('input, select')];
+                const answered = controls.some(control => control.type === 'radio') ? controls.some(control => control.checked)
+                    : controls.length > 0 && controls.every(control => control.value.trim());
+                jumps[index].dataset.answered = String(Boolean(answered));
+                jumps[index].setAttribute('aria-label', `Go to question ${index + 1}${answered ? ', answered' : ', unanswered'}`);
+                if (answered) completed++;
+            });
+            progress.textContent = `${completed} of ${groups.length} answered`;
+        };
+        groups.forEach(group => group.addEventListener('input', () => {
+            if (busy) return;
+            root.classList.remove('quiz-correct');
+            group.classList.remove('question-correct', 'question-retry');
+            group.querySelector('[data-question-feedback]').textContent = '';
+            feedback.textContent = 'Answer changed. Check your answers again.';
+            updateNavigation();
+        }));
+        updateNavigation();
+    }
     root.querySelector('form').addEventListener('submit', async (event) => {
         event.preventDefault();
         if (busy) return;
@@ -54,7 +88,16 @@ export function mountQuiz(root) {
             : Object.fromEntries(quiz.questions.map((question) => [question.id, readQuestionAnswer(root.querySelector(`[data-quiz-question="${question.id}"]`), question)]));
         const result = checkPracticeAnswer(quiz, answer);
         feedback.textContent = result.message;
-        if (result.results) result.results.forEach((item) => { root.querySelector(`[data-quiz-question="${item.id}"] [data-question-feedback]`).textContent = item.message; });
+        if (result.results) result.results.forEach((item) => {
+            const group = root.querySelector(`[data-quiz-question="${item.id}"]`);
+            group.querySelector('[data-question-feedback]').textContent = item.message;
+            group.classList.toggle('question-correct', item.correct);
+            group.classList.toggle('question-retry', !item.correct);
+        });
+        if (!result.results && groups.length === 1) {
+            groups[0].classList.toggle('question-correct', result.correct);
+            groups[0].querySelector('[data-question-feedback]').textContent = result.message;
+        }
         root.classList.toggle('quiz-correct', result.correct);
         if (!result.correct) {
             const incorrect = result.results?.find(item => !item.correct);

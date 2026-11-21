@@ -37,10 +37,10 @@ test('all seven games expose the first action and require a program before Run @
             await game.getByRole('textbox', { name: 'kody@workspace $', exact: true }).fill('ls');
             await game.getByRole('button', { name: 'Add instruction', exact: true }).click();
         } else {
-            const choice = game.getByRole('combobox', { name: 'Instruction', exact: true });
-            await expect(choice).toBeVisible();
-            if (template === 'memory-trail') await expect(choice).toContainText('stack.');
-            await game.getByRole('button', { name: 'Add instruction', exact: true }).click();
+            const choices = game.getByRole('group', { name: 'Available instructions' });
+            await expect(choices).toBeVisible();
+            if (template === 'memory-trail') await expect(choices).toContainText('stack.');
+            await choices.getByRole('button').first().click();
         }
         await expect(run).toBeEnabled();
         await expect(game.locator('[data-execution-label]')).toHaveText('Preview');

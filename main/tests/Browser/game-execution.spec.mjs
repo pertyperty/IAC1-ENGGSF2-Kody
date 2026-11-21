@@ -64,8 +64,8 @@ test('guided games mount without crypto.randomUUID on HTTP development hosts @cr
     await page.addInitScript(() => Object.defineProperty(globalThis.crypto, 'randomUUID', { value: undefined }));
     await page.goto('/playground?game=number-machine');
     const game = page.locator('[data-arcade-game]');
-    await expect(game.getByRole('combobox', { name: 'Instruction', exact: true })).toBeVisible();
-    await game.getByRole('button', { name: 'Add instruction', exact: true }).click();
+    await expect(game.getByRole('group', { name: 'Available instructions' })).toBeVisible();
+    await game.locator('[data-add-command]').first().click();
     await expect(game.locator('[data-instruction-index]')).toHaveCount(1);
     expect(errors).toEqual([]);
 });

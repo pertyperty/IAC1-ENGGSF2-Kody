@@ -101,9 +101,9 @@ test('guided command references match the instructions accepted by each task', a
         await game.getByText('Command reference', { exact: true }).click();
         const help = game.locator('[data-arcade-help]');
         await expect(help).toHaveText(`For this task: ${allowed.join(', ')}. One instruction per line.`);
-        const options = game.getByRole('combobox', { name: 'Instruction', exact: true }).locator('option');
-        await expect(options).toHaveText(labels);
-        expect(await options.evaluateAll(items => items.map(option => option.value))).toEqual(allowed);
+        const choices = game.locator('[data-add-command]');
+        await expect(choices.locator('code')).toHaveText(labels);
+        expect(await choices.evaluateAll(items => items.map(button => button.dataset.addCommand))).toEqual(allowed);
         if (template === 'number-machine') await page.screenshot({ path: 'storage/app/browser-results/task-command-reference.png', fullPage: true });
         await game.locator('.program-arrange summary').click();
         await game.getByLabel('Your program', { exact: true }).fill(forbidden);

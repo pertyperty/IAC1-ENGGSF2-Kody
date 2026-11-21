@@ -6,7 +6,7 @@
     @include('learning.briefing')
     <div class="arcade-workbench">
         <div class="arcade-scene">
-            <div class="scene-heading"><h3>Game state</h3><span data-execution-label>Not run</span></div>
+            <div class="scene-heading"><h3>Preview board</h3><span data-execution-label>Not run</span></div>
             <div data-arcade-world class="arcade-world" role="group" aria-label="Activity state" tabindex="0"></div>
             <p class="scene-caption" data-arcade-preview-status role="status" tabindex="0">Add instructions, then run your program.</p>
         </div>
@@ -16,7 +16,7 @@
             <div data-arcade-controls class="arcade-controls"></div>
             <ol class="arcade-program-list trace-source" data-arcade-program data-readable-program aria-label="Readable program" tabindex="0"></ol>
             <section data-concept-check class="concept-check" hidden aria-label="Concept check"></section>
-            <div class="game-toolbar"><button class="button button-play" type="button" data-arcade-run aria-label="Run">Run</button><button class="game-reset" type="button" data-arcade-reset>Reset</button><button class="game-reset" type="button" data-arcade-hint>Hint</button></div>
+            <div class="game-toolbar"><button class="button button-play" type="button" data-arcade-run aria-label="Run">Run</button><button class="game-reset" type="button" data-arcade-undo disabled>Undo</button><button class="game-reset" type="button" data-arcade-reset>Reset</button><button class="game-reset" type="button" data-arcade-hint>Hint</button></div>
             <pre data-arcade-output class="arcade-output" role="status" aria-live="polite" tabindex="0" aria-label="Program output">Ready to run.</pre>
             <div class="game-extras">
                 @include('learning.activity-reference')

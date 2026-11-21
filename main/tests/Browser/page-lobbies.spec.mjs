@@ -64,7 +64,7 @@ test('favicon and page guides stay specific across Help Arcade weekly quests wal
 test('arcade lobby quiz cabinet automatically checks choices blanks and matching without mutation requests', async ({ page }) => {
     const writes = []; page.on('request', request => { if (!['GET', 'HEAD'].includes(request.method())) writes.push(request.method()); });
     await page.setViewportSize({ width: 1920, height: 1000 }); await page.goto('/playground?game=quiz-lab');
-    await expect(page.locator('#practice-game option')).toHaveCount(8); await audit(page);
+    await expect(page.locator('#practice-game option')).toHaveCount(11); await audit(page);
     await page.screenshot({ path: 'storage/app/browser-results/arcade-cabinet-lobby.png', fullPage: true });
     const quiz = page.locator('[data-practice-quiz]');
     await quiz.getByLabel('True', { exact: true }).check(); await quiz.getByLabel('Your short answer').fill(' IF ');

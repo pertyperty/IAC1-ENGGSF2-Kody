@@ -1,5 +1,10 @@
 # Release evidence index
 
+The [21 November game overhaul](game-overhaul-2026-11-21.md) covers all existing
+engines, direct instructions, target comparisons, Focus game, quiz navigation and
+thirty practice tasks. Automated task completion remains distinct from human
+learning-effectiveness and release evidence.
+
 The [21 November first-play follow-up](learner-stabilization-2026-11-20.md#first-play-follow-up-21-november)
 records direct first-login Tower play, optional track choice, board-first mobile
 games, clearer actions and responsive shared controls. It supersedes the earlier
