@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\BrowseModulesRequest;
 use App\Models\ModuleRevision;
 use App\Services\Content\LearningHistory;
-use App\Services\Games\AssessmentChallenges;
+use App\Services\Games\PracticeChallenges;
 use App\Services\Gamification\LearningProgression;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -20,15 +20,17 @@ class LearningController extends Controller
 
     public function arcade(Request $request): Response
     {
-        $tasks = app(AssessmentChallenges::class)->catalog();
-        $cabinets = [];
-        foreach (config('arcade') as $template => $game) {
-            $cabinets[$template] = collect($tasks)->firstWhere('template', $template) ?? $game;
-        }
-        $cabinets += config('practice-quizzes');
-        $selected = $request->validate(['game' => ['sometimes', 'string', Rule::in(array_keys($cabinets))]])['game'] ?? 'pixel-studio';
+        $levels = PracticeChallenges::LEVELS;
+        $input = $request->validate([
+            'game' => ['sometimes', 'string', Rule::in([...array_keys(config('practice-challenges')), ...array_keys(config('practice-quizzes'))])],
+            'level' => ['sometimes', 'string', Rule::in(array_keys($levels))],
+        ]);
+        $level = $input['level'] ?? 'challenge';
+        $selected = $input['game'] ?? 'pixel-studio';
+        $cabinets = app(PracticeChallenges::class)->catalog($level) + config('practice-quizzes');
 
-        return response()->view('learning.arcade', ['selected' => $selected, 'game' => $cabinets[$selected], 'cabinets' => $cabinets]);
+        return response()->view('learning.arcade', ['selected' => $selected, 'level' => $level, 'levels' => $levels,
+            'game' => $cabinets[$selected], 'cabinets' => $cabinets]);
     }
 
     public function catalog(BrowseModulesRequest $request): Response

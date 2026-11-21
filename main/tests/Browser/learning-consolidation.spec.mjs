@@ -14,9 +14,13 @@ test.beforeEach(async ({ page }) => {
     await page.addInitScript(() => localStorage.setItem('kody-tour-v1', 'dismissed'));
     await mkdir(evidence, { recursive: true });
 });
-test('verified newcomer starts Expert directly and retains the choice after login @cross-browser', async ({ page }, testInfo) => {
+test('verified newcomer plays first and can choose Expert afterward @cross-browser', async ({ page }, testInfo) => {
     await login(page, `newlearner_${testInfo.project.name}`);
+    await expect(page).toHaveURL(/\/tower\/1$/);
     const prompt = page.getByRole('dialog', { name: 'Where would you like to start?' });
+    await expect(prompt).not.toBeVisible();
+    await expect(page.locator('[data-coding-game]')).toBeVisible();
+    await page.getByRole('button', { name: 'Choose track', exact: true }).click();
     await expect(prompt).toBeVisible();
     await prompt.getByRole('radio', { name: /Expert/ }).check();
     await page.screenshot({ path: `${evidence}/proficiency-choice.png` });

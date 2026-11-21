@@ -91,17 +91,19 @@ test('constrained practice checks answers without replay and clears them after p
 });
 
 test('guided command references match the instructions accepted by each task', async ({ page }) => {
-    for (const [template, allowed, forbidden] of [
-        ['number-machine', ['add 3', 'subtract 1', 'multiply 2'], 'subtract 2'],
-        ['string-forge', ['trim', 'upper', 'reverse', 'append _ok'], 'lower'],
-        ['memory-trail', ['pop', 'swap', 'duplicate'], 'push 2'],
+    for (const [template, allowed, labels, forbidden] of [
+        ['number-machine', ['add 3', 'subtract 1', 'multiply 2'], ['value = value + 3', 'value = value \u2212 1', 'value = value \u00d7 2'], 'subtract 2'],
+        ['string-forge', ['trim', 'upper', 'reverse', 'append _ok'], ['text = trim(text)', 'text = upper(text)', 'text = reverse(text)', 'text = text + "_ok"'], 'lower'],
+        ['memory-trail', ['pop', 'swap', 'duplicate'], ['stack.pop()', 'stack.swap_top()', 'stack.duplicate_top()'], 'push 2'],
     ]) {
         await page.goto(`/playground?game=${template}`);
         const game = page.locator('[data-arcade-game]');
         await game.getByText('Command reference', { exact: true }).click();
         const help = game.locator('[data-arcade-help]');
         await expect(help).toHaveText(`For this task: ${allowed.join(', ')}. One instruction per line.`);
-        await expect(game.getByRole('combobox', { name: 'Instruction', exact: true }).locator('option')).toHaveText(allowed);
+        const choices = game.locator('[data-add-command]');
+        await expect(choices.locator('code')).toHaveText(labels);
+        expect(await choices.evaluateAll(items => items.map(button => button.dataset.addCommand))).toEqual(allowed);
         if (template === 'number-machine') await page.screenshot({ path: 'storage/app/browser-results/task-command-reference.png', fullPage: true });
         await game.locator('.program-arrange summary').click();
         await game.getByLabel('Your program', { exact: true }).fill(forbidden);

@@ -1,3 +1,21 @@
+The [21 November game overhaul](docs/game-overhaul-2026-11-21.md) uses direct
+pseudocode instruction buttons, mission comparisons, visible Undo, bounded quiz
+navigation and practice-only Warm-up/Challenge/Stretch variations. Focus game
+uses a native dialog to fit board and independently scrolling controls to the
+screen; closing it restores the same live game and program. Do not rewrite saved
+assessment snapshots or treat preview matches/difficulty choices as completions.
+Keep provider activation paused.
+
+The [21 November first-play follow-up](docs/learner-stabilization-2026-11-20.md#first-play-follow-up-21-november)
+supersedes the mobile ordering below: show the goal and board before program
+controls, with Pixel Studio's palette beside its canvas. Keep desktop panes and
+bounded programs. The first verified learner login enters an admitted Tower game;
+Choose track opens an optional picker afterward. Never fabricate a preference,
+clearance or reward. Returning accounts retain their existing landing behavior.
+Run is unavailable until instructions exist; terminal commands are added before
+explicit Run. Board actions and displayed pseudocode share the same interpreters.
+Provider activation remains paused.
+
 The [20 November learner stabilization](docs/learner-stabilization-2026-11-20.md)
 anchors Show navigation to the viewport and removes automatic hover restoration.
 Mobile games show the goal and program before the scene; desktop reference help

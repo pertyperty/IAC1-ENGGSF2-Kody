@@ -22,7 +22,7 @@ async function login(page, role) {
     await page.getByRole('button', { name: 'Sign in', exact: false }).click();
     await finishSignIn(page);
     const creatorOrStaff = ['instructor','moderator','administrator','navinstructor','navmoderator','navadministrator','navcontributor','toweradmin'].includes(role);
-    await expect(page).toHaveURL(creatorOrStaff ? /\/dashboard$/ : /\/$/);
+    await expect(page).toHaveURL(creatorOrStaff ? /\/dashboard$/ : /\/(?:tower\/\d+)?$/);
     if (!creatorOrStaff) await page.goto('/dashboard');
 }
 

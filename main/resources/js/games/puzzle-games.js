@@ -15,9 +15,11 @@ export function evaluatePuzzle(game, program) {
     const scenario = game.scenario;
     const state = { text: scenario.start, stack: Array.isArray(scenario.start) ? [...scenario.start] : [], inputs: [...(scenario.inputs ?? [])] };
     const output = [];
-    const fail = error => ({ state, output, success: false, error });
+    let instructionIndex = -1;
+    const fail = error => ({ state, output, success: false, error, failedStep: instructionIndex });
     if (game.version !== 1 || !validPuzzle(game.template, scenario) || !Array.isArray(program) || program.length < 1 || program.length > 12) return fail('Use between 1 and 12 instructions in a valid scenario.');
     for (const command of program) {
+        instructionIndex++;
         if (typeof command !== 'string' || command.length > 100 || command.trim() !== command) return fail('Check the instruction format.');
         let match;
         if (game.template === 'logic-switchboard') {
@@ -63,8 +65,11 @@ export function renderPuzzle(game, state, world, node, button, add) {
         });
         const on = state.inputs.filter(Boolean).length;
         const signal = game.scenario.gate === 'and' ? on === state.inputs.length : game.scenario.gate === 'or' ? on > 0 : on % 2 === 1;
-        const gate = node('div', game.scenario.gate.toUpperCase(), 'logic-gate');
+        const gate = node('div', '', 'logic-gate');
+        gate.append(node('b', game.scenario.gate.toUpperCase()), node('small', { and: 'All inputs', or: 'Any input', xor: 'Odd count' }[game.scenario.gate]));
         const lamp = node('div', '', `signal-lamp ${signal ? 'is-on' : ''}`); lamp.append(node('small', 'OUTPUT'), node('b', signal ? 'TRUE' : 'FALSE'), node('small', `Target: ${game.scenario.target ? 'TRUE' : 'FALSE'}`)); world.append(inputs, gate, lamp);
+        const expression = node('p', `${state.inputs.map(value => value ? 'TRUE' : 'FALSE').join(` ${game.scenario.gate.toUpperCase()} `)} = ${signal ? 'TRUE' : 'FALSE'}`, 'boolean-expression');
+        expression.setAttribute('aria-label', 'Boolean expression'); world.append(expression);
     } else {
         for (const [label, value] of [['Your state', game.template === 'string-forge' ? state.text : state.stack], ['Target', game.scenario.target]]) {
             const panel = node('div', '', 'puzzle-state'); panel.append(node('h3', label));
@@ -73,6 +78,8 @@ export function renderPuzzle(game, state, world, node, button, add) {
             if (!values.length) strip.append(node('span', game.template === 'memory-trail' ? 'Empty stack' : 'Empty text', 'field-hint'));
             values.forEach((item, index) => {
                 const cell = node('span', item === ' ' ? 'space' : String(item), `value-cell${item === ' ' ? ' space-cell' : ''}`);
+                cell.setAttribute('aria-label', `${game.template === 'memory-trail' ? 'Slot' : 'Character'} ${index + 1}: ${item === ' ' ? 'space' : item}`);
+                if (label === 'Your state') cell.dataset.match = item === game.scenario.target[index] ? 'same' : 'different';
                 if (game.template === 'memory-trail' && index === values.length - 1) {
                     cell.classList.add('stack-top');
                     cell.append(node('small', 'TOP'));
@@ -80,6 +87,7 @@ export function renderPuzzle(game, state, world, node, button, add) {
                 strip.append(cell);
             });
             panel.append(strip);
+            if (game.template === 'memory-trail') panel.append(node('p', 'BOTTOM', 'stack-base'));
             world.append(panel);
         }
     }

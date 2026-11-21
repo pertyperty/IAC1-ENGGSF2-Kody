@@ -54,7 +54,7 @@ export function mountConceptCheck(root, game) {
                 labelRun(originalLabel);
                 return true;
             }
-            note.textContent = answer() ? `Try again. ${check.explanation}` : 'Your program works. Answer this concept check, then check your answer.';
+            note.textContent = answer() ? 'Try again. Trace the example one instruction at a time before choosing.' : 'Your program works. Answer this concept check, then check your answer.';
             labelRun('Check answer');
             return false;
         },
@@ -68,7 +68,7 @@ export function mountConceptCheck(root, game) {
 }
 
 export function objectiveFeedback(game, result) {
-    if (result.error) return result.error;
+    if (result.error) return result.failedStep >= 0 ? `Step ${result.failedStep + 1}: ${result.error}` : result.error;
     const { state } = result;
     const target = game.scenario.target;
     switch (game.template) {

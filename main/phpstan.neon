@@ -26,6 +26,7 @@ parameters:
         - app/Models/WeeklyEvent.php
         - app/Support/RegistrationTerms.php
         - app/Actions/Account/RegisterAccount.php
+        - app/Services/Games/PracticeChallenges.php
         - app/Services/Games/AssessmentChallenges.php
         - app/Services/Games/GameAssessment.php
         - app/Services/Games/ArcadeGames.php

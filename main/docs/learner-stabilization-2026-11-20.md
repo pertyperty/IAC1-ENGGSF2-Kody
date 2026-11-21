@@ -105,3 +105,114 @@ Logs are private `ci-439ef5e-focused.log` and `ci-439ef5e-sidebar-engines.log`.
 The new revision still requires full CI, including the previously skipped engine
 and recovery stages. No provider activation, migration or owner-data change was
 performed; the disposable PostgreSQL cluster was stopped after verification.
+
+## First-play follow-up, 21 November
+
+PR #53 was merged as `16b3093` on main. This follow-up starts from that fetched
+main tree. The workspace also contains unrelated Docker/deployment changes; those
+are not part of this learning-experience changeset.
+
+### Experience changes
+
+- First verified Learner login now enters the first available Tower game. A
+  server-owned session hint is recorded during successful authentication and
+  consumed once at home. It neither saves a skill preference nor awards progress.
+  Returning accounts keep their current landing behavior. `/tower/start` reuses
+  selected-track continuation; existing game admission still runs before play.
+- Choose track opens the skill picker when requested, including during a level.
+  Beginners can try the first game immediately; experienced learners can choose
+  Intermediate or Expert without fabricated easier-level clears.
+- On mobile, the goal and board precede the controls. This replaces the earlier
+  program-before-scene layout, which separated interactive canvases/switches from
+  their inputs. Desktop stationary scenes and independently scrolling controls
+  remain. Programs stay bounded as instructions are added.
+- Pixel Studio keeps its palette beside the canvas. Sorting and switch tasks use
+  their keyboard-accessible board buttons instead of duplicate position controls.
+  Guided command choices show pseudocode while retaining their validated transport
+  values. Parameter fields appear only for operations that need a value.
+- Short first-action guidance distinguishes adding instructions from executing
+  them. Run is disabled for an empty program. Terminal commands are added before
+  explicit Run, matching the other games. Fixed-command tasks also guard direct
+  board actions against unsupported commands.
+- Tower pages put secondary descriptions, reward rules and related links in About
+  this level. Mobile play uses a smaller header and avoids duplicate game titles;
+  Practice relies on the existing Play navigation instead of another Home button.
+  Shared mobile filters, form text, button spacing and footer spacing are improved.
+
+### Evidence and remaining work
+
+Compared the actual desktop Flexbox Froggy interface with Kody desktop/mobile captures.
+The useful behavior is immediate access to the task, state and editable program;
+its branding, automatic execution and advertising are not copied. The new Kody
+captures are private under `storage/app/private/first-play-2026-11-21/`.
+
+The first broad local browser batch passed 13 workflows and caught two test
+assumptions: every game having a command dropdown, and login always ending at the
+map. Those tests now exercise each game's real controls and accept the admitted
+Tower destination while retaining session-takeover confirmation.
+
+The focused backend run passed 85 tests with 601 assertions, including first
+login, selected-track continuation, role restrictions and existing login/session
+security. Seventy frontend tests, the production build, Pint and scoped PHPStan
+passed. Fresh Composer locked audit found no advisories/abandoned packages; npm
+audit reported zero vulnerabilities. These are local checks, not deployed evidence.
+
+The broad local cross-engine batch passed 36 executions covering first actions,
+all seven Arcade run/concept-check/reset flows, mobile ordering, stationary desktop
+scenes and first-login/Expert track choice. Screenshot review then exposed palette
+clipping that click automation had scrolled past. After moving colors outside the
+bounded state scroller, 12 focused cross-engine executions passed; six further
+first-action/Garden executions passed after improving cell-label legibility.
+These counts include repeated workflows and are not distinct learner studies.
+Mobile Help, Module/Course catalogs, Coding challenges, registration and login also
+passed the local Chromium accessibility/overflow audit. Logs are private
+`first-play-*.log`; full candidate CI remains required.
+
+The final map/level picker separation passed five backend routing tests with 79
+assertions and three newcomer browser executions across all engines. Verification
+used disposable PostgreSQL on port 51629; it was stopped afterward. Owner data was
+not migrated or reset. No credentials or provider settings were changed.
+
+Before provider work, review this candidate's complete CI, including cached
+routes, all Chromium workflows and recovery checks. A short observed human pilot
+must still validate whether first-time learners identify the next action, recover
+from mistakes and explain the taught concept. Automated completion cannot prove
+that games are fun or instruction is effective. Curriculum difficulty and learning
+transfer remain editorial work, rather than a reason to add another engine.
+
+There is no missing API credential blocking this work. Keep integrations disabled.
+After owner review, Judge0 is the first intended restricted trial; verify languages,
+limits, isolated workers, compile/runtime errors, wrong answers, timeout/outage
+handling, deduplication and attempt/spend limits. Public release still needs named
+operations/backup owners, staged mail, private storage, alerts, restore evidence
+and reviewed operator/legal facts. Payments and Google remain separate releases.
+
+### Candidate CI browser follow-up, 21 November
+
+PR #54 at `9a87f15` failed the Chromium step in CI run `44883163008`.
+Backend tests, cached configuration/routes, dependency audits, formatting,
+scoped analysis and asset builds passed before that failure. Cross-engine and
+recovery steps were skipped, so this run does not verify them.
+
+The uploaded browser evidence identified four outdated assertions: the new-account
+journey and both role-review journeys assumed login always ended at the map;
+the guided-command test expected raw transport commands as option labels.
+Role-review tests now use the shared sign-in helper, including real session
+confirmation. The learning journey accepts an admitted Tower game for learners
+while retaining the staff dashboard assertion. The guided-command test checks
+explicit pseudocode labels separately from unchanged accepted command values
+and continues rejecting instructions outside each task's allowed set.
+
+No application behavior, authentication protection, reward checks or provider
+settings changed in this follow-up. Complete candidate CI remains required.
+
+
+The complete local Chromium suite passed all 106 tests after these corrections,
+including all four failed workflows, onboarding, seven game types, publishing,
+private resources, moderation, accessibility and responsive-layout checks.
+Verification used the disposable PostgreSQL cluster on port 51629. The private
+log is `storage/app/private/pr54-ci/browser-full.log`; the cluster was stopped
+afterward. JavaScript syntax checks and the focused diff whitespace check passed.
+No PHP, frontend asset or dependency changes required rebuilding or repeating
+backend tests in this test-only repair. Fresh CI will rerun those gates and the
+cross-engine and recovery steps skipped by the failed candidate.

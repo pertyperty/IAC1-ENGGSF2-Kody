@@ -35,8 +35,7 @@ test('the arcade has one editable pseudocode list and a stable Run position @cro
     const writes = [];
     page.on('request', request => { if (request.method() === 'POST') writes.push(request.url()); });
     for (const command of commands) {
-        await game.getByRole('combobox', { name: 'Instruction', exact: true }).selectOption(command);
-        await game.getByRole('button', { name: 'Add instruction', exact: true }).click();
+        await game.locator(`[data-add-command="${command}"]`).click();
     }
     await expect(source.locator('code')).toHaveCount(4);
     await expect(source).toContainText('value = value + 3');

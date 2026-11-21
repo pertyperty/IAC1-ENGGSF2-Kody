@@ -375,15 +375,60 @@ dialog.proficiency-choice::backdrop { background: rgb(10 25 50 / .6); }
 }
 @media (max-width: 700px) { .faq-result { flex-wrap: wrap; }.faq-result details { flex-basis: 100%; } }
 
-/* Mobile follows goal, program, result; the desktop scene stays beside the editor. */
+/* Mobile shows the board before its controls; desktop retains side-by-side panes. */
 .game-card > .lesson-briefing { margin: 0 0 1rem; padding: 0; border: 0; background: transparent; }
 @media (max-width: 999px) {
     .game-card :is(.arcade-workbench, .garden-workbench) { grid-template-columns: minmax(0, 1fr); }
-    .game-card .game-controls { order: -1; }
+    .game-card .game-controls { order: 0; }
     .game-card .trace-source { height: 7rem; min-height: 0; }
 }
-.game-card.workspace-fluid .game-controls { order: -1; }
+.game-card.workspace-fluid .game-controls { order: 0; }
 
 .game-controls > .activity-reference { margin-bottom: .75rem; }
 
 .game-card .program-edit-tools { flex-wrap: wrap; }
+
+/* First-play hierarchy: targets are read-only; buttons add visible instructions. */
+.first-play-cue { margin: 0 0 .75rem; color: var(--muted); font-size: .9375rem; line-height: 1.5; }
+.game-card .game-toolbar { gap: .75rem; align-items: center; }
+.game-card .game-toolbar .game-reset { font-size: 1rem; }
+.game-card button:disabled { cursor: not-allowed; }
+.arcade-controls .paint-palette { flex-basis: 100%; }
+.arcade-scene > .paint-palette { flex: 0 0 auto; justify-content: center; gap: .5rem; margin-block: .75rem .25rem; }
+.game-card .arcade-controls:empty { display: none; }
+.arcade-game button.pixel-tile { border: 2px solid var(--accent); cursor: pointer; font-size: .875rem; }
+.arcade-game .pixel-panel:first-child .pixel-tile { font-size: .75rem; }
+.arcade-game .pixel-panel:first-child { cursor: default; }
+.arcade-game :is(.logic-switch, .sort-tile):hover:not(:disabled) { outline: 2px solid var(--accent); outline-offset: 2px; }
+.arcade-game .sort-tile[aria-pressed="true"] { outline: 3px solid var(--accent); outline-offset: 2px; background: var(--accent-soft); }
+.tower-level-actions { display: flex; flex-wrap: wrap; gap: .5rem; align-items: start; }
+.tower-level-details { margin-block: 1.5rem; }
+.tower-level-details > summary { min-height: 44px; padding-block: .5rem; cursor: pointer; color: var(--accent-text); }
+.tower-level .tower-study { background: transparent; border: 0; padding: 1rem 0; }
+.tower-level > .studio-actions { margin-top: 1.5rem; }
+@media (max-width: 999px) {
+    .game-card :is(.arcade-scene, .game-world) { padding: 1rem; }
+    .game-card .arcade-world { min-height: 8rem; max-height: 18rem; }
+    .garden-game .game-board { width: min(100%, 16rem); margin-inline: auto; }
+    .game-card :is(.scene-caption, .scene-heading) { margin-block: 0 .5rem; }
+    .game-card .scene-caption { margin-top: .75rem; }
+}
+@media (max-width: 700px) {
+    .page-width, .has-workspace .page-width { padding-inline: 1rem; }
+    .section-heading { flex-wrap: wrap; gap: 1rem; }
+    .section-heading > div { min-width: 0; }
+    .button { gap: .5rem; }
+    .catalog-search { gap: .75rem; }
+    .catalog-search > label, .catalog-search > input, .catalog-search > select { flex: 1 1 100%; min-width: 0; width: 100%; }
+    :is(.catalog-search, .account-form, .studio-form) :is(input, select, textarea) { font-size: 1rem; }
+    .site-footer { gap: 1rem 1.5rem; padding: 1.5rem 1rem; }
+    .tower-level > .section-heading { display: block; margin-bottom: .75rem; }
+    .tower-level-actions { margin-top: .5rem; }
+    .tower-level .game-heading { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+    .tower-level .tower-level-actions .button { padding: .5rem .75rem; white-space: nowrap; flex-shrink: 0; }
+    body:has(.game-card) .app-header { padding: .5rem .75rem; gap: .5rem; }
+    body:has(.game-card) .app-header-actions { gap: .25rem; }
+    body:has(.game-card) .header-join, body:has(.game-card) [data-page-context] { display: none; }
+    body:has(.game-card) .app-header .play-brand { font-size: 1.5rem; }
+    body:has(.game-card) .app-header .app-primary-nav { gap: .25rem; }
+}

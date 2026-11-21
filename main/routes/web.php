@@ -94,6 +94,7 @@ Route::middleware(['auth', 'account.session'])->prefix('manage/site')->name('sit
     Route::put('/announcement', [SiteManagementController::class, 'update'])->middleware('throttle:6,1,site-announcement:')->name('update');
 });
 Route::post('/tower/proficiency', [TowerController::class, 'proficiency'])->middleware(['auth', 'account.session', 'throttle:10,1,tower-proficiency:'])->name('tower.proficiency');
+Route::get('/tower/start', [TowerController::class, 'start'])->middleware(['auth', 'account.session'])->name('tower.start');
 Route::get('/tower/{level}', [TowerController::class, 'show'])->whereNumber('level')->middleware(OptionalAccountSession::class)->name('tower.show');
 Route::post('/tower/{level}/revisions/{revision}/stages/{stage}', [TowerController::class, 'complete'])
     ->whereNumber(['level', 'revision', 'stage'])->middleware(['auth', 'account.session', 'throttle:30,1,tower:'])->name('tower.complete');

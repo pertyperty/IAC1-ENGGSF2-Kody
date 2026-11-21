@@ -1,3 +1,4 @@
+import { mountMission } from './mission.js';
 import { mountLearningTrace, readableInstruction } from './learning-trace.js';
 import { createIcon } from '../icons.js';
 import { saveCompletion } from './save-completion.js';
@@ -78,6 +79,7 @@ export function mountGarden(root) {
     let inspector;
     let selected = -1;
     const tiles = [];
+    const mission = mountMission(root, instance);
     board.style.setProperty('--columns', instance.width);
     const path = new Set(instance.path.map(key));
     for (let y = 0; y < instance.height; y++) {
@@ -90,11 +92,15 @@ export function mountGarden(root) {
             const actor = document.createElement('span');
             actor.className = 'tile-actor';
             tile.append(decoration, actor);
+            if (path.has(key([x, y]))) {
+                const coordinate = document.createElement('small'); coordinate.className = 'board-coordinate'; coordinate.textContent = `${x + 1},${y + 1}`; tile.append(coordinate);
+            }
             board.append(tile);
             tiles.push({ tile, actor, point: [x, y] });
         }
     }
     const renderBoard = (position = instance.start, crystals = instance.crystals.map(key)) => {
+        mission.update({ position, crystals });
         for (const { tile, actor, point } of tiles) {
             const isKody = key(point) === key(position);
             actor.className = `tile-actor${isKody ? ' garden-kody' : ''}`;
@@ -108,6 +114,7 @@ export function mountGarden(root) {
         if (objectives) objectives.textContent = crystals.length ? `${crystals.length} crystals left` : (instance.crystals.length ? 'All crystals collected' : 'Follow the path to the flag');
     };
     const updateTools = () => {
+        root.querySelector('[data-game-run]').disabled = running || program.length === 0;
         if (earlier) earlier.disabled = running || selected <= 0;
         if (later) later.disabled = running || selected < 0 || selected >= program.length - 1;
         if (remove) remove.disabled = running || selected < 0;
@@ -143,6 +150,8 @@ export function mountGarden(root) {
             programTrack.append(step);
         });
         progress.textContent = `${program.length} / ${instance.maxCommands} instructions`;
+        root.querySelector('[data-game-undo]').disabled = running || !program.length;
+        root.querySelectorAll('[data-command]').forEach(control => { control.disabled = running || program.length >= instance.maxCommands; });
         updateTools();
     };
     const changed = () => {
@@ -218,6 +227,7 @@ export function mountGarden(root) {
                 if (delay && !checkingAnswer) await new Promise((resolve) => setTimeout(resolve, delay));
                 inspector.highlight(frame.index);
                 renderBoard(frame.position, frame.crystals);
+                feedback.textContent = `Step ${frame.index + 1}: ${readableInstruction('command-garden', program[frame.index])}. Now at column ${frame.position[0] + 1}, row ${frame.position[1] + 1}.`;
                 tiles.find(({ point }) => key(point) === key(frame.position))?.tile.classList.add('visited-tile');
                 programTrack.querySelectorAll('.program-step').forEach((step, index) => step.classList.toggle('executing', index === frame.index));
             }
