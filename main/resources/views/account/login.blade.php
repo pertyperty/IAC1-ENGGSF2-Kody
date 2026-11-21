@@ -1,7 +1,6 @@
 @extends('layouts.account')
 @section('title', 'Sign in — Kody')
 @section('content')
-    <p class="eyebrow">WELCOME BACK</p>
     <h1>Continue your journey</h1>
     <p class="intro">Sign in with your verified Kody account.</p>
     @if ($errors->any())<div class="form-errors" role="alert">{{ $errors->first() }}</div>@endif
@@ -18,9 +17,9 @@
         </form>
         <p>Already have Kody? Sign in with your password first to connect Google from your profile.</p>
     @endif
-    <p class="field-hint">Use your current username exactly, including capitals and spaces. If you renamed it, use the new username or your email.</p>
-    <p class="secondary-link"><a href="{{ route('verification.notice') }}">Need to verify your email?</a></p>
-    <p class="secondary-link"><a href="{{ route('recovery.request') }}">Forgot your password?</a></p>
-    <p class="secondary-link"><a href="{{ route('register') }}">Create an account</a></p>
-    <aside class="access-support"><h2>Think an account restriction was a mistake?</h2><p>You can ask the support team to review it.</p><a class="quiet-link" href="{{ route('contact') }}#appeals"><x-action-icon name="mail"/> Contact Kody or appeal a suspension</a></aside>
+    <p class="secondary-link">
+      <a href="{{ route('recovery.request') }}">Forgot your password?</a>
+      <a href="{{ route('register') }}">Create an account</a>
+    </p>
+    <aside class="access-support"><h2>Think an account restriction was a mistake?</h2><a class="quiet-link" href="{{ route('contact') }}#appeals"><x-action-icon name="mail"/> Contact Kody or appeal a suspension</a></aside>
 @endsection
