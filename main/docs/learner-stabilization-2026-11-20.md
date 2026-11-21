@@ -77,3 +77,31 @@ Earlier diagnostic failures remain in private logs and are not counted as passin
 runs. The audit remains a snapshot of the pre-fix revision, with its original
 failures preserved. Named human curriculum review, a voluntary learning pilot and
 staged operational sign-offs remain outstanding before public launch.
+
+## CI follow-up, 21 November
+
+Run 44761620252 on `439ef5e` passed backend tests, cached configuration/routes,
+dependency audits, frontend tests/build, formatting and scoped static analysis.
+Its Chromium suite failed in three places; later engine and recovery steps were
+skipped, so that run does not establish full verification.
+
+- The shared briefing was split into a goal and optional reference, but quizzes
+  omitted the reference include. Restore How it works for quizzes, including the
+  pinned Expert Tower teaching notes. Keep the existing answer/reward validation.
+- The older navigation journey still expected automatic hover restoration.
+  Exercise explicit Show navigation activation after hover instead, then move
+  focus out of the header before checking downward-scroll hiding and keyboard
+  restoration. Focused navigation must remain reachable.
+- The sidebar reload test changed its position using a synthetic scroll while a
+  final font-layout restoration could still be pending. Use real wheel input,
+  which already cancels pending restoration, and verify the exact saved interior
+  position after reload. Keep link-navigation and maximum-range checks intact.
+
+Follow-up local verification passed four Chromium journeys: navigation reveal,
+Expert Tower quiz completion, advanced Tower teaching-note authoring, and sidebar
+link/reload persistence. Sidebar persistence also passed in Chromium, Firefox and
+WebKit. Four navigation-rail unit tests, Pint and `git diff --check` passed.
+Logs are private `ci-439ef5e-focused.log` and `ci-439ef5e-sidebar-engines.log`.
+The new revision still requires full CI, including the previously skipped engine
+and recovery stages. No provider activation, migration or owner-data change was
+performed; the disposable PostgreSQL cluster was stopped after verification.

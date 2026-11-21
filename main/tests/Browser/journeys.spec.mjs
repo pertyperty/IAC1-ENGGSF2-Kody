@@ -31,7 +31,7 @@ async function accountLink(page, name) {
     await page.getByRole('navigation', { name: 'Account navigation', exact: true }).getByRole('link', { name, exact: true }).click();
 }
 
-test('navigation hides on downward scroll and returns by upward scroll, hover and keyboard without trapping menus', async ({ page }) => {
+test('navigation hides on downward scroll and returns by upward scroll, explicit click and keyboard without trapping menus', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 800 });
     await page.goto('/');
     const shell = page.locator('[data-scroll-navigation]');
@@ -52,8 +52,14 @@ test('navigation hides on downward scroll and returns by upward scroll, hover an
     await expect(shell).not.toHaveClass(/navigation-hidden/);
     await page.mouse.wheel(0, 150);
     await expect(shell).toHaveClass(/navigation-hidden/);
-    await page.mouse.move(10, 4);
+    await page.getByRole('button', { name: 'Show navigation' }).hover();
+    await expect(shell).toHaveClass(/navigation-hidden/);
+    await page.getByRole('button', { name: 'Show navigation' }).click();
     await expect(shell).not.toHaveClass(/navigation-hidden/);
+    // Explicit activation focuses the home link. Leave the header before
+    // testing scroll hiding again; focused navigation must remain reachable.
+    await page.getByRole('link', { name: 'Skip to content' }).focus();
+    await page.keyboard.press('Enter');
     await page.mouse.move(1430, 600);
     await page.mouse.wheel(0, 150);
     await expect(shell).toHaveClass(/navigation-hidden/);

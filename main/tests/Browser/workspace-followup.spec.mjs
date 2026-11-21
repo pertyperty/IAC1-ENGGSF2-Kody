@@ -39,11 +39,14 @@ test('sidebar preserves its own scroll after link navigation @cross-browser', as
         Math.abs(element.scrollTop - Math.min(position, element.scrollHeight - element.clientHeight)), saved)).toBeLessThan(3);
 
     // Also check an interior position, where clamping cannot hide a reset.
-    const interior = await nav.evaluate(element => {
-        element.scrollTop = Math.floor((element.scrollHeight - element.clientHeight) / 2);
-        element.dispatchEvent(new Event('scroll'));
-        return element.scrollTop;
-    });
+    // Use real input so a pending font/layout restoration yields to the user.
+    // A synthetic scroll alone can race the final restoration animation frame.
+    await nav.hover();
+    const initial = await nav.evaluate(element => element.scrollTop);
+    const delta = Math.floor(initial / 2);
+    await page.mouse.wheel(0, -delta);
+    await expect.poll(() => nav.evaluate(element => element.scrollTop)).toBe(initial - delta);
+    const interior = await nav.evaluate(element => element.scrollTop);
     expect(interior).toBeGreaterThan(0);
     await page.reload();
     await expect(page.getByRole('heading', { name: 'Help and FAQs' })).toBeVisible();

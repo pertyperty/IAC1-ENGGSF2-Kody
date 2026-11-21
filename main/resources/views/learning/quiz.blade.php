@@ -4,6 +4,7 @@
 <section class="practice-quiz" data-practice-quiz="{{ json_encode($quiz, JSON_THROW_ON_ERROR) }}" @if(isset($completionUrl) || isset($module)) data-completion-url="{{ $completionUrl ?? route('play.quiz', $module) }}" @endif aria-label="Practice quiz">
     <div class="game-heading"><div><p class="overline">Concept check</p><h2>{{ $quiz['title'] }}</h2></div></div>
     @include('learning.briefing', ['game' => $quiz])
+    @include('learning.activity-reference', ['game' => $quiz])
     <form>@foreach(app(\App\Services\Games\QuizAuthoring::class)->questions($quiz) as $question)<fieldset data-quiz-question="{{ $question['id'] }}"><legend>{{ $loop->count > 1 ? $loop->iteration.'. ' : '' }}{{ $question['question'] }}</legend>
     @if(($question['type'] ?? 'choice') === 'blank')
         <label>Your short answer<input data-blank-answer type="text" maxlength="100" autocomplete="off"></label><p class="field-hint">{{ $question['case_sensitive'] ? 'Letter case matters. Extra spaces are ignored.' : 'Letter case and extra spaces are ignored.' }}</p>
