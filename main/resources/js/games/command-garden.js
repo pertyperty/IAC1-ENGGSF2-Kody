@@ -1,3 +1,4 @@
+import { revealGameFeedback } from './workspace.js';
 import { mountMission } from './mission.js';
 import { mountLearningTrace, readableInstruction } from './learning-trace.js';
 import { createIcon } from '../icons.js';
@@ -197,7 +198,7 @@ export function mountGarden(root) {
         changed();
         feedback.textContent = 'A fresh start. Build a new program and give it a try.';
     });
-    root.querySelector('[data-game-hint]').addEventListener('click', () => { feedback.textContent = instance.hint; feedback.focus({ preventScroll: true }); });
+    root.querySelector('[data-game-hint]').addEventListener('click', () => { feedback.textContent = instance.hint; revealGameFeedback(feedback); });
     root.addEventListener('keydown', (event) => {
         // Shortcuts belong to the focused game, never the page or an editable field.
         if (event.target !== root || event.altKey || event.ctrlKey || event.metaKey) return;
@@ -234,7 +235,7 @@ export function mountGarden(root) {
             root.querySelector('[data-execution-label]').textContent = result.success ? 'Goal reached' : 'Needs changes';
             feedback.textContent = result.message; success.hidden = !result.success;
             root.dataset.playState = result.success ? 'success' : 'retry';
-            if (!result.success) feedback.focus({ preventScroll: true });
+            if (!result.success) revealGameFeedback(feedback);
             if (result.success && conceptCheck.verify()) {
                 const saved = await saveCompletion(root, { program, assessment_answer: conceptCheck.answer(), repeat: !!root.querySelector('[data-game-repeat]')?.checked, conditional: !!root.querySelector('[data-game-conditional]')?.checked });
                 if (saved) feedback.textContent = `${result.message} ${saved}`;

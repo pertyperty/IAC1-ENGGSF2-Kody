@@ -415,7 +415,7 @@ dialog.proficiency-choice::backdrop { background: rgb(10 25 50 / .6); }
     .tower-level .tower-level-actions .button { padding: .5rem .75rem; white-space: nowrap; flex-shrink: 0; }
     body:has(.game-card) .app-header { padding: .5rem .75rem; gap: .5rem; }
     body:has(.game-card) .app-header-actions { gap: .25rem; }
-    body:has(.game-card) .header-join, body:has(.game-card) [data-page-context] { display: none; }
+    body:has(.game-card) .header-join { display: none; }
     body:has(.game-card) .app-header .play-brand { font-size: 1.5rem; }
     body:has(.game-card) .app-header .app-primary-nav { gap: .25rem; }
 }

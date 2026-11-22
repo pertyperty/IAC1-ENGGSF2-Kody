@@ -1,3 +1,8 @@
+export function revealGameFeedback(element) {
+    element.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    element.focus({ preventScroll: true });
+}
+
 // Focus layout IS the live activity workspace: no modal overlay trapping page controls or settings.
 export function mountGameWorkspace(root) {
     const quiz = root.matches('[data-practice-quiz]');
@@ -35,9 +40,11 @@ export function mountGameWorkspace(root) {
             badge.textContent = kickerText;
             titleWrap.append(badge);
         }
-        const title = doc.createElement('h2');
-        title.textContent = headingText;
-        titleWrap.append(title);
+        if (!root.closest('[data-activity-title-shown]')) {
+            const title = doc.createElement('h2');
+            title.textContent = headingText;
+            titleWrap.append(title);
+        }
 
         const actions = doc.createElement('div');
         actions.className = 'focus-header-actions';

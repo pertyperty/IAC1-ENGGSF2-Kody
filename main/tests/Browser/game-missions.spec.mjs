@@ -114,6 +114,35 @@ test('focused games fit the screen, keep the board still and preserve the progra
     }
 });
 
+test('the arcade shows one title and keeps Run reachable in the program pane @cross-browser', async ({ page }, testInfo) => {
+    for (const [width, height] of [[1440, 800], [768, 800], [390, 844], [320, 740]]) {
+        await page.setViewportSize({ width, height });
+        await page.goto('/playground?game=number-machine');
+        await expect(page.getByRole('heading', { name: 'Calibrate the power supply', exact: true })).toHaveCount(1);
+        const controls = page.getByRole('region', { name: 'Instructions and program' });
+        const firstCommand = controls.locator('[data-add-command="add 3"]');
+        await expect(firstCommand).toBeVisible();
+        await firstCommand.scrollIntoViewIfNeeded();
+        await firstCommand.click();
+        if (width <= 800) {
+            // The stacked page keeps the scene first. Bring the entire program pane into view.
+            await controls.evaluate(element => element.scrollIntoView({ block: 'center' }));
+        }
+        const run = controls.getByRole('button', { name: 'Run', exact: true });
+        await expect(run).toBeInViewport({ ratio: 1 });
+        await expect(run).toBeEnabled();
+        await page.screenshot({ path: testInfo.outputPath(`arcade-${width}.png`) });
+        await run.click();
+        const result = controls.getByRole('status', { name: 'Program output' });
+        await expect(page.locator('[data-arcade-game]')).toHaveAttribute('data-play-state', 'retry');
+        await expect(result).toBeFocused();
+        await expect(result).toBeInViewport({ ratio: 1 });
+        await controls.getByRole('button', { name: 'Hint', exact: true }).click();
+        await expect(result).toBeFocused();
+        await expect(result).toBeInViewport({ ratio: 1 });
+    }
+});
+
 test('every game exposes usable focused board and program panes @cross-browser', async ({ page }, testInfo) => {
     await page.setViewportSize({ width: 390, height: 844 });
     for (const { template } of cases.filter(item => item.level === 'challenge')) {

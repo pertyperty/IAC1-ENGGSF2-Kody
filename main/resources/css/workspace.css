@@ -15,10 +15,19 @@
 .account-menu > summary::-webkit-details-marker { display: none; }
 .account-menu > summary:hover, .account-menu[open] > summary { background: var(--surface-soft); border-color: var(--border); }
 .header-avatar { width: 30px; height: 30px; display: grid; place-items: center; border-radius: 10px; color: var(--accent-text); background: var(--accent-soft); }
-.account-menu > nav { position: absolute; right: 0; top: calc(100% + 8px); width: 224px; padding: 10px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); box-shadow: none; }
+.account-menu > nav {
+    position: absolute; right: 0; top: calc(100% + 8px); width: 224px;
+    max-height: calc(100dvh - var(--header-height, 72px) - 1rem); overflow-y: auto;
+    overscroll-behavior: contain; padding: .625rem; border: 1px solid var(--border);
+    border-radius: .75rem; background: var(--surface); box-shadow: 0 .5rem 1.5rem var(--shadow);
+}
 .account-menu nav a { display: flex; align-items: center; min-height: 44px; padding: 10px 14px; color: var(--text); border-radius: 8px; font-size: 14px; text-decoration: none; }
 .account-menu nav a:hover { color: var(--accent-text); background: var(--accent-soft); }
-.menu-role { display: block; padding: 10px 14px; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid var(--border); margin-bottom: 6px; }
+.menu-identity { display: grid; gap: .125rem; margin-bottom: .375rem; padding: .625rem .875rem; border-bottom: 1px solid var(--border); overflow-wrap: anywhere; }
+.menu-identity strong { color: var(--text); font-size: .9375rem; }
+.menu-identity span { color: var(--muted); font-size: .8125rem; }
+.account-menu .menu-wallet { justify-content: space-between; gap: .5rem; }
+.menu-wallet span { color: var(--muted); font-size: .8125rem; }
 .app-frame { max-width: 1600px; margin: auto; }
 .app-frame.has-workspace { display: grid; grid-template-columns: 224px minmax(0, 1fr); min-height: calc(100vh - 80px); }
 .app-frame > main { min-width: 0; width: 100%; }

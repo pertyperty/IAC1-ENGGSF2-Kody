@@ -2,9 +2,9 @@
 @section('title', 'Account governance — Kody')
 @section('shell-class', 'account-shell-wide')
 @section('content')
-<h1>Community accounts</h1><p>{{ $expanded ? 'Matching accounts, newest first.' : 'The ten most recently created accounts. Use filters or select All accounts to explore more.' }} Open an account to review its role, status and enforcement history.</p>
+<h1>Community accounts</h1><p>{{ $expanded ? 'Matching accounts, newest first.' : 'Showing the 10 newest accounts.' }} Open an account to review its status and history.</p>
 <form class="account-form governance-filters" method="GET" action="{{ route('account-governance.index') }}">
-<label>Username<input name="q" maxlength="80" value="{{ $filters['q'] ?? '' }}"></label>
+<label>Username<input name="q" maxlength="80" placeholder="Search usernames" value="{{ $filters['q'] ?? '' }}"></label>
 <label>Role<select name="role"><option value="">All roles</option>@foreach(\App\Enums\Role::cases() as $role)<option value="{{ $role->value }}" @selected(($filters['role'] ?? '') === $role->value)>{{ $role->name }}</option>@endforeach</select></label>
 <label>Status<select name="status"><option value="">All statuses</option>@foreach(\App\Enums\AccountStatus::cases() as $status)<option value="{{ $status->value }}" @selected(($filters['status'] ?? '') === $status->value)>{{ $status->value }}</option>@endforeach</select></label>
 <label>Browse<select name="scope"><option value="recent" @selected(($filters['scope'] ?? 'recent') === 'recent')>Newest 10 accounts</option><option value="all" @selected(($filters['scope'] ?? '') === 'all')>All accounts</option></select></label>

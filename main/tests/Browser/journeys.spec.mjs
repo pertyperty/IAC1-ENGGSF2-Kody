@@ -178,7 +178,7 @@ test('staff workspace, account filters and password controls stay accessible in 
     await page.getByRole('button', { name: 'Hide password', exact: true }).click();
     await expect(page.getByLabel('Password', { exact: true })).toHaveAttribute('type', 'password');
     await login(page, 'administrator');
-    await expect(page.getByRole('heading', { name: 'Help good learning happen.' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Staff tools' })).toBeVisible();
     for (const width of [1280, 390, 320]) {
         await page.setViewportSize({ width, height: 900 });
         for (const dark of [false, true]) {
