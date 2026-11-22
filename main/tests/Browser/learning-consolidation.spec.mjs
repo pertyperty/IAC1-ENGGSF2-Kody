@@ -20,7 +20,9 @@ test('verified newcomer plays first and can choose Expert afterward @cross-brows
     const prompt = page.getByRole('dialog', { name: 'Where would you like to start?' });
     await expect(prompt).not.toBeVisible();
     await expect(page.locator('[data-coding-game]')).toBeVisible();
-    await page.getByRole('button', { name: 'Choose track', exact: true }).click();
+    const menu = page.locator('[data-tower-stage]:visible [data-focus-surface] .focus-navigation');
+    await menu.locator('summary').click();
+    await menu.getByRole('button', { name: 'Choose track', exact: true }).click();
     await expect(prompt).toBeVisible();
     await prompt.getByRole('radio', { name: /Expert/ }).check();
     await page.screenshot({ path: `${evidence}/proficiency-choice.png` });

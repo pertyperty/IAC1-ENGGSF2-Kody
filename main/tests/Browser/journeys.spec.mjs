@@ -84,7 +84,9 @@ test('workspace navigation sticks on short desktops and touch layouts; expanded 
         await context.route('**/*', route => new URL(route.request().url()).origin === process.env.KODY_BROWSER_BASE_URL ? route.continue() : route.abort());
         await login(page, 'stickylearner');
         await page.goto('/learn/sequences');
-        await page.evaluate(() => window.scrollTo(0, 500));
+        // Check stickiness before the short embedded lesson reaches the footer boundary.
+        await page.evaluate(() => window.scrollTo(0, 160));
+        await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThanOrEqual(120);
         await expect(page.locator('.app-rail')).toBeInViewport();
         await expect.poll(async () => (await page.locator('.app-rail').boundingBox()).y).toBeGreaterThanOrEqual(0);
         await expect.poll(async () => (await page.locator('.app-rail').boundingBox()).y).toBeLessThan(160);
