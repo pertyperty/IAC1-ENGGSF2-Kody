@@ -56,8 +56,6 @@ if (cooldown) {
     updateCooldown();
 }
 
-const pageContext = document.querySelector('[data-page-context]');
-if (pageContext) pageContext.textContent = document.querySelector('main h1')?.textContent?.trim() ?? '';
 mountKodyCompanion(document, window);
 document.querySelectorAll('[data-role-update]').forEach(dialog => mountRoleUpdate(dialog, document, window));
 mountPageLoader(document, window);

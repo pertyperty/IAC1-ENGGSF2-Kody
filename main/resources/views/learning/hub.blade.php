@@ -1,7 +1,11 @@
 @extends('layouts.learning')
 @section('title', 'Your workspace — Kody')
 @section('content')
-    <section class="play-hub page-width"><div class="section-heading"><div>@if(auth()->user()->can('viewAny', \App\Models\User::class))<p class="overline">YOUR COMMUNITY WORKSPACE</p><h1>Everything you need to help.</h1>@elseif(!$progress)<p class="overline">YOUR CREATOR WORKSPACE</p><h1>Make learning worth playing.</h1>@else<p class="overline">MY PROGRESS</p><h1>Progress</h1>@endif</div><a class="quiet-link" href="{{ route('account.show') }}">View your profile</a></div>
+    <section class="play-hub page-width">
+        <header class="section-heading">
+            <h1>{{ auth()->user()->can('viewAny', \App\Models\User::class) ? 'Staff dashboard' : (!$progress ? 'Creator dashboard' : 'Progress') }}</h1>
+            <a class="quiet-link" href="{{ route('account.show') }}">View your profile</a>
+        </header>
         @include('layouts.staff-tools')
         @if(auth()->user()->account_role === \App\Enums\Role::Instructor)<div class="creator-play-link"><div><h2>Explore the Tower</h2><p>Explore the Tower as a learner. Your confirmed clears save your own progress and daily streak.</p></div><a class="button button-play" href="{{ route('home') }}"><x-action-icon name="tower"/> Play the Tower</a></div>@endif
         @if($progress)

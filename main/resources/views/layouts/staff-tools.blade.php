@@ -1,12 +1,12 @@
 @can('viewAny', \App\Models\User::class)
 <section class="staff-workspace" aria-labelledby="staff-workspace-heading">
-    <div class="section-heading"><div><p class="overline">YOUR STAFF WORKSPACE</p><h2 id="staff-workspace-heading">Help good learning happen.</h2></div><p>Review, support and manage your community.</p></div>
+    <h2 id="staff-workspace-heading">Staff tools</h2>
     <div class="workspace-grid">
         @can('manageSite', \App\Models\User::class)<a href="{{ route('site-management.index') }}"><span class="workspace-icon" aria-hidden="true"><x-action-icon name="settings"/></span><strong>Site management</strong><span>Publish audited notices and inspect background work.</span></a>@endcan
         @can('manage', \App\Models\TowerLevel::class)<a href="{{ route('tower-studio.index') }}"><span class="workspace-icon" aria-hidden="true"><x-action-icon name="tower"/></span><strong>Tower studio</strong><span>Shape levels, bosses and learning checkpoints.</span></a>@endcan
         <a href="{{ route('account-governance.index') }}"><span class="workspace-icon" aria-hidden="true"><x-action-icon name="people"/></span><strong>Community accounts</strong><span>Find accounts and review their history.</span></a>
         <a href="{{ route('content-moderation.index') }}"><span class="workspace-icon" aria-hidden="true"><x-action-icon name="shield"/></span><strong>Content moderation</strong><span>Manage learner availability and staff withdrawals.</span></a>
-        @can('viewAny', \App\Models\LearningModule::class)<a href="{{ route('module-reviews.index') }}"><span class="workspace-icon" aria-hidden="true"><x-action-icon name="spark"/></span><strong>Module reviews</strong><span>Review new adventures and updated lessons.</span></a>@endcan
+        @can('viewAny', \App\Models\LearningModule::class)<a href="{{ route('module-reviews.index') }}"><span class="workspace-icon" aria-hidden="true"><x-action-icon name="spark"/></span><strong>Module reviews</strong><span>Review new and updated modules.</span></a>@endcan
         @can('viewAny', \App\Models\LearningCourse::class)<a href="{{ route('course-reviews.index') }}"><span class="workspace-icon" aria-hidden="true"><x-action-icon name="book"/></span><strong>Course reviews</strong><span>Check learning paths and their pinned lessons.</span></a>@endcan
         @can('viewAny', \App\Models\CodingChallenge::class)<a href="{{ route('challenge-reviews.index') }}"><span class="workspace-icon" aria-hidden="true"><x-action-icon name="code"/></span><strong>Challenge reviews</strong><span>Review coding challenges and their test cases.</span></a>@endcan
         @can('viewAny', \App\Models\InstructorApplication::class)<a href="{{ route('instructor-reviews.index') }}"><span class="workspace-icon" aria-hidden="true"><x-action-icon name="create"/></span><strong>Instructor applications</strong><span>Review teaching credentials and decisions.</span></a>@endcan

@@ -25,10 +25,7 @@
             </form>
         </details>
     </header>
-    @if($game['template'] !== 'choice-quiz')
-        <p class="practice-level-note">{{ ['warmup' => 'Learn the controls with a short task.', 'challenge' => 'Apply the idea with a limited set of instructions.', 'stretch' => 'Plan a longer solution with less room for trial and error.'][$level] }}</p>
-    @endif
-    <section id="arcade-station" class="arcade-station" aria-label="Selected practice game">
+    <section id="arcade-station" class="arcade-station" aria-label="Selected practice game" data-activity-title-shown>
         @if($game['template'] === 'choice-quiz')@include('learning.quiz', ['quiz' => $game, 'module' => null])@elseif($game['template'] === 'command-garden')@include('learning.game', ['game' => $game, 'completionUrl' => null])@else @include('learning.arcade-game', ['game' => $game, 'completionUrl' => null])@endif
     </section>
     @if($game['template'] !== 'choice-quiz' && $level !== 'stretch')

@@ -1,3 +1,4 @@
+import { revealGameFeedback } from './workspace.js';
 import { mountLearningTrace, arcadeTrace, readableInstruction as formatInstruction } from './learning-trace.js';
 import { createIcon } from '../icons.js';
 import { puzzleTemplates, validPuzzle, evaluatePuzzle, renderPuzzle } from './puzzle-games.js';
@@ -270,7 +271,7 @@ export function mountArcade(root) {
     function commandAvailable(command) {
         if (game.assessment?.commands.length && !game.assessment.commands.includes(command)) {
             output.textContent = 'That instruction is not available in this task. Use the available instruction buttons.';
-            output.focus({ preventScroll: true });
+            revealGameFeedback(output);
             return false;
         }
         return true;
@@ -415,7 +416,7 @@ export function mountArcade(root) {
                 root.querySelector('[data-execution-label]').textContent = 'Preview';
                 previewStatus.textContent = 'Preview of your commands. Run to check the goal.';
             }
-            if (!result.success && showResult) output.focus({ preventScroll: true });
+            if (!result.success && showResult) revealGameFeedback(output);
             if (result.success && showResult && conceptCheck.verify()) {
                 const canonical = program.map(command => normalizeArcadeCommand(game.template, command));
                 const message = await saveCompletion(root, { program: canonical, assessment_answer: conceptCheck.answer() });
@@ -448,7 +449,7 @@ export function mountArcade(root) {
     root.querySelector('[data-arcade-undo]').addEventListener('click', () => {
         if (!busy) { const program = lines(); program.pop(); code.value = program.join('\n'); preview(); }
     });
-    root.querySelector('[data-arcade-hint]').addEventListener('click', () => { output.textContent = game.hint; output.focus({ preventScroll: true }); });
+    root.querySelector('[data-arcade-hint]').addEventListener('click', () => { output.textContent = game.hint; revealGameFeedback(output); });
     root.querySelector('[data-arcade-reset]').addEventListener('click', () => {
         if (!busy) { code.value = ''; history.length = 0; historyIndex = 0; if (terminalInput) terminalInput.value = ''; preview(); output.textContent = 'Ready when you are.'; }
     });

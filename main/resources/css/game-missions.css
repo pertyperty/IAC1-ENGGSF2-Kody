@@ -37,7 +37,7 @@
 .game-card .value-history { flex-basis: 100%; width: 100%; margin-top: .5rem; }
 .value-history summary { cursor: pointer; min-height: 44px; padding: .5rem 0; color: var(--accent-text); font-size: .9375rem; }
 .arcade-page .game-heading { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); }
-.arcade-page .practice-header { margin-bottom: .5rem; }
+.arcade-page .practice-header { margin-bottom: 1rem; }
 .arcade-page .practice-header h1 { font-size: 1.5rem; }
 .game-card .trace-source .instruction-error { background: var(--error-soft); color: var(--error-text); box-shadow: inset 3px 0 var(--error-text); }
 .practice-next { margin-top: 1.5rem; }
@@ -82,7 +82,6 @@
 .practice-levels { display: flex; flex-wrap: wrap; gap: .5rem; margin: .5rem 0; }
 .practice-levels a { display: block; padding: .625rem 1rem; color: var(--muted); border-radius: 6px; text-decoration: none; min-height: 44px; }
 .practice-levels a[aria-current] { background: var(--accent-soft); color: var(--accent-text); font-weight: 650; box-shadow: inset 0 -2px var(--accent); }
-.practice-level-note { margin: .5rem 0 1.25rem; color: var(--muted); font-size: .9375rem; }
 .practice-quiz { margin-block: 1.5rem; padding: 0; border: 0; border-radius: 0; background: transparent; color: var(--text); }
 .practice-quiz .game-heading { padding-bottom: 1rem; border: 0; background: transparent; }
 /* One question at a time, with large answer targets and an explicit final check. */
@@ -129,7 +128,6 @@
     .mission-status { margin-bottom: .5rem; }
     .mission-status p { font-size: .875rem; }
     .game-card .scene-caption { font-size: .875rem; margin-top: .5rem; }
-    .practice-level-note { margin-block: .25rem .75rem; }
     .practice-quiz form { max-height: 65dvh; }
     .practice-levels a { padding-inline: .75rem; }
 }
@@ -155,7 +153,16 @@
     display: grid; grid-template-columns: minmax(0, 1fr) minmax(320px, 1fr); align-items: stretch; gap: 1.25rem;
     height: var(--workspace-height, min(68dvh, 640px)); min-height: 360px; overflow: hidden;
 }
-.play-focus-surface .game-controls { overflow-y: auto; min-height: 0; padding: 0 .5rem .75rem 0; overscroll-behavior: contain; }
+.play-focus-surface .game-controls {
+    overflow-y: auto; min-height: 0; padding: 0 .5rem 0 0; overscroll-behavior: contain;
+    scroll-padding-bottom: 7rem;
+}
+.play-focus-surface .game-controls .game-toolbar {
+    position: sticky; bottom: 0; z-index: 2; padding-block: .5rem;
+    border-top: 1px solid var(--border); background: var(--surface);
+}
+.play-focus-surface .game-controls .game-reset:not(:disabled) { color: var(--text); }
+.play-focus-surface.game-card .trace-source { height: 10rem; min-height: 10rem; max-height: 10rem; }
 .play-focus-surface :is(.game-world, .arcade-scene) { min-height: 0; max-height: none; overflow-y: auto; }
 .play-focus-surface .arcade-world { min-height: 0; max-height: none; align-content: flex-start; }
 .play-focus-surface .arcade-world:has(.machine-node) { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr); gap: .5rem; align-items: center; padding-top: 1rem; }
@@ -219,14 +226,14 @@
         grid-template-rows: auto minmax(0, 1fr);
         height: auto; min-height: 0; overflow: visible; gap: .75rem;
     }
-    .play-focus-surface .game-controls { max-height: 48dvh; padding: 0 .25rem .5rem 0; }
+    .play-focus-surface .game-controls { max-height: 48dvh; padding: 0 .25rem 0 0; }
     .play-focus-surface :is(.game-world, .arcade-scene) { padding: .65rem; }
     .play-focus-surface .game-board { width: min(100%, 12rem); max-height: none; }
     .play-focus-surface .arcade-world { padding: 0; }
     .play-focus-surface .mission-status { margin-bottom: .35rem; }
     .play-focus-surface .mission-status progress { display: none; }
     .play-focus-surface .scene-heading { margin-bottom: .25rem; }
-    .play-focus-surface .trace-source { height: 8.5rem; min-height: 8.5rem; max-height: 8.5rem; }
+    .play-focus-surface.game-card .trace-source { height: 8rem; min-height: 8rem; max-height: 8rem; }
     .play-focus-surface .pixel-panel h3 { margin-bottom: .25rem; }
     .play-focus-surface .pixel-panel:last-child { max-width: 144px; }
     .play-focus-surface .arcade-world:has(.pixel-grid) { flex: 0 0 auto; overflow: visible; }
@@ -235,8 +242,11 @@
 }
 @media(max-width: 600px) {
     .focus-workspace-bar { gap: .5rem; }
-    .focus-workspace-title { flex-basis: 100%; }
+    .focus-workspace-title:has(h2) { flex-basis: 100%; }
     .focus-header-actions { margin-left: auto; }
+    .play-focus-surface .game-controls .game-toolbar { gap: .25rem; }
+    .play-focus-surface .game-toolbar .button-play { flex-basis: 4.5rem; }
+    .play-focus-surface .game-toolbar .game-reset { padding-inline: .5rem; font-size: .875rem; }
     .play-focus-surface .lesson-briefing { padding-bottom: .25rem; }
     .play-focus-surface .activity-goal p { max-height: 4.5rem; font-size: .9375rem; }
     .practice-quiz form { padding-right: .25rem; }

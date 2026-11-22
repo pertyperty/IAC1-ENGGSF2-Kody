@@ -74,7 +74,8 @@ body :is(p, li, dd, label) { overflow-wrap: anywhere; }
 .rail-identity b, .workspace-nav a { font-size: .9375rem; }
 .rail-identity div > span, .workspace-nav .rail-label { font-size: .8125rem; }
 .workspace-nav a { min-height: 44px; }
-.site-footer, .account-footer { position: static; display: flex; align-items: center; flex-wrap: wrap; gap: 1rem; padding-block: 1.5rem; font-size: .9375rem; }
+.site-footer, .account-footer { position: static; display: flex; align-items: center; flex-wrap: wrap; gap: .375rem 1.25rem; padding-block: 1rem; font-size: .9375rem; }
+:is(.site-footer, .account-footer) a { display: inline-flex; align-items: center; min-height: 44px; }
 .skip-link { z-index: 100; }
 .app-header .brand-mark { display: block; width: 36px; height: 36px; padding: 0; margin: 0; background: none; border-radius: 0; transform: none; }
 .landing-art { display: block; width: 100%; height: auto; border-radius: .75rem; }
@@ -84,7 +85,11 @@ body :is(p, li, dd, label) { overflow-wrap: anywhere; }
     .form-row { grid-template-columns: minmax(0, 1fr); }
     .section-heading, .studio-heading { flex-wrap: wrap; }
     .account-shell, .has-workspace .account-shell { margin-inline: 1rem; padding: 1.25rem; }
-    .account-shell-wide { width: auto; }
+    .account-shell-wide, .has-workspace .account-shell-wide {
+        width: auto; margin-inline: 0; padding-inline: 1rem; background: transparent;
+    }
+    .account-shell-wide > :is(.staff-workspace, .content-panel, .dashboard-panel),
+    .account-shell-wide .workspace-columns > .content-panel { padding-inline: 0; }
     .studio-form fieldset { min-width: 0; }
     .studio-actions > :is(.button, form) { max-width: 100%; }
     .filter-row, .catalog-filters { gap: .75rem; }

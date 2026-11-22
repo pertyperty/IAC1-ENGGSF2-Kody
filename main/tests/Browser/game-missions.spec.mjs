@@ -101,16 +101,49 @@ test('focused games fit the screen, keep the board still and preserve the progra
         await expect(game).toBeVisible();
         await game.locator('[data-add-command="add 3"]').click();
         const scene = game.locator('.arcade-scene');
-        const before = await scene.boundingBox();
+        const boardTop = () => scene.evaluate((element, stacked) => element.getBoundingClientRect().top + (stacked ? window.scrollY : 0), width <= 800);
+        const beforeOpening = await boardTop();
         const controls = game.locator('.game-controls');
         await game.getByText('Step through program', { exact: true }).click();
+        // On stacked layouts, bringing the controls into view can scroll the page.
+        if (width <= 800) expect(Math.abs(await boardTop() - beforeOpening)).toBeLessThan(2);
+        const beforeScrolling = await boardTop();
         await controls.evaluate(element => { element.scrollTop = element.scrollHeight; });
-        expect(Math.abs((await scene.boundingBox()).y - before.y)).toBeLessThan(2);
+        await expect.poll(async () => Math.abs(await boardTop() - beforeScrolling)).toBeLessThan(2);
         await expect(scene).toBeVisible();
         await expect(scene.getByText('START', { exact: true })).toBeVisible();
         await expect(game.locator('[data-readable-program] code')).toHaveText('value = value + 3');
         await audit(page);
         await page.screenshot({ path: `${evidence}/focus-${width}-${testInfo.project.name}.png` });
+    }
+});
+
+test('the arcade shows one title and keeps Run reachable in the program pane @cross-browser', async ({ page }, testInfo) => {
+    for (const [width, height] of [[1440, 800], [768, 800], [390, 844], [320, 740]]) {
+        await page.setViewportSize({ width, height });
+        await page.goto('/playground?game=number-machine');
+        await expect(page.getByRole('heading', { name: 'Calibrate the power supply', exact: true })).toHaveCount(1);
+        const controls = page.getByRole('region', { name: 'Instructions and program' });
+        const firstCommand = controls.locator('[data-add-command="add 3"]');
+        await expect(firstCommand).toBeVisible();
+        await firstCommand.scrollIntoViewIfNeeded();
+        await firstCommand.click();
+        if (width <= 800) {
+            // The stacked page keeps the scene first. Bring the entire program pane into view.
+            await controls.evaluate(element => element.scrollIntoView({ block: 'center' }));
+        }
+        const run = controls.getByRole('button', { name: 'Run', exact: true });
+        await expect(run).toBeInViewport({ ratio: 1 });
+        await expect(run).toBeEnabled();
+        await page.screenshot({ path: testInfo.outputPath(`arcade-${width}.png`) });
+        await run.click();
+        const result = controls.getByRole('status', { name: 'Program output' });
+        await expect(page.locator('[data-arcade-game]')).toHaveAttribute('data-play-state', 'retry');
+        await expect(result).toBeFocused();
+        await expect(result).toBeInViewport({ ratio: 1 });
+        await controls.getByRole('button', { name: 'Hint', exact: true }).click();
+        await expect(result).toBeFocused();
+        await expect(result).toBeInViewport({ ratio: 1 });
     }
 });
 

@@ -9,7 +9,7 @@ test('staff workspace respects existing role policies and guest/participant navi
     moduleSignIn($this, moduleAccount($role));
     $response = $this->get(route('dashboard'))->assertOk();
     if (in_array($role, [Role::Moderator, Role::Administrator], true)) {
-        $response->assertSee('YOUR STAFF WORKSPACE')->assertSee('Community accounts')->assertSee('Module reviews');
+        $response->assertSee('Staff tools')->assertSee('Community accounts')->assertSee('Module reviews');
         $this->get(route('account.show'))->assertOk()->assertSee('account-shell-wide')->assertSee('Account navigation');
         $this->get(route('account-governance.index'))->assertOk()->assertSee('account-result', false)->assertSee('Apply filters');
         if ($role === Role::Administrator) {
@@ -18,7 +18,7 @@ test('staff workspace respects existing role policies and guest/participant navi
             $response->assertSee('Prepare future weeks')->assertDontSee('Finance workspace')->assertDontSee('Game presets');
         }
     } else {
-        $response->assertDontSee('YOUR STAFF WORKSPACE')->assertDontSee('Finance workspace');
+        $response->assertDontSee('Staff tools')->assertDontSee('Finance workspace');
         $this->get(route('account-governance.index'))->assertForbidden();
     }
 })->with(Role::cases());
