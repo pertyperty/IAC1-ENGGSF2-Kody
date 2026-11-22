@@ -86,8 +86,9 @@ test('mobile games show the goal and board before the program @cross-browser', a
             if (width <= 800) expect((await scene.boundingBox()).y).toBeLessThan((await game.locator('.game-controls').boundingBox()).y);
             else expect((await scene.boundingBox()).x).toBeLessThan((await game.locator('.game-controls').boundingBox()).x);
             await expect(run).toBeDisabled();
-            await run.scrollIntoViewIfNeeded();
-            await expect(run).toBeInViewport();
+            // Bring the pane into view before checking its sticky action row.
+            await game.locator('.game-controls').evaluate(element => element.scrollIntoView({ block: 'center' }));
+            await expect(run).toBeInViewport({ ratio: 1 });
             await audit(page);
             await page.screenshot({ path: `${evidence}/mobile-first-${path.includes('pixel') ? 'pixels' : path.includes('tower') ? 'garden' : 'numbers'}-${width}.png`, fullPage: true });
         }

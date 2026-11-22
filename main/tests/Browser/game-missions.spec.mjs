@@ -101,11 +101,15 @@ test('focused games fit the screen, keep the board still and preserve the progra
         await expect(game).toBeVisible();
         await game.locator('[data-add-command="add 3"]').click();
         const scene = game.locator('.arcade-scene');
-        const before = await scene.boundingBox();
+        const boardTop = () => scene.evaluate((element, stacked) => element.getBoundingClientRect().top + (stacked ? window.scrollY : 0), width <= 800);
+        const beforeOpening = await boardTop();
         const controls = game.locator('.game-controls');
         await game.getByText('Step through program', { exact: true }).click();
+        // On stacked layouts, bringing the controls into view can scroll the page.
+        if (width <= 800) expect(Math.abs(await boardTop() - beforeOpening)).toBeLessThan(2);
+        const beforeScrolling = await boardTop();
         await controls.evaluate(element => { element.scrollTop = element.scrollHeight; });
-        expect(Math.abs((await scene.boundingBox()).y - before.y)).toBeLessThan(2);
+        await expect.poll(async () => Math.abs(await boardTop() - beforeScrolling)).toBeLessThan(2);
         await expect(scene).toBeVisible();
         await expect(scene.getByText('START', { exact: true })).toBeVisible();
         await expect(game.locator('[data-readable-program] code')).toHaveText('value = value + 3');
