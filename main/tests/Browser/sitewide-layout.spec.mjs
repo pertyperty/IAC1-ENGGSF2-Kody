@@ -30,6 +30,12 @@ const routes = {
     ],
 };
 
+const visualSamples = new Set([
+    '/welcome', '/tower/1', '/playground', '/learn', '/learn/courses', '/challenges', '/help', '/login',
+    '/dashboard', '/updates', '/account', '/learn/courses/mine', '/learn/modules/:module', '/wallet',
+    '/create/modules/new', '/manage/reviews', '/manage/game-presets', '/manage/finance', '/manage/faqs',
+]);
+
 test.beforeEach(async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.addInitScript(() => localStorage.setItem('kody-tour-v1', 'dismissed'));
@@ -70,8 +76,11 @@ for (const [role, paths] of Object.entries(routes)) {
                 expect.soft(response?.ok(), `${role} ${path} HTTP ${response?.status()}`).toBe(true);
                 expect.soft(new URL(page.url()).pathname, `${role} ${path} destination`).toBe(path);
                 expect.soft(layout.width, `${role} ${path} at ${width}px: ${layout.offenders.join(', ')}`).toBeLessThanOrEqual(width + 1);
-                if (path === paths[0] && [320, 768, 1440].includes(width)) {
-                    await page.screenshot({ path: testInfo.outputPath(`${role}-${width}.png`) });
+                if (visualSamples.has(template) && [320, 1440].includes(width)) {
+                    const label = template.slice(1).replace(/[^a-z0-9-]+/g, '-');
+                    await page.screenshot({ path: testInfo.outputPath(`${role}-${label}-${width}.png`) });
+                }
+                if (path === paths[0] && [320, 768].includes(width)) {
                     if (role !== 'guest' && width <= 768) {
                         const workspace = page.getByLabel('Explore your workspace');
                         await expect(workspace).toBeVisible();
@@ -85,3 +94,21 @@ for (const [role, paths] of Object.entries(routes)) {
         }
     });
 }
+
+
+test('challenge filters stay out of the way until needed and retain the selected topic', async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 800 });
+    await page.goto('/challenges');
+    const filters = page.getByText('More filters', { exact: true });
+    const topic = page.getByLabel('Topic', { exact: true });
+    await expect(topic).toBeHidden();
+    await filters.focus();
+    await filters.press('Enter');
+    await topic.selectOption('collections');
+    await page.getByRole('button', { name: 'Search', exact: true }).click();
+    await expect(topic).toBeVisible();
+    await expect(topic).toHaveValue('collections');
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(321);
+    await page.getByRole('link', { name: 'Clear filters' }).click();
+    await expect(topic).toBeHidden();
+});

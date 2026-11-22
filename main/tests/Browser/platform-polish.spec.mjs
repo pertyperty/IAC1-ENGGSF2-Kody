@@ -167,9 +167,9 @@ test('course progress appears in both catalogs and centered results retain icon 
     const readingTitle = await page.locator('main h1').textContent();
     await page.getByRole('button', { name: 'Mark as read' }).click();
     await page.goto('/learn?q=' + encodeURIComponent(readingTitle));
-    await expect(page.locator('.module-card').filter({ has: page.getByRole('heading', { name: readingTitle, exact: true }) })).toContainText('Completed · read in course');
+    await expect(page.locator('.catalog-entry').filter({ has: page.getByRole('heading', { name: readingTitle, exact: true }) })).toContainText('Completed · read in course');
     await page.goto('/learn/courses');
-    await expect(page.locator('.module-card').filter({ hasText: /first programming adventures/i }).locator('progress')).toHaveAttribute('value', '1');
+    await expect(page.locator('.catalog-entry').filter({ hasText: /first programming adventures/i }).locator('progress')).toHaveAttribute('value', '1');
     await page.goto('/learn/courses/mine');
     await expect(page.getByRole('heading', { name: 'Recent modules' })).toBeVisible();
     await expect(page.locator('.journey-card').filter({ hasText: /first programming adventures/i })).toContainText('1 / 5 modules');

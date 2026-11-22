@@ -106,7 +106,7 @@ test('creator mixed quiz preview is editable and learner completion is saved by 
                 for (const [label, value] of [['Loop', 'loop'], ['Variable', 'variable'], ['Condition', 'condition']]) await quiz.getByLabel(label, { exact: true }).selectOption(value);
                 await quiz.getByRole('button', { name: 'Check answers' }).click();
                 await expect(page.locator('[data-game-result]')).toBeVisible(); await expect(quiz.locator('[data-quiz-feedback]')).toContainText(/saved/i);
-                await page.locator('[data-result-return]').click(); await page.goto('/learn?q=Choose%2C%20recall'); await expect(page.locator('.module-card').filter({ hasText: 'Choose, recall and connect' }).locator('.saved-progress')).toContainText('Completed');
+                await page.locator('[data-result-return]').click(); await page.goto('/learn?q=Choose%2C%20recall'); await expect(page.locator('.catalog-entry').filter({ hasText: 'Choose, recall and connect' }).locator('.saved-progress')).toContainText('Completed');
             }
         } finally { await context.close(); }
     }

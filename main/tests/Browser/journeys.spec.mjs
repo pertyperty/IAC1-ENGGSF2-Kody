@@ -455,7 +455,7 @@ test('empty catalogs offer clear next actions on narrow screens in both themes',
             await audit(page);
             await empty.getByRole('link', { name: action }).click();
             await expect(page).toHaveURL(/\/learn$/);
-            await expect(page.locator('.module-card').first()).toBeVisible();
+            await expect(page.locator('.catalog-entry').first()).toBeVisible();
         }
     }
 });
