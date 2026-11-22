@@ -15,6 +15,18 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 uses(RefreshDatabase::class);
 
+test('arcade normalizes displayed pseudocode before applying command limits and restrictions', function () {
+    $engine = app(ArcadeGames::class);
+    $number = $engine->instance('number-machine');
+    $number['assessment'] = ['version' => 1, 'limit' => 2, 'commands' => ['add 3', 'multiply 2']];
+
+    expect($engine->succeeds($number, ['value = value + 3', 'value = value * 2']))->toBeTrue()
+        ->and($engine->succeeds($number, ['add 3', 'value = value × 2']))->toBeTrue()
+        ->and($engine->succeeds($number, ['value = value + 3; alert(1)', 'multiply 2']))->toBeFalse()
+        ->and($engine->succeeds($number, ['value = value + 3 ', 'multiply 2']))->toBeFalse()
+        ->and($engine->succeeds($number, ['value = value + 3', 'value = value + 5']))->toBeFalse();
+});
+
 dataset('arcade solutions', [
     ['pixel-studio', ['paint 1 1 mint', 'paint 2 2 peach']],
     ['number-machine', ['add 3', 'multiply 2']],

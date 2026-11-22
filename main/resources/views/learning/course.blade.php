@@ -18,6 +18,6 @@
 @endif
 @if(!$enrollment && $revision->sequential)<p class="lesson-note">Complete modules in order to unlock the next.</p>@endif
 @if($accessible)@include('learning.journey-next')@endif
-<h2>Lessons</h2>@include('learning.course-trail')
+<h2>Modules</h2>@include('learning.course-trail')
 @include('engagement.reactions')</section>
 @endsection

@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 import { mkdir } from 'node:fs/promises';
 import { phpFixture } from '../Support/php-fixture.mjs';
 import { audit } from './support/audit.mjs';
+import { readableInstruction } from '../../resources/js/games/learning-trace.js';
 const tasks = JSON.parse(phpFixture(['-r', 'echo json_encode(require "config/assessment-challenges.php");'], { encoding: 'utf8' }));
 const evidence = 'storage/app/private/learning-consolidation-evidence';
 
@@ -20,7 +21,7 @@ for (const template of ['pixel-studio', 'number-machine', 'sort-lab', 'terminal-
         const instance = JSON.parse(await game.getAttribute('data-arcade-game'));
         const task = tasks[instance.assessment.id];
         await game.getByText('Edit commands as text', { exact: true }).click();
-        await game.getByLabel('Your program', { exact: true }).fill(task.reference.program.join('\n'));
+        await game.getByLabel('Your program', { exact: true }).fill(task.reference.program.map(command => readableInstruction(template, command)).join('\n'));
         await game.getByRole('button', { name: 'Run', exact: true }).click();
         await expect(game.locator('[data-execution-label]')).toHaveText('Goal reached');
         await expect(game.locator('[data-concept-check]')).toBeVisible();

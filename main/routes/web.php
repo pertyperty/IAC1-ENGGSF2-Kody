@@ -27,6 +27,7 @@ use App\Http\Controllers\Administration\SiteManagementController;
 use App\Http\Controllers\Administration\SystemReportController;
 use App\Http\Controllers\Administration\TowerStudioController;
 use App\Http\Controllers\Challenges\ChallengeReviewController;
+use App\Http\Controllers\Challenges\ChallengeSampleRunController;
 use App\Http\Controllers\Challenges\ChallengeStudioController;
 use App\Http\Controllers\Challenges\ChallengeSubmissionController;
 use App\Http\Controllers\Challenges\PublishedChallengeController;
@@ -149,6 +150,7 @@ Route::middleware(['auth', 'account.session'])->group(function (): void {
     Route::post('/manage/weekly-events', [WeeklyEventStudioController::class, 'store'])->middleware('throttle:10,1,weekly-configure:')->name('weekly-studio.store');
     Route::get('/challenges/{challenge}', [PublishedChallengeController::class, 'show'])->name('challenges.show');
     Route::post('/challenges/{challenge}/attempts', [ChallengeSubmissionController::class, 'store'])->middleware('throttle:10,1,challenge-attempt:')->name('challenge-attempts.store');
+    Route::post('/challenges/{challenge}/sample-runs', ChallengeSampleRunController::class)->middleware('throttle:5,1,challenge-sample-run:')->name('challenge-sample-runs.store');
     Route::get('/challenge-attempts/{submission}', [ChallengeSubmissionController::class, 'show'])->whereUuid('submission')->name('challenge-attempts.show');
     Route::get('/challenge-attempts/{submission}/status', [ChallengeSubmissionController::class, 'status'])->whereUuid('submission')->middleware('throttle:90,1,challenge-result:')->name('challenge-attempts.status');
     Route::get('/create/challenges', [ChallengeStudioController::class, 'index'])->name('challenges.index');

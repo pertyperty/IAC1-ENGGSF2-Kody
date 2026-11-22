@@ -25,6 +25,7 @@ test('Tower list keeps guest trials and account invitation without recording pro
         $response->assertSee('href="'.route('tower.show', TowerLevel::where('position', $position)->sole()).'"', false);
     }
     $response->assertDontSee('href="'.route('tower.show', TowerLevel::where('position', 4)->sole()).'"', false);
+    $response->assertSee('href="'.route('register', ['from' => 'tower']).'"', false);
     $this->assertDatabaseCount('tower_clearances', 0);
     $this->assertDatabaseCount('learning_activity_days', 0);
 });

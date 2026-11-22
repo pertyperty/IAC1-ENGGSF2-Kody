@@ -7,13 +7,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Account\RegisterAccountRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class RegistrationController extends Controller
 {
-    public function create(): View
+    public function create(Request $request): View
     {
-        return view('account.register');
+        return view('account.register', ['fromTower' => $request->query('from') === 'tower']);
     }
 
     public function store(RegisterAccountRequest $request, RegisterAccount $register): JsonResponse|RedirectResponse

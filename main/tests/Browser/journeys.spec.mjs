@@ -280,10 +280,11 @@ test('tower guest trials unlock locally and level four invites registration on d
     await page.locator('[data-tower-next]').click();
     await page.locator('[data-tower-stop="3"] a').click();
     await page.locator('[data-game-conditional]').check(); await solveGarden(page, false);
-    await page.locator('[data-tower-next]').click(); await expect(page).toHaveURL(/\/welcome$/);
+    await page.getByRole('link', { name: 'Create a free account' }).click(); await expect(page).toHaveURL(/\/register\?from=tower$/);
+    await expect(page.getByText('Create a free account to play beyond the three Tower trials.')).toBeVisible();
     await page.goto('/'); await page.setViewportSize({ width: 390, height: 844 });
     await audit(page); await page.locator('[data-tower-stop="4"] a').click();
-    await expect(page).toHaveURL(/\/welcome$/);
+    await expect(page).toHaveURL(/\/register\?from=tower$/);
 });
 
 test('learner username sign-in lands on the tower and saved wins refresh the deliberate HUD', async ({ page }) => {
@@ -444,7 +445,7 @@ test('empty catalogs offer clear next actions on narrow screens in both themes',
     await page.setViewportSize({ width: 320, height: 740 });
     for (const dark of [false, true]) {
         for (const [path, title, action] of [
-            ['/learn', 'No modules found', 'See all lessons'],
+            ['/learn', 'No modules found', 'See all modules'],
             ['/learn/courses', 'No courses found', 'Browse modules'],
             ['/challenges', 'No coding challenges found', 'Browse modules'],
         ]) {

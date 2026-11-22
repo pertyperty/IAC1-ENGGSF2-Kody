@@ -15,6 +15,8 @@ export function validateQuestion(question) {
         if (!Array.isArray(question.options) || question.options.length < 2 || question.options.length > 6
             || !distinct(question.options.map(option => option.label)) || question.options.some(option => [...option.label].length > 300 || !/^[a-z0-9_-]{1,30}$/.test(option.id))
             || new Set(question.options.map(option => option.id)).size !== question.options.length || !question.options.some(option => option.id === question.answer)) throw new Error('Choose a valid correct choice.');
+        if (question.options.some(option => Object.keys(option).some(key => !['id', 'label', 'wrong_hint'].includes(key))
+            || (option.wrong_hint != null && (typeof option.wrong_hint !== 'string' || [...option.wrong_hint].length > 1000)))) throw new Error('Choice hints must be at most 1000 characters.');
     } else if (type === 'blank') {
         if (typeof question.case_sensitive !== 'boolean' || !Array.isArray(question.accepted) || question.accepted.length < 1 || question.accepted.length > 6
             || question.accepted.some(answer => typeof answer !== 'string' || [...answer].length > 100)
@@ -33,7 +35,26 @@ export function checkQuestion(question, answer) {
     const correct = type === 'blank' ? typeof answer === 'string' && [...answer].length <= 100 && question.accepted.some(accepted => normalizeBlank(accepted, question.case_sensitive) === normalizeBlank(answer, question.case_sensitive))
         : type === 'matching' ? Boolean(answer && typeof answer === 'object' && !Array.isArray(answer) && Object.keys(answer).length === question.pairs.length && question.pairs.every(pair => answer[pair.id] === pair.id))
         : answer === question.answer;
-    return { correct, message: `${correct ? 'Correct.' : 'Try again.'} ${!correct && question.retry_explanation?.trim() ? question.retry_explanation : question.explanation}` };
+    const chosenHint = type === 'choice' ? question.options.find(option => option.id === answer)?.wrong_hint?.trim() : '';
+    const feedback = correct ? question.explanation : chosenHint || question.retry_explanation?.trim() || question.explanation;
+    return { correct, message: (correct ? 'Correct. ' : 'Try again. ') + feedback };
+}
+
+// Shared with QuizQuestions::matchingChoices. Ordering never affects pair IDs.
+export function matchingChoices(question, index) {
+    const order = question.pairs.map((_, position) => position);
+    let seed = index;
+    for (const character of question.id) seed = (seed * 31 + character.charCodeAt(0)) % 65536;
+    for (let i = order.length - 1; i > 0; i--) {
+        seed = (seed * 25173 + 13849) % 65536;
+        const j = seed % (i + 1);
+        [order[i], order[j]] = [order[j], order[i]];
+    }
+    if (order.every((position, i) => position === i)
+        || (order.length > 2 && order.every((position, i) => position === (i + 1) % order.length))) {
+        [order[0], order[1]] = [order[1], order[0]];
+    }
+    return order.map(position => question.pairs[position]);
 }
 
 export function readQuestionAnswer(group, question) {
@@ -55,7 +76,7 @@ export function renderQuizForm(root, quiz) {
             const input = doc.createElement('input'); input.type = 'text'; input.maxLength = 100; input.dataset.blankAnswer = ''; input.autocomplete = 'off'; label.append(input); group.append(label);
             const hint = doc.createElement('p'); hint.className = 'field-hint'; hint.textContent = question.case_sensitive ? 'Letter case matters. Extra spaces are ignored.' : 'Letter case and extra spaces are ignored.'; group.append(hint);
         } else if (question.type === 'matching') {
-            const choices = [...question.pairs.slice(1), question.pairs[0]];
+            const choices = matchingChoices(question, index);
             question.pairs.forEach(pair => {
                 const label = doc.createElement('label'); label.className = 'quiz-match-row'; label.append(doc.createTextNode(pair.left));
                 const select = doc.createElement('select'); select.dataset.matchAnswer = pair.id; select.setAttribute('aria-label', pair.left);

@@ -33,7 +33,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->replace(TrustProxies::class, TrustConfiguredProxies::class);
         $middleware->trustHosts(at: fn () => config('http.allowed_hosts'), subdomains: false);
         // Test-case whitespace is part of the expected program behavior.
-        $middleware->trimStrings(except: ['test_cases.*.input', 'test_cases.*.expected_output', 'source_code']);
+        $middleware->trimStrings(except: ['test_cases.*.input', 'test_cases.*.expected_output', 'source_code', 'starter_code']);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->dontFlash(['verification_token', 'recovery_token', 'source_code', 'code', 'state', 'access_token', 'id_token', 'client_secret', 'code_verifier', 'mobile', 'street', 'city', 'province', 'postal_code', 'account_holder_name']);

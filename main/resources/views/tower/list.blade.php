@@ -30,11 +30,11 @@
                 @if($locked)
                 <span class="tower-list-title">Level {{ $level->position }}: {{ $level->currentRevision->title }}</span>
                 @else
-                <a class="tower-list-title" href="{{ auth()->guest() && $level->position > 3 ? route('welcome') : route('tower.show', $level) }}">Level {{ $level->position }}: {{ $level->currentRevision->title }}</a>
+                <a class="tower-list-title" href="{{ auth()->guest() && $level->position > 3 ? route('register', ['from' => 'tower']) : route('tower.show', $level) }}">Level {{ $level->position }}: {{ $level->currentRevision->title }}</a>
                 @endif
                 <p>{{ $level->currentRevision->concept }}</p>
             </div>
-            <span class="tower-list-status" data-tower-list-status>{{ $step['completed'] ? 'Cleared' : ($locked ? 'Locked' : (auth()->guest() && $level->position > 3 ? 'Sign in' : ($isNext ? 'Up next' : 'Ready'))) }}</span>
+            <span class="tower-list-status" data-tower-list-status>{{ $step['completed'] ? 'Cleared' : ($locked ? 'Locked' : (auth()->guest() && $level->position > 3 ? 'Account needed' : ($isNext ? 'Up next' : 'Ready'))) }}</span>
         </li>
         @empty
         <li><p>No published levels in this track yet.</p></li>

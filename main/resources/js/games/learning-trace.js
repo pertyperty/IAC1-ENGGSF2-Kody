@@ -3,7 +3,7 @@ export function readableInstruction(template, command) {
     const [operation, ...args] = command.split(' ');
     const rest = args.join(' ');
     if (template === 'command-garden') return `kody.move_${command}()`;
-    if (template === 'number-machine') return `value = value ${{ add: '+', subtract: '−', multiply: '×' }[operation] ?? '?'} ${rest}`;
+    if (template === 'number-machine') return `value = value ${{ add: '+', subtract: '-', multiply: '*' }[operation] ?? '?'} ${rest}`;
     if (template === 'pixel-studio') return `canvas.paint(${args[0]}, ${args[1]}, ${JSON.stringify(args[2])})`;
     if (template === 'sort-lab') return `swap(items, ${args[0]}, ${args[1]})`;
     if (template === 'logic-switchboard') return `inputs[${rest}] = not inputs[${rest}]`;

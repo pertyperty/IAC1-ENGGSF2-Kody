@@ -15,7 +15,7 @@ test('trace states come from the actual interpreter and stop at the first invali
     assert.equal(trace.frames[1].state.number, 10);
     assert.match(trace.frames[2].explanation, /Use add/);
     assert.equal(evaluateArcade(game, ['add 3', 'multiply 2']).state.number, trace.frames[1].state.number);
-    assert.equal(readableInstruction(game.template, 'multiply 2'), 'value = value × 2');
+    assert.equal(readableInstruction(game.template, 'multiply 2'), 'value = value * 2');
 });
 test('all seven arcade state displays and readable programs describe their bounded operations', () => {
     for (const game of Object.values(games)) {

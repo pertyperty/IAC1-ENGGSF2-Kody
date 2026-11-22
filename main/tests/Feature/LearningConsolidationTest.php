@@ -88,6 +88,13 @@ test('creator list filters use literal titles statuses and preserve ownership', 
 });
 
 test('course difficulty and preset browsing filters are validated and resettable', function () {
+    $this->get(route('course-learning.catalog'))
+        ->assertOk()
+        ->assertSee('id="course-difficulty"', false)
+        ->assertSee('All difficulties');
+    $this->get(route('course-learning.catalog', ['difficulty' => 'Beginner']))
+        ->assertOk()
+        ->assertSee('Clear filters');
     $this->getJson(route('course-learning.catalog', ['difficulty' => 'Master']))->assertUnprocessable();
     $admin = moduleAccount(Role::Administrator);
     moduleSignIn($this, $admin);

@@ -29,8 +29,20 @@ class QuizAuthoring
     {
         $questions = Validator::make(['quiz_questions' => $questions, 'title' => $title], $this->rules()
             + ['title' => ['required', 'string', 'max:100']])->validate()['quiz_questions'];
-        $mixed = collect($questions)->contains(fn ($question) => ($question['type'] ?? 'choice') !== 'choice' || filled($question['retry_explanation'] ?? null));
         $questions = array_map(fn ($question) => app(QuizQuestions::class)->validate($question), $questions);
+        foreach ($questions as &$question) {
+            if (isset($question['options'])) {
+                foreach ($question['options'] as $index => $option) {
+                    if (blank($option['wrong_hint'] ?? null)) {
+                        unset($question['options'][$index]['wrong_hint']);
+                    }
+                }
+            }
+        }
+        unset($question);
+        $mixed = collect($questions)->contains(fn ($question) => ($question['type'] ?? 'choice') !== 'choice'
+            || filled($question['retry_explanation'] ?? null)
+            || array_column($question['options'] ?? [], 'wrong_hint') !== []);
         if (! $mixed && count($questions) === 1) {
             return ['template' => 'choice-quiz', 'version' => 1, 'title' => $title]
                 + array_intersect_key($questions[0], array_flip(['question', 'options', 'answer', 'explanation']));

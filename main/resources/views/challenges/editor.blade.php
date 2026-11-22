@@ -26,6 +26,12 @@
 <label for="rules">Rules and constraints</label><textarea id="rules" name="rules" rows="4" maxlength="20000" required>{{ old('rules', $revision?->rules ?? ($starter['rules'] ?? null)) }}</textarea>
 <label for="input_format">What does the program receive?</label><textarea id="input_format" name="input_format" rows="3" maxlength="5000" required>{{ old('input_format', $revision?->input_format ?? ($starter['input_format'] ?? null)) }}</textarea>
 <label for="output_format">What should the program print?</label><textarea id="output_format" name="output_format" rows="3" maxlength="5000" required>{{ old('output_format', $revision?->output_format ?? ($starter['output_format'] ?? null)) }}</textarea>
+@php $starterInput = old('starter_code', $revision?->starter_code); @endphp
+<details @if(filled($starterInput) || $errors->has('starter_code')) open @endif>
+    <summary>Starter code (optional)</summary>
+    <label for="starter-code">Code learners start with</label>
+    <textarea id="starter-code" name="starter_code" rows="6" maxlength="65536" spellcheck="false">{{ "\n".(is_string($starterInput) ? $starterInput : '') }}</textarea>
+</details>
 <section data-test-case-editor data-max-cases="{{ config('challenges.authoring.max_test_cases') }}"><h2 id="quest-checks">2. Add test cases</h2><p class="field-hint">Sample cases are visible to learners. Hidden cases are for you and reviewers. Spaces and line breaks are checked exactly; empty input or output is allowed.</p>
 @php
     $savedCases = $revision?->testCases->map(fn ($case) => ['input' => $case->input, 'expected_output' => $case->expected_output, 'hidden' => $case->hidden])->all() ?? ($starter['test_cases'] ?? [['input' => '', 'expected_output' => '', 'hidden' => false]]);

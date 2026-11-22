@@ -10,6 +10,10 @@
             <a href="{{ route('arcade') }}">Arcade</a>
             <a href="{{ route('learning.catalog') }}">Modules</a>
             <a href="{{ route('course-learning.catalog') }}">Courses</a>
+            <a href="{{ route('challenges.catalog') }}">Challenges</a>
+            @can('viewLearning', \App\Models\LearningCourse::class)
+                <a href="{{ route('course-learning.mine') }}">Library</a>
+            @endcan
             <a href="{{ route('help.index') }}">Help</a>
         </nav>
     </details>

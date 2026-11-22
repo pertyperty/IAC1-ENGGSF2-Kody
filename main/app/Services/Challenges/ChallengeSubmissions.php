@@ -34,7 +34,7 @@ class ChallengeSubmissions
             }
             $current = CodingChallenge::whereKey($challenge->id)->lockForUpdate()->firstOrFail();
             $participation = DB::table('challenge_participations')->where('user_id', $user->id)->where('challenge_id', $current->id)
-                ->where('context_key', $weeklyEvent?->id ?? 0)->lockForUpdate()->first();
+                ->where('context_key', $weeklyEvent->id ?? 0)->lockForUpdate()->first();
             $digest = hash('sha256', json_encode([(int) $data['revision_id'], $data['language'], $data['source_code']], JSON_THROW_ON_ERROR));
             if ($participation !== null) {
                 $existing = ChallengeSubmission::where('participation_id', $participation->id)->where('confirmation_id', $data['confirmation_id'])->first();
@@ -47,7 +47,7 @@ class ChallengeSubmissions
                 }
             }
             $event = $weeklyEvent === null ? null : app(WeeklyEvents::class)->admit($weeklyEvent->id, $current);
-            $revisionId = $event?->revision_id ?? $current->published_revision_id;
+            $revisionId = $event->revision_id ?? $current->published_revision_id;
             if ($current->status !== 'Published' || $current->isWithdrawn() || $revisionId !== (int) $data['revision_id']) {
                 throw ValidationException::withMessages(['revision_id' => 'This coding challenge changed or is unavailable. Reload before submitting.']);
             }
@@ -84,13 +84,13 @@ class ChallengeSubmissions
                 app(ContentAccess::class)->assertAccessible($user, 'challenge', $current, $revision);
             }
             app(CurrentAccountSession::class)->assert($user, $sessionId);
-            $participationId = $participation?->id ?? DB::table('challenge_participations')->insertGetId([
+            $participationId = $participation->id ?? DB::table('challenge_participations')->insertGetId([
                 'user_id' => $user->id, 'challenge_id' => $current->id, 'weekly_event_id' => $event?->id,
                 'attempts' => 0, 'created_at' => now(), 'updated_at' => now()]);
             $submission = new ChallengeSubmission;
             $submission->id = (string) Str::uuid();
             $submission->fill(['participation_id' => $participationId, 'challenge_id' => $current->id, 'revision_id' => $revision->id,
-                'provider_profile_id' => $profile->id, 'attempt' => ($participation?->attempts ?? 0) + 1,
+                'provider_profile_id' => $profile->id, 'attempt' => ($participation->attempts ?? 0) + 1,
                 'confirmation_id' => $data['confirmation_id'], 'request_digest' => $digest, 'source_code' => $data['source_code'],
                 'language' => $revision->language, 'weekly_event_id' => $event?->id, 'total_cases' => $cases->count(), 'submitted_at' => now()]);
             $submission->save();

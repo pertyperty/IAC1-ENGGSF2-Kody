@@ -62,7 +62,7 @@ class Refunds
         DB::transaction(function () use ($actor, $sessionId, $id, $data): void {
             $staff = app(FinancialAccounts::class)->lock($actor, $sessionId, true);
             app(FinancialAccounts::class)->confirm($staff, $data);
-            $candidate = DB::table('refund_requests')->find($id) ?? abort(404);
+            $candidate = DB::table('refund_requests')->where('id', $id)->first() ?? abort(404);
             abort_if($candidate->user_id === $staff->id, 403);
             // Serialize assessment/attempt writers before reversing their access.
             User::whereKey($candidate->user_id)->lockForUpdate()->firstOrFail();
@@ -127,7 +127,7 @@ class Refunds
             return;
         }
         try {
-            $purchase = DB::table('payment_purchases')->find($row->target_id);
+            $purchase = DB::table('payment_purchases')->where('id', $row->target_id)->firstOrFail();
             $proof = app(Client::class)->createRefund($row, $purchase);
             if ($proof->reference !== $row->id || $proof->paymentRequestId !== $purchase->provider_request_id || $proof->amountMinor !== $purchase->gross_minor) {
                 throw new RuntimeException('Unexpected refund response.');
@@ -210,6 +210,7 @@ class Refunds
             'module' => DB::table('learning_activity_days')->where('user_id', $purchase->user_id)->where('level', 'module-'.$purchase->content_id)->exists(),
             'course' => DB::table('course_module_progress as progress')->join('course_enrollments as enrollment', 'enrollment.id', '=', 'progress.enrollment_id')->where('enrollment.user_id', $purchase->user_id)->where('enrollment.course_id', $purchase->content_id)->whereNotNull('progress.completed_at')->exists(),
             'challenge' => DB::table('challenge_participations')->where('user_id', $purchase->user_id)->where('challenge_id', $purchase->content_id)->whereNull('weekly_event_id')->where('attempts', '>', 0)->exists(),
+            default => throw new RuntimeException('Unsupported refundable content type.'),
         };
         if ($purchase->status !== 'Active' || $used || CarbonImmutable::parse($purchase->created_at)->addDays(config('economy.access_refund_days'))->lessThan(now())) {
             throw ValidationException::withMessages(['refund' => 'Only unused access within seven days qualifies for the courtesy policy. Contact staff for an exceptional remedy.']);
