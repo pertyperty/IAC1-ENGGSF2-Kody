@@ -84,6 +84,15 @@ to 26 files. Relationship annotations retain actual revision/challenge types;
 the focused record owns its additional regression evidence.
 The 23-file results above describe the initial tooling revision.
 
+The 22 November backend batch adds 14 services and controllers covering course
+and module publishing, learning progress and history, challenge submissions,
+wallet/refund/settlement workflows, account deletion and creator profiles.
+Eloquent relationship return types identify their actual models, and revision
+model annotations describe the access columns added by the shared economy
+migration. No baseline or ignores were added. Refund creation requires its
+linked purchase before calling the provider and retains the reconciliation path
+when it is missing.
+
 ## npm advisory gate
 
 The following records the initial 18 November failure. The 19 November recheck

@@ -96,7 +96,10 @@ test('tower installs 80 editable levels without overwriting revisions on reseed'
     $this->assertDatabaseCount('tower_levels', 80);
     $this->assertDatabaseCount('tower_revisions', 80);
     $this->get(route('home'))->assertOk()->assertSee('The Kody Tower')->assertSee('data-tower-stop="80"', false)->assertSee('BOSS');
-    $this->get(route('tower.show', TowerLevel::where('position', 4)->sole()))->assertRedirect(route('welcome'));
+    $signup = route('register', ['from' => 'tower']);
+    $this->get(route('tower.show', TowerLevel::where('position', 4)->sole()))->assertRedirect($signup);
+    $this->get($signup)->assertOk()->assertSee('play beyond the three Tower trials')->assertDontSee('trials are complete');
+    $this->get(route('register'))->assertOk()->assertDontSee('three Tower trials');
     $this->get(route('welcome'))->assertOk()->assertSee('data-coding-game', false);
     $this->assertDatabaseCount('tower_clearances', 0);
 });

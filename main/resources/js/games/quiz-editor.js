@@ -7,7 +7,11 @@ export function readQuizQuestions(root) {
         if (type === 'blank') return { ...common, type, accepted: [...question.querySelectorAll('[data-accepted-answer]')].map(input => input.value), case_sensitive: question.querySelector('[data-case-sensitive]').checked };
         if (type === 'matching') return { ...common, type, pairs: [...question.querySelectorAll('[data-matching-pair]')].map(pair => Object.fromEntries(['id', 'left', 'right'].map(field => [field, pair.querySelector(`[data-pair-field="${field}"]`).value]))) };
         return { ...common, answer: question.querySelector('[data-question-field="answer"]').value,
-            options: [...question.querySelectorAll('[data-quiz-option-editor]')].map(option => Object.fromEntries(['id', 'label'].map(field => [field, option.querySelector(`[data-option-field="${field}"]`).value]))) };
+            options: [...question.querySelectorAll('[data-quiz-option-editor]')].map(option => {
+                const value = field => option.querySelector('[data-option-field="' + field + '"]')?.value;
+                const hint = value('wrong_hint')?.trim();
+                return { id: value('id'), label: value('label'), ...(hint ? { wrong_hint: hint } : {}) };
+            }) };
     });
 }
 export function firstUnusedId(ids, prefix = 'q') {

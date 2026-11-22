@@ -16,6 +16,7 @@ class CourseRevisionModule extends Model
         return $this->belongsTo(LearningModule::class, 'module_id');
     }
 
+    /** @return BelongsTo<ModuleRevision, $this> */
     public function revision(): BelongsTo
     {
         return $this->belongsTo(ModuleRevision::class, 'module_revision_id');

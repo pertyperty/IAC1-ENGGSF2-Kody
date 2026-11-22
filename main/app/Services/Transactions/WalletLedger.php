@@ -24,8 +24,8 @@ class WalletLedger
     {
         $row = DB::table('wallet_accounts')->where('user_id', $userId)->first();
 
-        return ['balance' => (int) ($row?->balance ?? 0), 'reserved' => (int) ($row?->reserved ?? 0),
-            'available' => (int) ($row?->balance ?? 0) - (int) ($row?->reserved ?? 0)];
+        return ['balance' => (int) ($row->balance ?? 0), 'reserved' => (int) ($row->reserved ?? 0),
+            'available' => (int) ($row->balance ?? 0) - (int) ($row->reserved ?? 0)];
     }
 
     public function credit(int $userId, string $reference, string $kind, int $kb, int $minor, ?int $purchasedKb = null): object

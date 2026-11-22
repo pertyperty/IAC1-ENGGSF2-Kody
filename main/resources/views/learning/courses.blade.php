@@ -11,9 +11,29 @@
             <a class="button button-secondary button-small" href="{{ route('course-learning.mine') }}"><x-action-icon name="journey"/> Your courses</a>
         @endcan
     </div>
-    <form method="get" class="catalog-search">
-        <label for="course-search">Find a course</label>
-        <div><input id="course-search" name="q" type="search" maxlength="80" value="{{ $query }}" placeholder="Search ideas, titles or categories"><button class="button button-dark button-small">Search</button></div>
+    <form method="get" action="{{ route('course-learning.catalog') }}" class="catalog-search catalog-filter-panel">
+        <div class="filter-grid">
+            <div>
+                <label for="course-search">Find a course</label>
+                <input id="course-search" name="q" type="search" maxlength="80" value="{{ $query }}" placeholder="Search ideas, titles or categories">
+            </div>
+            <div>
+                <label for="course-difficulty">Difficulty</label>
+                <select id="course-difficulty" name="difficulty">
+                    <option value="">All difficulties</option>
+                    @foreach(['Beginner', 'Intermediate', 'Advanced'] as $difficulty)
+                        <option value="{{ $difficulty }}" @selected(($filters['difficulty'] ?? null) === $difficulty)>{{ $difficulty }}</option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
+        <div class="filter-actions">
+            <button class="button button-dark button-small" type="submit">Search</button>
+            @if($query !== '' || ($filters['difficulty'] ?? null))
+                <a class="quiet-link" href="{{ route('course-learning.catalog') }}">Clear filters</a>
+            @endif
+            <span class="filter-summary">{{ $courses->total() }} {{ $courses->total() === 1 ? 'course' : 'courses' }} found</span>
+        </div>
     </form>
     <div class="module-grid">
         @forelse($courses as $revision)
@@ -48,7 +68,7 @@
                 </div>
             </article>
         @empty
-            <x-empty-state title="No courses found" description="Try another search or browse individual lessons." :action-url="route('learning.catalog')" action-label="Browse modules" />
+            <x-empty-state title="No courses found" description="Try another search or browse individual modules." :action-url="route('learning.catalog')" action-label="Browse modules" />
         @endforelse
     </div>
     {{ $courses->links() }}

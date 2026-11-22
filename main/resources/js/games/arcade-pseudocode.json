@@ -1,0 +1,62 @@
+{
+  "pixel-studio": [
+    [
+      "canvas\\.paint\\(([1-3]), ?([1-3]), ?\"(mint|peach|lavender)\"\\)",
+      "paint $1 $2 $3"
+    ]
+  ],
+  "number-machine": [
+    [
+      "value = value \\+ (-?[0-9]{1,3})",
+      "add $1"
+    ],
+    [
+      "value = value [-−] (-?[0-9]{1,3})",
+      "subtract $1"
+    ],
+    [
+      "value = value [*×] (-?[0-9]{1,3})",
+      "multiply $1"
+    ]
+  ],
+  "sort-lab": [
+    [
+      "swap\\(items, ?([1-6]), ?([1-6])\\)",
+      "swap $1 $2"
+    ]
+  ],
+  "logic-switchboard": [
+    [
+      "inputs\\[([1-4])\\] = not inputs\\[\\1\\]",
+      "flip $1"
+    ]
+  ],
+  "string-forge": [
+    [
+      "text = text \\+ \"([A-Za-z0-9_-]{1,12})\"",
+      "append $1"
+    ],
+    [
+      "text = (upper|lower|reverse|trim)\\(text\\)",
+      "$1"
+    ]
+  ],
+  "memory-trail": [
+    [
+      "stack\\.push\\(([0-9])\\)",
+      "push $1"
+    ],
+    [
+      "stack\\.pop\\(\\)",
+      "pop"
+    ],
+    [
+      "stack\\.duplicate_top\\(\\)",
+      "duplicate"
+    ],
+    [
+      "stack\\.swap_top\\(\\)",
+      "swap"
+    ]
+  ]
+}

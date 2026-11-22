@@ -21,6 +21,7 @@ class CourseEnrollment extends Model
         return $this->belongsTo(LearningCourse::class, 'course_id');
     }
 
+    /** @return BelongsTo<CourseRevision, $this> */
     public function revision(): BelongsTo
     {
         return $this->belongsTo(CourseRevision::class, 'course_revision_id');

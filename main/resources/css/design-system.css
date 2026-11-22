@@ -93,6 +93,27 @@ body :is(p, li, dd, label) { overflow-wrap: anywhere; }
     .button, .primary-button { transition: none; }
 }
 
+.challenge-editor-header {
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .75rem;
+}
+.challenge-editor {
+    display: grid; grid-template-columns: auto minmax(0, 1fr);
+    border: 1px solid var(--border); border-radius: var(--control-radius);
+    background: var(--surface); overflow: hidden;
+}
+.challenge-editor:focus-within { outline: 3px solid var(--focus); outline-offset: 2px; }
+.challenge-editor-gutter {
+    min-width: 2.75rem; padding: .65rem .6rem; border-right: 1px solid var(--border);
+    background: var(--surface-soft); color: var(--muted);
+    font: 500 .875rem/1.5 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    text-align: right; white-space: pre; user-select: none; overflow: hidden;
+}
+.challenge-editor textarea.challenge-source {
+    border: 0; border-radius: 0; outline: none; resize: vertical;
+    font: 400 .875rem/1.5 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    tab-size: 4;
+}
+.challenge-editor-meta [data-over-limit="true"] { color: var(--error-text); font-weight: 650; }
 @media(max-width: 380px) {
     .app-header .brand-mark { display: none; }
 }

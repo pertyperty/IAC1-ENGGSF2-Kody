@@ -49,7 +49,7 @@ class PublishedChallengeController extends Controller
         // Use the publication checked by admission, rather than the earlier route binding.
         $challenge = $access['target'];
         $revision = CodingChallengeRevision::whereKey($challenge->published_revision_id)->where('challenge_id', $challenge->id)->where('review_status', 'Approved')
-            ->firstOrFail(['id', 'title', 'description', 'language', 'difficulty', 'category', 'tags', 'rules', 'input_format', 'output_format', 'cpu_time_ms', 'memory_kib']);
+            ->firstOrFail(['id', 'title', 'description', 'language', 'difficulty', 'category', 'tags', 'rules', 'input_format', 'output_format', 'starter_code', 'cpu_time_ms', 'memory_kib']);
         // Hidden tests are excluded by SQL and never loaded into the learner view.
         $samples = $revision->testCases()->where('hidden', false)->get(['position', 'input', 'expected_output']);
         $participation = DB::table('challenge_participations')->where('user_id', $request->user()->id)->where('challenge_id', $challenge->id)->whereNull('weekly_event_id')->first();

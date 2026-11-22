@@ -26,6 +26,7 @@ class AccessSettings
             'prerequisite_modules.*' => ['required', 'integer', 'min:1', 'distinct']];
     }
 
+    /** @return array{price_kb: int, minimum_xp: int, prerequisite_modules: list<int>, creator_settlement: 'Cash'|'KodeBits'} */
     public function attributes(User $owner, string $type, array $data, ?int $contentId = null): array
     {
         $fields = Validator::make($data, $this->rules($type))->validate();

@@ -1,9 +1,11 @@
 @extends('layouts.learning')
-@section('title', 'This week’s quest — Kody')
+@section('title', 'This week’s challenge — Kody')
 @section('content')
 <section class="page-width quest-page">@include('weekly.navigation')<header class="quest-hero">@include('weekly.scenery')<div><p class="overline">THIS WEEK'S SHARED CHALLENGE</p><h1>{{ $revision->title }}</h1>
 <p>Closes {{ $weeklyEvent->ends_at->setTimezone('Asia/Manila')->format('M j, Y · g:i a') }} Manila time. Three fresh attempts for this event.</p>
 </div><x-kody-art size="140"/></header><div class="quest-play-columns"><div data-quest-problem><div class="lesson-note"><h2>The weekly rules</h2><p class="lesson-text">{{ $weeklyEvent->rules }}</p><p>Free play, three attempts and verified results. Your first passed attempt this week earns 25 bonus XP. @if($weeklyEvent->reward_mode === 'Capped')KodeBit prizes depend on the published results and the monthly reward budget.@else This event has no KodeBit prizes. @endif</p></div>
-@include('challenges.problem')<h2>A few examples</h2>@forelse($samples as $sample)<div class="lesson-note challenge-case"><h3>Sample {{ $loop->iteration }}</h3><p>Input</p><pre>{{ $sample->input }}</pre><p>Expected output</p><pre>{{ $sample->expected_output }}</pre></div>@empty<p>This quest has no public samples. Follow the formats above.</p>@endforelse
+@include('challenges.problem')
+@include('challenges.starter-code')
+<h2>A few examples</h2>@forelse($samples as $sample)<div class="lesson-note challenge-case"><h3>Sample {{ $loop->iteration }}</h3><p>Input</p><pre>{{ $sample->input }}</pre><p>Expected output</p><pre>{{ $sample->expected_output }}</pre></div>@empty<p>This challenge has no public samples. Follow the formats above.</p>@endforelse
 </div><aside class="content-panel">@include('challenges.participation')@include('engagement.reactions')</aside></div></section>
 @endsection

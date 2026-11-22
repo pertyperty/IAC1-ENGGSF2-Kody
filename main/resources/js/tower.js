@@ -23,7 +23,7 @@ export function mountTower(doc, win) {
             const link = row.querySelector('a');
             link.setAttribute('aria-disabled', String(locked));
             link.tabIndex = locked ? -1 : 0;
-            row.querySelector('[data-tower-list-status]').textContent = position > 3 ? 'Sign in' : position <= cleared ? 'Trial cleared' : locked ? 'Locked' : 'Up next';
+            row.querySelector('[data-tower-list-status]').textContent = position > 3 ? 'Account needed' : position <= cleared ? 'Trial cleared' : locked ? 'Locked' : 'Up next';
             if (position === cleared + 1 && position <= 3) row.setAttribute('aria-current', 'step');
             else row.removeAttribute('aria-current');
         });
@@ -39,7 +39,7 @@ export function mountTower(doc, win) {
         if (!map || !guest) return;
         const cleared = guestClearance(win);
         const resume = map.querySelector('[data-tower-continue]');
-        if (resume) { resume.href = cleared === 3 ? map.dataset.welcomeUrl : map.querySelector(`[data-tower-stop="${cleared + 1}"] a`).href; setIconLabel(resume, 'right', cleared === 3 ? 'Join to save your climb' : `${cleared ? 'Continue' : 'Start'} level ${cleared + 1}`); }
+        if (resume) { resume.href = cleared === 3 ? map.dataset.signupUrl : map.querySelector(`[data-tower-stop="${cleared + 1}"] a`).href; setIconLabel(resume, 'right', cleared === 3 ? 'Create a free account' : `${cleared ? 'Continue' : 'Start'} level ${cleared + 1}`); }
         map.querySelectorAll('[data-tower-stop]').forEach(stop => {
             const position = Number(stop.dataset.towerStop);
             // Level 4 is always an invitation; later trial nodes stay locked.
@@ -105,8 +105,8 @@ export function mountTower(doc, win) {
             const cleared = Math.max(guestClearance(win), position);
             try { win.localStorage.setItem(KEY, String(Math.min(3, cleared))); } catch {}
             victory.querySelector('[data-tower-result]').textContent = position === 3 ? 'Your first three trials are complete. Join Kody to start saving your climb.' : 'Trial complete. Your next level is ready on the map.';
-            link.href = position === 3 ? level.dataset.welcomeUrl : level.dataset.mapUrl;
-            setIconLabel(link, 'right', position === 3 ? 'Discover Kody' : 'Next level');
+            link.href = position === 3 ? level.dataset.signupUrl : level.dataset.mapUrl;
+            setIconLabel(link, 'right', position === 3 ? 'Create a free account' : 'Next level');
         } else if (event.detail.tower.cleared) {
             victory.querySelector('[data-tower-result]').textContent = event.detail.message;
             const next = new URL(event.detail.tower.next ?? '/', win.location.origin);

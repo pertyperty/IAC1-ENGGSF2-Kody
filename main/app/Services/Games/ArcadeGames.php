@@ -77,8 +77,17 @@ class ArcadeGames
 
     public function succeeds(array $instance, array $program): bool
     {
-        if (! $this->supports($instance) || ! array_is_list($program) || $program === [] || count($program) > 12
-            || ! app(AssessmentChallenges::class)->allows($instance, $program)) {
+        if (! $this->supports($instance) || ! array_is_list($program) || $program === [] || count($program) > 12) {
+            return false;
+        }
+        $syntax = app(ArcadePseudocode::class);
+        foreach ($program as $index => $command) {
+            if (! is_string($command) || strlen($command) > 100 || trim($command) !== $command) {
+                return false;
+            }
+            $program[$index] = $syntax->normalize($instance['template'], $command);
+        }
+        if (! app(AssessmentChallenges::class)->allows($instance, $program)) {
             return false;
         }
         if (in_array($instance['template'], PuzzleGames::TEMPLATES, true)) {
@@ -91,9 +100,6 @@ class ArcadeGames
         $files = array_column($scenario['files'] ?? [], 'content', 'name');
         $readDestination = false;
         foreach ($program as $command) {
-            if (! is_string($command) || strlen($command) > 100 || trim($command) !== $command) {
-                return false;
-            }
             switch ($instance['template']) {
                 case 'pixel-studio':
                     if (! preg_match('/^paint ([1-3]) ([1-3]) (mint|peach|lavender)$/D', $command, $match)) {

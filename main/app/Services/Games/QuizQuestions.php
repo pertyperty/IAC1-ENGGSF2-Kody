@@ -21,7 +21,8 @@ class QuizQuestions
             'question.retry_explanation' => ['sometimes', 'nullable', 'string', 'max:1000']];
         $rules += match ($type) {
             'choice' => ['question.options' => ['required', 'array', 'list', 'min:2', 'max:6'],
-                'question.options.*' => ['required', 'array:id,label'],
+                'question.options.*' => ['required', 'array:id,label,wrong_hint'],
+                'question.options.*.wrong_hint' => ['sometimes', 'nullable', 'string', 'max:1000'],
                 'question.options.*.id' => ['required', 'string', 'regex:/\A[a-z0-9_-]{1,30}\z/', 'distinct:strict'],
                 'question.options.*.label' => ['required', 'string', 'max:300'], 'question.answer' => ['required', 'string', 'max:30']],
             'blank' => ['question.accepted' => ['required', 'array', 'list', 'min:1', 'max:6'],
@@ -60,6 +61,27 @@ class QuizQuestions
                 && collect($question['pairs'])->every(fn ($pair) => ($answer[$pair['id']] ?? null) === $pair['id']),
             default => false,
         };
+    }
+
+    public function matchingChoices(array $question, int $index): array
+    {
+        $pairs = $question['pairs'];
+        $original = array_keys($pairs);
+        $order = $original;
+        $seed = $index;
+        foreach (str_split($question['id']) as $character) {
+            $seed = ($seed * 31 + ord($character)) % 65536;
+        }
+        for ($i = count($order) - 1; $i > 0; $i--) {
+            $seed = ($seed * 25173 + 13849) % 65536;
+            $j = $seed % ($i + 1);
+            [$order[$i], $order[$j]] = [$order[$j], $order[$i]];
+        }
+        if ($order === $original || (count($order) > 2 && $order === [...array_slice($original, 1), 0])) {
+            [$order[0], $order[1]] = [$order[1], $order[0]];
+        }
+
+        return array_map(fn (int $position) => $pairs[$position], $order);
     }
 
     public function answerRules(): array

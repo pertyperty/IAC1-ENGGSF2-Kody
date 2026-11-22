@@ -26,6 +26,7 @@ class TowerTracks
         return $this->all()[$this->key($level)];
     }
 
+    /** @return Builder<TowerLevel> */
     public function query(string $key): Builder
     {
         if (! array_key_exists($key, $this->all())) {

@@ -33,7 +33,8 @@ test('Tower list supports guest trials, keyboard navigation and selected-track l
     await expect(trials.getByRole('link', { name: /^Level 2:/ })).toHaveAttribute('aria-disabled', 'false');
     await expect(trials.getByRole('link', { name: /^Level 3:/ })).toHaveAttribute('aria-disabled', 'true');
     await trials.getByRole('link', { name: /^Level 4:/ }).click();
-    await expect(page).toHaveURL(/\/welcome$/);
+    await expect(page).toHaveURL(/\/register\?from=tower$/);
+    await expect(page.getByText('Trial clears stay in this browser.')).toBeVisible();
     await login(page, 'learner');
     await page.goto('/?view=list&track=expert');
     const levels = page.getByRole('list', { name: 'Expert levels' });

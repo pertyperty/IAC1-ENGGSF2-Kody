@@ -9,7 +9,9 @@ fifty floors and readable simulator programs.
 The Tower now contains **80 free levels and 111 stages**. Thirty original lessons
 add ten floors for each track. Expert is a content difficulty label, not a
 placement result or certification. Formative code-reading questions do not
-execute the displayed Python or pseudocode; Judge0 remains disabled.
+execute the displayed Python or pseudocode; Judge0 remains disabled. Expansion
+entries are grouped by track in `app/Services/Games/TowerData/` and built through
+`TowerExpansion`. The extraction preserved all 30 generated entries exactly.
 
 | Track | Retained floors | New floors | Learning focus |
 | --- | --- | --- | --- |
@@ -21,7 +23,7 @@ Floor numbers are stable identities, not inter-track prerequisites. Eligible
 signed-in participants may start any track, then clear published floors in its
 ascending order. Beginner 25 continues to 51, Intermediate 50 to 61, and Expert
 starts at 71. No earlier clears are fabricated. Guest trials remain 1–3; later
-floors lead to welcome. Only validated final-stage wins qualify Manila daily
+floors lead to contextual account registration. Trial clears remain in the browser. Only validated final-stage wins qualify Manila daily
 activity; no extra Tower XP or KodeBits are issued.
 
 The additive, database-checked nullable `tower_levels.skill_track` preserves the

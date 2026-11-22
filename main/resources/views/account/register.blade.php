@@ -2,7 +2,11 @@
 @section('title', 'Create your account — Kody')
 @section('content')
 <h1>Create your account</h1>
-<p class="intro">Save your progress and continue learning.</p>
+@if($fromTower ?? false)
+    <p class="intro">Create a free account to play beyond the three Tower trials. Trial clears stay in this browser.</p>
+@else
+    <p class="intro">Save your progress and continue learning.</p>
+@endif
 @include('layouts.form-errors')
 <form action="{{ route('register.store') }}" method="post" class="account-form">
     @csrf

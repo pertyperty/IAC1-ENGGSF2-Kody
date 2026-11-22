@@ -20,11 +20,13 @@ class LearningModule extends Model
         return ['record_version' => 'integer', 'staff_withdrawn_at' => 'immutable_datetime'];
     }
 
+    /** @return HasOne<ModuleRevision, $this> */
     public function latestRevision(): HasOne
     {
         return $this->hasOne(ModuleRevision::class, 'module_id')->latestOfMany();
     }
 
+    /** @return BelongsTo<ModuleRevision, $this> */
     public function publishedRevision(): BelongsTo
     {
         return $this->belongsTo(ModuleRevision::class, 'published_revision_id');

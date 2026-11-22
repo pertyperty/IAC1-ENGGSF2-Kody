@@ -20,7 +20,7 @@
             <pre data-arcade-output class="arcade-output" role="status" aria-live="polite" tabindex="0" aria-label="Program output">Ready to run.</pre>
             <div class="game-extras">
                 @include('learning.activity-reference')
-                <details class="program-arrange"><summary>Edit commands as text</summary><p class="field-hint">Use one command per line from Command reference. The Pseudocode list shows the equivalent.</p><label class="arcade-code-label">One command per line<textarea data-arcade-code rows="4" maxlength="1212" spellcheck="false" autocomplete="off" aria-label="Your program"></textarea></label></details>
+                <details class="program-arrange"><summary>Edit commands as text</summary><p class="field-hint">Enter one instruction per line. You can use the displayed pseudocode or commands from the reference.</p><label class="arcade-code-label">One instruction per line<textarea data-arcade-code rows="4" maxlength="1212" spellcheck="false" autocomplete="off" aria-label="Your program"></textarea></label></details>
                 <details class="command-reference"><summary>Command reference</summary><p class="field-hint" data-arcade-help></p></details>
             </div>
             <noscript><p>Enable JavaScript to use this activity.</p></noscript>

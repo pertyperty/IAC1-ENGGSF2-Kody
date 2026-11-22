@@ -10,7 +10,8 @@
     @if(($question['type'] ?? 'choice') === 'blank')
         <label>Your short answer<input data-blank-answer type="text" maxlength="100" autocomplete="off"></label><p class="field-hint">{{ $question['case_sensitive'] ? 'Letter case matters. Extra spaces are ignored.' : 'Letter case and extra spaces are ignored.' }}</p>
     @elseif(($question['type'] ?? 'choice') === 'matching')
-        @foreach($question['pairs'] as $pair)<label class="quiz-match-row">{{ $pair['left'] }}<select aria-label="{{ $pair['left'] }}" data-match-answer="{{ $pair['id'] }}"><option value="">Choose a match</option>@foreach([...array_slice($question['pairs'], 1), $question['pairs'][0]] as $choice)<option value="{{ $choice['id'] }}">{{ $choice['right'] }}</option>@endforeach</select></label>@endforeach
+        @php $choices = app(\App\Services\Games\QuizQuestions::class)->matchingChoices($question, $loop->index); @endphp
+        @foreach($question['pairs'] as $pair)<label class="quiz-match-row">{{ $pair['left'] }}<select aria-label="{{ $pair['left'] }}" data-match-answer="{{ $pair['id'] }}"><option value="">Choose a match</option>@foreach($choices as $choice)<option value="{{ $choice['id'] }}">{{ $choice['right'] }}</option>@endforeach</select></label>@endforeach
     @else
         @foreach($question['options'] as $option)<label><input type="radio" name="practice_answer_{{ $question['id'] }}" value="{{ $option['id'] }}">{{ $option['label'] }}</label>@endforeach
     @endif

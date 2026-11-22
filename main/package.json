@@ -3,6 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "lint:js": "node tests/Frontend/lint-js.mjs",
     "test:games": "node --test tests/Frontend/*.test.mjs",
     "test:browser": "node tests/Browser/run.mjs",
     "test:browser:engines": "node tests/Browser/run.mjs --cross-browser",

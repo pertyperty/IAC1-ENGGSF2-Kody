@@ -29,7 +29,7 @@ class TowerController extends Controller
         }
 
         $choice = $request->query('track');
-        $track = is_string($choice) && array_key_exists($choice, app(TowerTracks::class)->all()) ? $choice : $request->session()->get('tower.track', $request->user()?->coding_proficiency ?? 'beginner');
+        $track = is_string($choice) && array_key_exists($choice, app(TowerTracks::class)->all()) ? $choice : $request->session()->get('tower.track', $request->user()->coding_proficiency ?? 'beginner');
         if ($request->user()) {
             $request->session()->put('tower.track', $track);
         } else {
@@ -75,7 +75,7 @@ class TowerController extends Controller
     {
         abort_if($level->current_revision_id === null, 404);
         if ($request->user() === null && $level->position > 3) {
-            return redirect()->route('welcome');
+            return redirect()->route('register', ['from' => 'tower']);
         }
         if ($request->user()) {
             $tower->assertUnlocked($request->user(), $level);

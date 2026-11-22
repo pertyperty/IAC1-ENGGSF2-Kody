@@ -11,7 +11,7 @@
     @can('viewLearning', \App\Models\LearningCourse::class)
     <a href="{{ route('course-learning.mine') }}" @if(request()->routeIs('course-learning.mine')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'journey', 'label' => 'Library'])</a>
 
-    <a href="{{ route('weekly-events.index') }}" @if(request()->routeIs('weekly-events.*', 'weekly-leaderboards.*', 'weekly-results.show')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'game', 'label' => 'History'])</a>
+    <a href="{{ route('weekly-events.index') }}" @if(request()->routeIs('weekly-events.*', 'weekly-leaderboards.*', 'weekly-results.show')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'game', 'label' => 'Weekly'])</a>
     <a href="{{ route('leaderboards.index') }}" @if(request()->routeIs('leaderboards.*')) aria-current="page" @endif>@include('layouts.navigation-item-content', ['icon' => 'chart', 'label' => 'Rankings'])</a>
     @endcan
     @can('create', \App\Models\CodingChallenge::class)

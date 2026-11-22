@@ -20,6 +20,7 @@ class CodingChallengeRevision extends Model
         return $this->belongsTo(CodingChallenge::class, 'challenge_id');
     }
 
+    /** @return HasMany<ChallengeTestCase, $this> */
     public function testCases(): HasMany
     {
         return $this->hasMany(ChallengeTestCase::class, 'revision_id')->orderBy('position');

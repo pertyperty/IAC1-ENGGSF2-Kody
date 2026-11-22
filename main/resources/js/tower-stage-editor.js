@@ -56,7 +56,12 @@ export function editTowerStage(root, stage, index, changed, previewHost) {
             } else if (question.type === 'matching') {
                 question.pairs.forEach((pair, index) => { field(group, `Pair ${index + 1} prompt`, pair.left, value => pair.left = value, { max: 300 }); field(group, `Pair ${index + 1} match`, pair.right, value => pair.right = value, { max: 300 }); });
             } else {
-            (question.options ?? []).forEach((option, choice) => field(group, `Choice ${choice + 1}`, option.label, value => option.label = value, { max: 300 }));
+            (question.options ?? []).forEach((option, choice) => {
+                field(group, 'Choice ' + (choice + 1), option.label, value => option.label = value, { max: 300 });
+                if (stage.version === 3) field(group, 'Hint for choice ' + (choice + 1) + ' (optional)', option.wrong_hint ?? '', value => {
+                    if (value.trim()) option.wrong_hint = value; else delete option.wrong_hint;
+                }, { area: true });
+            });
             const answerLabel = doc.createElement('label'); answerLabel.textContent = 'Correct choice';
             const select = doc.createElement('select');
             (question.options ?? []).forEach((option, choice) => { const item = doc.createElement('option'); item.value = option.id; item.textContent = `Choice ${choice + 1}`; select.append(item); });

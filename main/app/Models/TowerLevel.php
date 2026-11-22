@@ -9,6 +9,7 @@ class TowerLevel extends Model
 {
     protected $guarded = ['id'];
 
+    /** @return BelongsTo<TowerRevision, $this> */
     public function currentRevision(): BelongsTo
     {
         return $this->belongsTo(TowerRevision::class, 'current_revision_id');

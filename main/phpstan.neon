@@ -32,6 +32,24 @@ parameters:
         - app/Services/Games/GameAssessment.php
         - app/Services/Games/ArcadeGames.php
         - app/Services/Games/CommandGarden.php
+        - app/Services/Content/CourseLearning.php
+        - app/Services/Content/ModulePublishing.php
+        - app/Services/Content/CoursePublishing.php
+        - app/Services/Content/LearningHistory.php
+        - app/Services/Gamification/TowerProgression.php
+        - app/Services/Gamification/LearningProgression.php
+        - app/Services/Gamification/Achievements.php
+        - app/Services/Challenges/ChallengeSubmissions.php
+        - app/Services/Challenges/ChallengeSampleRuns.php
+        - app/Http/Controllers/Challenges/ChallengeSampleRunController.php
+        - app/Services/Transactions/WalletLedger.php
+        - app/Services/Transactions/Refunds.php
+        - app/Services/Transactions/PublisherSettlements.php
+        - app/Services/Account/AccountDeletion.php
+        - app/Http/Controllers/TowerController.php
+        - app/Http/Controllers/Account/CreatorProfileController.php
+        - app/Support/LearningProse.php
+        - app/Support/LearningCodeBlock.php
     tmpDir: storage/framework/cache/phpstan
     checkModelProperties: true
     # Enum/date casts live in model casts() methods, not constant PHPDoc shapes.

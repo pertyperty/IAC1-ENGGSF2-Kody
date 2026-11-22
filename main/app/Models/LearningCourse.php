@@ -20,11 +20,13 @@ class LearningCourse extends Model
         return ['record_version' => 'integer', 'staff_withdrawn_at' => 'immutable_datetime'];
     }
 
+    /** @return HasOne<CourseRevision, $this> */
     public function latestRevision(): HasOne
     {
         return $this->hasOne(CourseRevision::class, 'course_id')->latestOfMany();
     }
 
+    /** @return BelongsTo<CourseRevision, $this> */
     public function publishedRevision(): BelongsTo
     {
         return $this->belongsTo(CourseRevision::class, 'published_revision_id');

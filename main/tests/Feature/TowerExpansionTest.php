@@ -56,7 +56,7 @@ test('track choice survives map and level navigation without granting admission 
 test('guests cannot select a saved advanced track or bypass their three trials', function () {
     $this->seed(TowerLevelSeeder::class);
     $this->get(route('home', ['track' => 'expert']))->assertOk()->assertSee('Start level 1');
-    $this->get(route('tower.show', TowerLevel::where('position', 71)->sole()))->assertRedirect(route('welcome'));
+    $this->get(route('tower.show', TowerLevel::where('position', 71)->sole()))->assertRedirect(route('register', ['from' => 'tower']));
     $this->assertDatabaseCount('tower_clearances', 0);
 });
 

@@ -1,9 +1,12 @@
-import { mountLearningTrace, arcadeTrace, readableInstruction } from './learning-trace.js';
+import { mountLearningTrace, arcadeTrace, readableInstruction as formatInstruction } from './learning-trace.js';
 import { createIcon } from '../icons.js';
 import { puzzleTemplates, validPuzzle, evaluatePuzzle, renderPuzzle } from './puzzle-games.js';
 import { saveCompletion } from './save-completion.js';
 import { programRuleError, mountConceptCheck, objectiveFeedback } from './assessment-challenges.js';
 import { mountMission } from './mission.js';
+import { normalizeArcadeCommand } from './arcade-pseudocode.js';
+
+const readableInstruction = (template, command) => formatInstruction(template, normalizeArcadeCommand(template, command));
 
 export const arcadeTemplates = ['pixel-studio', 'number-machine', 'sort-lab', 'terminal-quest', ...puzzleTemplates];
 
@@ -30,6 +33,9 @@ export function validScenario(template, scenario) {
 }
 
 export function evaluateArcade(game, program) {
+    if (Array.isArray(program) && program.length <= 12) {
+        program = program.map(command => normalizeArcadeCommand(game.template, command));
+    }
     const ruleError = Array.isArray(program) ? programRuleError(game, program) : null;
     if (ruleError) return { ...evaluateArcade({ ...game, assessment: undefined }, []), success: false, error: ruleError };
     if (puzzleTemplates.includes(game.template)) return evaluatePuzzle(game, program);
@@ -411,7 +417,8 @@ export function mountArcade(root) {
             }
             if (!result.success && showResult) output.focus({ preventScroll: true });
             if (result.success && showResult && conceptCheck.verify()) {
-                const message = await saveCompletion(root, { program, assessment_answer: conceptCheck.answer() });
+                const canonical = program.map(command => normalizeArcadeCommand(game.template, command));
+                const message = await saveCompletion(root, { program: canonical, assessment_answer: conceptCheck.answer() });
                 if (message) output.textContent += `\n${message}`;
             } else if (result.success && showResult && game.assessment) {
                 root.dataset.playState = 'checking';

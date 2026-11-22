@@ -46,7 +46,7 @@ beforeEach(function () {
 test('E02 Moderators configure future pinned weekly quests with UTC windows and server-owned capped rewards', function () {
     $challenge = challengeFixture(true, overrides: ['test_cases' => [['input' => 'weekly-private-input', 'expected_output' => 'weekly-private-output', 'hidden' => true]]]);
     moduleSignIn($this, User::factory()->create(['account_role' => Role::Moderator]));
-    $this->get(route('weekly-studio.index'))->assertOk()->assertSee('A fresh quest')->assertDontSee('weekly-private-input')->assertDontSee('weekly-private-output')->assertHeader('Cache-Control', 'no-store, private');
+    $this->get(route('weekly-studio.index'))->assertOk()->assertSee('Choose this challenge')->assertDontSee('weekly-private-input')->assertDontSee('weekly-private-output')->assertHeader('Cache-Control', 'no-store, private');
     $this->post(route('weekly-studio.store'), weeklyData($challenge, ['week' => '2026-10-11', 'configured_by' => 999, 'reward_mode' => 'Paid', 'status' => 'Active']))->assertRedirect();
     $event = WeeklyEvent::sole();
     expect($event->starts_at->utc()->format('Y-m-d H:i:s'))->toBe('2026-10-10 16:00:00')

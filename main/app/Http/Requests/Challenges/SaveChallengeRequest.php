@@ -4,6 +4,7 @@ namespace App\Http\Requests\Challenges;
 
 use App\Http\Requests\Content\NormalizesAccessSettings;
 use App\Models\CodingChallenge;
+use App\Services\Challenges\ChallengeCode;
 use App\Services\Challenges\ChallengeMetadata;
 use App\Services\Publishing\AccessSettings;
 use Illuminate\Foundation\Http\FormRequest;
@@ -40,6 +41,7 @@ class SaveChallengeRequest extends FormRequest
             'rules' => ['required', 'string', 'max:20000', 'not_regex:/\x00/'],
             'input_format' => ['required', 'string', 'max:5000', 'not_regex:/\x00/'],
             'output_format' => ['required', 'string', 'max:5000', 'not_regex:/\x00/'],
+            'starter_code' => ['sometimes', 'nullable', 'string'],
             'cpu_time_ms' => ['required', 'integer', 'between:'.$limits['min_cpu_time_ms'].','.$limits['max_cpu_time_ms']],
             'memory_kib' => ['required', 'integer', 'between:'.$limits['min_memory_kib'].','.$limits['max_memory_kib']],
             'test_cases' => ['required', 'array', 'list', 'min:1', 'max:'.$limits['max_test_cases']],
@@ -52,6 +54,9 @@ class SaveChallengeRequest extends FormRequest
     public function withValidator(Validator $validator): void
     {
         $validator->after(function (Validator $validator): void {
+            if ($this->input('starter_code') !== null && ! ChallengeCode::valid($this->input('starter_code'))) {
+                $validator->errors()->add('starter_code', 'Starter code must be UTF-8, at most 64 KiB and contain no NUL bytes.');
+            }
             if ($validator->errors()->isNotEmpty()) {
                 return;
             }
