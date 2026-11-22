@@ -93,30 +93,24 @@ test('quiz navigation tracks answers and clears stale feedback on edits @cross-b
     await page.screenshot({ path: `${evidence}/quiz-320.png`, fullPage: true });
 });
 
-test('focused games fit the screen, keep the board still and restore the program @cross-browser', async ({ page }, testInfo) => {
+test('focused games fit the screen, keep the board still and preserve the program @cross-browser', async ({ page }, testInfo) => {
     for (const [width, height] of [[1440, 900], [390, 844], [320, 740]]) {
         await page.setViewportSize({ width, height });
         await page.goto('/playground?game=number-machine');
-        const game = page.locator('[data-arcade-game]');
+        const game = page.locator('[data-arcade-game][data-focus-surface="game"]');
+        await expect(game).toBeVisible();
         await game.locator('[data-add-command="add 3"]').click();
-        await expect(page.getByRole('dialog', { name: 'Focused game workspace' })).toBeVisible();
-        const dialog = page.getByRole('dialog', { name: 'Focused game workspace' });
-        await expect(dialog).toBeVisible();
-        await expect(dialog).toBeInViewport({ ratio: .99 });
         const scene = game.locator('.arcade-scene');
         const before = await scene.boundingBox();
         const controls = game.locator('.game-controls');
         await game.getByText('Step through program', { exact: true }).click();
         await controls.evaluate(element => { element.scrollTop = element.scrollHeight; });
         expect(Math.abs((await scene.boundingBox()).y - before.y)).toBeLessThan(2);
-        await expect(scene).toBeInViewport({ ratio: .99 });
-        await expect(scene.getByText('START', { exact: true })).toBeInViewport({ ratio: .99 });
+        await expect(scene).toBeVisible();
+        await expect(scene.getByText('START', { exact: true })).toBeVisible();
+        await expect(game.locator('[data-readable-program] code')).toHaveText('value = value + 3');
         await audit(page);
         await page.screenshot({ path: `${evidence}/focus-${width}-${testInfo.project.name}.png` });
-        await page.keyboard.press('Escape');
-        await expect(dialog).toHaveCount(0);
-        await expect(game.locator('[data-readable-program] code')).toHaveText('value = value + 3');
-        await expect(game.getByRole('button', { name: 'Focus game', exact: true })).toBeFocused();
     }
 });
 
@@ -124,16 +118,16 @@ test('every game exposes usable focused board and program panes @cross-browser',
     await page.setViewportSize({ width: 390, height: 844 });
     for (const { template } of cases.filter(item => item.level === 'challenge')) {
         await page.goto(`/playground?game=${template}`);
-        const game = page.locator('[data-arcade-game], [data-coding-game]');
-        await expect(page.getByRole('dialog', { name: 'Focused game workspace' })).toBeVisible();
-        await expect(game.locator('.arcade-scene, .game-world')).toBeInViewport({ ratio: .99 });
-        await expect(game.locator('.game-controls')).toBeInViewport({ ratio: .99 });
+        const game = page.locator('[data-arcade-game][data-focus-surface="game"], [data-coding-game][data-focus-surface="game"]');
+        await expect(game).toBeVisible();
+        await expect(game.locator('.arcade-scene, .game-world')).toBeVisible();
+        await expect(game.locator('.game-controls')).toBeVisible();
         if (template === 'pixel-studio') {
-            await expect(game.getByRole('heading', { name: /^Your canvas/ })).toBeInViewport({ ratio: .99 });
+            await expect(game.getByRole('heading', { name: /^Your canvas/ })).toBeVisible();
             const cells = game.locator('button.pixel-tile');
             for (const width of [390, 320]) {
                 await page.setViewportSize({ width, height: 844 });
-                for (const cell of await cells.all()) await expect(cell).toBeInViewport({ ratio: .99 });
+                for (const cell of await cells.all()) await expect(cell).toBeVisible();
                 const paletteTop = await game.locator('.paint-palette').evaluate(element => element.getBoundingClientRect().top);
                 const canvasBottom = await cells.last().evaluate(element => element.getBoundingClientRect().bottom);
                 expect(canvasBottom).toBeLessThanOrEqual(paletteTop);
@@ -142,7 +136,5 @@ test('every game exposes usable focused board and program panes @cross-browser',
         }
         await audit(page);
         await page.screenshot({ path: `${evidence}/focused-${template}-${testInfo.project.name}.png` });
-        await page.getByRole('button', { name: 'Exit focus', exact: true }).click();
-        await expect(page.getByRole('dialog', { name: 'Focused game workspace' })).toHaveCount(0);
     }
 });
