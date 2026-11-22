@@ -92,7 +92,7 @@ test('constrained practice checks answers without replay and clears them after p
 
 test('guided command references match the instructions accepted by each task', async ({ page }) => {
     for (const [template, allowed, labels, forbidden] of [
-        ['number-machine', ['add 3', 'subtract 1', 'multiply 2'], ['value = value + 3', 'value = value \u2212 1', 'value = value \u00d7 2'], 'subtract 2'],
+        ['number-machine', ['add 3', 'subtract 1', 'multiply 2'], ['value = value + 3', 'value = value - 1', 'value = value * 2'], 'subtract 2'],
         ['string-forge', ['trim', 'upper', 'reverse', 'append _ok'], ['text = trim(text)', 'text = upper(text)', 'text = reverse(text)', 'text = text + "_ok"'], 'lower'],
         ['memory-trail', ['pop', 'swap', 'duplicate'], ['stack.pop()', 'stack.swap_top()', 'stack.duplicate_top()'], 'push 2'],
     ]) {

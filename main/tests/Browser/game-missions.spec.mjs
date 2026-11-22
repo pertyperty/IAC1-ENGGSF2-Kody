@@ -68,7 +68,7 @@ test('instruction buttons, Undo and keyboard reordering preserve the program @cr
     await root.locator('[data-add-command="multiply 2"]').click();
     const rows = root.locator('[data-arcade-program] > li');
     await rows.first().focus(); await page.keyboard.press('Alt+ArrowDown');
-    await expect(rows.first()).toContainText('value = value \u00d7 2');
+    await expect(rows.first()).toContainText('value = value * 2');
     await expect(rows.nth(1)).toBeFocused();
     await root.getByRole('button', { name: 'Undo', exact: true }).click();
     await expect(rows).toHaveCount(1);
