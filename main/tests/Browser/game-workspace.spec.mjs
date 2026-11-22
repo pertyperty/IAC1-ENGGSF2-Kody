@@ -115,9 +115,9 @@ test('every arcade scene remains readable on desktop, mobile and dark theme', as
 });
 
 
-test('practice activity switching remains an explicit form action', async ({ page }) => {
+test('practice activity switching works directly without exiting focus', async ({ page }) => {
     await page.goto('/playground?game=number-machine');
-    await page.getByRole('button', { name: 'Exit focus', exact: true }).click();
+    await expect(page.locator('[data-focus-surface="game"]')).toBeVisible();
     await expect(page.getByRole('combobox', { name: 'Choose a concept' })).toBeHidden();
     await page.getByText('Change activity', { exact: true }).click();
     await page.getByRole('combobox', { name: 'Choose a concept' }).selectOption('memory-trail');

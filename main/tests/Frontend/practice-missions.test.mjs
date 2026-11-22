@@ -20,7 +20,8 @@ test('all thirty practice tasks are reachable and agree with authoritative repla
 test('goal comparisons account for blank cells, extra text and stack order', () => {
     assert.equal(missionProgress({ template: 'pixel-studio', scenario: { pixels: ['1 1 mint'] } }, { pixels: {} }).value, 8);
     assert.equal(missionProgress({ template: 'pixel-studio', scenario: { pixels: ['1 1 mint'] } }, { pixels: { '1 1': 'mint', '2 1': 'mint' } }).value, 8);
-    assert.deepEqual(missionProgress({ template: 'string-forge', scenario: { target: 'AB' } }, { text: 'ABX' }), { value: 2, max: 3, text: '2 matching characters · Length 3 / target 2' });
+    assert.deepEqual(missionProgress({ template: 'string-forge', scenario: { target: 'AB' } }, { text: 'ABX' }), { value: 2, max: 3, matched: false, text: '2 matching characters · Length 3 / target 2' });
+    assert.equal(missionProgress({ template: 'string-forge', scenario: { target: 'AB' } }, { text: 'AB' }).matched, true);
     assert.equal(missionProgress({ template: 'memory-trail', scenario: { target: [2, 3] } }, { stack: [3, 2] }).value, 0);
     assert.equal(missionProgress({ template: 'memory-trail', scenario: { target: [] } }, { stack: [] }).value, 1);
 });

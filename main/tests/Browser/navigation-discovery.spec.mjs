@@ -98,9 +98,6 @@ test('Show navigation remains fixed while hovering and clicking on narrow screen
     await login(page, 'learner');
     await page.setViewportSize({ width: 320, height: 740 });
     await page.goto('/learn/sequences');
-    await page.getByRole('button', { name: 'Exit focus', exact: true }).click();
-    await expect(page.locator('.focus-game-shell')).toHaveCount(0);
-    // Exit focus leaves the pointer over the restored header, which intentionally stays open on hover.
     await page.mouse.move(160, 600);
     await page.evaluate(() => window.scrollTo(0, 450));
     const reveal = page.locator('[data-navigation-reveal]');

@@ -55,7 +55,7 @@ test('staff forms and workspace icons stay usable on desktop and mobile', async 
         }
     }
     await page.goto('/playground?game=number-machine');
-    const focused = page.getByRole('dialog', { name: 'Focused game workspace' });
+    const focused = page.locator('[data-focus-surface="game"]');
     await expect(focused).toBeVisible();
     await focused.getByText('Menu', { exact: true }).click();
     const navigation = focused.getByRole('navigation', { name: 'Game navigation' });
@@ -64,29 +64,28 @@ test('staff forms and workspace icons stay usable on desktop and mobile', async 
     await page.screenshot({ path: `${evidence}/staff-focused-menu-320.png` });
 });
 
-test('default focus provides a menu, learning context and a reversible exit @cross-browser', async ({ page }) => {
+test('focus workspace is the live interface with menu, learning context, and direct settings @cross-browser', async ({ page }) => {
     for (const width of [1440, 390, 320]) {
         await page.setViewportSize({ width, height: 844 });
         await page.goto('/playground?game=number-machine');
-        const dialog = page.getByRole('dialog', { name: 'Focused game workspace' });
-        await expect(dialog).toBeVisible();
-        await dialog.getByRole('button', { name: 'Learn', exact: true }).click();
-        await expect(dialog.getByRole('region', { name: 'Activity explanation' })).toBeVisible();
-        await expect(dialog.getByRole('link', { name: 'Related modules' })).toHaveAttribute('href', /template=number-machine/);
-        await dialog.getByText('Menu', { exact: true }).click();
-        await expect(dialog.getByRole('navigation', { name: 'Game navigation' })).toBeVisible();
-        await expect(dialog.getByRole('link', { name: 'Modules', exact: true })).toHaveAttribute('href', /\/learn$/);
+        const surface = page.locator('[data-focus-surface="game"]');
+        await expect(surface).toBeVisible();
+        await expect(page.locator('.focus-game-shell')).toHaveCount(0);
+        // Settings (activity switcher & difficulty) stay directly reachable without exiting focus.
+        await expect(page.getByRole('navigation', { name: 'Practice difficulty' })).toBeVisible();
+        await expect(page.getByText('Change activity', { exact: true })).toBeVisible();
+        await surface.getByRole('button', { name: 'Learn', exact: true }).click();
+        await expect(surface.getByRole('region', { name: 'Activity explanation' })).toBeVisible();
+        await expect(surface.getByRole('link', { name: 'Related modules' })).toHaveAttribute('href', /template=number-machine/);
+        await surface.getByText('Menu', { exact: true }).click();
+        await expect(surface.getByRole('navigation', { name: 'Game navigation' })).toBeVisible();
+        await expect(surface.getByRole('link', { name: 'Modules', exact: true })).toHaveAttribute('href', /\/learn$/);
         const theme = await page.locator('html').getAttribute('data-theme');
-        await dialog.getByRole('navigation', { name: 'Game navigation' }).getByRole('button', { name: /^(Dark|Light) mode$/ }).click();
+        await surface.getByRole('navigation', { name: 'Game navigation' }).getByRole('button', { name: /^(Dark|Light) mode$/ }).click();
         await expect(page.locator('html')).toHaveAttribute('data-theme', theme === 'dark' ? 'light' : 'dark');
-        await dialog.getByText('Menu', { exact: true }).click();
+        await surface.getByText('Menu', { exact: true }).click();
         await audit(page);
         await page.screenshot({ path: `${evidence}/focus-${width}.png` });
-        await dialog.getByRole('button', { name: 'Exit focus' }).click();
-        await expect(dialog).toHaveCount(0);
-        await expect(page.getByRole('button', { name: 'Focus game' })).toBeFocused();
-        await page.getByRole('button', { name: 'Focus game' }).click();
-        await expect(dialog).toBeVisible();
     }
 });
 
@@ -94,14 +93,13 @@ test('quiz steps retain answers, reveal errors and complete through a final chec
     for (const width of [1440, 390, 320]) {
         await page.setViewportSize({ width, height: 740 });
         await page.goto('/playground?game=quiz-lab');
-        await expect(page.getByRole('dialog', { name: 'Focused quiz workspace' })).toBeVisible();
+        await expect(page.locator('[data-focus-surface="quiz"]')).toBeVisible();
         await audit(page);
-        await expect(page.getByRole('button', { name: 'Check answers' })).toBeInViewport();
+        await expect(page.getByRole('button', { name: 'Check answers' })).toBeVisible();
         await page.screenshot({ path: `${evidence}/quiz-choice-${width}.png` });
     }
-    const dialog = page.getByRole('dialog', { name: 'Focused quiz workspace' });
-    await expect(dialog).toBeVisible();
-    const quiz = dialog.locator('[data-practice-quiz]');
+    const quiz = page.locator('[data-focus-surface="quiz"]');
+    await expect(quiz).toBeVisible();
     await expect(quiz.locator('[data-quiz-question]:visible')).toHaveCount(1);
     await quiz.getByLabel('True', { exact: true }).check();
     await quiz.getByRole('button', { name: 'Next question' }).click();

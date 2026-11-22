@@ -1,4 +1,4 @@
-// Keep one live activity and its completion context while changing its presentation.
+// Focus layout IS the live activity workspace: no modal overlay trapping page controls or settings.
 export function mountGameWorkspace(root) {
     const quiz = root.matches('[data-practice-quiz]');
     const workspace = root.querySelector('.garden-workbench, .arcade-workbench, form');
@@ -6,38 +6,68 @@ export function mountGameWorkspace(root) {
     root.dataset.workspaceMounted = 'true';
     const doc = root.ownerDocument;
     const win = doc.defaultView;
-    const launch = doc.createElement('button');
-    launch.type = 'button';
-    launch.className = 'button button-secondary focus-game-launch';
-    launch.textContent = quiz ? 'Focus quiz' : 'Focus game';
-    let dialog = null;
-    let openedAutomatically = false;
+    const isFocusDefault = Boolean(root.closest('[data-focus-default]'));
 
     const fit = () => {
         if (!root.isConnected || root.getClientRects().length === 0) return;
         root.classList.toggle('workspace-fluid', root.getBoundingClientRect().width < 850);
         const header = doc.querySelector('.app-header-shell');
         const top = Math.max(workspace.getBoundingClientRect().top, header?.getBoundingClientRect().bottom ?? 0);
-        workspace.style.setProperty('--workspace-height', `${Math.max(320, win.innerHeight - top - 16)}px`);
+        const available = Math.max(360, Math.min(760, win.innerHeight - top - 16));
+        workspace.style.setProperty('--workspace-height', `${available}px`);
     };
-    const open = () => {
-        if (dialog?.open || root.getClientRects().length === 0) return;
-        const origin = doc.createComment('activity workspace');
-        root.before(origin);
-        dialog = doc.createElement('dialog');
-        dialog.className = `focus-game-shell${quiz ? ' focus-quiz-shell' : ''}`;
-        dialog.setAttribute('aria-label', quiz ? 'Focused quiz workspace' : 'Focused game workspace');
-        const header = doc.createElement('header');
+
+    if (isFocusDefault) {
+        root.classList.add('play-focus-surface');
+        root.dataset.focusSurface = quiz ? 'quiz' : 'game';
+
+        const bar = doc.createElement('header');
+        bar.className = 'focus-workspace-bar';
+        bar.setAttribute('aria-label', quiz ? 'Quiz workspace controls' : 'Game workspace controls');
+
+        const titleWrap = doc.createElement('div');
+        titleWrap.className = 'focus-workspace-title';
+        const headingText = root.querySelector('.game-heading h2')?.textContent?.trim() ?? (quiz ? 'Quiz' : 'Activity');
+        const kickerText = root.querySelector('.game-heading .game-kicker, .game-heading .overline')?.textContent?.trim();
+        if (kickerText) {
+            const badge = doc.createElement('span');
+            badge.className = 'focus-kicker-pill';
+            badge.textContent = kickerText;
+            titleWrap.append(badge);
+        }
         const title = doc.createElement('h2');
-        title.textContent = root.querySelector('.game-heading h2').textContent;
+        title.textContent = headingText;
+        titleWrap.append(title);
+
         const actions = doc.createElement('div');
         actions.className = 'focus-header-actions';
+
+        const reference = root.querySelector('.activity-reference');
+        if (reference) {
+            const learn = doc.createElement('button');
+            learn.type = 'button';
+            learn.className = 'button button-secondary button-small';
+            learn.textContent = 'Learn';
+            learn.setAttribute('aria-expanded', String(reference.open));
+            learn.addEventListener('click', () => {
+                reference.open = !reference.open;
+                learn.setAttribute('aria-expanded', String(reference.open));
+                if (reference.open) reference.querySelector('summary')?.focus({ preventScroll: true });
+                fit();
+            });
+            reference.addEventListener('toggle', () => {
+                learn.setAttribute('aria-expanded', String(reference.open));
+                fit();
+            });
+            actions.append(learn);
+        }
+
         const menu = doc.querySelector('[data-focus-navigation]');
         if (menu) {
             actions.append(menu.content.cloneNode(true));
             const navigation = actions.querySelector('nav');
             const theme = doc.querySelector('[data-theme-toggle]');
-            if (theme) {
+            if (theme && navigation) {
                 const toggleTheme = doc.createElement('button');
                 toggleTheme.type = 'button';
                 toggleTheme.textContent = theme.getAttribute('aria-label');
@@ -46,12 +76,12 @@ export function mountGameWorkspace(root) {
                     toggleTheme.textContent = theme.getAttribute('aria-label');
                 });
                 navigation.append(toggleTheme);
-                actions.querySelector('.focus-navigation').addEventListener('toggle', () => {
+                actions.querySelector('.focus-navigation')?.addEventListener('toggle', () => {
                     toggleTheme.textContent = theme.getAttribute('aria-label');
                 });
             }
             const track = doc.querySelector('[data-proficiency-open]');
-            if (track) {
+            if (track && navigation) {
                 const chooseTrack = doc.createElement('button');
                 chooseTrack.type = 'button';
                 chooseTrack.textContent = 'Choose track';
@@ -59,75 +89,15 @@ export function mountGameWorkspace(root) {
                 navigation.append(chooseTrack);
             }
         }
-        const learn = doc.createElement('button');
-        learn.type = 'button';
-        learn.className = 'button button-secondary';
-        learn.textContent = 'Learn';
-        learn.addEventListener('click', () => {
-            const reference = root.querySelector('.activity-reference');
-            if (!reference) return;
-            reference.open = !reference.open;
-            reference.querySelector('summary').focus();
-        });
-        const close = doc.createElement('button');
-        close.type = 'button';
-        close.className = 'button button-secondary';
-        close.textContent = 'Exit focus';
-        close.addEventListener('click', () => {
-            doc.documentElement.dataset.focusDismissed = 'true';
-            dialog.close();
-        });
-        actions.append(learn, close);
-        header.append(title, actions);
-        origin.after(dialog);
-        dialog.append(header, root);
-        launch.hidden = true;
-        const activeDialog = dialog;
-        activeDialog.addEventListener('cancel', () => { doc.documentElement.dataset.focusDismissed = 'true'; });
-        activeDialog.addEventListener('close', () => {
-            origin.replaceWith(root);
-            activeDialog.remove();
-            if (dialog === activeDialog) dialog = null;
-            launch.hidden = false;
-            fit();
-            // A result dialog may be above this one; never take its focus.
-            if (!doc.querySelector('dialog[open]')) launch.focus({ preventScroll: true });
-        }, { once: true });
-        activeDialog.showModal();
-        fit();
-    };
-    launch.addEventListener('click', () => {
-        doc.documentElement.dataset.focusDismissed = 'false';
-        open();
-    });
-    root.querySelector('.lesson-briefing').append(launch);
-    const automatic = () => {
-        if (openedAutomatically || doc.documentElement.dataset.focusDismissed === 'true'
-            || !root.closest('[data-focus-default]') || root.closest('details:not([open]), [hidden]') || doc.querySelector('dialog[open]')
-            || root.getClientRects().length === 0) return;
-        const stage = root.closest('[data-tower-stage]');
-        const requested = doc.querySelector(/^#tower-stage-\d+$/.test(win.location.hash) ? win.location.hash : '[data-no-stage]');
-        if (requested && stage && requested !== stage) return;
-        openedAutomatically = true;
-        open();
-    };
-    const schedule = () => win.requestAnimationFrame(automatic);
-    // Stage admission and details visibility can change without a page navigation.
-    const visibility = new MutationObserver(schedule);
-    visibility.observe(doc.querySelector('main'), { subtree: true, attributes: true, attributeFilter: ['hidden', 'open'] });
-    doc.addEventListener('close', schedule, true);
-    doc.addEventListener('toggle', schedule, true);
-    win.addEventListener('hashchange', () => {
-        doc.documentElement.dataset.focusDismissed = 'false';
-        schedule();
-    });
-    root.addEventListener('kody:completed', () => {
-        // The Tower owns stage continuation and its result dialog.
-        if (root.closest('[data-tower-stage]')) dialog?.close();
-    });
+
+        bar.append(titleWrap, actions);
+        const heading = root.querySelector('.game-heading');
+        if (heading) heading.after(bar);
+        else root.prepend(bar);
+    }
+
     fit();
     const observer = new ResizeObserver(fit);
     observer.observe(root);
     win.addEventListener('resize', fit);
-    schedule();
 }

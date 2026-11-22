@@ -16,10 +16,6 @@ async function login(page, name) {
 }
 
 async function guide(page, title) {
-    if (await page.locator('.arcade-page').count()) {
-        await page.getByRole('button', { name: 'Exit focus', exact: true }).click();
-        await expect(page.locator('.focus-game-shell')).toHaveCount(0);
-    }
     await page.getByRole('button', { name: 'Kody guide and companion' }).click();
     const tour = page.locator('[data-kody-tour]');
     await expect(tour.locator('#tour-title')).toContainText(await page.locator('main h1').textContent());

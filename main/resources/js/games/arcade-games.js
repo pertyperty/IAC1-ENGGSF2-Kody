@@ -439,6 +439,12 @@ export function mountArcade(root) {
         }
     }
     root.querySelector('[data-arcade-run]').addEventListener('click', () => run(true));
+    root.addEventListener('keydown', (event) => {
+        if ((event.ctrlKey || event.metaKey) && event.key === 'Enter' && !busy && lines().length > 0) {
+            event.preventDefault();
+            run(true);
+        }
+    });
     root.querySelector('[data-arcade-undo]').addEventListener('click', () => {
         if (!busy) { const program = lines(); program.pop(); code.value = program.join('\n'); preview(); }
     });

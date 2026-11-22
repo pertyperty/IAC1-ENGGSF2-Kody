@@ -110,11 +110,7 @@ test('creator publishes a profile and staff explicitly grants then revokes the q
 test('learner saves a Tower concept for later without earning a clearance', async ({ page }) => {
     await login(page, 'reviewlearner');
     await page.goto('/tower/1');
-    await page.getByRole('button', { name: 'Exit focus', exact: true }).click();
-    await expect(page.locator('.focus-game-shell')).toHaveCount(0);
     await page.getByRole('button', { name: 'Bookmark level', exact: true }).click();
-    await page.getByRole('button', { name: 'Exit focus', exact: true }).click();
-    await expect(page.locator('.focus-game-shell')).toHaveCount(0);
     await page.getByRole('link', { name: 'Bookmarks', exact: true }).click();
     await expect(page.locator('.saved-learning-list')).toContainText('First steps');
     await expect(page.locator('[data-progress-level]')).toContainText('0 / 80');

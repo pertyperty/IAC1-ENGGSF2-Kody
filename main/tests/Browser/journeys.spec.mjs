@@ -84,8 +84,6 @@ test('workspace navigation sticks on short desktops and touch layouts; expanded 
         await context.route('**/*', route => new URL(route.request().url()).origin === process.env.KODY_BROWSER_BASE_URL ? route.continue() : route.abort());
         await login(page, 'stickylearner');
         await page.goto('/learn/sequences');
-        await page.getByRole('button', { name: 'Exit focus', exact: true }).click();
-        await expect(page.locator('.focus-game-shell')).toHaveCount(0);
         await page.evaluate(() => window.scrollTo(0, 500));
         await expect(page.locator('.app-rail')).toBeInViewport();
         await expect.poll(async () => (await page.locator('.app-rail').boundingBox()).y).toBeGreaterThanOrEqual(0);
@@ -93,8 +91,6 @@ test('workspace navigation sticks on short desktops and touch layouts; expanded 
         await page.setViewportSize({ width: 320, height: 740 });
         await expect(page.locator('.mobile-workspace summary')).toBeInViewport();
         await page.goto('/learn/sequences');
-        await page.getByRole('button', { name: 'Exit focus', exact: true }).click();
-        await expect(page.locator('.focus-game-shell')).toHaveCount(0);
         await page.evaluate(() => window.scrollTo(0, 450));
         // Scroll navigation is coalesced in animation frames. Inspect its settled
         // reveal state rather than taking a stale visibility snapshot immediately.
@@ -405,7 +401,6 @@ test('D01 D05 D07: creator draft, staff review, course composition and learner p
         await learnerPage.getByRole('button', { name: 'Enroll in course' }).click();
         await audit(learnerPage);
         await learnerPage.locator(`a[href*="/learn/courses/${courseId}/modules/"]`).first().click();
-        await learnerPage.getByRole('button', { name: 'Exit focus', exact: true }).click();
         await expect(learnerPage.locator('.lesson-reading')).toHaveAttribute('open', '');
         await expect(learnerPage.locator('.lesson-video iframe')).toHaveAttribute('src', 'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ');
         await learnerPage.setViewportSize({ width: 1920, height: 1000 });
