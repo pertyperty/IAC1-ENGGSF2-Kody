@@ -45,7 +45,18 @@ test('sidebar preserves its own scroll after link navigation @cross-browser', as
     const initial = await nav.evaluate(element => element.scrollTop);
     const delta = Math.floor(initial / 2);
     await page.mouse.wheel(0, -delta);
-    await expect.poll(() => nav.evaluate(element => element.scrollTop)).toBe(initial - delta);
+    // Wheel deltas are input requests, not exact scroll distances (Firefox can
+    // round or animate them). Verify real movement, then capture its settled
+    // position so the persistence assertion below still checks actual pixels.
+    await expect.poll(() => nav.evaluate(element => element.scrollTop)).toBeLessThan(initial);
+    let previousPosition;
+    let stableSamples = 0;
+    await expect.poll(async () => {
+        const position = await nav.evaluate(element => element.scrollTop);
+        stableSamples = position === previousPosition ? stableSamples + 1 : 0;
+        previousPosition = position;
+        return stableSamples;
+    }, { intervals: [100] }).toBeGreaterThanOrEqual(3);
     const interior = await nav.evaluate(element => element.scrollTop);
     expect(interior).toBeGreaterThan(0);
     await page.reload();

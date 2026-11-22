@@ -148,3 +148,16 @@ transfer, engagement or production readiness. An observed first-time learner
 pilot, curriculum/target-device review and operational evidence remain open.
 Third-party activation remains paused. The owner's unrelated Docker/deployment
 changes are excluded from this PR.
+
+### CI follow-up
+
+The first PR run on `4a06e97` passed all 118 Chromium browser tests, 1,407
+backend tests (11,154 assertions), and 1,037 tests with cached configuration
+(7,964 assertions), alongside the dependency, formatting, static, frontend and
+build checks. The cross-engine run passed 113 of 114 executions. Its sole failure
+was a Firefox sidebar test expecting wheel input to produce an exact pixel
+distance (398px expected, 402px observed). The test now waits for real scrolling
+to settle before capturing the interior position. The reload assertion retains
+its existing less-than-3px tolerance; application scroll persistence is unchanged.
+The corrected test passed nine local executions: three each in Chromium,
+Firefox and WebKit. Fresh CI remains pending after this test-only correction.
