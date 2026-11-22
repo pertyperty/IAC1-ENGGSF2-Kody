@@ -84,6 +84,8 @@ test('workspace navigation sticks on short desktops and touch layouts; expanded 
         await context.route('**/*', route => new URL(route.request().url()).origin === process.env.KODY_BROWSER_BASE_URL ? route.continue() : route.abort());
         await login(page, 'stickylearner');
         await page.goto('/learn/sequences');
+        await page.getByRole('button', { name: 'Exit focus', exact: true }).click();
+        await expect(page.locator('.focus-game-shell')).toHaveCount(0);
         await page.evaluate(() => window.scrollTo(0, 500));
         await expect(page.locator('.app-rail')).toBeInViewport();
         await expect.poll(async () => (await page.locator('.app-rail').boundingBox()).y).toBeGreaterThanOrEqual(0);
@@ -91,6 +93,8 @@ test('workspace navigation sticks on short desktops and touch layouts; expanded 
         await page.setViewportSize({ width: 320, height: 740 });
         await expect(page.locator('.mobile-workspace summary')).toBeInViewport();
         await page.goto('/learn/sequences');
+        await page.getByRole('button', { name: 'Exit focus', exact: true }).click();
+        await expect(page.locator('.focus-game-shell')).toHaveCount(0);
         await page.evaluate(() => window.scrollTo(0, 450));
         // Scroll navigation is coalesced in animation frames. Inspect its settled
         // reveal state rather than taking a stale visibility snapshot immediately.
@@ -123,9 +127,9 @@ test.beforeEach(async ({ page }) => {
     await page.route('**/*', route => new URL(route.request().url()).origin === process.env.KODY_BROWSER_BASE_URL ? route.continue() : route.abort());
 });
 
-test('clear back buttons, dismissible errors and persistent progress work through account and mobile navigation', async ({ page }) => {
+test('header navigation, dismissible errors and persistent progress work through account and mobile navigation', async ({ page }) => {
     await page.goto('/login');
-    await page.getByRole('link', { name: 'Back to home', exact: false }).click();
+    await page.locator('.app-header .play-brand').click();
     await expect(page).toHaveURL(/\/$/);
     await page.goto('/login');
     await page.getByLabel('Email or username').fill('missing@browser.example.test');
@@ -143,7 +147,7 @@ test('clear back buttons, dismissible errors and persistent progress work throug
     await expect(strip).toBeInViewport();
     await page.goto('/account/edit');
     await expect(strip).toHaveCount(0);
-    await page.getByRole('navigation', { name: 'Page navigation' }).getByRole('link', { name: 'Back to my account', exact: false }).click();
+    await page.getByRole('link', { name: 'Back to your profile', exact: true }).click();
     await expect(page).toHaveURL(/\/account$/);
     await expect(strip).toBeVisible();
     await page.setViewportSize({ width: 320, height: 740 });
@@ -292,7 +296,9 @@ test('learner username sign-in lands on the tower and saved wins refresh the del
     await page.locator('[data-tower-stop="1"] a').click(); await solveGarden(page);
     await expect(page.locator('[data-progress-level]')).toContainText('1 / 80');
     await expect(page.locator('[data-tower-victory]')).toBeVisible();
-    await page.reload(); await page.getByRole('link', { name: 'Level map', exact: false }).click();
+    await page.reload();
+    await page.getByText('Menu', { exact: true }).click();
+    await page.getByRole('navigation', { name: 'Game navigation' }).getByRole('link', { name: 'Tower', exact: true }).click();
     await expect(page.locator('[data-tower-stop="1"]')).toHaveClass(/is-cleared/);
     await expect(page.locator('[data-tower-stop="2"]')).not.toHaveClass(/is-locked/);
     const map = page.locator('[data-tower-viewport]');
@@ -398,6 +404,7 @@ test('D01 D05 D07: creator draft, staff review, course composition and learner p
         await learnerPage.getByRole('button', { name: 'Enroll in course' }).click();
         await audit(learnerPage);
         await learnerPage.locator(`a[href*="/learn/courses/${courseId}/modules/"]`).first().click();
+        await learnerPage.getByRole('button', { name: 'Exit focus', exact: true }).click();
         await expect(learnerPage.locator('.lesson-reading')).toHaveAttribute('open', '');
         await expect(learnerPage.locator('.lesson-video iframe')).toHaveAttribute('src', 'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ');
         await learnerPage.setViewportSize({ width: 1920, height: 1000 });
@@ -497,7 +504,8 @@ test('B05: four creator arcade assessments and a multi-question quiz save valida
         await audit(page);
     }
     await page.goto(`/learn/modules/${manifest.modules['programming-check']}`);
-    for (const label of ['The result must always stay the same', 'A loop around the three steps', 'Check a condition before collecting']) {
+    for (const [index, label] of ['The result must always stay the same', 'A loop around the three steps', 'Check a condition before collecting'].entries()) {
+        if (index) await page.getByRole('button', { name: 'Next question', exact: true }).click();
         await page.getByRole('radio', { name: label, exact: true }).check();
     }
     await page.getByRole('button', { name: 'Check answers' }).click();

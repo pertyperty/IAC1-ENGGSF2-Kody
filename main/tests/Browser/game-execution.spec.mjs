@@ -53,7 +53,7 @@ test('desktop instruction scrolling keeps the scene and document stationary @cro
     expect(await page.evaluate(() => window.scrollY)).toBe(documentY);
     await page.screenshot({ path: `${evidence}/desktop-workspace.png` });
     await page.setViewportSize({ width: 390, height: 844 });
-    expect(await controls.evaluate(element => getComputedStyle(element).overflowY)).not.toBe('auto');
+    expect(await controls.evaluate(element => getComputedStyle(element).overflowY)).toBe('auto');
     await audit(page);
     await page.screenshot({ path: `${evidence}/mobile-workspace.png`, fullPage: true });
 });
@@ -82,7 +82,8 @@ test('mobile games show the goal and board before the program @cross-browser', a
             const scene = game.locator('.arcade-scene, .game-world');
             expect((await goal.boundingBox()).y).toBeLessThan((await run.boundingBox()).y);
             expect((await goal.boundingBox()).y).toBeLessThan((await scene.boundingBox()).y);
-            expect((await scene.boundingBox()).y).toBeLessThan((await game.locator('.game-controls').boundingBox()).y);
+            if (width <= 800) expect((await scene.boundingBox()).y).toBeLessThan((await game.locator('.game-controls').boundingBox()).y);
+            else expect((await scene.boundingBox()).x).toBeLessThan((await game.locator('.game-controls').boundingBox()).x);
             await expect(run).toBeDisabled();
             await run.scrollIntoViewIfNeeded();
             await expect(run).toBeInViewport();

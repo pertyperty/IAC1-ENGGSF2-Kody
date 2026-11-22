@@ -25,8 +25,6 @@
 .account-form fieldset { border: 1px solid var(--border); border-radius: 10px; padding: 18px; }
 .account-form fieldset label { margin-top: 16px; }
 .account-form fieldset p { color: var(--muted); font-size: 12px; line-height: 1.6; }
-.primary-button { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; background: var(--accent); color: var(--on-accent); border: 0; border-radius: 9px; cursor: pointer; text-decoration: none; font-weight: 600; font-size: 14px; }
-.primary-button:hover { background: var(--accent-hover); }
 .secondary-link { margin-top: 24px; font-size: 12px; color: var(--accent-text); }
 .secondary-link a { text-decoration: underline; text-underline-offset: 3px; }
 .notice { border: 1px solid var(--accent-line); background: var(--accent-soft); padding: 14px; border-radius: 10px; font-size: 13px; line-height: 1.6; }

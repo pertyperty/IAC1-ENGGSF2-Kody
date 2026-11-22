@@ -79,9 +79,11 @@ for (const [template, command, expected] of [
         expect(requests).toEqual([]);
         await audit(page);
         if (template === 'terminal-quest') {
-            await page.locator('[data-theme-toggle]').focus();
+            await page.getByText('Menu', { exact: true }).click();
+            await page.getByRole('navigation', { name: 'Game navigation' }).getByRole('button', { name: 'Dark mode', exact: true }).focus();
             await page.keyboard.press('Enter');
             await expect(page.locator('[data-theme-toggle]')).toHaveAttribute('aria-pressed', 'true');
+            await page.getByText('Menu', { exact: true }).click();
             await audit(page);
         }
     });

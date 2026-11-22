@@ -16,6 +16,10 @@ async function login(page, name) {
 }
 
 async function guide(page, title) {
+    if (await page.locator('.arcade-page').count()) {
+        await page.getByRole('button', { name: 'Exit focus', exact: true }).click();
+        await expect(page.locator('.focus-game-shell')).toHaveCount(0);
+    }
     await page.getByRole('button', { name: 'Kody guide and companion' }).click();
     const tour = page.locator('[data-kody-tour]');
     await expect(tour.locator('#tour-title')).toContainText(await page.locator('main h1').textContent());
@@ -67,7 +71,7 @@ test('arcade lobby quiz cabinet automatically checks choices blanks and matching
     await expect(page.locator('#practice-game option')).toHaveCount(11); await audit(page);
     await page.screenshot({ path: 'storage/app/browser-results/arcade-cabinet-lobby.png', fullPage: true });
     const quiz = page.locator('[data-practice-quiz]');
-    await quiz.getByLabel('True', { exact: true }).check(); await quiz.getByLabel('Your short answer').fill(' IF ');
+    await quiz.getByLabel('True', { exact: true }).check(); await quiz.getByRole('button', { name: 'Next question', exact: true }).click(); await quiz.getByLabel('Your short answer').fill(' IF '); await quiz.getByRole('button', { name: 'Next question', exact: true }).click();
     for (const [label, value] of [['Loop', 'loop'], ['Variable', 'variable'], ['Condition', 'condition']]) await quiz.getByLabel(label, { exact: true }).selectOption(value);
     await page.setViewportSize({ width: 320, height: 740 }); await audit(page);
     await quiz.getByRole('button', { name: 'Check answers' }).click();
@@ -102,7 +106,7 @@ test('creator mixed quiz preview is editable and learner completion is saved by 
             } else {
                 await page.goto(`/learn/modules/${manifest().modules['quiz-lab']}`);
                 const quiz = page.locator('[data-practice-quiz]'); await expect(quiz).toHaveAttribute('data-completion-url', /\/quiz$/);
-                await quiz.getByLabel('True', { exact: true }).check(); await quiz.getByLabel('Your short answer').fill(' IF ');
+                await quiz.getByLabel('True', { exact: true }).check(); await quiz.getByRole('button', { name: 'Next question', exact: true }).click(); await quiz.getByLabel('Your short answer').fill(' IF '); await quiz.getByRole('button', { name: 'Next question', exact: true }).click();
                 for (const [label, value] of [['Loop', 'loop'], ['Variable', 'variable'], ['Condition', 'condition']]) await quiz.getByLabel(label, { exact: true }).selectOption(value);
                 await quiz.getByRole('button', { name: 'Check answers' }).click();
                 await expect(page.locator('[data-game-result]')).toBeVisible(); await expect(quiz.locator('[data-quiz-feedback]')).toContainText(/saved/i);
