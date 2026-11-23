@@ -123,7 +123,7 @@ test('Administrator cash expenses reconcile in business reports and remain reada
     }
     const ledger = page.locator('details').filter({ has: page.getByText('Platform cash ledger', { exact: true }) });
     await ledger.locator('summary').click(); await expect(ledger).toContainText('-20.25');
-    await page.getByRole('link', { name: 'Cash, expenses and transaction reports' }).click();
+    await page.getByRole('link', { name: 'View financial reports', exact: true }).click();
     await page.getByRole('link', { name: 'Today', exact: true }).click();
     await expect(page.locator('.report-financial-grid')).toContainText('PHP 20.25');
     const expenseRegister = page.locator('.report-detail').filter({ has: page.getByText('Cash register', { exact: true }) });
