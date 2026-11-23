@@ -60,7 +60,7 @@ class SiteManagement
                 ->groupBy('queue')->orderBy('queue')->get(),
             'failed' => DB::table('failed_jobs')->where('failed_at', '>=', now()->subDays(7))->count(),
             'services' => ['Judge0 execution' => (bool) config('judge0.enabled'), 'Xendit payments' => (bool) config('xendit.enabled'), 'Google identity' => (bool) config('services.google.enabled'),
-                'SendGrid verification transport' => config('account.verification.mailer') === 'sendgrid'],
+                'Mailgun verification transport' => config('account.verification.mailer') === 'mailgun'],
             'changes' => DB::table('audit_events')->where('event', 'site.announcement_updated')->orderByDesc('created_at')->orderByDesc('id')->limit(5)->get(['actor_id', 'created_at'])];
     }
 }

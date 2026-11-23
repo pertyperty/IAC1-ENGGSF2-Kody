@@ -28,7 +28,7 @@ const env = { ...process.env, APP_ENV: 'testing', APP_DEBUG: 'false', KODY_BROWS
     KODY_CROSS_BROWSER: crossBrowser ? '1' : '0',
     // Database URLs can override the explicit isolation configuration in Laravel.
     DB_URL: '', DATABASE_URL: '', GOOGLE_CLIENT_SECRET: '', GOOGLE_CLIENT_ID: '', JUDGE0_RAPIDAPI_KEY: '',
-    JUDGE0_AUTH_TOKEN: '', XENDIT_SECRET_KEY: '', XENDIT_CALLBACK_TOKEN: '', SENDGRID_API_KEY: '',
+    JUDGE0_AUTH_TOKEN: '', XENDIT_SECRET_KEY: '', XENDIT_CALLBACK_TOKEN: '', MAILGUN_SMTP_USERNAME: '', MAILGUN_SMTP_PASSWORD: '',
     MAIL_USERNAME: '', MAIL_PASSWORD: '', AWS_ACCESS_KEY_ID: '', AWS_SECRET_ACCESS_KEY: '', AWS_SESSION_TOKEN: '' };
 function fixture(operation, environment = env) {
     const result = spawnSync(php, ['tests/Browser/support/fixture.php', operation], { cwd: root, env: environment, encoding: 'utf8', windowsHide: true, timeout: 120_000 });

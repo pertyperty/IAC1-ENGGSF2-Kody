@@ -13,7 +13,7 @@ Use this step-by-step guide to create accounts and gather **sandbox / staging** 
 
 | Order | Service | Unlocks in Kody | Prerequisite |
 | --- | --- | --- | --- |
-| **1** | **SendGrid** | Email verification (6-digit OTP + link), password recovery, purchase receipts | Domain or verified single sender |
+| **1** | **Mailgun** | Email verification (6-digit OTP + link), password recovery, purchase receipts | Sandbox authorized recipient (staging) or verified custom domain (production) |
 | **2** | **Judge0 CE (via RapidAPI)** | Real Python/Java/C++ execution for Coding Challenges, Weekly Events & Contributor eligibility | Dedicated `code-execution` queue worker |
 | **3** | **Xendit** | GCash KodeBit purchases, creator PHP payouts, automated refunds | Business/merchant onboarding & verified fee contract |
 | **4** | **Google Cloud OAuth** *(optional)* | Explicit password-confirmed Google sign-in linking for existing verified accounts | Public HTTPS domain |
@@ -21,30 +21,35 @@ Use this step-by-step guide to create accounts and gather **sandbox / staging** 
 
 ---
 
-## 1. SendGrid (Email Delivery — Start Here)
+## 1. Mailgun (Email Delivery — Start Here)
 
-1. **Create an account:** Sign up at [https://signup.sendgrid.com/](https://signup.sendgrid.com/) (start on the Free/Essentials tier for staging).
-2. **Authenticate your sender:**
-   - Go to **Settings → Sender Authentication**.
-   - **Recommended for production:** Click **Authenticate Your Domain** and add the CNAME/TXT (SPF/DKIM) DNS records at your domain registrar.
-   - **For quick staging testing:** Click **Verify a Single Sender** using an email address you control (e.g. `no-reply@yourdomain.com` or your project mailbox).
+Reference: [Mailgun Documentation](https://documentation.mailgun.com/)
+
+1. **Create an account:** Sign up at [https://signup.mailgun.com/](https://signup.mailgun.com/) (start on the Free/Flex tier for staging and verify your account).
+2. **Choose your sending domain & region (US vs EU):**
+   - **Quick staging tests:** Open the built-in **Sandbox domain** under **Sending → Domains**, then add your test inbox(es) under **Authorized Recipients** (Sandbox domains can only send to authorized recipients).
+   - **Production / public pilot:** Click **Add New Domain** (recommended: a dedicated subdomain like `mg.yourdomain.com`), pick your region (**US** → `smtp.mailgun.org`, **EU** → `smtp.eu.mailgun.org`), and add the required **SPF**, **DKIM**, and **DMARC** DNS records at your domain registrar until Mailgun marks the domain **Verified**.
 3. **Disable click tracking** *(important!)*:
-   - Go to **Settings → Tracking → Click Tracking** and turn it **Off** so SendGrid does not rewrite Kody's fragment-based one-time verification/recovery links.
-4. **Create a restricted API key:**
-   - Go to **Settings → API Keys → Create API Key**.
-   - Choose **Restricted Access** and grant **Mail Send → Full Access** only.
-   - Copy the key once and save it in your password manager.
+   - Go to **Sending → Domain Settings → Tracking** and turn **Click Tracking** **Off** so Mailgun does not rewrite Kody's fragment-based one-time verification and password-recovery links.
+4. **Create per-domain SMTP credentials:**
+   - Go to **Sending → Domain Settings → SMTP Credentials**.
+   - Use the domain's default `postmaster@your-domain` login (or create a dedicated SMTP user like `kody@your-domain`) and click **Reset Password** / **Create** to generate a unique SMTP password.
+   - Copy the SMTP username and password once and save them in your password manager (never use your main Mailgun account login password).
 5. **Values to place in `.env` (staging only when ready):**
    ```dotenv
-   MAIL_MAILER=sendgrid
-   ACCOUNT_VERIFICATION_MAILER=sendgrid
-   ACCOUNT_RECOVERY_MAILER=sendgrid
-   ACCOUNT_NOTIFICATION_MAILER=sendgrid
-   MAIL_FROM_ADDRESS=your-verified-sender@yourdomain.com
+   MAIL_MAILER=mailgun
+   ACCOUNT_VERIFICATION_MAILER=mailgun
+   ACCOUNT_RECOVERY_MAILER=mailgun
+   ACCOUNT_NOTIFICATION_MAILER=mailgun
+   MAIL_FROM_ADDRESS=no-reply@your-verified-domain.com
    MAIL_FROM_NAME="Kody"
-   SENDGRID_API_KEY=SG.your_private_key_here
+   MAILGUN_SMTP_HOST=smtp.mailgun.org
+   MAILGUN_SMTP_PORT=587
+   MAILGUN_SMTP_USERNAME=postmaster@your-verified-domain.com
+   MAILGUN_SMTP_PASSWORD=your_private_smtp_password_here
    ```
-6. **Verify:** Run `php artisan kody:setup-status` and send a real verification + recovery email to an inbox you control on staging.
+   *(If your domain is registered in Mailgun's EU region, set `MAILGUN_SMTP_HOST=smtp.eu.mailgun.org`. Port `587` uses required STARTTLS / TLS 1.2+.)*
+6. **Verify:** Run `php artisan config:clear && php artisan kody:setup-status`, then send a real verification and password-recovery email to an inbox you control on staging.
 
 ---
 
@@ -61,9 +66,9 @@ Use this step-by-step guide to create accounts and gather **sandbox / staging** 
 5. **Values to place in `.env` (keep `JUDGE0_ENABLED=false` until staging drills pass):**
    ```dotenv
    JUDGE0_ENABLED=false
-   JUDGE0_BASE_URL=https://judge0-ce.p.rapidapi.com
-   JUDGE0_API_HOST=judge0-ce.p.rapidapi.com
-   JUDGE0_API_KEY=your_rapidapi_key_here
+   JUDGE0_URL=https://judge0-ce.p.rapidapi.com
+   JUDGE0_RAPIDAPI_HOST=judge0-ce.p.rapidapi.com
+   JUDGE0_RAPIDAPI_KEY=your_rapidapi_key_here
    JUDGE0_PYTHON_ID=<discovered_id>
    JUDGE0_JAVA_ID=<discovered_id>
    JUDGE0_CPP_ID=<discovered_id>

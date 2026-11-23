@@ -21,7 +21,7 @@ with per-request cleanup; PDF font/cache files use `storage/framework/cache/pdf/
 Deployment must grant the application user write access to these storage paths.
 See [reporting verification](system-reports-implementation.md).
 
-## SendGrid
+## Mailgun
 
 The 2026-10-12 [readiness follow-up](studios-media-and-integration-readiness.md)
 adds ten-minute six-digit verification codes with five guesses per issuance and
@@ -29,30 +29,39 @@ the existing link fallback, plus PDF attachments for verified purchase receipts.
 Staging must verify code expiry/resend, PDF receipt delivery and email failure
 reconciliation. Code preparation is not live inbox verification.
 
-Authenticate the sender/domain with SendGrid, configure SPF/DKIM and review DMARC.
-Create a restricted Mail Send API key and save `SENDGRID_API_KEY` privately.
-Set `MAIL_FROM_ADDRESS` to the authenticated sender and choose `sendgrid` for:
+Verify a sending domain with Mailgun (or add authorized recipients on the
+Sandbox domain for staging), configure SPF/DKIM and review DMARC. Create
+per-domain SMTP credentials under **Sending → Domain Settings → SMTP Credentials**
+and save `MAILGUN_SMTP_USERNAME` and `MAILGUN_SMTP_PASSWORD` privately. Set
+`MAILGUN_SMTP_HOST` to `smtp.mailgun.org` (US) or `smtp.eu.mailgun.org` (EU),
+set `MAIL_FROM_ADDRESS` to the authenticated sender, and choose `mailgun` for:
 
 ```dotenv
-MAIL_MAILER=sendgrid
-ACCOUNT_VERIFICATION_MAILER=sendgrid
-ACCOUNT_RECOVERY_MAILER=sendgrid
-ACCOUNT_NOTIFICATION_MAILER=sendgrid
+MAIL_MAILER=mailgun
+ACCOUNT_VERIFICATION_MAILER=mailgun
+ACCOUNT_RECOVERY_MAILER=mailgun
+ACCOUNT_NOTIFICATION_MAILER=mailgun
+MAILGUN_SMTP_HOST=smtp.mailgun.org
+MAILGUN_SMTP_PORT=587
+MAILGUN_SMTP_USERNAME=postmaster@your-verified-domain.com
+MAILGUN_SMTP_PASSWORD=
 ```
 
-The named transport sets `smtp.sendgrid.net:587`, username `apikey`, required TLS
-and a bounded timeout. It uses the existing dedicated account delivery boundary;
+The named transport sets `smtp.mailgun.org:587` by default (configurable for EU
+via `MAILGUN_SMTP_HOST`), required STARTTLS (`require_tls: true`) and a bounded
+10-second timeout. It uses the existing dedicated account delivery boundary;
 there is no log/failover fallback for sensitive mail. Credentials are loaded from
 Laravel config, so rebuild the config cache and restart workers after changes.
-See [official SMTP setup](https://www.twilio.com/docs/sendgrid/for-developers/sending-email/integrating-with-the-smtp-api).
+See [Mailgun Documentation](https://documentation.mailgun.com/).
 
 In isolated staging, send an ordinary non-sensitive probe first, then exercise
 registration verification, generic password recovery and an account-change notice
 with synthetic addresses you control. Confirm actual receipt, sender identity,
 expiry/single use, failure retry and delivery-state transitions. Disable click
-tracking or prove that it preserves the fragment-based one-time links. A database
-worker/array test is not inbox delivery evidence. SMTP acceptance alone also does
-not prove inbox delivery. No live messages are sent by `kody:setup-status`.
+tracking in **Sending → Domain Settings → Tracking** or prove that it preserves
+the fragment-based one-time links. A database worker/array test is not inbox
+delivery evidence. SMTP acceptance alone also does not prove inbox delivery. No
+live messages are sent by `kody:setup-status`.
 
 ## Judge0
 
