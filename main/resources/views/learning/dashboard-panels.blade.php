@@ -74,7 +74,7 @@
                 <article class="dashboard-panel">
                     <h3>{{ $summary['label'] }}</h3>
                     <p>{{ $summary['published'] }} published · {{ $summary['pending'] }} awaiting review · {{ $summary['drafts'] }} drafts or corrections</p>
-                    <a class="button button-dark button-small" href="{{ route($summary['route']) }}">Continue creating</a>
+                    <a class="button button-dark button-small" href="{{ route($summary['route']) }}">Open {{ strtolower($summary['label']) }}</a>
                 </article>
             @endforeach
         </div>

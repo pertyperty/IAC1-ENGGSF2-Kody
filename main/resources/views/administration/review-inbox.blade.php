@@ -3,7 +3,7 @@
 @section('content')
 <section class="review-page page-width" aria-labelledby="review-inbox-heading">
     <h1 id="review-inbox-heading">Review inbox</h1>
-    <p>Pending content and role applications, oldest first. Open an item to review it.</p>
+    <p>Pending content and role applications, oldest first.</p>
     <form method="get" action="{{ route('review-inbox') }}" class="review-inbox-filter">
         <label for="review-category">Review type</label>
         <select id="review-category" name="category">

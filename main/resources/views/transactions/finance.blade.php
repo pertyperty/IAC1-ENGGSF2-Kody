@@ -1,8 +1,8 @@
 @extends('layouts.learning')
 @section('title', 'Financial review — Kody')
 @section('content')
-<section class="review-page page-width finance-workspace"><p class="overline">ADMINISTRATOR FINANCE</p><h1>Review with a clear trail.</h1>
-<div class="studio-actions"><a class="button button-secondary" href="{{ route('system-reports', ['type' => 'economy']) }}"><x-action-icon name="chart"/>Cash, expenses and transaction reports</a></div>
+<section class="review-page page-width finance-workspace"><h1>Finance</h1>
+<div class="studio-actions"><a class="button button-secondary" href="{{ route('system-reports', ['type' => 'economy']) }}"><x-action-icon name="chart"/>View financial reports</a></div>
 
 @if($errors->any())<p class="studio-errors" role="alert">{{ $errors->first() }}</p>@endif
 <p class="lesson-note">Platform cash: PHP {{ \App\Support\ExactMoney::signedDecimal($cash->platform_minor) }} · Reserved: PHP {{ \App\Support\ExactMoney::signedDecimal($cash->reserved_minor) }}. Held margins and recipient earnings are excluded from reward funding.</p>

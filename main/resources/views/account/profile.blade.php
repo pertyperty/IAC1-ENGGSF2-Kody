@@ -2,12 +2,15 @@
 @section('title', 'Your account — Kody')
 @section('shell-class', 'account-shell-wide')
 @section('content')
-    <p class="eyebrow">YOUR KODY ACCOUNT</p>
+    <header class="catalog-header">
+        <div><h1>Your profile</h1><p>Manage your account and public details.</p></div>
+        <a class="button button-play" href="{{ route('account.edit') }}">Edit profile</a>
+    </header>
     <div class="profile-overview"><section class="profile-identity">
     <a class="profile-picture-link" href="{{ route('account.edit') }}#profile-picture" aria-label="Edit your profile picture">@include('layouts.avatar', ['avatarUser' => auth()->user(), 'avatarClass' => 'profile-avatar'])<span class="profile-edit-icon" aria-hidden="true"><x-action-icon name="pencil"/></span></a><span class="profile-edit-cue">Edit picture</span>
-    <h1>Your profile</h1><b>{{ $profile['username'] ?? 'Kody player' }}</b><p>{{ $profile['role'] }} · {{ $profile['status'] }}</p>
-    @if(!$profile['first_name'] && !$profile['last_name'])<p class="field-hint">You can play with just your username. Adding personal names is optional; skip this step or add them later in Edit profile.</p>@endif
-    <div class="profile-tools"><a class="button button-play" href="{{ route('account.edit') }}">Edit profile</a><a class="button button-secondary" href="{{ route('account.google') }}">Manage Google sign-in</a><a class="button button-secondary" href="{{ route('wallet.index') }}"><x-kody-art name="kodebit" size="28"/> Wallet and earnings</a></div>
+    <h2>{{ $profile['username'] ?? 'Kody player' }}</h2><p>{{ $profile['role'] }} · {{ $profile['status'] }}</p>
+    @if(!$profile['first_name'] && !$profile['last_name'])<p class="field-hint">Your name is optional. You can use Kody with just your username.</p>@endif
+    <div class="profile-tools"><a class="button button-secondary" href="{{ route('account.google') }}">Manage Google sign-in</a><a class="button button-secondary" href="{{ route('wallet.index') }}"><x-kody-art name="kodebit" size="28"/> Wallet and earnings</a></div>
     </section><section><h2>Account details</h2><p class="field-hint">Your email is masked for privacy.</p>
     <dl class="profile-details">
         <dt>Username</dt><dd>{{ $profile['username'] ?? 'Not yet provided' }}</dd>
@@ -27,10 +30,9 @@
         <a href="{{ route('notifications.index') }}">Your updates</a>
         @can('viewOwn', \App\Models\ContributorApplication::class)<a href="{{ route('contributor-application.create') }}">Contributor application and history</a>@endcan
     </div>
-    @if(app(\App\Services\Account\CreatorProfiles::class)->visible(auth()->user()))<p><a href="{{ route('creators.show', auth()->user()) }}">View public creator profile</a> ? <a href="{{ route('creator-profile.edit') }}">Edit public details</a></p>@endif
+    @if(app(\App\Services\Account\CreatorProfiles::class)->visible(auth()->user()))<div class="profile-actions"><a href="{{ route('creators.show', auth()->user()) }}">View public creator profile</a><a href="{{ route('creator-profile.edit') }}">Edit public details</a></div>@endif
     @include('layouts.staff-tools')
-    @can('archive', auth()->user())<p class="secondary-link"><a href="{{ route('account.archive') }}">Take a break: archive your account</a></p>@endcan
+    @can('archive', auth()->user())<p class="secondary-link"><a href="{{ route('account.archive') }}">Archive your account</a></p>@endcan
     @can('delete', auth()->user())<p class="secondary-link"><a href="{{ route('account.delete') }}">Permanently delete your account</a></p>@endcan
-    <p class="secondary-link"><a href="{{ route('dashboard') }}">Back to your account home</a></p>
     </div>
 @endsection

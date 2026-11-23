@@ -19,7 +19,7 @@ test('course cards render unjoined progress and shared actions have aligned icon
     await expect(page).toHaveURL(/\/$/);
     await page.setViewportSize({ width: 1920, height: 1080 });
     await page.goto('/learn/courses');
-    const cards = page.locator('.module-card');
+    const cards = page.locator('.catalog-entry');
     expect(await cards.count()).toBeGreaterThan(0);
     expect(await page.locator('main h1').evaluate(element => parseFloat(getComputedStyle(element).fontSize))).toBeGreaterThanOrEqual(28);
     expect((await cards.first().locator('.content-price').boundingBox()).height).toBeLessThan(40);
@@ -29,7 +29,10 @@ test('course cards render unjoined progress and shared actions have aligned icon
     const hud = page.locator('[data-progress-strip]');
     const boxes = await hud.locator('a').evaluateAll(links => links.map(link => { const box = link.getBoundingClientRect(); return { left: box.left, right: box.right }; }));
     expect(Math.abs((boxes[0].left + boxes.at(-1).right) / 2 - 960)).toBeLessThan(2);
-    const action = page.getByRole('main').getByRole('link', { name: 'Browse modules' });
+    const action = cards.first().locator('.catalog-entry-action');
+    await expect(action).toHaveAccessibleName(/^View course:/);
+    const href = await action.getAttribute('href');
+    expect(await cards.first().locator('a').evaluateAll((links, destination) => links.filter(link => link.getAttribute('href') === destination).length, href)).toBe(1);
     const icon = await action.locator('svg').boundingBox(), button = await action.boundingBox();
     expect(Math.abs(icon.y + icon.height / 2 - button.y - button.height / 2)).toBeLessThan(2);
     await audit(page);

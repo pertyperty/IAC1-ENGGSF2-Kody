@@ -7,7 +7,7 @@
             <a class="quiet-link" href="{{ route('account.show') }}">View your profile</a>
         </header>
         @include('layouts.staff-tools')
-        @if(auth()->user()->account_role === \App\Enums\Role::Instructor)<div class="creator-play-link"><div><h2>Explore the Tower</h2><p>Explore the Tower as a learner. Your confirmed clears save your own progress and daily streak.</p></div><a class="button button-play" href="{{ route('home') }}"><x-action-icon name="tower"/> Play the Tower</a></div>@endif
+        @if(auth()->user()->account_role === \App\Enums\Role::Instructor)<div class="creator-play-link"><div><h2>Explore the Tower</h2><p>Play levels and track your own progress.</p></div><a class="button button-play" href="{{ route('home') }}"><x-action-icon name="tower"/> Play the Tower</a></div>@endif
         @if($progress)
         <section class="content-panel tower-continuation" aria-labelledby="continue-heading">
             <p class="overline">{{ $continuation['label'] }}</p><h2 id="continue-heading">Next Tower level</h2>
@@ -27,8 +27,8 @@
         <details class="progress-rules"><summary>How progress works</summary><p>Streaks count eligible activity each day, resetting at midnight in Manila. Tower clears save your climb without extra XP or KodeBits. Eligible module and challenge completions earn XP.</p><a class="quiet-link" href="{{ route('help.index') }}">Read progress rules</a></details>
         @endif
         @if($progress)
-        <details class="content-panel optional-starter-lessons"><summary>Optional starter modules</summary><p>Three optional introductory modules. Your saved results stay here.</p><div id="level-trail" class="level-ladder">@foreach($progress['levels'] as $slug => $level)<article class="ladder-card {{ $level['color'] }} {{ $level['unlocked'] ? '' : 'level-locked' }}"><div class="level-number">{{ str_pad((string) $loop->iteration, 2, '0', STR_PAD_LEFT) }}</div><div><span class="module-meta">{{ $level['concept'] }}</span><h2>{{ $level['title'] }}</h2><p>{{ $level['concept'] }}</p></div><div>@if($level['unlocked'])<a class="button button-dark button-small" href="{{ route('learning.show', $slug) }}">{{ $level['completed'] ? 'Play again' : 'Let’s play' }}</a><span class="level-state">{{ $level['completed'] ? 'Cleared' : 'Ready to explore' }}</span>@else<span class="level-state">Clear the previous level to unlock</span>@endif</div></article>@endforeach</div>
-        <p class="catalog-note">Clear a level to save your progress and keep your streak growing. Your first verified game clear and quiz win on each starter level earn 20 XP each. Local previews earn no rewards.</p></details>
+        <details class="content-panel optional-starter-lessons"><summary>Optional starter modules</summary><div id="level-trail" class="level-ladder">@foreach($progress['levels'] as $slug => $level)<article class="ladder-card {{ $level['color'] }} {{ $level['unlocked'] ? '' : 'level-locked' }}"><div class="level-number">{{ str_pad((string) $loop->iteration, 2, '0', STR_PAD_LEFT) }}</div><div><span class="module-meta">{{ $level['concept'] }}</span><h2>{{ $level['title'] }}</h2></div><div>@if($level['unlocked'])<a class="button button-dark button-small" href="{{ route('learning.show', $slug) }}">{{ $level['completed'] ? 'Play again' : 'Let’s play' }}</a><span class="level-state">{{ $level['completed'] ? 'Cleared' : 'Ready to explore' }}</span>@else<span class="level-state">Clear the previous level to unlock</span>@endif</div></article>@endforeach</div>
+        <p class="catalog-note">Earn 20 XP for each first verified game clear or quiz win.</p></details>
         @endif
         @include('learning.dashboard-panels')
         @if($insights)@include('learning.creator-insights')@endif
