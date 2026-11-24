@@ -76,6 +76,18 @@ for (const [role, paths] of Object.entries(routes)) {
                 expect.soft(response?.ok(), `${role} ${path} HTTP ${response?.status()}`).toBe(true);
                 expect.soft(new URL(page.url()).pathname, `${role} ${path} destination`).toBe(path);
                 expect.soft(layout.width, `${role} ${path} at ${width}px: ${layout.offenders.join(', ')}`).toBeLessThanOrEqual(width + 1);
+                if (role === 'learner' && path === '/dashboard' && width === 320) {
+                    const strip = page.getByRole('navigation', { name: 'Your learning progress' });
+                    const links = await strip.getByRole('link').evaluateAll(items => items.map(item => {
+                        const { top, height } = item.getBoundingClientRect();
+                        return { top, height };
+                    }));
+                    expect(links).toHaveLength(4);
+                    expect(new Set(links.map(link => link.top)).size).toBe(2);
+                    expect(links.every(link => link.height >= 44)).toBe(true);
+                    await expect(page.locator('.tower-continuation')).toBeVisible();
+                    expect(await page.locator('.tower-continuation').evaluate(panel => getComputedStyle(panel, '::after').content)).toBe('none');
+                }
                 if (visualSamples.has(template) && [320, 1440].includes(width)) {
                     const label = template.slice(1).replace(/[^a-z0-9-]+/g, '-');
                     await page.screenshot({ path: testInfo.outputPath(`${role}-${label}-${width}.png`) });
