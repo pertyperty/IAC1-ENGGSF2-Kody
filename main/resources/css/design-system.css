@@ -467,3 +467,365 @@ details.progress-rules { max-width: none; }
 @media (prefers-reduced-motion: reduce) {
     .tower-map-page .tower-node:is(:hover, :active) { transform: translateX(calc(var(--lane) * var(--tower-bend))); }
 }
+
+/* =========================================================================
+   Visual system v2 extension (25 November 2026)
+   Extends the approved Courses/Modules/Progress card, stat-tile, row, and
+   filter-panel primitives to remaining public, learner, creator, and staff
+   pages without altering challenge-specific views or editors.
+   ========================================================================= */
+
+/* Shared tint rotation helper across multi-card grids. */
+:is(.journey-library .journey-cards > .journey-card,
+    .welcome-paths > .content-panel,
+    .support-topics > .content-panel,
+    .weekly-archive-grid > .content-panel,
+    .creator-steps > li,
+    .staff-workspace .workspace-grid > a,
+    .studio-library-grid > .tower-editor-card) {
+    --tint: var(--accent); --tint-soft: var(--accent-soft); --tint-text: var(--accent-text);
+    min-width: 0; max-width: 100%;
+    border: 1px solid var(--border); border-block-start: 4px solid var(--tint);
+    border-radius: var(--radius-card); background: var(--surface); box-shadow: var(--elev-1);
+    transition: box-shadow .2s var(--ease), border-color .2s;
+}
+:is(.journey-library .journey-cards > .journey-card,
+    .welcome-paths > .content-panel,
+    .support-topics > .content-panel,
+    .weekly-archive-grid > .content-panel,
+    .creator-steps > li,
+    .staff-workspace .workspace-grid > a,
+    .studio-library-grid > .tower-editor-card):nth-child(5n + 2) { --tint: #7c52d6; --tint-soft: var(--violet-soft); --tint-text: var(--violet-text); }
+:is(.journey-library .journey-cards > .journey-card,
+    .welcome-paths > .content-panel,
+    .support-topics > .content-panel,
+    .weekly-archive-grid > .content-panel,
+    .creator-steps > li,
+    .staff-workspace .workspace-grid > a,
+    .studio-library-grid > .tower-editor-card):nth-child(5n + 3) { --tint: var(--teal); --tint-soft: var(--teal-soft); --tint-text: var(--teal-text); }
+:is(.journey-library .journey-cards > .journey-card,
+    .welcome-paths > .content-panel,
+    .support-topics > .content-panel,
+    .weekly-archive-grid > .content-panel,
+    .creator-steps > li,
+    .staff-workspace .workspace-grid > a,
+    .studio-library-grid > .tower-editor-card):nth-child(5n + 4) { --tint: var(--streak); --tint-soft: var(--streak-soft); --tint-text: var(--streak-text); }
+:is(.journey-library .journey-cards > .journey-card,
+    .welcome-paths > .content-panel,
+    .support-topics > .content-panel,
+    .weekly-archive-grid > .content-panel,
+    .creator-steps > li,
+    .staff-workspace .workspace-grid > a,
+    .studio-library-grid > .tower-editor-card):nth-child(5n + 5) { --tint: var(--rose); --tint-soft: var(--rose-soft); --tint-text: var(--rose-text); }
+
+:is(.journey-library .journey-cards > .journey-card,
+    .welcome-paths > .content-panel,
+    .support-topics > .content-panel,
+    .weekly-archive-grid > .content-panel,
+    .staff-workspace .workspace-grid > a,
+    .studio-library-grid > .tower-editor-card):hover {
+    box-shadow: var(--elev-2); border-color: var(--tint); background: var(--surface);
+}
+
+/* Library (My courses, recent modules, bookmarks). */
+.journey-library .journey-cards { gap: 1.25rem; }
+.journey-library .journey-card { padding: 1.25rem; gap: .75rem; }
+.journey-library .journey-card h3 { font-size: 1.15rem; }
+.journey-library .journey-dates {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr)); gap: .5rem;
+    width: 100%; padding: .625rem .75rem; border-radius: .875rem; background: var(--surface-soft);
+}
+.journey-library .journey-dates dt { font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+.journey-library .journey-dates dd { margin: .125rem 0 0; font-size: .875rem; font-weight: 600; color: var(--text); }
+.saved-learning-list { display: grid; gap: .75rem; }
+.saved-learning-list > li:not(.empty-state) {
+    min-width: 0; padding: 1rem 1.25rem; border: 1px solid var(--border);
+    border-radius: 1rem; background: var(--surface); box-shadow: var(--elev-1);
+    transition: box-shadow .18s var(--ease), border-color .18s;
+}
+.saved-learning-list > li:not(.empty-state):hover { border-color: var(--accent-line); box-shadow: var(--elev-2); }
+
+/* Welcome, Contact, and Legal public surfaces. */
+.welcome-paths { gap: 1.25rem; }
+.welcome-paths > .content-panel, .support-topics > .content-panel {
+    display: flex; flex-direction: column; align-items: start; gap: .625rem; padding: 1.375rem;
+}
+.welcome-paths > .content-panel > .action-icon, .support-topics > .content-panel > .action-icon {
+    width: 2.75rem; height: 2.75rem; padding: .625rem; border-radius: .875rem;
+    background: var(--tint-soft); color: var(--tint-text);
+}
+.welcome-paths > .content-panel > .quiet-link, .support-topics > .content-panel > .button { margin-block-start: auto; }
+.welcome-points { display: flex; flex-wrap: wrap; gap: .5rem; }
+.welcome-points > span {
+    display: inline-flex; align-items: center; gap: .5rem; padding: .375rem .875rem;
+    border: 1px solid var(--border); border-radius: var(--radius-pill);
+    background: var(--surface); box-shadow: var(--elev-1); font-size: .875rem; font-weight: 600;
+}
+.welcome-trial {
+    padding: clamp(1.25rem, 3vw, 2rem); border: 1px solid var(--border);
+    border-radius: var(--radius-card); background: var(--surface); box-shadow: var(--elev-1);
+}
+.support-hero, .contact-page > aside.content-panel {
+    padding: clamp(1.25rem, 3vw, 2rem); border: 1px solid var(--border);
+    border-radius: var(--radius-card); background: var(--surface); box-shadow: var(--elev-2);
+}
+.support-topics { gap: 1.25rem; }
+.support-privacy {
+    padding: 1rem 1.25rem; border: 1px solid var(--border);
+    border-radius: 1rem; background: var(--surface-soft);
+}
+.legal-page {
+    padding: clamp(1.25rem, 3vw, 2.25rem); margin-block: 1.5rem;
+    border: 1px solid var(--border); border-radius: var(--radius-card);
+    background: var(--surface); box-shadow: var(--elev-1);
+}
+
+/* Weekly lobbies, leaderboards, and results (excludes challenge play views). */
+.quest-page:not(:has(.quest-play-columns)) .quest-hero {
+    border: 1px solid var(--border); border-radius: var(--radius-card);
+    background: var(--surface); box-shadow: var(--elev-2);
+}
+.quest-lobby-columns > .content-panel,
+.review-page .workspace-columns > .content-panel,
+.leaderboard-list.content-panel {
+    min-width: 0; max-width: 100%; padding: clamp(1.125rem, 2.5vw, 1.5rem);
+    border: 1px solid var(--border); border-radius: var(--radius-card);
+    background: var(--surface); box-shadow: var(--elev-1);
+}
+.quest-current { border-block-start: 4px solid var(--accent); }
+.quest-weekly-scores { border-block-start: 4px solid var(--xp); }
+.weekly-archive-grid { gap: 1.25rem; }
+.weekly-archive-grid > .content-panel { display: flex; flex-direction: column; align-items: start; gap: .625rem; padding: 1.25rem; }
+.weekly-archive-grid > .content-panel > .button { margin-block-start: auto; }
+.leaderboard-list { display: grid; gap: .625rem; }
+.leaderboard-row, .weekly-score-row {
+    min-width: 0; padding: .875rem 1rem; border: 1px solid var(--border);
+    border-radius: 1rem; background: var(--surface); box-shadow: var(--elev-1);
+}
+.leaderboard-row.is-you {
+    border-color: var(--accent); background: var(--accent-soft);
+    box-shadow: 0 0 0 2px var(--accent-soft), var(--elev-1);
+}
+.rank-number {
+    display: inline-flex; align-items: center; justify-content: center; gap: .25rem;
+    padding: .25rem .625rem; border-radius: var(--radius-pill);
+    background: var(--surface-soft); font-family: var(--font-display); font-weight: 700;
+}
+.rank-place-1 { background: var(--xp-soft); color: var(--xp-text); }
+.rank-place-2 { background: var(--accent-soft); color: var(--accent-text); }
+.rank-place-3 { background: var(--streak-soft); color: var(--streak-text); }
+
+/* Wallet, earnings, and finance cards + expandable disclosures. */
+.wallet-summary { gap: 1.25rem; }
+.wallet-summary-card {
+    --tile: var(--teal);
+    position: relative; overflow: hidden; min-width: 0;
+    padding: 1.25rem 1.5rem 1.25rem 1.75rem;
+    border: 1px solid var(--border); border-radius: var(--radius-card);
+    background: var(--surface); box-shadow: var(--elev-1);
+}
+.wallet-summary-card::before { content: ''; position: absolute; inset: 0 auto 0 0; width: 6px; background: var(--tile); }
+.wallet-summary-card:nth-child(2) { --tile: var(--xp); }
+.wallet-columns > .content-panel, .wallet-page > .content-panel {
+    min-width: 0; padding: clamp(1.125rem, 2.5vw, 1.5rem);
+    border: 1px solid var(--border); border-radius: var(--radius-card);
+    background: var(--surface); box-shadow: var(--elev-1);
+}
+.wallet-package {
+    min-width: 0; padding: 1.25rem; border: 1px solid var(--border);
+    border-block-start: 4px solid var(--package-accent, var(--accent));
+    border-radius: var(--radius-card); background: var(--surface); box-shadow: var(--elev-1);
+    transition: box-shadow .18s var(--ease), border-color .18s;
+}
+.wallet-package:hover { box-shadow: var(--elev-2); border-color: var(--package-accent, var(--accent)); }
+.wallet-transaction {
+    min-width: 0; padding: .875rem 1rem; border: 1px solid var(--border);
+    border-radius: 1rem; background: var(--surface-soft);
+}
+:is(.review-page, .finance-workspace) details.lesson-note {
+    min-width: 0; padding: .5rem 1.25rem; margin-block: .75rem;
+    border: 1px solid var(--border); border-radius: var(--radius-card);
+    background: var(--surface); box-shadow: var(--elev-1);
+}
+:is(.review-page, .finance-workspace) details.lesson-note[open] { padding-block-end: 1.25rem; }
+:is(.review-page, .finance-workspace) details.lesson-note > summary {
+    cursor: pointer; padding-block: .625rem; font-family: var(--font-display); font-weight: 650;
+}
+.finance-workspace > p.lesson-note {
+    padding: 1rem 1.25rem; border: 1px solid var(--accent-line);
+    border-radius: var(--radius-card); background: var(--accent-soft); color: var(--accent-text); font-weight: 600;
+}
+.finance-workspace .dashboard-grid > article.lesson-note {
+    --tile: var(--accent);
+    position: relative; overflow: hidden; min-width: 0;
+    padding: 1.125rem 1.25rem 1.125rem 1.5rem;
+    border: 1px solid var(--border); border-radius: var(--radius-card);
+    background: var(--surface); box-shadow: var(--elev-1);
+}
+.finance-workspace .dashboard-grid > article.lesson-note::before { content: ''; position: absolute; inset: 0 auto 0 0; width: 6px; background: var(--tile); }
+.finance-workspace .dashboard-grid > article.lesson-note:nth-child(2) { --tile: var(--streak); }
+.finance-workspace .dashboard-grid > article.lesson-note:nth-child(3) { --tile: var(--success); }
+
+/* Notifications, account profile, and public creator profiles. */
+.notification-list { display: grid; gap: .75rem; }
+.notification-item {
+    min-width: 0; padding: 1rem 1.25rem; border: 1px solid var(--border);
+    border-radius: 1rem; background: var(--surface); box-shadow: var(--elev-1);
+    transition: box-shadow .18s var(--ease), border-color .18s;
+}
+.notification-item.is-unread {
+    border-inline-start: 4px solid var(--accent); padding-inline-start: 1.125rem;
+    box-shadow: var(--elev-2);
+}
+.profile-overview { gap: 1.25rem; }
+.profile-overview > section, .creator-profile > section {
+    min-width: 0; padding: clamp(1.125rem, 2.5vw, 1.5rem);
+    border: 1px solid var(--border); border-radius: var(--radius-card);
+    background: var(--surface); box-shadow: var(--elev-1);
+}
+.profile-actions { display: flex; flex-wrap: wrap; gap: .625rem; margin-block: 1rem; }
+.profile-actions > a {
+    display: inline-flex; align-items: center; min-height: 44px; padding: .5rem 1.125rem;
+    border: 1.5px solid var(--border); border-radius: var(--radius-pill);
+    background: var(--surface); color: var(--text); font-weight: 650; text-decoration: none;
+    box-shadow: var(--elev-1); transition: border-color .15s, background-color .15s;
+}
+.profile-actions > a:hover { border-color: var(--accent-line); background: var(--accent-soft); color: var(--accent-text); }
+
+/* Course detail, standalone module detail, and continuation banners. */
+.journey-next {
+    padding: 1.125rem 1.375rem; border: 1.5px solid var(--accent-line);
+    border-radius: var(--radius-card); background: var(--surface); box-shadow: var(--elev-1);
+}
+:is(.course-trail-page, .lesson-page) > .lesson-note {
+    padding: 1rem 1.25rem; border: 1px solid var(--border);
+    border-radius: 1rem; background: var(--surface); box-shadow: var(--elev-1);
+}
+
+/* Creator studios, curriculum packs, Tower studio, and Tower list. */
+.creator-steps { gap: 1rem; }
+.creator-steps > li { padding: 1.125rem 1.25rem; }
+.review-page > article.dashboard-panel {
+    min-width: 0; padding: clamp(1.25rem, 2.5vw, 1.75rem); margin-block: 1.25rem;
+    border: 1px solid var(--border); border-radius: var(--radius-card);
+    background: var(--surface); box-shadow: var(--elev-1);
+}
+details.starter-library {
+    border: 1px solid var(--border); border-radius: var(--radius-card);
+    background: var(--surface); padding: .5rem 1.25rem; margin-block: 1.25rem; box-shadow: var(--elev-1);
+}
+details.starter-library[open] { padding-block-end: 1.25rem; }
+.studio-library-grid > .tower-editor-card { padding: 1.25rem; display: flex; flex-direction: column; gap: .375rem; text-decoration: none; }
+.studio-library-grid > .tower-editor-card > b { margin-block-start: auto; color: var(--tint-text); }
+.tower-level-list > li {
+    border-radius: 1rem; box-shadow: var(--elev-1);
+    transition: box-shadow .18s var(--ease), border-color .18s;
+}
+.tower-level-list > li[aria-current="step"] {
+    border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft), var(--elev-2);
+}
+.tower-list-status {
+    padding: .25rem .75rem; border-radius: var(--radius-pill);
+    background: var(--surface-soft); font-size: .8125rem;
+}
+.tower-level-list > li[aria-current="step"] .tower-list-status { background: var(--accent-soft); color: var(--accent-text); }
+.studio-wayfinding > a[aria-current="page"] {
+    border-color: var(--accent); background: var(--accent-soft); color: var(--accent-text);
+}
+
+/* Staff tools, Community accounts, Site management, System reports, and Review rows. */
+.staff-workspace { margin-block: 1.5rem; }
+.staff-workspace .workspace-grid { gap: 1rem; }
+.staff-workspace .workspace-grid > a {
+    border-block-start-width: 3px; padding: 1.125rem 1.25rem; gap: .5rem; text-decoration: none;
+}
+.staff-workspace .workspace-icon {
+    display: inline-grid; place-items: center; width: 2.5rem; height: 2.5rem;
+    border-radius: .75rem; background: var(--tint-soft); color: var(--tint-text);
+}
+.account-results { display: grid; gap: .625rem; }
+.account-shell .account-results .account-result {
+    min-width: 0; padding: .875rem 1.125rem; border: 1px solid var(--border);
+    border-radius: 1rem; background: var(--surface); box-shadow: var(--elev-1);
+    transition: box-shadow .18s var(--ease), border-color .18s;
+}
+.account-shell .account-results .account-result:hover {
+    border-color: var(--accent-line); box-shadow: var(--elev-2); background: var(--surface);
+}
+.governance-filters,
+.report-filters,
+.review-inbox-filter,
+.review-page > form.account-form,
+.review-page > form.catalog-search:not(.catalog-filter-panel) {
+    min-width: 0; max-width: 100%; padding: clamp(1rem, 2.2vw, 1.35rem);
+    border: 1px solid var(--border); border-radius: var(--radius-card);
+    background: var(--surface); box-shadow: var(--elev-1);
+}
+.site-management-grid .content-panel {
+    min-width: 0; padding: clamp(1.125rem, 2.5vw, 1.5rem);
+    border: 1px solid var(--border); border-radius: var(--radius-card);
+    background: var(--surface); box-shadow: var(--elev-1);
+}
+.site-management-grid .notice-preview {
+    padding: 1rem 1.125rem; border: 1px dashed var(--accent-line);
+    border-radius: 1rem; background: var(--surface-soft);
+}
+.report-insights { gap: 1rem; margin-block: 1.25rem; }
+.report-insights .report-insight {
+    --tile: var(--accent);
+    position: relative; overflow: hidden; min-width: 0;
+    padding: 1rem 1.25rem 1rem 1.5rem;
+    border: 1px solid var(--border); border-radius: var(--radius-card);
+    background: var(--surface); box-shadow: var(--elev-1);
+}
+.report-insights .report-insight::before { content: ''; position: absolute; inset: 0 auto 0 0; width: 6px; background: var(--tile); }
+.report-insights .report-insight:nth-child(4n + 2) { --tile: #7c52d6; }
+.report-insights .report-insight:nth-child(4n + 3) { --tile: var(--teal); }
+.report-insights .report-insight:nth-child(4n + 4) { --tile: var(--streak); }
+.report-insights .report-insight b { font-family: var(--font-display); font-size: clamp(1.375rem, 2.4vw, 1.875rem); }
+details.report-section.content-panel {
+    min-width: 0; padding: .75rem 1.25rem; margin-block: 1rem;
+    border: 1px solid var(--border); border-radius: var(--radius-card);
+    background: var(--surface); box-shadow: var(--elev-1);
+}
+.review-list:not(.dashboard-panel .review-list) > :is(li, div.lesson-note) {
+    min-width: 0; padding: 1rem 1.25rem; border: 1px solid var(--border);
+    border-radius: 1rem; background: var(--surface); box-shadow: var(--elev-1);
+}
+.review-list:not(.dashboard-panel .review-list) > li > a {
+    display: inline-flex; align-items: center; min-height: 44px; font-weight: 650;
+}
+
+@media (max-width: 600px) {
+    .journey-library .journey-card,
+    .welcome-paths > .content-panel,
+    .support-topics > .content-panel,
+    .weekly-archive-grid > .content-panel,
+    .staff-workspace .workspace-grid > a,
+    .wallet-columns > .content-panel,
+    .wallet-page > .content-panel,
+    .site-management-grid .content-panel,
+    .profile-overview > section,
+    .creator-profile > section,
+    .legal-page { padding: 1rem; }
+    .saved-learning-list > li:not(.empty-state) { flex-wrap: wrap; gap: .75rem; }
+    .notification-item { flex-wrap: wrap; gap: .75rem; }
+    .wallet-summary-card { padding: 1rem 1rem 1rem 1.375rem; }
+    .account-shell-wide .site-management-grid .content-panel,
+    .account-shell-wide .profile-overview > section,
+    .account-shell-wide .governance-filters,
+    .account-shell-wide .report-filters { padding: 1rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .journey-library .journey-card,
+    .welcome-paths > .content-panel,
+    .support-topics > .content-panel,
+    .weekly-archive-grid > .content-panel,
+    .staff-workspace .workspace-grid > a,
+    .studio-library-grid > .tower-editor-card,
+    .saved-learning-list > li,
+    .notification-item,
+    .account-shell .account-results .account-result,
+    .tower-level-list > li,
+    .wallet-package { transition: none; }
+}
