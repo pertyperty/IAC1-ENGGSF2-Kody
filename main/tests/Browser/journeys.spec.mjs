@@ -395,7 +395,11 @@ test('D01 D05 D07: creator draft, staff review, course composition and learner p
         await expect(courseNotice.getByRole('link', { name: 'View details' })).toHaveAttribute('href', new RegExp(`/create/courses/${courseId}$`));
         await courseNotice.getByRole('button', { name: 'Mark as read' }).click();
         await expect(authorPage.locator('[data-flash-toast]')).toContainText('Update marked as read');
-        await expect(authorPage.locator('.notification-item').filter({ hasText: 'Browser reviewed journey' }).getByText('Read', { exact: true })).toBeVisible();
+        await expect(courseNotice.getByText('Unread', { exact: true })).toHaveCount(0);
+        await expect(courseNotice.getByRole('button', { name: 'Mark as read' })).toHaveCount(0);
+        await authorPage.getByLabel('Show', { exact: true }).selectOption('read');
+        await authorPage.getByRole('button', { name: 'Apply filter' }).click();
+        await expect(courseNotice.getByRole('heading', { name: /Browser reviewed journey/ })).toBeVisible();
         await audit(authorPage);
         await login(learnerPage, 'learner');
         await learnerPage.goto(`/learn/courses/${courseId}`);

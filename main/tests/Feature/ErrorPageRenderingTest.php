@@ -11,6 +11,7 @@ test('branded error pages close their sections and preserve the expected HTTP st
     $buffers = ob_get_level();
     $this->get('/__test/error-page')->assertStatus($status)
         ->assertSee($status >= 500 ? '<title>A little pause · Kody</title>' : '<title>'.$status.' · Kody </title>', false)
-        ->assertSee('Back to Kody')->assertDontSee('@endsection', false);
+        ->assertSee('href="'.url('/').'">'.($status >= 500 ? 'Back to Kody' : 'Go to Kody').'</a>', false)
+        ->assertDontSee('@endsection', false);
     expect(ob_get_level())->toBe($buffers);
 })->with([403, 404, 419, 429, 500, 503]);

@@ -28,7 +28,7 @@
                     <p>{{ $module['description'] }}</p>
                     <span class="creator-byline">By Kody</span>
                     @if($starterProgress)
-                        @include('learning.saved-progress', ['saved' => ['state' => $starterProgress['levels'][$slug]['completed'] ? 'complete' : 'new', 'label' => $starterProgress['levels'][$slug]['completed'] ? 'Completed' : ($starterProgress['levels'][$slug]['unlocked'] ? 'Ready to play' : 'Locked: clear the previous game')]])
+                        @include('learning.saved-progress', ['saved' => ['state' => $starterProgress['levels'][$slug]['completed'] ? 'complete' : 'new', 'label' => $starterProgress['levels'][$slug]['completed'] ? 'Completed · game cleared' : ($starterProgress['levels'][$slug]['unlocked'] ? 'Ready to play' : 'Locked: clear the previous game')]])
                     @endif
                 </x-catalog-entry>
             @empty

@@ -37,13 +37,13 @@ return [
 
     'mailers' => [
 
-        'sendgrid' => [
+        'mailgun' => [
             'transport' => 'smtp',
             'scheme' => 'smtp',
-            'host' => 'smtp.sendgrid.net',
-            'port' => 587,
-            'username' => 'apikey',
-            'password' => env('SENDGRID_API_KEY'),
+            'host' => env('MAILGUN_SMTP_HOST', 'smtp.mailgun.org'),
+            'port' => (int) env('MAILGUN_SMTP_PORT', 587),
+            'username' => env('MAILGUN_SMTP_USERNAME'),
+            'password' => env('MAILGUN_SMTP_PASSWORD'),
             'timeout' => 10,
             'require_tls' => true,
             'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url((string) env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
