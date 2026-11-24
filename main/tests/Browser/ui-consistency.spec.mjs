@@ -38,6 +38,9 @@ test('course cards render unjoined progress and shared actions have aligned icon
     await audit(page);
     await page.screenshot({ path: 'storage/app/browser-results/consistent-course-cards-wide.png' });
     await page.setViewportSize({ width: 320, height: 740 });
+    for (const link of await page.locator('.catalog-links a, .catalog-entry-action').all()) {
+        expect((await link.boundingBox()).height).toBeGreaterThanOrEqual(44);
+    }
     await audit(page);
     await page.screenshot({ path: 'storage/app/browser-results/consistent-course-cards-mobile.png' });
     await page.goto('/account/edit');
@@ -68,4 +71,16 @@ test('tower grid redraws with theme and ascent colors without a floating satelli
     await expect.poll(pixels).not.toBe(themedPixels);
     await audit(page);
     await page.screenshot({ path: 'storage/app/browser-results/consistent-tower-summit.png' });
+});
+
+
+test('reduced motion keeps Tower nodes in their lanes and steady on hover', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/');
+    const node = page.locator('.tower-node[href]').first();
+    const transform = await node.evaluate(el => getComputedStyle(el).transform);
+    expect(transform).not.toBe('none');
+    await node.hover();
+    await expect(node).toHaveCSS('transform', transform);
 });
