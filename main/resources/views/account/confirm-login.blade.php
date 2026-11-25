@@ -7,6 +7,6 @@
     <form method="post" action="{{ route('login.confirm') }}" class="account-form">
         @csrf
         <button type="submit" name="choice" value="continue" class="primary-button">End previous session and continue</button>
-        <button type="submit" name="choice" value="cancel">Cancel sign-in</button>
+        <button type="submit" name="choice" value="cancel" class="button button-secondary">Cancel sign-in</button>
     </form>
 @endsection

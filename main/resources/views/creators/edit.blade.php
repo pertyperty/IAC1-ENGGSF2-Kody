@@ -1,5 +1,6 @@
 @extends('layouts.account')
 @section('title', 'Public creator profile — Kody')
+@section('shell-class', 'account-shell-wide')
 @section('content')
 <h1>Public creator profile</h1><p>Share your work and experience. These fields and your username are public. Keep personal contact details and qualification documents private.</p>
 @include('layouts.form-errors')
@@ -18,5 +19,5 @@
 @else<p>Staff can review the credentials in your approved role application. Documents remain private; a badge is issued only after review.</p>
 <form class="account-form" method="post" action="{{ route('creator-profile.badge-request') }}">@csrf<label><input type="checkbox" name="confirmed" value="1" required> Ask staff to review my existing qualifications.</label><button class="primary-button">Request qualifications review</button></form>
 @endif</section>@endif
-<p><a href="{{ route('account.show') }}">Back to account</a></p>
+<p class="secondary-link"><a href="{{ route('account.show') }}">Back to account</a></p>
 @endsection

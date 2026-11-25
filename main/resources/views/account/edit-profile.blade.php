@@ -4,7 +4,7 @@
 @section('content')
 <p class="eyebrow">MAKE IT YOURS</p><h1>Your player profile</h1>
 <p class="intro">Update your name and username. Changing your email or password requires your current password and ends your signed-in sessions.</p>
-@if($errors->any())<div class="notice" role="alert">@foreach($errors->all() as $error)<p>{{ $error }}</p>@endforeach</div>@endif
+@if($errors->any())<div class="form-errors" role="alert">@foreach($errors->all() as $error)<p>{{ $error }}</p>@endforeach</div>@endif
 <div data-live-preview class="profile-preview-layout"><div class="profile-editor-grid"><section id="profile-picture" class="profile-picture-editor lesson-note">
 <h2>Your profile picture</h2>
 @include('layouts.avatar', ['avatarUser' => auth()->user(), 'avatarClass' => 'profile-avatar'])
@@ -14,7 +14,7 @@
 <label for="picture">New picture</label><input type="file" id="picture" name="picture" accept="image/jpeg,image/png" required>
 <p class="field-hint">Up to 2 MB, 6 megapixels and 4096 pixels per side.</p>
 <button class="primary-button" type="submit">Upload picture</button></form>
-@if(auth()->user()->profile_picture)<form method="POST" action="{{ route('account.picture-update') }}">@csrf<input type="hidden" name="profile_version" value="{{ $profile['profile_version'] }}"><input type="hidden" name="remove_picture" value="1"><button class="secondary-button" type="submit">Remove picture</button></form>@endif
+@if(auth()->user()->profile_picture)<form method="POST" action="{{ route('account.picture-update') }}">@csrf<input type="hidden" name="profile_version" value="{{ $profile['profile_version'] }}"><input type="hidden" name="remove_picture" value="1"><button class="button button-secondary" type="submit">Remove picture</button></form>@endif
 </section>
 <form class="account-form" method="POST" action="{{ route('account.update') }}">@csrf @method('PATCH')
 <input type="hidden" name="profile_version" value="{{ $profile['profile_version'] }}">
