@@ -9,6 +9,7 @@ use App\Models\CodingChallenge;
 use App\Models\WeeklyEvent;
 use App\Services\Challenges\ChallengeSubmissions;
 use App\Services\Challenges\Judge0\ProviderReadiness;
+use App\Services\Challenges\RetrySource;
 use App\Services\Engagement\ContentFeedback;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -38,14 +39,17 @@ class WeeklyChallengeController extends Controller
         $revision = $weeklyEvent->revision()->where('review_status', 'Approved')->firstOrFail(['id', 'title', 'description', 'language', 'difficulty', 'category', 'tags', 'rules', 'input_format', 'output_format', 'starter_code', 'cpu_time_ms', 'memory_kib']);
         $samples = $revision->testCases()->where('hidden', false)->get(['position', 'input', 'expected_output']);
         $participation = DB::table('challenge_participations')->where('user_id', $request->user()->id)->where('weekly_event_id', $weeklyEvent->id)->first();
-        $attempts = $participation === null ? collect() : ChallengeSubmission::where('participation_id', $participation->id)->orderByDesc('attempt')->get(['id', 'attempt', 'status']);
+        $attempts = $participation === null ? collect() : ChallengeSubmission::where('participation_id', $participation->id)->orderByDesc('attempt')->get(['id', 'attempt', 'status', 'revision_id']);
         $ready = Gate::allows('create', ChallengeSubmission::class) && app(ProviderReadiness::class)->profile($revision) !== null;
+        $retrySource = $ready && $participation !== null && ! $participation->active_submission_id && $participation->attempts < 3
+            ? app(RetrySource::class)->read($attempts, $revision, $request->query('retry'))
+            : null;
         $confirmationId = (string) Str::uuid();
         $attemptAction = route('weekly-events.attempt', $weeklyEvent);
         $attemptScope = 'this weekly event. Your standard quest attempts are separate';
         $feedback = $feedbackService->read($request->user(), $request->session()->getId(), 'challenge', $weeklyEvent->challenge_id, true);
 
-        return response()->view('weekly.play', compact('weeklyEvent', 'revision', 'samples', 'participation', 'attempts', 'ready', 'confirmationId', 'attemptAction', 'attemptScope', 'feedback'))->header('Cache-Control', 'no-store, private');
+        return response()->view('weekly.play', compact('weeklyEvent', 'revision', 'samples', 'participation', 'attempts', 'ready', 'retrySource', 'confirmationId', 'attemptAction', 'attemptScope', 'feedback'))->header('Cache-Control', 'no-store, private');
     }
 
     public function store(SubmitCodeRequest $request, WeeklyEvent $weeklyEvent, ChallengeSubmissions $submissions): RedirectResponse

@@ -1,5 +1,5 @@
-<section data-quest-participation>
-    <h2>Write your solution</h2>
+<section id="solution" data-quest-participation aria-labelledby="solution-heading">
+    <h2 id="solution-heading">Your solution</h2>
     <p>{{ 3 - ($participation->attempts ?? 0) }} of 3 attempts remain for {{ $attemptScope }}.</p>
     @if($errors->any())
         <div class="lesson-note" role="alert">
@@ -14,12 +14,12 @@
     @elseif(($participation->attempts ?? 0) >= 3)
         <p class="lesson-note">You've used your three attempts. Explore another challenge to keep practicing.</p>
     @elseif($ready)
-        <form class="studio-form" method="POST" action="{{ $attemptAction }}">
+        <form class="studio-form challenge-solution-form" method="POST" action="{{ $attemptAction }}">
             @csrf
             <input type="hidden" name="revision_id" value="{{ $revision->id }}">
             <input type="hidden" name="language" value="{{ $revision->language }}">
             <input type="hidden" name="confirmation_id" value="{{ $confirmationId }}">
-            @php $sourceInput = old('source_code', $revision->starter_code); @endphp
+            @php $sourceInput = old('source_code', $retrySource ?? $revision->starter_code); @endphp
             <div class="challenge-editor-header">
                 <label for="source-code">Your {{ config('challenges.languages')[$revision->language] }} solution</label>
                 @if(filled($revision->starter_code ?? null))
@@ -34,15 +34,17 @@
                 <span data-editor-bytes aria-live="polite">0 / 65,536 bytes</span> ·
                 <span>Press Tab to indent, Shift+Tab to outdent, or Escape then Tab to move focus.</span>
             </p>
-            <p id="attempt-help">Access unlocked. Up to 64 KiB of code. Confirming uses one attempt; evaluation continues if you leave this page.</p>
-            <label class="checkbox-row"><input type="checkbox" name="confirmed" value="1" required> I confirm this solution for evaluation.</label>
-            <button class="button button-play" type="submit"><x-kody-art name="run" size="28"/> Submit my solution</button>
+            @if($retrySource !== null && ! session()->hasOldInput('source_code'))
+                <p class="field-hint">Your previous solution is loaded. Edit it before submitting again.</p>
+            @endif
+            <p id="attempt-help">Submitting uses one attempt. You can leave while we check your code.</p>
+            <label class="checkbox-row"><input type="checkbox" name="confirmed" value="1" required> Use one attempt for this solution.</label>
+            <button class="button button-play" type="submit">Submit solution</button>
         </form>
     @else
         <div class="execution-pending" data-execution-pending>
             <h3><x-action-icon name="code"/>@can('create', \App\Models\ChallengeSubmission::class) Live code execution: setup pending @else Participant access required @endcan</h3>
-            <p>Code evaluation is not available yet for this account. No attempt will be used. @can('create', \App\Models\ChallengeSubmission::class) The submission workflow is built, but live evaluation needs the isolated execution provider to be configured and verified. @endcan</p>
-            <p>You can read the problem and examples, or play a local practice game.</p>
+            <p>You can still read the problem and examples. No attempt will be used.</p>
             <button class="button button-secondary" type="button" disabled>Submission unavailable</button>
             <p><a class="button button-play" href="{{ route('arcade') }}"><x-action-icon name="game"/> Visit Practice</a></p>
         </div>

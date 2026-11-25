@@ -7,6 +7,7 @@ use App\Models\ChallengeSubmission;
 use App\Models\CodingChallenge;
 use App\Models\CodingChallengeRevision;
 use App\Services\Challenges\Judge0\ProviderReadiness;
+use App\Services\Challenges\RetrySource;
 use App\Services\Engagement\ContentFeedback;
 use App\Services\Transactions\ContentAccess;
 use Illuminate\Http\Request;
@@ -53,11 +54,14 @@ class PublishedChallengeController extends Controller
         // Hidden tests are excluded by SQL and never loaded into the learner view.
         $samples = $revision->testCases()->where('hidden', false)->get(['position', 'input', 'expected_output']);
         $participation = DB::table('challenge_participations')->where('user_id', $request->user()->id)->where('challenge_id', $challenge->id)->whereNull('weekly_event_id')->first();
-        $attempts = $participation === null ? collect() : ChallengeSubmission::where('participation_id', $participation->id)->orderByDesc('attempt')->get(['id', 'attempt', 'status']);
+        $attempts = $participation === null ? collect() : ChallengeSubmission::where('participation_id', $participation->id)->orderByDesc('attempt')->get(['id', 'attempt', 'status', 'revision_id']);
         $ready = Gate::allows('create', ChallengeSubmission::class) && app(ProviderReadiness::class)->profile($revision) !== null;
+        $retrySource = $ready && $participation !== null && ! $participation->active_submission_id && $participation->attempts < 3
+            ? app(RetrySource::class)->read($attempts, $revision, $request->query('retry'))
+            : null;
         $confirmationId = (string) Str::uuid();
         $feedback = $feedbackService->read($request->user(), $request->session()->getId(), 'challenge', $challenge->id, true);
 
-        return response()->view('challenges.published', compact('revision', 'samples', 'challenge', 'participation', 'attempts', 'ready', 'confirmationId', 'feedback'))->header('Cache-Control', 'no-store, private');
+        return response()->view('challenges.published', compact('revision', 'samples', 'challenge', 'participation', 'attempts', 'ready', 'retrySource', 'confirmationId', 'feedback'))->header('Cache-Control', 'no-store, private');
     }
 }

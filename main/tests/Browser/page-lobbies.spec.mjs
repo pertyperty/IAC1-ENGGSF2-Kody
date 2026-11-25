@@ -61,6 +61,36 @@ test('favicon and page guides stay specific across Help Arcade weekly quests wal
     await page.goto('/account'); await guide(page, 'Make your profile yours');
 });
 
+test('challenge instructions scroll separately on desktop and link to the solution on mobile', async ({ page }, testInfo) => {
+    await page.setViewportSize({ width: 1440, height: 740 });
+    await login(page, 'questlearner');
+    for (const [name, url] of [['challenge', `/challenges/${manifest().challenge}`], ['weekly', `/weekly/${manifest().weekly}`]]) {
+        await page.goto(url);
+        const problem = page.getByRole('region', { name: 'Problem and examples' });
+        const panel = page.locator('.challenge-solution-panel');
+        const jump = page.getByRole('link', { name: 'Go to editor' });
+        await expect(jump).toBeHidden();
+        await expect(problem).toHaveCSS('overflow-y', 'auto');
+        expect((await panel.boundingBox()).width).toBeGreaterThan((await problem.boundingBox()).width);
+        expect(await problem.evaluate(element => {
+            const before = window.scrollY;
+            element.scrollTop = element.scrollHeight;
+            return element.scrollTop > 0 && window.scrollY === before;
+        })).toBe(true);
+        await problem.evaluate(element => { element.scrollTop = 0; });
+        await page.screenshot({ path: testInfo.outputPath(`${name}-desktop.png`) });
+
+        await page.setViewportSize({ width: 390, height: 740 });
+        await expect(problem).toHaveCSS('overflow-y', 'visible');
+        await expect(jump).toBeVisible();
+        await jump.click();
+        await expect(page).toHaveURL(/#solution$/);
+        await expect(page.getByRole('heading', { name: 'Your solution' })).toBeInViewport();
+        await page.screenshot({ path: testInfo.outputPath(`${name}-mobile-solution.png`) });
+        await page.setViewportSize({ width: 1440, height: 740 });
+    }
+});
+
 test('arcade lobby quiz cabinet automatically checks choices blanks and matching without mutation requests', async ({ page }) => {
     const writes = []; page.on('request', request => { if (!['GET', 'HEAD'].includes(request.method())) writes.push(request.method()); });
     await page.setViewportSize({ width: 1920, height: 1000 }); await page.goto('/playground?game=quiz-lab');

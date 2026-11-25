@@ -80,7 +80,7 @@ test('C03 verified participants confirm free durable encrypted attempts queued a
     $challenge = challengeFixture(true);
     $user = User::factory()->create(['account_role' => $role]);
     moduleSignIn($this, $user);
-    $this->get(route('challenges.show', $challenge))->assertOk()->assertSee('Submit my solution');
+    $this->get(route('challenges.show', $challenge))->assertOk()->assertSee('Submit solution');
     $source = "  print('hello')\n\n";
     $this->post(route('challenge-attempts.store', $challenge), attemptData($challenge, ['source_code' => $source, 'status' => 'Passed', 'passed_cases' => 99]))->assertRedirect();
     $submission = ChallengeSubmission::sole();
@@ -90,7 +90,7 @@ test('C03 verified participants confirm free durable encrypted attempts queued a
     $job = DB::table('jobs')->sole();
     expect($job->queue)->toBe('code-execution')->and($job->payload)->toContain($submission->id)->not->toContain('hello');
     $this->get(route('challenge-attempts.show', $submission))->assertOk()->assertSee('Your code is saved')->assertSee('hello')->assertHeader('Cache-Control', 'no-store, private');
-    $this->getJson(route('challenge-attempts.status', $submission))->assertExactJson(['status' => 'Queued', 'passed_cases' => 0, 'evaluated_cases' => 0, 'total_cases' => 2, 'feedback' => null, 'completed' => false]);
+    $this->getJson(route('challenge-attempts.status', $submission))->assertExactJson(['status' => 'Queued', 'passed_cases' => 0, 'evaluated_cases' => 0, 'total_cases' => 2, 'feedback' => null, 'completed' => false, 'issues' => []]);
     Http::assertNothingSent();
 })->with([Role::Learner, Role::Contributor, Role::Instructor]);
 
@@ -362,4 +362,29 @@ test('C03 storage failures are sanitized and roll back every attempt record', fu
     }
     $this->assertDatabaseCount('challenge_submissions', 0);
     $this->assertDatabaseCount('challenge_participations', 0);
+});
+
+test('failed attempts show safe case diagnostics and refill only the owner editor', function () {
+    readyJudge();
+    $challenge = challengeFixture(true);
+    $owner = moduleAccount(Role::Learner);
+    $source = "print('retry-original')\n";
+    $attempt = submitAttempt($challenge, $owner, ['source_code' => $source]);
+    evaluateAttempt($attempt, 6);
+
+    moduleSignIn($this, $owner);
+    $this->get(route('challenge-attempts.show', $attempt))->assertOk()
+        ->assertSee('Compilation error (2)')->assertSee('0 / 2 test cases passed.')
+        ->assertSee('Edit saved solution')->assertDontSee('HIDDEN_INPUT_SECRET');
+    $this->getJson(route('challenge-attempts.status', $attempt))->assertOk()
+        ->assertJsonPath('issues.0.label', 'Compilation error')->assertJsonPath('issues.0.count', 2)
+        ->assertDontSee('HIDDEN_INPUT_SECRET')->assertDontSee('provider_token');
+    $retry = route('challenges.show', ['challenge' => $challenge, 'retry' => $attempt->id]);
+    $this->get($retry)->assertOk()->assertSee($source)->assertSee('Your previous solution is loaded.');
+    $this->get(route('challenges.show', $challenge))->assertOk()->assertSee($source);
+    $this->assertDatabaseCount('challenge_submissions', 1);
+
+    moduleSignIn($this, moduleAccount(Role::Learner));
+    $this->get($retry)->assertOk()->assertDontSee('retry-original');
+    $this->getJson(route('challenge-attempts.status', $attempt))->assertForbidden();
 });
