@@ -34,11 +34,14 @@ test('creator public details are explicit escaped and never disclose private ide
     approvedBadgeProof($creator);
     moduleSignIn($this, $creator);
     $this->put(route('creator-profile.update'), ['record_version' => 0, 'headline' => 'Software developer',
-        'bio' => '<script>alert(1)</script>', 'accomplishments' => 'Teaching programming for five years.', 'confirmed' => true])->assertRedirect();
+        'bio' => '<script>alert(1)</script>', 'accomplishments' => 'Teaching programming for five years.',
+        'qualifications' => 'BS Computer Science', 'social_links' => ['github' => 'https://github.com/example-creator'], 'confirmed' => true])->assertRedirect();
     $this->get(route('creators.show', $creator))->assertOk()->assertSee('Software developer')->assertSee('&lt;script&gt;', false)
+        ->assertSee('BS Computer Science')->assertSee('https://github.com/example-creator')
         ->assertDontSee('<script>alert', false)->assertDontSee($creator->email)->assertDontSee('instructor-credentials')->assertDontSee('Qualifications reviewed');
     $this->putJson(route('creator-profile.update'), ['record_version' => 0, 'confirmed' => true])->assertUnprocessable();
     $this->putJson(route('creator-profile.update'), ['record_version' => 1, 'confirmed' => true, 'verified' => true])->assertJsonValidationErrors('verified');
+    $this->putJson(route('creator-profile.update'), ['record_version' => 1, 'confirmed' => true, 'social_links' => ['website' => 'javascript:alert(1)']])->assertJsonValidationErrors('social_links.website');
     $this->post(route('logout'));
     $this->get(route('creators.show', $creator))->assertOk()->assertDontSee($creator->email)->assertDontSee($creator->first_name ?? 'PRIVATE-NAME');
 });
@@ -63,6 +66,11 @@ test('public creator publication lists load titles without complete revision pay
 
         return true;
     });
+    $this->get(route('creators.show', [$module->creator, 'tab' => 'modules', 'q' => $module->publishedRevision->title]))
+        ->assertOk()->assertSee($module->publishedRevision->title);
+    $this->get(route('creators.show', [$module->creator, 'tab' => 'modules', 'q' => 'no-match-zzz']))
+        ->assertOk()->assertDontSee($module->publishedRevision->title);
+    $this->getJson(route('creators.show', [$module->creator, 'tab' => 'invalid']))->assertUnprocessable();
 });
 
 test('only current staff can grant reviewed creator badges with approved unchanged proof and an audited decision', function () {

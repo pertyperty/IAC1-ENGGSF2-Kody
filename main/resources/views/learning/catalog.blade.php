@@ -23,9 +23,8 @@
 
         <div class="catalog-results">
             @forelse($modules as $slug => $module)
-                <x-catalog-entry :title="$module['title']" :url="route('learning.show', $slug)" :action="auth()->check() ? 'Open module' : 'Sign in to explore'" icon="book">
-                    <x-slot:meta><span>{{ $module['concept'] }}</span><span>Beginner</span><span>{{ $module['duration'] }}</span></x-slot:meta>
-                    <p>{{ $module['description'] }}</p>
+                <x-catalog-entry :title="$module['title']" :url="route('learning.show', $slug)" :action="auth()->check() ? 'Open module' : 'Sign in to explore'" icon="book" :tags="[$module['concept'], 'Beginner', $module['duration'], 'Game & Quiz']">
+                    <p class="catalog-entry-desc">{{ $module['description'] }}</p>
                     <span class="creator-byline">By Kody</span>
                     @if($starterProgress)
                         @include('learning.saved-progress', ['saved' => ['state' => $starterProgress['levels'][$slug]['completed'] ? 'complete' : 'new', 'label' => $starterProgress['levels'][$slug]['completed'] ? 'Completed · game cleared' : ($starterProgress['levels'][$slug]['unlocked'] ? 'Ready to play' : 'Locked: clear the previous game')]])
@@ -35,9 +34,18 @@
                 @if($published->isEmpty())<x-empty-state title="No modules found" description="Try another search or clear the filters." :action-url="route('learning.catalog')" action-label="See all modules" />@endif
             @endforelse
             @foreach($published as $revision)
-                <x-catalog-entry :title="$revision->title" :url="route('modules.show', $revision->module_id)" :action="auth()->check() ? 'Open module' : 'Sign in to explore'" icon="book">
-                    <x-slot:meta><span>{{ $templates[$revision->assessment_template ?? ''] ?? 'Creator module' }}</span><span>{{ $revision->type }}</span></x-slot:meta>
-                    <p>{{ \Illuminate\Support\Str::limit($revision->description, 180) }}</p>
+                @php
+                    $moduleTags = [
+                        $templates[$revision->assessment_template ?? ''] ?? 'Creator module',
+                        $revision->type,
+                        $revision->module->creator?->account_status === \App\Enums\AccountStatus::Deleted ? 'Free' : ($revision->price_kb ? $revision->price_kb.' KB' : 'Free'),
+                    ];
+                    if ($revision->minimum_xp > 0) {
+                        $moduleTags[] = $revision->minimum_xp.' XP to unlock';
+                    }
+                @endphp
+                <x-catalog-entry :title="$revision->title" :url="route('modules.show', $revision->module_id)" :action="auth()->check() ? 'Open module' : 'Sign in to explore'" icon="book" :tags="$moduleTags" :bookmarked="$bookmarkedModules->has($revision->module_id)" bookmark-kind="module" :bookmark-content="$revision->module_id">
+                    <p class="catalog-entry-desc">{{ \Illuminate\Support\Str::limit($revision->description, 180) }}</p>
                     <x-creator-byline :creator="$revision->module->creator"/>
                     @if($moduleProgress->has($revision->module_id))@include('learning.saved-progress', ['saved' => $moduleProgress->get($revision->module_id)])@endif
                     <p class="content-price">{{ $revision->module->creator?->account_status === \App\Enums\AccountStatus::Deleted ? 'Free · retained creator content' : ($revision->price_kb ? $revision->price_kb.' KB' : 'Free') }}@if($revision->minimum_xp > 0) · {{ $revision->minimum_xp }} XP to unlock @endif</p>

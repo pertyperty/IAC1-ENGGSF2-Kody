@@ -4,7 +4,7 @@
 <section class="module-section page-width">
 <x-catalog-header title="Coding challenges" description="Practice programming by solving a problem in your chosen language."/>
 <form method="get" class="catalog-search catalog-filter-panel" action="{{ route('challenges.catalog') }}">
-    <div class="filter-search"><label for="challenge-search">Search challenges</label<input id="challenge-search" name="q" type="search" maxlength="80" value="{{ $query }}" placeholder="Search a title or programming idea"></div>
+    <div class="filter-search"><label for="challenge-search">Search challenges</label><input id="challenge-search" name="q" type="search" maxlength="80" value="{{ $query }}" placeholder="Search a title or programming idea"></div>
     <details class="challenge-filters" @if(array_filter($filters)) open @endif>
         <summary>More filters</summary>
         <div class="filter-grid">
@@ -18,9 +18,17 @@
 </form>
 <div class="catalog-results">
     @forelse($challenges as $revision)
-        <x-catalog-entry :title="$revision->title" :url="route('challenges.show', $revision->challenge_id)" :action="auth()->check() ? 'View challenge' : 'Sign in to explore'" icon="code">
-            <x-slot:meta><span>{{ config('challenges.languages.'.$revision->language) }}</span><span>{{ $revision->difficulty }}</span><span>{{ config('challenges.categories.'.$revision->category) }}</span></x-slot:meta>
-            @if($revision->tags)<p>{{ collect($revision->tags)->map(fn ($tag) => config('challenges.tags.'.$tag))->implode(', ') }}</p>@endif
+        @php
+            $challengeTags = array_merge(
+                [
+                    config('challenges.languages.'.$revision->language),
+                    $revision->difficulty,
+                    config('challenges.categories.'.$revision->category),
+                ],
+                collect($revision->tags ?? [])->map(fn ($tag) => config('challenges.tags.'.$tag))->filter()->values()->all()
+            );
+        @endphp
+        <x-catalog-entry :title="$revision->title" :url="route('challenges.show', $revision->challenge_id)" :action="auth()->check() ? 'View challenge' : 'Sign in to explore'" icon="code" :tags="$challengeTags">
             <x-creator-byline :creator="$revision->challenge->creator"/>
             <p class="content-price">{{ $revision->challenge->creator?->account_status === \App\Enums\AccountStatus::Deleted ? 'Free · retained creator content' : ($revision->price_kb ? $revision->price_kb.' KB' : 'Free') }}@if($revision->minimum_xp > 0) · {{ $revision->minimum_xp }} XP to unlock @endif</p>
         </x-catalog-entry>

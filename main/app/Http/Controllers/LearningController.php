@@ -9,6 +9,7 @@ use App\Services\Games\PracticeChallenges;
 use App\Services\Gamification\LearningProgression;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 class LearningController extends Controller
@@ -53,8 +54,16 @@ class LearningController extends Controller
         $participant = $history->participant($request);
         $moduleProgress = $participant === null ? collect() : $history->modules($participant, $published->getCollection());
         $starterProgress = $participant === null ? null : app(LearningProgression::class)->snapshot($participant->id);
+        $bookmarkedModules = $participant === null || $published->isEmpty()
+            ? collect()
+            : DB::table('learning_bookmarks')
+                ->where('user_id', $participant->id)
+                ->where('kind', 'module')
+                ->whereIn('content_id', $published->pluck('module_id'))
+                ->pluck('content_id')
+                ->flip();
 
-        return response()->view('learning.catalog', compact('modules', 'query', 'published', 'template', 'templates', 'moduleProgress', 'starterProgress'))->header('Cache-Control', 'no-store, private');
+        return response()->view('learning.catalog', compact('modules', 'query', 'published', 'template', 'templates', 'moduleProgress', 'starterProgress', 'bookmarkedModules'))->header('Cache-Control', 'no-store, private');
     }
 
     public function show(Request $request, string $module, LearningProgression $progression): Response

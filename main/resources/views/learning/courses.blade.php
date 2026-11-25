@@ -34,11 +34,24 @@
     </form>
     <div class="catalog-results">
         @forelse($courses as $revision)
-            @php($canReview = auth()->user()?->can('viewAny', \App\Models\LearningCourse::class))
+            @php
+                $canReview = auth()->user()?->can('viewAny', \App\Models\LearningCourse::class);
+                $courseTags = [
+                    $revision->category,
+                    $revision->difficulty,
+                    trans_choice(':count hour|:count hours', $revision->estimated_duration),
+                ];
+                if (($revision->modules_count ?? 0) > 0) {
+                    $courseTags[] = trans_choice(':count module|:count modules', $revision->modules_count);
+                }
+            @endphp
             <x-catalog-entry :title="$revision->title" :url="route($canReview ? 'course-reviews.show' : 'course-learning.show', $revision->course_id)"
-                :action="$canReview ? 'Review this course' : (auth()->check() ? 'View course' : 'Sign in to explore')" icon="journey">
-                <x-slot:meta><span>{{ $revision->category }}</span><span>{{ $revision->difficulty }}</span><span>{{ trans_choice(':count hour|:count hours', $revision->estimated_duration) }}</span></x-slot:meta>
-                <p>{{ \Illuminate\Support\Str::limit($revision->description, 180) }}</p>
+                :action="$canReview ? 'Review this course' : (auth()->check() ? 'View course' : 'Sign in to explore')" icon="journey"
+                :tags="$courseTags"
+                :bookmarked="$bookmarkedCourses->has($revision->course_id)"
+                bookmark-kind="course"
+                :bookmark-content="$revision->course_id">
+                <p class="catalog-entry-desc">{{ \Illuminate\Support\Str::limit($revision->description, 180) }}</p>
                 <x-creator-byline :creator="$revision->course->creator"/>
                 @if($participant)
                     @if($courseProgress->has($revision->course_id))
