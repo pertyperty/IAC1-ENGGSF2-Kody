@@ -14,7 +14,7 @@
     @elseif(($participation->attempts ?? 0) >= 3)
         <p class="lesson-note">You've used your three attempts. Explore another challenge to keep practicing.</p>
     @elseif($ready)
-        <form class="studio-form challenge-solution-form" method="POST" action="{{ $attemptAction }}">
+        <form class="studio-form challenge-solution-form" data-challenge-solution method="POST" action="{{ $attemptAction }}">
             @csrf
             <input type="hidden" name="revision_id" value="{{ $revision->id }}">
             <input type="hidden" name="language" value="{{ $revision->language }}">
@@ -33,6 +33,7 @@
                 <div class="challenge-editor-actions">
                     <button type="button" class="button button-secondary button-small" data-editor-insert-hint hidden>Add hint comment</button>
                     <button type="button" class="button button-secondary button-small" data-editor-reset-starter hidden>Reset to starter code</button>
+                    <button type="button" class="button button-secondary button-small" data-editor-undo-reset hidden>Undo reset</button>
                 </div>
             </div>
             <div class="challenge-editor" data-challenge-editor data-starter-code="{{ $starter }}" data-hint-comment="{{ $hint }}">
@@ -40,7 +41,7 @@
                 <textarea id="source-code" class="challenge-source" name="source_code" rows="20" spellcheck="false" autocapitalize="off" autocomplete="off" required aria-describedby="attempt-help">{{ "\n".(is_string($sourceInput) ? $sourceInput : '') }}</textarea>
             </div>
             <p class="field-hint challenge-editor-meta">
-                <span data-editor-bytes aria-live="polite">0 / 65,536 bytes</span> ·
+                <span data-editor-bytes>0 / 65,536 bytes</span> ·
                 <span>Press Tab to indent, Shift+Tab to outdent, or Escape then Tab to move focus.</span>
             </p>
             @if($retrySource !== null && ! session()->hasOldInput('source_code'))

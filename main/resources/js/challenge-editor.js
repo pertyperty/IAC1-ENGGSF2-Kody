@@ -56,7 +56,9 @@ export function mountChallengeEditor(root) {
     const form = root.closest('form');
     const bytesLabel = form?.querySelector('[data-editor-bytes]');
     const resetButton = form?.querySelector('[data-editor-reset-starter]');
+    const undoButton = form?.querySelector('[data-editor-undo-reset]');
     const starterCode = root.dataset.starterCode ?? '';
+    let beforeReset = null;
     const hintButton = form?.querySelector('[data-editor-insert-hint]');
     const hint = root.dataset.hintComment ?? '';
     let escapeTab = false;
@@ -78,10 +80,13 @@ export function mountChallengeEditor(root) {
         if (resetButton && starterCode) {
             resetButton.hidden = textarea.value === starterCode;
         }
+        if (undoButton) undoButton.hidden = beforeReset === null;
     };
+    const sourceChanged = () => textarea.dispatchEvent(new Event('input', { bubbles: true }));
 
     textarea.addEventListener('input', () => {
         escapeTab = false;
+        if (textarea.value !== starterCode) beforeReset = null;
         sync();
     });
     textarea.addEventListener('scroll', () => {
@@ -108,23 +113,35 @@ export function mountChallengeEditor(root) {
         textarea.value = next.value;
         textarea.selectionStart = next.start;
         textarea.selectionEnd = next.end;
-        sync();
+        sourceChanged();
     });
 
     if (resetButton && starterCode) {
         resetButton.addEventListener('click', () => {
+            beforeReset = { value: textarea.value, start: textarea.selectionStart, end: textarea.selectionEnd, scrollTop: textarea.scrollTop };
             textarea.value = starterCode;
-            textarea.focus();
-            sync();
+            sourceChanged();
+            (undoButton ?? textarea).focus();
         });
     }
+
+    undoButton?.addEventListener('click', () => {
+        if (beforeReset === null) return;
+        const { value, start, end, scrollTop } = beforeReset;
+        beforeReset = null;
+        textarea.value = value;
+        textarea.focus();
+        textarea.setSelectionRange(start, end);
+        textarea.scrollTop = scrollTop;
+        sourceChanged();
+    });
 
     if (hintButton && hint) {
         hintButton.addEventListener('click', () => {
             if (hintButton.disabled) return;
             textarea.setRangeText(`${hint}\n`, 0, 0, 'preserve');
             textarea.focus();
-            sync();
+            sourceChanged();
         });
     }
 

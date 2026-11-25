@@ -1,9 +1,11 @@
-export function mountUnsavedChanges(doc, win) {
-    const forms = [...doc.querySelectorAll('form[data-module-editor], form[data-preset-editor], form[data-tower-editor], [data-course-composer], [data-test-case-editor]')]
+const AUTHORING_FORMS = 'form[data-module-editor], form[data-preset-editor], form[data-tower-editor], [data-course-composer], [data-test-case-editor]';
+
+export function mountUnsavedChanges(doc, win, { roots = AUTHORING_FORMS, fields = 'input, select, textarea' } = {}) {
+    const forms = [...doc.querySelectorAll(roots)]
         .map(root => root.closest('form')).filter((form, index, all) => form && all.indexOf(form) === index);
     if (!forms.length) return;
     // Include unnamed Tower controls, and avoid synthetic empty File timestamps.
-    const signature = form => JSON.stringify([...form.querySelectorAll('input, select, textarea')]
+    const signature = form => JSON.stringify([...form.querySelectorAll(fields)]
         .filter(field => !field.closest('[data-coding-game], [data-practice-quiz], [data-arcade-game]')).map(field => [
         field.name, field.type, field.type === 'file'
             ? [...field.files].map(file => [file.name, file.size, file.lastModified]) : field.value,
@@ -17,6 +19,7 @@ export function mountUnsavedChanges(doc, win) {
         // Mounted after editor validation: rejected/invalid submissions remain protected.
         form.addEventListener('submit', event => { if (event.target === form && !event.defaultPrevented) submitting = form; });
     });
+    win.addEventListener('pageshow', () => { submitting = null; });
     win.addEventListener('beforeunload', event => {
         if (!forms.some(form => form !== submitting && signature(form) !== initial.get(form))) return;
         event.preventDefault();
