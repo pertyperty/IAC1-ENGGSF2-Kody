@@ -57,6 +57,8 @@ export function mountChallengeEditor(root) {
     const bytesLabel = form?.querySelector('[data-editor-bytes]');
     const resetButton = form?.querySelector('[data-editor-reset-starter]');
     const starterCode = root.dataset.starterCode ?? '';
+    const hintButton = form?.querySelector('[data-editor-insert-hint]');
+    const hint = root.dataset.hintComment ?? '';
     let escapeTab = false;
 
     const sync = () => {
@@ -68,6 +70,10 @@ export function mountChallengeEditor(root) {
             const bytes = utf8ByteLength(textarea.value);
             bytesLabel.textContent = `${bytes.toLocaleString('en-US')} / ${MAX_BYTES.toLocaleString('en-US')} bytes`;
             bytesLabel.dataset.overLimit = String(bytes > MAX_BYTES);
+        }
+        if (hintButton && hint) {
+            hintButton.hidden = false;
+            hintButton.disabled = textarea.value.includes(hint) || utf8ByteLength(`${hint}\n${textarea.value}`) > MAX_BYTES;
         }
         if (resetButton && starterCode) {
             resetButton.hidden = textarea.value === starterCode;
@@ -113,5 +119,26 @@ export function mountChallengeEditor(root) {
         });
     }
 
+    if (hintButton && hint) {
+        hintButton.addEventListener('click', () => {
+            if (hintButton.disabled) return;
+            textarea.setRangeText(`${hint}\n`, 0, 0, 'preserve');
+            textarea.focus();
+            sync();
+        });
+    }
+
     sync();
+    if (typeof window !== 'undefined' && window.location.hash === '#source-code') {
+        const target = new URLSearchParams(window.location.search).get('line');
+        const lines = textarea.value.split('\n');
+        if (target && /^[1-9]\d{0,5}$/.test(target) && Number(target) <= lines.length) {
+            const index = Number(target) - 1;
+            const start = lines.slice(0, index).reduce((length, line) => length + line.length + 1, 0);
+            textarea.focus();
+            textarea.setSelectionRange(start, start + lines[index].length);
+            textarea.scrollTop = Math.max(0, (index - 2) * parseFloat(window.getComputedStyle(textarea).lineHeight));
+            sync();
+        }
+    }
 }

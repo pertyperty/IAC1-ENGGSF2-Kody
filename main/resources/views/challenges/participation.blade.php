@@ -19,16 +19,25 @@
             <input type="hidden" name="revision_id" value="{{ $revision->id }}">
             <input type="hidden" name="language" value="{{ $revision->language }}">
             <input type="hidden" name="confirmation_id" value="{{ $confirmationId }}">
-            @php $sourceInput = old('source_code', $retrySource ?? $revision->starter_code); @endphp
+            @php
+                $hint = ($revision->language === 'python' ? '# ' : '// ').'Read the input from stdin. Print only the required output (no prompts or debug text).';
+                $starter = $revision->starter_code ?? match ($revision->language) {
+                    'java' => "import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        $hint\n    }\n}\n",
+                    'cpp' => "#include <iostream>\n\nint main() {\n    $hint\n    return 0;\n}\n",
+                    default => "$hint\n",
+                };
+                $sourceInput = old('source_code', $retrySource ?? $starter);
+            @endphp
             <div class="challenge-editor-header">
-                <label for="source-code">Your {{ config('challenges.languages')[$revision->language] }} solution</label>
-                @if(filled($revision->starter_code ?? null))
+                <label for="source-code">{{ config('challenges.languages')[$revision->language] }} editor</label>
+                <div class="challenge-editor-actions">
+                    <button type="button" class="button button-secondary button-small" data-editor-insert-hint hidden>Add hint comment</button>
                     <button type="button" class="button button-secondary button-small" data-editor-reset-starter hidden>Reset to starter code</button>
-                @endif
+                </div>
             </div>
-            <div class="challenge-editor" data-challenge-editor @if(filled($revision->starter_code ?? null)) data-starter-code="{{ $revision->starter_code }}" @endif>
+            <div class="challenge-editor" data-challenge-editor data-starter-code="{{ $starter }}" data-hint-comment="{{ $hint }}">
                 <div class="challenge-editor-gutter" data-editor-gutter aria-hidden="true">1</div>
-                <textarea id="source-code" class="challenge-source" name="source_code" rows="16" spellcheck="false" required aria-describedby="attempt-help">{{ "\n".(is_string($sourceInput) ? $sourceInput : '') }}</textarea>
+                <textarea id="source-code" class="challenge-source" name="source_code" rows="20" spellcheck="false" autocapitalize="off" autocomplete="off" required aria-describedby="attempt-help">{{ "\n".(is_string($sourceInput) ? $sourceInput : '') }}</textarea>
             </div>
             <p class="field-hint challenge-editor-meta">
                 <span data-editor-bytes aria-live="polite">0 / 65,536 bytes</span> ·

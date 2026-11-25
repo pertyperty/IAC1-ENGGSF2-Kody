@@ -31,6 +31,7 @@ test('challenge editor releases Tab focus after Escape and supports resetting st
         scrollTop: 0,
         addEventListener(type, fn) { listeners[type] = fn; },
         focus() { focused = true; },
+        setRangeText(text, start, end) { this.value = this.value.slice(0, start) + text + this.value.slice(end); },
     };
     const gutter = { textContent: '', scrollTop: 0 };
     const bytesLabel = { textContent: '', dataset: {} };
@@ -39,15 +40,18 @@ test('challenge editor releases Tab focus after Escape and supports resetting st
         hidden: true,
         addEventListener(type, fn) { if (type === 'click') resetClick = fn; },
     };
+    let hintClick;
+    const hintButton = { hidden: true, addEventListener(type, fn) { if (type === 'click') hintClick = fn; } };
     const form = {
         querySelector(selector) {
+            if (selector === '[data-editor-insert-hint]') return hintButton;
             if (selector === '[data-editor-bytes]') return bytesLabel;
             if (selector === '[data-editor-reset-starter]') return resetButton;
             return null;
         },
     };
     const root = {
-        dataset: { starterCode: 'print(1)' },
+        dataset: { starterCode: 'print(1)', hintComment: '# Print only the output.' },
         closest() { return form; },
         querySelector(selector) {
             if (selector === 'textarea.challenge-source') return textarea;
@@ -72,6 +76,10 @@ test('challenge editor releases Tab focus after Escape and supports resetting st
     listeners.keydown({ key: 'Escape', preventDefault() { prevented = true; } });
     listeners.keydown({ key: 'Tab', shiftKey: false, preventDefault() { prevented = true; } });
     assert.equal(prevented, false);
+
+    hintClick();
+    assert.equal(textarea.value, '# Print only the output.\n    print(1)\nprint(2)');
+    assert.equal(hintButton.disabled, true);
 
     // Reset restores starter code and hides button
     resetClick();

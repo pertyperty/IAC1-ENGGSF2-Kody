@@ -54,19 +54,29 @@ class Judge0Client
         return $data['token'];
     }
 
-    public function result(string $token): EvaluationResult
+    public function result(string $token, ?string $publicLanguage = null, int $lineCount = 0): EvaluationResult
     {
         if (! Str::isUuid($token)) {
             throw new ProviderUnavailable;
         }
-        // Request only the verdict. Program output can reproduce hidden inputs.
-        $data = $this->request('GET', '/submissions/'.$token.'?fields=status&base64_encoded=true');
+        // Program output can reproduce hidden inputs. Only public cases may request it.
+        $path = '/submissions/'.$token.'?base64_encoded=true&fields=';
+        $fields = 'status,time,memory';
+        try {
+            $data = $this->request('GET', $path.$fields.($publicLanguage === null ? '' : ',stdout,compile_output,stderr'));
+        } catch (OversizedProviderResponse $exception) {
+            if ($publicLanguage === null) {
+                throw $exception;
+            }
+            // A large diagnostic must not prevent grading. Reading a result is safe to repeat.
+            $data = $this->request('GET', $path.$fields);
+        }
         $status = $data['status']['id'] ?? null;
         if (! is_int($status) || $status < 1 || $status > 14) {
             throw new ProviderUnavailable;
         }
 
-        return new EvaluationResult($status);
+        return new EvaluationResult($status, ResultDetails::fromResponse($data, $status, $publicLanguage, $lineCount));
     }
 
     private function request(string $method, string $path, array $payload = []): array
@@ -95,7 +105,7 @@ class Judge0Client
                     $body .= $chunk;
                 }
                 if (strlen($body) > config('judge0.response_bytes')) {
-                    throw new ProviderUnavailable;
+                    throw new OversizedProviderResponse;
                 }
                 $data = json_decode($body, true, 32, JSON_THROW_ON_ERROR);
                 if (! is_array($data)) {
@@ -106,6 +116,8 @@ class Judge0Client
             } finally {
                 $stream->close();
             }
+        } catch (ProviderUnavailable $exception) {
+            throw $exception;
         } catch (Throwable) {
             throw new ProviderUnavailable;
         }

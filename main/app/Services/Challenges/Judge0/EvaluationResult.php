@@ -4,7 +4,7 @@ namespace App\Services\Challenges\Judge0;
 
 final readonly class EvaluationResult
 {
-    public function __construct(public int $status) {}
+    public function __construct(public int $status, public array $details = []) {}
 
     public function pending(): bool
     {

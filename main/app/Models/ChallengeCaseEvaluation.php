@@ -10,10 +10,10 @@ class ChallengeCaseEvaluation extends Model
 
     protected $guarded = ['id'];
 
-    protected $hidden = ['provider_token'];
+    protected $hidden = ['provider_token', 'result_details'];
 
     protected function casts(): array
     {
-        return ['provider_token' => 'encrypted', 'provider_status' => 'integer'];
+        return ['provider_token' => 'encrypted', 'provider_status' => 'integer', 'result_details' => 'encrypted:array'];
     }
 }

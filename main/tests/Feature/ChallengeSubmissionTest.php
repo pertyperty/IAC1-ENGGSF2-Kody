@@ -388,3 +388,79 @@ test('failed attempts show safe case diagnostics and refill only the owner edito
     $this->get($retry)->assertOk()->assertDontSee('retry-original');
     $this->getJson(route('challenge-attempts.status', $attempt))->assertForbidden();
 });
+
+test('C04 results compare public output without reading or exposing hidden output', function () {
+    readyJudge();
+    $challenge = challengeFixture(true);
+    $user = moduleAccount(Role::Learner);
+    $submission = submitAttempt($challenge, $user);
+    Http::fake(function ($request) {
+        if ($request->method() === 'POST') {
+            return Http::response(['token' => (string) Str::uuid()], 201);
+        }
+        parse_str(parse_url($request->url(), PHP_URL_QUERY), $query);
+        $public = str_contains($query['fields'], 'stdout');
+        if (! $public) {
+            expect($query['fields'])->toBe('status,time,memory');
+        }
+
+        return Http::response(['status' => ['id' => 4], 'stdout' => base64_encode($public ? "<script>prompt</script>\n12\n" : 'HIDDEN_OUTPUT_SECRET')]);
+    });
+    for ($step = 0; $step < 4; $step++) {
+        app(SubmissionEvaluation::class)->advance($submission->id);
+    }
+    Http::assertSentCount(4);
+    expect(Http::recorded(fn ($request) => $request->method() === 'GET' && str_contains($request->url(), 'stdout'))->count())->toBe(1);
+    moduleSignIn($this, $user);
+    $this->get(route('challenge-attempts.show', $submission))->assertOk()
+        ->assertSee('Sample 1: Wrong output')->assertSee('<script>prompt</script>')->assertDontSee('<script>prompt</script>', false)
+        ->assertDontSee('HIDDEN_INPUT_SECRET')->assertDontSee('HIDDEN_OUTPUT_SECRET');
+    $this->getJson(route('challenge-attempts.status', $submission))->assertJsonCount(1, 'examples')
+        ->assertJsonPath('examples.0.output', "<script>prompt</script>\n12\n")->assertDontSee('HIDDEN_OUTPUT_SECRET');
+    expect(DB::table('challenge_case_evaluations')->whereNotNull('result_details')->sole()->result_details)->not->toContain('prompt');
+});
+
+test('C04 accepted attempts report slowest CPU and peak memory across the full suite', function () {
+    readyJudge();
+    $challenge = challengeFixture(true);
+    $user = moduleAccount(Role::Learner);
+    $submission = submitAttempt($challenge, $user);
+    Http::fake(fn ($request) => $request->method() === 'POST'
+        ? Http::response(['token' => (string) Str::uuid()], 201)
+        : Http::response(['status' => ['id' => 3], 'time' => '0.023', 'memory' => 5120]));
+    for ($step = 0; $step < 4; $step++) {
+        app(SubmissionEvaluation::class)->advance($submission->id);
+    }
+    moduleSignIn($this, $user);
+    $this->get(route('challenge-attempts.show', $submission))->assertOk()->assertSee('23 ms')->assertSee('5,120 KiB');
+    $this->getJson(route('challenge-attempts.status', $submission))->assertJsonPath('statistics.slowest_ms', 23)->assertJsonPath('statistics.peak_kib', 5120);
+});
+
+test('C04 retains only bounded public compiler locations and links back to saved source', function () {
+    readyJudge();
+    $challenge = challengeFixture(true);
+    $user = moduleAccount(Role::Learner);
+    moduleSignIn($this, $user);
+    $source = "print(1)\nprint(\n";
+    $this->post(route('challenge-attempts.store', $challenge), attemptData($challenge, ['source_code' => $source]))->assertRedirect();
+    $submission = ChallengeSubmission::sole();
+    Http::fake(fn ($request) => $request->method() === 'POST'
+        ? Http::response(['token' => (string) Str::uuid()], 201)
+        : Http::response(['status' => ['id' => 6], 'compile_output' => base64_encode("  File \"script.py\", line 2\nPROVIDER_RAW_TEXT\n  File \"script.py\", line 200\n")]));
+    for ($step = 0; $step < 4; $step++) {
+        app(SubmissionEvaluation::class)->advance($submission->id);
+    }
+    $this->get(route('challenge-attempts.show', $submission))->assertOk()->assertSee('Edit line 2')
+        ->assertSee('line=2#source-code')->assertDontSee('Edit line 200')->assertDontSee('PROVIDER_RAW_TEXT');
+    $this->get(route('challenges.show', ['challenge' => $challenge, 'retry' => $submission->id, 'line' => 2]))
+        ->assertOk()->assertSee($source);
+});
+
+test('C04 an oversized public response retries the verdict without output', function () {
+    config(judgeConfiguration());
+    Http::fake(['*' => Http::sequence()->push(['stdout' => str_repeat('x', 270000)])->push(['status' => ['id' => 4]])]);
+    $result = app(Judge0Client::class)->result((string) Str::uuid(), 'python', 2);
+    expect($result->outcome())->toBe('Failed')->and($result->details)->toBe([]);
+    Http::assertSentCount(2);
+    expect(Http::recorded()->last()[0]->url())->not->toContain('stdout');
+});

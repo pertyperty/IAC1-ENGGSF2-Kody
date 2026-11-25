@@ -7,7 +7,8 @@ async function withStatusPage(run) {
     const timers = new Map();
     const events = {};
     let id = 0;
-    globalThis.window = { location: { origin: 'https://kody.test' }, addEventListener: (name, callback) => { events[name] = callback; } };
+    let reloads = 0;
+    globalThis.window = { location: { origin: 'https://kody.test', reload() { reloads++; } }, addEventListener: (name, callback) => { events[name] = callback; } };
     globalThis.setTimeout = (callback) => { timers.set(++id, callback); return id; };
     globalThis.clearTimeout = (key) => timers.delete(key);
     const nodes = Object.fromEntries(['status', 'feedback', 'counts'].map((name) => [name, { textContent: '' }]));
@@ -18,12 +19,12 @@ async function withStatusPage(run) {
         timers.delete(key);
         await callback();
     };
-    try { await run({ root, nodes, timers, events, tick }); }
+    try { await run({ root, nodes, timers, events, tick, reloads: () => reloads }); }
     finally { Object.assign(globalThis, saved); }
 }
 
-test('attempt feedback renders as text and polling stops at a durable terminal result', async () => {
-    await withStatusPage(async ({ root, nodes, timers, tick }) => {
+test('terminal polling loads the server-rendered result once without inserting provider text', async () => {
+    await withStatusPage(async ({ root, nodes, timers, tick, reloads }) => {
         let calls = 0;
         globalThis.fetch = async (url, options) => {
             calls++;
@@ -35,8 +36,8 @@ test('attempt feedback renders as text and polling stops at a durable terminal r
         };
         mountChallengeStatus(root);
         await tick();
-        assert.equal(nodes.feedback.textContent, '<script>untrusted</script>');
-        assert.equal(nodes.counts.textContent, '2 / 2 test cases passed.');
+        assert.equal(nodes.feedback.textContent, '');
+        assert.equal(reloads(), 1);
         assert.equal(timers.size, 0);
         assert.equal(calls, 1);
     });
