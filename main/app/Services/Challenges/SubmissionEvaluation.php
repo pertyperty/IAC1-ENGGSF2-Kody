@@ -72,7 +72,12 @@ class SubmissionEvaluation
                 $revision = CodingChallengeRevision::findOrFail($claim['submission']->revision_id);
                 $token = $client->create($claim['submission']->source_code, $claim['language_id'], $test->input, $test->expected_output, $revision->cpu_time_ms, $revision->memory_kib);
             } else {
-                $result = $client->result($claim['case']->provider_token);
+                $test = ChallengeTestCase::findOrFail($claim['case']->test_case_id, ['id', 'hidden']);
+                $result = $client->result(
+                    $claim['case']->provider_token,
+                    $test->hidden ? null : $claim['submission']->language,
+                    substr_count($claim['submission']->source_code, "\n") + 1,
+                );
             }
         } catch (ProviderUnavailable) {
             // GET is safe to retry; an uncertain POST must never be retried.
@@ -94,7 +99,11 @@ class SubmissionEvaluation
             if ($token !== null) {
                 $case->update(['provider_token' => $token, 'status' => 'Submitted']);
             } elseif ($result !== null) {
-                $case->update(['provider_status' => $result->status, 'status' => $result->pending() ? 'Submitted' : $result->outcome()]);
+                $case->update([
+                    'provider_status' => $result->status,
+                    'status' => $result->pending() ? 'Submitted' : $result->outcome(),
+                    'result_details' => $result->details === [] ? null : $result->details,
+                ]);
             }
             $submission->update(['lease_id' => null, 'lease_expires_at' => null]);
             if (! ChallengeCaseEvaluation::where('submission_id', $id)->whereNotIn('status', ['Passed', 'Failed'])->exists()) {

@@ -60,7 +60,7 @@
 
 /* Keep the problem and the editor independently usable on wide screens. */
 .challenge-workspace { width: min(100% - 2rem, 92rem); }
-.challenge-workspace .quest-play-columns { gap: 1rem; align-items: start; }
+.challenge-workspace .quest-play-columns { gap: clamp(.875rem, 2vw, 1.5rem); align-items: start; }
 .challenge-workspace [data-quest-problem], .challenge-solution-panel { min-width: 0; }
 .challenge-workspace [data-quest-problem] { overflow-wrap: anywhere; overscroll-behavior-y: contain; }
 .challenge-brief { display: grid; gap: .5rem; margin-block: 1rem; line-height: 1.6; }
@@ -71,7 +71,7 @@
 .challenge-solution-panel { padding: clamp(1rem, 2vw, 1.5rem); border: 1px solid var(--border); border-radius: 1rem; background: var(--surface); }
 .challenge-solution-panel [data-quest-participation] > h2 { margin-top: 0; }
 .challenge-solution-panel .challenge-solution-form { width: 100%; max-width: none; padding: 0; margin-block: 1rem; border: 0; background: transparent; }
-.challenge-solution-form .challenge-editor textarea.challenge-source { min-height: clamp(16rem, 35dvh, 28rem); resize: vertical; }
+.challenge-solution-form .challenge-editor textarea.challenge-source { height: clamp(20rem, 55dvh, 38rem); padding: .65rem .75rem; white-space: pre; overflow: auto; resize: vertical; }
 .challenge-workspace-jump { display: inline-flex; align-items: center; min-height: 44px; }
 .challenge-hints { margin-block: 1rem; }
 .challenge-hints summary { cursor: pointer; padding-block: .625rem; font-weight: 650; }
@@ -80,7 +80,7 @@
 .challenge-result-issues { padding-inline-start: 1.25rem; }
 .challenge-result-issues p { margin-block: .25rem .75rem; }
 @media (min-width: 72rem) and (min-height: 42rem) {
-    .challenge-workspace .quest-play-columns { grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); }
+    .challenge-workspace .quest-play-columns { grid-template-columns: minmax(15rem, 1fr) minmax(0, 2fr); }
     .challenge-workspace [data-quest-problem] {
         max-height: max(20rem, calc(100dvh - var(--navigation-offset, 128px) - 5rem));
         overflow: auto;
@@ -95,3 +95,14 @@
     .challenge-workspace .quest-play-columns { grid-template-columns: minmax(0, 1fr); }
     .challenge-workspace-jump { margin-block: .5rem; }
 }
+
+.challenge-editor-actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+.challenge-result-detail { inline-size: min(100%, 60rem); min-width: 0; border-block-start: 1px solid var(--border); padding-block: .75rem; }
+.challenge-result-detail summary { cursor: pointer; min-block-size: 44px; padding-block: .55rem; font-weight: 650; }
+.challenge-result-stats, .challenge-output-comparison { display: grid; gap: .75rem; inline-size: 100%; margin: 0; }
+.challenge-result-stats { grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr)); }
+.challenge-output-comparison { grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); }
+.challenge-result-stats > div, .challenge-output-comparison > div { min-width: 0; padding: .75rem; background: var(--surface-soft); border-radius: var(--control-radius); }
+.challenge-result-stats dd, .challenge-output-comparison dd { margin: .375rem 0 0; }
+.challenge-output-comparison pre { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; max-block-size: 14rem; }
+.challenge-result-stats dd { font-size: 1.25rem; font-weight: 700; }

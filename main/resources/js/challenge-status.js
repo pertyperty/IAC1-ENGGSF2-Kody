@@ -56,31 +56,8 @@ export function mountChallengeStatus(root) {
                 if (!terminal) counts.textContent = `${result.evaluated_cases} / ${result.total_cases} cases evaluated. Your committed attempt continues on the server.`;
             }
             if (terminal) {
-                const issues = Array.isArray(result.issues) ? result.issues.filter(issue => issue
-                    && typeof issue.label === 'string' && typeof issue.hint === 'string'
-                    && Number.isInteger(issue.count) && issue.count > 0) : [];
-                feedback.textContent = result.status === 'Failed' && issues.length
-                    ? 'Review the results below before trying again.' : result.feedback;
-                const issueList = root.querySelector('[data-attempt-issues]');
-                if (issueList && issues.length) {
-                    const rows = issues.map(issue => {
-                        const row = document.createElement('li');
-                        const label = document.createElement('strong');
-                        const hint = document.createElement('p');
-                        label.textContent = `${issue.label} (${issue.count})`;
-                        hint.textContent = issue.hint;
-                        row.append(label, hint);
-                        return row;
-                    });
-                    issueList.replaceChildren(...rows);
-                    issueList.hidden = false;
-                }
-                const retry = root.querySelector('[data-attempt-retry]');
-                if (retry) retry.hidden = result.status === 'Passed';
-                counts.textContent = `${result.passed_cases} / ${result.total_cases} test cases passed.`;
                 stopped = true;
-                const refresh = root.querySelector('[data-attempt-refresh]');
-                if (refresh) refresh.hidden = true;
+                window.location.reload();
             }
         } catch {
             // Manual refresh remains available during network interruptions.

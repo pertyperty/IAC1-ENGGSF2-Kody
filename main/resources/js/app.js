@@ -2,6 +2,7 @@ import { mountLivePreviews } from './live-preview.js';
 import { mountFormGuidance } from './form-guidance.js';
 import { mountChallengeEditor } from './challenge-editor.js';
 import { mountChallengeStatus } from './challenge-status.js';
+import { mountUnsavedChanges } from './unsaved-changes.js';
 import { mountContentReactions } from './content-reactions.js';
 import { mountTheme } from './theme.js';
 import { mountAccountLinks } from './account-links.js';
@@ -42,6 +43,7 @@ document.querySelectorAll('[data-course-journey]').forEach(root => mountCourseJo
 mountScrollNavigation(document, window);
 
 document.querySelectorAll('[data-challenge-editor]').forEach(mountChallengeEditor);
+mountUnsavedChanges(document, window, { roots: 'form[data-challenge-solution]', fields: 'textarea.challenge-source' });
 document.querySelectorAll('[data-challenge-status]').forEach(mountChallengeStatus);
 document.querySelectorAll('[data-content-reactions]').forEach((root) => mountContentReactions(root));
 
