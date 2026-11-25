@@ -11,37 +11,40 @@ use Illuminate\Support\Str;
 
 uses(RefreshDatabase::class);
 
-test('verified learners choose an independent Tower track without fabricated progress', function (string $track) {
+test('first verified login guides learners to their chosen Tower map without granting progress', function (string $track, int $firstFloor) {
     $this->seed(TowerLevelSeeder::class);
     $user = User::factory()->create();
     moduleSignIn($this, $user);
-    $this->get(route('home'))->assertRedirect(route('tower.start'));
-    $this->get(route('home'))->assertOk()->assertSee('Choose a skill track')->assertDontSee('data-proficiency-open');
-    $this->post(route('tower.proficiency'), ['proficiency' => $track])->assertRedirect();
-    expect($user->fresh()->coding_proficiency)->toBe($track);
-    $this->assertDatabaseCount('tower_clearances', 0);
-    $this->assertDatabaseCount('tower_stage_completions', 0);
-    $this->get(route('home'))->assertOk()->assertSee('Choose a skill track')
-        ->assertViewHas('tower', fn ($tower) => $tower['selected_track'] === $track);
-    $this->flushSession();
-    moduleSignIn($this, $user);
-    $this->get(route('home'))->assertViewHas('tower', fn ($tower) => $tower['selected_track'] === $track);
-})->with(['beginner', 'intermediate', 'expert']);
+    $this->get(route('home'))->assertRedirect(route('tower.onboarding'));
+    $this->get(route('tower.start'))->assertRedirect(route('tower.onboarding'));
+    $this->get(route('tower.onboarding'))->assertOk()->assertSee('Choose your coding level');
+    $this->post(route('tower.onboarding.finish'))->assertRedirect(route('tower.onboarding'));
 
-test('first verified login starts a Tower game without choosing or fabricating a track', function () {
-    $this->seed(TowerLevelSeeder::class);
-    $user = User::factory()->create();
-    $this->post(route('login.store'), ['email' => $user->email, 'password' => 'password'])
-        ->assertRedirect(route('home'));
-    $this->withCookie(config('session.cookie'), session()->getId());
-    $this->get(route('home'))->assertRedirect(route('tower.start'));
-    $first = TowerLevel::where('position', 1)->firstOrFail();
-    $this->get(route('tower.start'))->assertRedirect(route('tower.show', $first));
-    $this->get(route('tower.show', $first))->assertOk()->assertSee('Choose track');
-    $this->get(route('home'))->assertOk();
-    expect($user->fresh()->coding_proficiency)->toBeNull();
+    $this->post(route('tower.proficiency'), ['proficiency' => $track])->assertRedirect(route('tower.onboarding'));
+    expect($user->fresh()->coding_proficiency)->toBe($track);
+    // A new session resumes the tutorial with the learner's saved choice.
+    moduleSignIn($this, $user);
+    $this->get(route('home'))->assertRedirect(route('tower.onboarding'));
+    $this->get(route('tower.onboarding'))->assertOk()->assertSee('How to play the Tower');
+    $map = route('home', ['view' => 'map', 'track' => $track]);
+    $this->post(route('tower.onboarding.finish'))->assertRedirect($map);
+    $this->get($map)->assertOk()->assertViewIs('tower.map')->assertViewHas('tower', fn ($tower) => $tower['selected_track'] === $track && $tower['next']->position === $firstFloor);
     $this->assertDatabaseCount('tower_clearances', 0);
     $this->assertDatabaseCount('tower_stage_completions', 0);
+
+    moduleSignIn($this, $user);
+    $this->get(route('home'))->assertOk()->assertViewIs('tower.map');
+})->with([
+    ['beginner', 1],
+    ['intermediate', 26],
+    ['expert', 71],
+]);
+
+test('returning learners without a proficiency keep their existing Tower entry', function () {
+    $user = User::factory()->create(['last_login_at' => now()->subDay()]);
+    moduleSignIn($this, $user);
+    $this->get(route('home'))->assertOk()->assertViewIs('tower.map');
+    $this->get(route('tower.onboarding'))->assertRedirect(route('home'));
 });
 
 test('Tower start respects a selected track and excludes staff', function () {

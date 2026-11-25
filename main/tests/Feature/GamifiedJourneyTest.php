@@ -34,6 +34,7 @@ test('continuation uses the selected Tower track and never mistakes starter hist
     $this->seed(TowerLevelSeeder::class);
     $user = moduleAccount(Role::Learner);
     app(LearningProgression::class)->record($user, 'module-test-session', 'sequences', 'game', courseWin());
+    $user->forceFill(['last_login_at' => now()->subDay()])->save();
     moduleSignIn($this, $user);
     $this->get(route('home', ['track' => 'expert']))->assertOk();
     $this->get(route('dashboard'))->assertOk()->assertSee('Continue level 71');

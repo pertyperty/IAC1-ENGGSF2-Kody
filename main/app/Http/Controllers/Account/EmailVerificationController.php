@@ -33,7 +33,7 @@ class EmailVerificationController extends Controller
             return response()->json(['message' => $message]);
         }
 
-        return back()->with('status', $message);
+        return redirect()->route('verification.notice')->with('status', $message)->withInput(['email' => $request->validated('email')]);
     }
 
     public function verify(Request $request, EmailVerificationService $verification): JsonResponse|Response
@@ -54,12 +54,17 @@ class EmailVerificationController extends Controller
 
     public function code(Request $request, EmailVerificationService $verification): JsonResponse|Response
     {
-        $data = $request->validate(['email' => ['required', 'email', 'max:100'], 'code' => ['required', 'string', 'regex:/\A[0-9]{6}\z/']]);
-        $verified = $verification->verifyCode($data['email'], $data['code']);
+        $data = $request->validate(['email' => ['required', 'email', 'max:100'], 'code' => ['required', 'string', 'max:32']]);
+        $code = preg_replace('/[\s\p{Z}-]+/u', '', $data['code']);
+        $verified = $code !== null && $verification->verifyCode($data['email'], $code);
         $message = $verified ? 'Your email is verified. Your account is now active.' : 'This code is invalid, expired or unavailable. Request another email if needed.';
 
-        return $request->expectsJson()
-            ? response()->json(compact('message'), $verified ? 200 : 422)->header('Cache-Control', 'no-store')->header('Referrer-Policy', 'no-referrer')
-            : response()->view('account.verification-result', compact('verified', 'message'), $verified ? 200 : 422)->header('Cache-Control', 'no-store')->header('Referrer-Policy', 'no-referrer');
+        $response = match (true) {
+            $request->expectsJson() => response()->json(compact('message'), $verified ? 200 : 422),
+            $verified => response()->view('account.verification-result', compact('verified', 'message')),
+            default => response()->view('account.verify-email', ['email' => $data['email'], 'codeError' => $message], 422),
+        };
+
+        return $response->header('Cache-Control', 'no-store')->header('Referrer-Policy', 'no-referrer');
     }
 }

@@ -74,12 +74,15 @@ test('track boundaries continue to their appended floors and a finished track re
         }
         expect($result['tower']['next'])->toBe($next ? route('tower.show', TowerLevel::where('position', $next)->sole()) : route('home', ['track' => $track]));
     }
+    $user->forceFill(['last_login_at' => now()->subDay()])->save();
     moduleSignIn($this, $user);
     $this->get(route('home', ['track' => 'expert']))->assertOk()->assertSee('Track cleared. Choose another adventure.');
 });
 
 test('a track without published floors is described as unavailable rather than completed', function () {
-    moduleSignIn($this, moduleAccount(Role::Learner));
+    $user = moduleAccount(Role::Learner);
+    $user->forceFill(['last_login_at' => now()->subDay()])->save();
+    moduleSignIn($this, $user);
     $this->get(route('home', ['track' => 'expert']))->assertOk()->assertSee('This track is being prepared.')->assertDontSee('Track cleared.');
 });
 
