@@ -157,8 +157,9 @@ class LoginAccount
 
     private function authenticate(User $user, Session $session): LoginOutcome
     {
-        $session->put('tower.first_play', $user->account_role === Role::Learner
-            && $user->last_login_at === null && $user->coding_proficiency === null);
+        if ($user->account_role === Role::Learner && $user->last_login_at === null && $user->coding_proficiency === null) {
+            $user->tower_onboarding_pending = true;
+        }
         // SessionGuard rotates the session ID and CSRF token before recording its fingerprint.
         Auth::login($user);
         $user->forceFill([

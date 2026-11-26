@@ -23,9 +23,8 @@ class TowerController extends Controller
             return redirect()->route('dashboard');
         }
 
-        if ($request->session()->pull('tower.first_play', false)
-            && ! $request->hasAny(['track', 'view'])) {
-            return redirect()->route('tower.start');
+        if ($request->user()?->account_role === Role::Learner && $request->user()->tower_onboarding_pending) {
+            return redirect()->route('tower.onboarding');
         }
 
         $choice = $request->query('track');
@@ -45,6 +44,36 @@ class TowerController extends Controller
         return response()->view('tower.'.$view, ['tower' => $tower->snapshot($request->user()?->id, $track)])->header('Cache-Control', 'no-store, private');
     }
 
+    public function onboarding(Request $request, TowerTracks $tracks): Response|RedirectResponse
+    {
+        if ($request->user()->account_role !== Role::Learner || ! $request->user()?->tower_onboarding_pending) {
+            return redirect()->route('home');
+        }
+
+        return response()->view('tower.onboarding', [
+            'tracks' => $tracks->all(),
+            'selected' => $request->user()->coding_proficiency,
+        ])->header('Cache-Control', 'no-store, private');
+    }
+
+    public function finishOnboarding(Request $request): RedirectResponse
+    {
+        $track = DB::transaction(function () use ($request): ?string {
+            $user = User::whereKey($request->user()->id)->lockForUpdate()->firstOrFail();
+            app(CurrentAccountSession::class)->assert($user, $request->session()->getId());
+            abort_unless($user->account_role === Role::Learner, 403);
+            if ($user->tower_onboarding_pending && $user->coding_proficiency !== null) {
+                $user->forceFill(['tower_onboarding_pending' => false])->save();
+            }
+
+            return $user->coding_proficiency;
+        });
+
+        return $track === null && $request->user()->tower_onboarding_pending
+            ? redirect()->route('tower.onboarding')
+            : redirect()->route('home', ['view' => 'map', 'track' => $track]);
+    }
+
     public function proficiency(Request $request, TowerProgression $tower): RedirectResponse
     {
         $data = $request->validate(['proficiency' => ['required', 'in:beginner,intermediate,expert']]);
@@ -55,6 +84,10 @@ class TowerController extends Controller
             $user->forceFill(['coding_proficiency' => $data['proficiency']])->save();
         });
         $request->session()->put('tower.track', $data['proficiency']);
+        if ($request->user()?->account_role === Role::Learner && $request->user()->tower_onboarding_pending) {
+            return redirect()->route('tower.onboarding');
+        }
+
         $next = $tower->continuation($request->user()->id, $data['proficiency'])['next'];
 
         return $next ? redirect($next['url']) : redirect()->route('home', ['track' => $data['proficiency']]);
@@ -65,6 +98,10 @@ class TowerController extends Controller
         if (! in_array($request->user()->account_role, [Role::Learner, Role::Instructor], true)) {
             return redirect()->route('dashboard');
         }
+        if ($request->user()->account_role === Role::Learner && $request->user()->tower_onboarding_pending) {
+            return redirect()->route('tower.onboarding');
+        }
+
         $next = $tower->continuation($request->user()->id,
             $request->session()->get('tower.track', $request->user()->coding_proficiency))['next'];
 

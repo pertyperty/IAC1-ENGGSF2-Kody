@@ -18,9 +18,10 @@ Keep provider activation paused.
 The [21 November first-play follow-up](docs/learner-stabilization-2026-11-20.md#first-play-follow-up-21-november)
 supersedes the mobile ordering below: show the goal and board before program
 controls, with Pixel Studio's palette beside its canvas. Keep desktop panes and
-bounded programs. The first verified learner login enters an admitted Tower game;
-Choose track opens an optional picker afterward. Never fabricate a preference,
-clearance or reward. Returning accounts retain their existing landing behavior.
+bounded programs. The [25 November verification and onboarding update](docs/verification-tower-onboarding-2026-11-25.md)
+replaces automatic first play with proficiency selection, a short tutorial and
+the selected Tower map. Never fabricate a preference, clearance or reward.
+Returning accounts retain their existing landing behavior.
 Run is unavailable until instructions exist; terminal commands are added before
 explicit Run. Board actions and displayed pseudocode share the same interpreters.
 Provider activation remains paused.

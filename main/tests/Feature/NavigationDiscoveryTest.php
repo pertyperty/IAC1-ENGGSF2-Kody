@@ -33,6 +33,7 @@ test('Tower list keeps guest trials and account invitation without recording pro
 test('Tower list shares track locks and saved clears with the map and survives navigation', function () {
     $this->seed(TowerLevelSeeder::class);
     $user = moduleAccount(Role::Learner);
+    $user->forceFill(['last_login_at' => now()->subDay()])->save();
     moduleSignIn($this, $user);
     $first = TowerLevel::where('position', 71)->sole();
     $second = TowerLevel::where('position', 72)->sole();
