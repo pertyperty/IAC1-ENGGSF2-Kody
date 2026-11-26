@@ -11,7 +11,7 @@ async function withStatusPage(run) {
     globalThis.window = { location: { origin: 'https://kody.test', reload() { reloads++; } }, addEventListener: (name, callback) => { events[name] = callback; } };
     globalThis.setTimeout = (callback) => { timers.set(++id, callback); return id; };
     globalThis.clearTimeout = (key) => timers.delete(key);
-    const nodes = Object.fromEntries(['status', 'feedback', 'counts'].map((name) => [name, { textContent: '' }]));
+    const nodes = Object.fromEntries(['status', 'feedback', 'counts'].map((name) => [name, { textContent: '', dataset: {} }]));
     const root = { dataset: { challengeStatus: '/challenge-attempts/id/status' },
         querySelector: (selector) => nodes[selector.match(/data-attempt-(\w+)/)[1]] };
     const tick = async () => {
@@ -37,6 +37,8 @@ test('terminal polling loads the server-rendered result once without inserting p
         mountChallengeStatus(root);
         await tick();
         assert.equal(nodes.feedback.textContent, '');
+        assert.equal(root.dataset.verdict, 'passed');
+        assert.equal(nodes.status.dataset.verdict, 'passed');
         assert.equal(reloads(), 1);
         assert.equal(timers.size, 0);
         assert.equal(calls, 1);

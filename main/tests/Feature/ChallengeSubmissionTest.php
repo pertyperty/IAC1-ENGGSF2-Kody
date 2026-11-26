@@ -432,7 +432,9 @@ test('C04 accepted attempts report slowest CPU and peak memory across the full s
         app(SubmissionEvaluation::class)->advance($submission->id);
     }
     moduleSignIn($this, $user);
-    $this->get(route('challenge-attempts.show', $submission))->assertOk()->assertSee('23 ms')->assertSee('5,120 KiB');
+    $this->get(route('challenge-attempts.show', $submission))->assertOk()
+        ->assertSeeInOrder(['Passed', '2 / 2 test cases passed.', 'Performance', '23 ms', '5,120 KiB', 'Your code'])
+        ->assertSee('aria-label="Test cases passed"', false);
     $this->getJson(route('challenge-attempts.status', $submission))->assertJsonPath('statistics.slowest_ms', 23)->assertJsonPath('statistics.peak_kib', 5120);
 });
 

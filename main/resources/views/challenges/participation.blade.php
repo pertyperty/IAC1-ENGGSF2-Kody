@@ -1,6 +1,8 @@
 <section id="solution" data-quest-participation aria-labelledby="solution-heading">
-    <h2 id="solution-heading">Your solution</h2>
-    <p>{{ 3 - ($participation->attempts ?? 0) }} of 3 attempts remain for {{ $attemptScope }}.</p>
+    <div class="challenge-pane-heading">
+        <h2 id="solution-heading">Your solution</h2>
+        <p class="challenge-attempt-budget"><strong>{{ 3 - ($participation->attempts ?? 0) }} / 3</strong> attempts left<span class="sr-only"> for {{ $attemptScope }}</span></p>
+    </div>
     @if($errors->any())
         <div class="lesson-note" role="alert">
             @foreach($errors->all() as $error)
@@ -47,24 +49,35 @@
             @if($retrySource !== null && ! session()->hasOldInput('source_code'))
                 <p class="field-hint">Your previous solution is loaded. Edit it before submitting again.</p>
             @endif
-            <p id="attempt-help">Submitting uses one attempt. You can leave while we check your code.</p>
-            <label class="checkbox-row"><input type="checkbox" name="confirmed" value="1" required> Use one attempt for this solution.</label>
-            <button class="button button-play" type="submit">Submit solution</button>
+            <div class="challenge-submit-bar">
+                <div>
+                    <label class="checkbox-row"><input type="checkbox" name="confirmed" value="1" required> Use one attempt for this solution.</label>
+                    <p class="field-hint" id="attempt-help">You can leave while we check your code.</p>
+                </div>
+                <button class="button button-play" type="submit">Submit solution</button>
+            </div>
         </form>
     @else
         <div class="execution-pending" data-execution-pending>
             <h3><x-action-icon name="code"/>@can('create', \App\Models\ChallengeSubmission::class) Live code execution: setup pending @else Participant access required @endcan</h3>
             <p>You can still read the problem and examples. No attempt will be used.</p>
-            <button class="button button-secondary" type="button" disabled>Submission unavailable</button>
-            <p><a class="button button-play" href="{{ route('arcade') }}"><x-action-icon name="game"/> Visit Practice</a></p>
+            <a class="button button-secondary" href="{{ route('arcade') }}"><x-action-icon name="game"/> Practice in the Arcade</a>
         </div>
     @endif
     @if($attempts->isNotEmpty())
-        <h2>Your attempts</h2>
-        <ul>
-            @foreach($attempts as $attempt)
-                <li><a href="{{ route('challenge-attempts.show', $attempt->id) }}">Attempt {{ $attempt->attempt }} · {{ $attempt->status }}</a></li>
-            @endforeach
-        </ul>
+        <section class="challenge-history" id="challenge-history" aria-labelledby="challenge-history-heading">
+            <h2 id="challenge-history-heading">Your attempts</h2>
+            <ul class="challenge-attempt-list">
+                @foreach($attempts as $attempt)
+                    <li>
+                        <a href="{{ route('challenge-attempts.show', $attempt->id) }}" aria-label="Attempt {{ $attempt->attempt }}: {{ $attempt->status }}">
+                            <strong>Attempt {{ $attempt->attempt }}</strong>
+                            <span class="challenge-verdict" data-verdict="{{ strtolower($attempt->status) }}">{{ $attempt->status }}</span>
+                            <x-action-icon name="right"/>
+                        </a>
+                    </li>
+                @endforeach
+            </ul>
+        </section>
     @endif
 </section>
