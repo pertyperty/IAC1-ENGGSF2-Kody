@@ -11,8 +11,9 @@
 <p>Choose a JPEG or PNG. We crop it to a square and remove image metadata. Your picture is visible to signed-in Kody members.</p>
 <form class="account-form" method="POST" action="{{ route('account.picture-update') }}" enctype="multipart/form-data">@csrf
 <input type="hidden" name="profile_version" value="{{ $profile['profile_version'] }}">
-<label for="picture">New picture</label><input type="file" id="picture" name="picture" accept="image/jpeg,image/png" required>
-<p class="field-hint">Up to 2 MB, 6 megapixels and 4096 pixels per side.</p>
+<label for="picture">New picture</label><input type="file" id="picture" name="picture" accept="image/jpeg,image/png,.jpg,.jpeg,.png" data-file-constraints data-max-bytes="2097152" data-max-files="1" data-allowed-types="image/jpeg,image/png" data-allowed-extensions="jpg,jpeg,png" required>
+<p class="field-hint file-constraints-note">Accepted formats: <strong>JPEG or PNG</strong> · Maximum size: <strong>2 MB</strong> · Up to <strong>6 megapixels</strong> and <strong>4096 px</strong> per side. Cropped to a 256×256 square with metadata removed.</p>
+<p class="file-constraint-feedback" data-file-feedback="picture" role="status" aria-live="polite" hidden></p>
 <button class="primary-button" type="submit">Upload picture</button></form>
 @if(auth()->user()->profile_picture)<form method="POST" action="{{ route('account.picture-update') }}">@csrf<input type="hidden" name="profile_version" value="{{ $profile['profile_version'] }}"><input type="hidden" name="remove_picture" value="1"><button class="button button-secondary" type="submit">Remove picture</button></form>@endif
 </section>
@@ -30,6 +31,6 @@
 <label for="password_confirmation">Confirm new password</label><input id="password_confirmation" type="password" name="password_confirmation" maxlength="32" autocomplete="new-password">
 <button class="primary-button" type="submit">Save your profile</button></form>
 </div>
-<aside class="live-preview-panel"><details><summary>Preview profile</summary><section class="profile-preview" aria-label="Profile preview"><p class="overline">UNSAVED PREVIEW</p><img data-preview-picture hidden width="96" height="96" alt="Selected profile picture"><h2 data-preview-value="username" data-preview-placeholder="Your username"></h2><span class="creator-role">{{ auth()->user()->account_role->name }}</span><p>Your public identity. Email and personal names stay private.</p></section></details></aside></div>
+<aside class="live-preview-panel"><details><summary>Preview profile</summary><section class="profile-preview" aria-label="Profile preview"><p class="overline">UNSAVED PREVIEW</p><img data-preview-picture hidden width="96" height="96" alt="Selected profile picture"><h2 data-preview-value="username" data-preview-placeholder="Your username"></h2><p class="profile-role-line"><x-role-badge :user="auth()->user()" :show-verified="true"/></p><p>Your public identity. Email and personal names stay private.</p></section></details></aside></div>
 <p class="secondary-link"><a href="{{ route('account.show') }}">Back to your profile</a></p>
 @endsection

@@ -36,7 +36,7 @@ class SaveModuleRequest extends FormRequest
             'type' => ['required', Rule::in(['Article', 'Interactive', 'Video'])],
             'video_url' => ['nullable', 'required_if:type,Video', 'url:https', 'max:2000'],
             'attachments' => ['sometimes', 'array', 'list', 'max:5'],
-            'attachments.*' => ['required', 'file', 'max:20480', 'extensions:pdf,docx,pptx'],
+            'attachments.*' => ['required', 'file', 'max:'.config('content-media.max_kilobytes', 20480), 'extensions:pdf,docx,pptx', 'mimetypes:application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/zip'],
             'retain_attachments' => ['sometimes', 'array', 'list', 'max:5'],
             'retain_attachments.*' => ['required', 'integer', 'between:0,4', 'distinct'],
             'assessment_kind' => ['required', Rule::in($this->input('type') === 'Interactive' ? ['game', 'quiz', 'preset'] : ['none', 'game', 'quiz', 'preset'])],

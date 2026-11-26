@@ -54,7 +54,9 @@
 <input type="hidden" name="previous_application_id" value="{{ $latest?->id ?? 0 }}">
 <label>Why would you like to contribute?<textarea name="request_message" maxlength="500" rows="4" required placeholder="Share the programming topics you want to author challenges for">{{ old('request_message') }}</textarea></label>
 <label>Portfolio link (optional)<input type="url" name="portfolio_link" maxlength="255" value="{{ old('portfolio_link') }}" placeholder="https://github.com/username"></label>
-<label>Supporting credentials<input type="file" name="credential_document" accept=".pdf,.jpg,.jpeg,.png" required><small>PDF, JPEG or PNG, up to {{ config('account.credentials.max_kilobytes') }} KB. Only authorized reviewers can download your private document.</small></label>
+@php($credMaxKb = (int) config('account.credentials.max_kilobytes', 5120))
+<label>Supporting credentials<input type="file" name="credential_document" accept="application/pdf,image/jpeg,image/png,.pdf,.jpg,.jpeg,.png" data-file-constraints data-max-bytes="{{ $credMaxKb * 1024 }}" data-max-files="1" data-allowed-types="application/pdf,image/jpeg,image/png" data-allowed-extensions="pdf,jpg,jpeg,png" required><small class="file-constraints-note">Accepted formats: <strong>PDF, JPEG, or PNG</strong> · Maximum size: <strong>{{ number_format($credMaxKb / 1024, 1) }} MB</strong> · Standard unencrypted files only. Only authorized reviewers can view or download your private document.</small></label>
+<p class="file-constraint-feedback" data-file-feedback="credential_document" role="status" aria-live="polite" hidden></p>
 <label class="checkbox-label"><input type="checkbox" name="confirmed" value="1" required> I confirm these application details.</label>
 <button class="primary-button">Submit for review</button></form>
 @elseif(!$progress['eligible'] && !$latest)<p class="notice">Complete all three milestones before applying.</p>@endif

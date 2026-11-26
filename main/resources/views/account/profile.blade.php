@@ -22,6 +22,20 @@
         <dt>Joined</dt><dd>{{ $profile['joined_at'] ?? 'Not available' }}</dd>
     </dl>
     @if($application)<div class="notice"><b>Instructor application: {{ $application->verification_status }}</b>@if($application->verification_notes)<p>{{ $application->verification_notes }}</p>@endif</div>@endif
+    @if(!empty($badgeSummary))
+        <div class="lesson-note badge-status-card">
+            <div>
+                <strong>Qualifications badge: {{ $badgeSummary['active'] ? 'Verified' : ($badgeSummary['pending'] ? 'Review requested' : 'Not yet verified') }}</strong>
+                <p class="field-hint">
+                    @if($badgeSummary['active'])Visible on your public profile and published work.
+                    @elseif($badgeSummary['pending'])Staff are reviewing your private supporting document.
+                    @else Request a staff review of your approved application credentials to display a verified badge.
+                    @endif
+                </p>
+            </div>
+            <a class="button button-secondary button-small" href="{{ $badgeSummary['active'] ? route('creators.show', auth()->user()) : route('creator-profile.edit').'#qualifications-badge' }}">{{ $badgeSummary['active'] ? 'View public profile' : ($badgeSummary['pending'] ? 'View status' : 'Request review') }}</a>
+        </div>
+    @endif
     </section></div><div class="profile-support">
     @if(in_array(auth()->user()->account_role, [\App\Enums\Role::Learner, \App\Enums\Role::Contributor], true))
     <div class="profile-actions" aria-label="Role applications">

@@ -190,3 +190,31 @@ test('learners and creators without approved proof cannot request a qualificatio
     }
     $this->assertDatabaseCount('creator_badge_requests', 0);
 });
+
+test('badge decisions notify creators privately without exposing staff notes and reflect on account profile', function () {
+    $creator = moduleAccount(Role::Instructor);
+    $proof = approvedBadgeProof($creator);
+    $moderator = moduleAccount(Role::Moderator);
+    moduleSignIn($this, $moderator);
+    $privateNote = 'Internal verification check code XYZ-999.';
+    $this->get(route('creator-badges.show', $creator))->assertOk()
+        ->assertSee('Preview private document inline')
+        ->assertSee('Download private document');
+    $this->put(route('creator-badges.update', $creator), badgeData([
+        'application_id' => $proof->id,
+        'reason' => $privateNote,
+    ]))->assertRedirect();
+
+    $notice = $creator->notifications()->sole();
+    expect($notice->type)->toBe('creator.badge')
+        ->and($notice->data['title'])->toBe('Qualifications badge active')
+        ->and(json_encode($notice->data))->not->toContain($privateNote);
+
+    moduleSignIn($this, $creator);
+    $this->get(route('account.show'))->assertOk()
+        ->assertSee('Verified Instructor')
+        ->assertSee('Qualifications badge: Verified');
+    $this->get(route('notifications.index'))->assertOk()
+        ->assertSee('Qualifications badge active')
+        ->assertDontSee($privateNote);
+});

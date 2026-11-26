@@ -28,19 +28,31 @@ class InstructorReviewController extends Controller
         return response()->view('account.instructor-reviews', compact('applications', 'filters'))->header('Cache-Control', 'no-store, private');
     }
 
-    public function show(InstructorApplication $application): Response
+    public function show(InstructorApplication $application, CredentialDocuments $documents): Response
     {
         Gate::authorize('view', $application);
-        $application->load('user');
+        $application->load('user.creatorVerification');
 
         $versions = DB::table('instructor_application_versions')->where('instructor_application_id', $application->id)->orderByDesc('application_version')->paginate(10);
+        $documentMeta = $documents->metadata($application);
+        $versionMeta = [];
+        foreach ($versions as $version) {
+            $versionMeta[$version->application_version] = $documents->metadata($application, (int) $version->application_version);
+        }
+        $badgeRequest = DB::table('creator_badge_requests')
+            ->where('user_id', $application->user_id)
+            ->where('role', $application->user->account_role->value)
+            ->whereNull('resolved_at')
+            ->first();
 
-        return response()->view('account.instructor-review', compact('application', 'versions'))->header('Cache-Control', 'no-store, private');
+        return response()->view('account.instructor-review', compact('application', 'versions', 'documentMeta', 'versionMeta', 'badgeRequest'))->header('Cache-Control', 'no-store, private');
     }
 
     public function credential(Request $request, InstructorApplication $application, CredentialDocuments $documents): StreamedResponse
     {
-        return $documents->download($request->user(), $application);
+        return $request->boolean('inline')
+            ? $documents->inline($request->user(), $application)
+            : $documents->download($request->user(), $application);
     }
 
     public function review(ReviewInstructorRequest $request, InstructorApplication $application, ReviewInstructorApplication $review): JsonResponse|RedirectResponse
@@ -54,6 +66,8 @@ class InstructorReviewController extends Controller
 
     public function versionCredential(Request $request, InstructorApplication $application, int $version, CredentialDocuments $documents): StreamedResponse
     {
-        return $documents->download($request->user(), $application, $version);
+        return $request->boolean('inline')
+            ? $documents->inline($request->user(), $application, $version)
+            : $documents->download($request->user(), $application, $version);
     }
 }
