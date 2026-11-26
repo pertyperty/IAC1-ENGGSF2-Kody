@@ -50,6 +50,8 @@ export function mountChallengeStatus(root) {
                 || result.passed_cases < 0 || result.total_cases < 0 || result.passed_cases > result.total_cases)) return;
             if (!terminal && result.completed !== false) return;
             heading.textContent = result.status;
+            heading.dataset.verdict = result.status.toLowerCase();
+            root.dataset.verdict = heading.dataset.verdict;
             const progress = root.querySelector('[data-attempt-progress]');
             if (progress && Number.isInteger(result.evaluated_cases) && result.evaluated_cases >= 0 && result.evaluated_cases <= result.total_cases) {
                 progress.max = Math.max(1, result.total_cases); progress.value = result.evaluated_cases;

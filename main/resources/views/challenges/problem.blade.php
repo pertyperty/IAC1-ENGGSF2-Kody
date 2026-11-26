@@ -1,5 +1,9 @@
-<p class="overline">{{ config('challenges.languages.'.$revision->language) }} · {{ $revision->difficulty }}</p>
-<p>{{ config('challenges.categories.'.$revision->category) }}@foreach($revision->tags ?? [] as $tag) · {{ config('challenges.tags.'.$tag) }}@endforeach</p>
+<div class="challenge-tags" aria-label="Challenge details">
+    <span class="challenge-difficulty" data-difficulty="{{ strtolower($revision->difficulty) }}">{{ $revision->difficulty }}</span>
+    <span class="catalog-tag">{{ config('challenges.languages.'.$revision->language) }}</span>
+    <span class="catalog-tag">{{ config('challenges.categories.'.$revision->category) }}</span>
+    @foreach($revision->tags ?? [] as $tag)<span class="catalog-tag">{{ config('challenges.tags.'.$tag) }}</span>@endforeach
+</div>
 <div class="challenge-brief">
     <h2>The problem</h2>
     <x-learning-prose :source="$revision->description" class="challenge-prose" />

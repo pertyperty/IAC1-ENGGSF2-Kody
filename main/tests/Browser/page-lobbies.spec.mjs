@@ -48,7 +48,8 @@ test('favicon and page guides stay specific across Help Arcade weekly quests wal
     await page.goto(`/weekly/${manifest().weekly}`); await expect(page.locator('[data-execution-pending]')).toContainText('Live code execution: setup pending');
     await expect(page.locator('[data-quest-problem]')).toContainText('Numbers and arithmetic');
     await expect(page.locator('[data-quest-problem]')).toContainText('Variables');
-    await expect(page.getByRole('button', { name: 'Submission unavailable' })).toBeDisabled();
+    await expect(page.getByRole('button', { name: 'Submit solution' })).toHaveCount(0);
+    await expect(page.getByRole('link', { name: 'Practice in the Arcade' })).toBeVisible();
     await guide(page, 'Execution setup is pending'); await audit(page);
     await page.screenshot({ path: 'storage/app/browser-results/weekly-quest-wide.png', fullPage: true });
     await page.goto(`/challenges/${manifest().challenge}`); await expect(page.locator('[data-execution-pending]')).toBeVisible();
@@ -77,6 +78,14 @@ test('challenge instructions scroll separately on desktop and link to the soluti
             element.scrollTop = element.scrollHeight;
             return element.scrollTop > 0 && window.scrollY === before;
         })).toBe(true);
+        await problem.evaluate(element => { element.scrollTop = 0; });
+        const sample = problem.locator('details.challenge-sample').first();
+        await expect(sample.locator('pre').first()).toBeVisible();
+        await sample.locator('summary').click();
+        await expect(sample.locator('pre').first()).toBeHidden();
+        await sample.locator('summary').focus();
+        await sample.locator('summary').press('Enter');
+        await expect(sample.locator('pre').first()).toBeVisible();
         await problem.evaluate(element => { element.scrollTop = 0; });
         await page.screenshot({ path: testInfo.outputPath(`${name}-desktop.png`) });
 
