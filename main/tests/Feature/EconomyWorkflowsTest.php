@@ -13,8 +13,10 @@ use App\Services\Transactions\ProviderWebhooks;
 use App\Services\Transactions\PublisherSettlements;
 use App\Services\Transactions\Refunds;
 use App\Services\Transactions\WalletLedger;
+use App\Services\Transactions\Xendit\Readiness;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Client\Factory;
+use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Queue;
@@ -262,4 +264,46 @@ test('A08 creator erasure needs genuine consent manual review unchanged inventor
     expect(app(ContentAccess::class)->price($module->publishedRevision, $user->id))->toBe(0);
     $this->assertDatabaseHas('learning_modules', ['id' => $module->id, 'status' => 'Published']);
     $this->assertDatabaseHas('creator_erasure_reviews', ['id' => $review, 'state' => 'Consumed']);
+});
+
+test('sandbox GCash credits only after authenticated capture and separate provider reads, once across redelivery', function () {
+    $this->partialMock(Readiness::class)->shouldReceive('sandboxAvailable')->andReturnTrue();
+    config(['xendit.enabled' => false, 'xendit.contract_verified' => false, 'xendit.secret_key' => 'xnd_development_fake_for_tests',
+        'xendit.callback_token' => str_repeat('test-token', 4), 'xendit.business_id' => 'test-merchant',
+        'xendit.sandbox_return_url' => 'https://sandbox.example.test/done']);
+    Queue::fake();
+    Http::preventStrayRequests();
+    $user = moduleAccount(Role::Learner);
+    $id = app(Payments::class)->purchase($user, 'module-test-session', economyConfirm(['package' => 'starter']));
+    $capture = economyPaymentProof($id);
+    $request = $capture;
+    unset($request['captures']);
+    $paymentId = $capture['latest_payment_id'];
+    $capture['payment_id'] = $paymentId;
+    unset($capture['latest_payment_id'], $capture['actions']);
+    Http::fake([
+        'https://api.xendit.co/v3/payment_requests' => Http::response(economyPaymentProof($id, 'REQUIRES_ACTION')),
+        'https://api.xendit.co/v3/payment_requests/'.$request['payment_request_id'] => Http::response($request),
+        'https://api.xendit.co/v3/payments/'.$paymentId => Http::response($capture),
+    ]);
+    app(Payments::class)->create($id);
+    Http::assertSent(fn (Request $request) => $request->method() === 'POST'
+        && json_decode($request->body(), true)['channel_properties']['success_return_url'] === 'https://sandbox.example.test/done');
+    expect(app(WalletLedger::class)->snapshot($user->id)['balance'])->toBe(0);
+    $webhook = route('xendit.webhook');
+    $payload = ['event' => 'payment.capture', 'business_id' => 'test-merchant', 'data' => $capture];
+    $headers = ['x-callback-token' => config('xendit.callback_token'), 'webhook-id' => 'sandbox-capture'];
+    $this->postJson($webhook, $payload, ['x-callback-token' => 'wrong'])->assertForbidden();
+    $this->postJson($webhook, array_replace($payload, ['event' => 'refund.succeeded']), $headers)->assertUnprocessable();
+    $this->postJson($webhook, $payload, $headers)->assertOk();
+    app(ProviderWebhooks::class)->reconcile('sandbox-capture');
+    $this->postJson($webhook, $payload, $headers)->assertOk();
+    app(ProviderWebhooks::class)->reconcile('sandbox-capture');
+    economyCallback('payment.capture', $capture, 'sandbox-redelivery');
+    app(ProviderWebhooks::class)->reconcile('sandbox-redelivery');
+    expect(app(WalletLedger::class)->snapshot($user->id)['balance'])->toBe(105);
+    $this->assertDatabaseHas('payment_purchases', ['id' => $id, 'state' => 'Succeeded', 'fee_minor' => 0]);
+    $this->assertDatabaseCount('wallet_lots', 1);
+    $this->assertDatabaseCount('financial_deliveries', 1);
+    Http::assertSentCount(5);
 });

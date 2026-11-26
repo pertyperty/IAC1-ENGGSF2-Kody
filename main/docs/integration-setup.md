@@ -112,6 +112,8 @@ real-money activation remains separately gated. No setup command enables payment
 
 ## Xendit economy setup — deferred live verification
 
+For test-only GCash checkout, use the [isolated local sandbox](xendit-local-sandbox.md).
+
 Use the merchant's approved GCash Payments API and Payouts v3 products. Store
 `XENDIT_SECRET_KEY`, `XENDIT_CALLBACK_TOKEN` and `XENDIT_BUSINESS_ID` privately.
 Keep `XENDIT_ENABLED=false` until evidence exists. Configure HTTPS

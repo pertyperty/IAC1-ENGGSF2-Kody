@@ -30,7 +30,7 @@ class PaymentController extends Controller
     {
         $row = DB::table('payment_purchases')->where('id', $purchase)->where('user_id', $request->user()->id)->firstOrFail();
         abort_unless($row->state === 'Pending' && $row->checkout_url !== null, 409);
-        abort_unless(app(Readiness::class)->available(), 503, 'Live checkout is currently unavailable.');
+        abort_unless(app(Readiness::class)->checkoutAvailable(), 503, 'Checkout is currently unavailable.');
 
         return redirect()->away($client->checkout($row->checkout_url))->header('Cache-Control', 'no-store, private')->header('Referrer-Policy', 'no-referrer');
     }
@@ -46,7 +46,7 @@ class PaymentController extends Controller
     {
         $row = DB::table('payment_purchases')->where('id', $purchase)->where('user_id', $request->user()->id)->firstOrFail();
 
-        $paymentsReady = app(Readiness::class)->available();
+        $paymentsReady = app(Readiness::class)->checkoutAvailable();
 
         return response()->view('transactions.purchase-status', compact('row', 'paymentsReady'))->header('Cache-Control', 'no-store, private');
     }
@@ -57,7 +57,7 @@ class PaymentController extends Controller
 
         return response()->json(['state' => $row->state, 'verified' => $row->lot_id !== null,
             'available' => app(WalletLedger::class)->snapshot($request->user()->id)['available'],
-            'checkout' => app(Readiness::class)->available() && $row->state === 'Pending' && $row->checkout_url !== null ? route('wallet.checkout', $row->id) : null,
+            'checkout' => app(Readiness::class)->checkoutAvailable() && $row->state === 'Pending' && $row->checkout_url !== null ? route('wallet.checkout', $row->id) : null,
             'receipt' => $row->lot_id !== null ? route('wallet.receipt', $row->id) : null])->header('Cache-Control', 'no-store, private');
     }
 

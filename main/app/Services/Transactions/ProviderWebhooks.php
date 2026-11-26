@@ -16,7 +16,8 @@ class ProviderWebhooks
 {
     public function receive(#[\SensitiveParameter] string $token, string $raw, ?string $headerId): void
     {
-        abort_unless(app(Readiness::class)->available(), 503);
+        $readiness = app(Readiness::class);
+        abort_unless($readiness->checkoutAvailable(), 503);
         abort_unless(hash_equals(config('xendit.callback_token'), $token), 403);
         abort_if(strlen($raw) > 65536, 413);
         try {
@@ -35,13 +36,13 @@ class ProviderWebhooks
                 $expected = match ($event) {
                     'payment.capture' => 'SUCCEEDED', 'payment.failure' => 'FAILED', default => 'EXPIRED'
                 };
-            } elseif (in_array($event, ['v3_payout.succeeded', 'v3_payout.failed', 'v3_payout.rejected', 'v3_payout.reversed', 'v3_payout.pending_compliance'], true)) {
+            } elseif ($readiness->available() && in_array($event, ['v3_payout.succeeded', 'v3_payout.failed', 'v3_payout.rejected', 'v3_payout.reversed', 'v3_payout.pending_compliance'], true)) {
                 $result = $client->payout($data);
                 $object = $result->id;
                 $expected = match ($event) {
                     'v3_payout.succeeded' => 'SUCCEEDED', 'v3_payout.failed' => 'FAILED', 'v3_payout.rejected' => 'REJECTED', 'v3_payout.reversed' => 'REVERSED', default => 'PENDING_COMPLIANCE_REVIEW'
                 };
-            } elseif (in_array($event, ['refund.succeeded', 'refund.failed'], true)) {
+            } elseif ($readiness->available() && in_array($event, ['refund.succeeded', 'refund.failed'], true)) {
                 $result = $client->refund($data);
                 $object = $result->id;
                 $expected = $event === 'refund.succeeded' ? 'SUCCEEDED' : 'FAILED';
@@ -86,6 +87,8 @@ class ProviderWebhooks
         if ($row === null || $row->state === 'Processed') {
             return;
         }
+        $readiness = app(Readiness::class);
+        abort_unless(str_starts_with($row->event, 'payment') ? $readiness->checkoutAvailable() : $readiness->available(), 503);
         try {
             if (str_starts_with($row->event, 'payment')) {
                 app(Payments::class)->reconcile($row);

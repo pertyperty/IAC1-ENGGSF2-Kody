@@ -14,7 +14,7 @@
     </div>
     <div class="workspace-columns wallet-columns">
         <section class="content-panel">
-            @if($paymentsReady)<h2>Buy KodeBits</h2><p class="field-hint">One-time PHP purchases. KodeBits do not expire and cannot be exchanged for cash.</p>
+            @if($paymentsReady)<h2>Buy KodeBits</h2>@if($sandbox)<p class="lesson-note">Xendit test mode. Use test payment details only. Credits stay in this sandbox.</p>@endif<p class="field-hint">One-time PHP purchases. KodeBits do not expire and cannot be exchanged for cash.</p>
             <div class="wallet-packages">
                 @foreach(config('economy.packages') as $slug => $package)
                     <article class="wallet-package wallet-package-{{ $slug }}"><div class="package-identity"><span class="package-tier">{{ ['starter' => 'A small start', 'builder' => 'Keep exploring', 'explorer' => 'Build your library'][$slug] ?? 'Your next lesson' }}</span><div class="package-coins" aria-hidden="true">@for($coin = 0; $coin < min(3, $loop->iteration); $coin++)<x-kody-art name="kodebit" class="package-art" size="56"/>@endfor</div></div><h3>{{ $package['label'] }}</h3><strong><x-kodebits :amount="$package['kodebits']"/></strong><p class="package-price">PHP {{ \App\Support\ExactMoney::decimal($package['price_minor']) }}</p>

@@ -7,6 +7,8 @@ $minorSetting = static function (string $key): ?int {
 };
 
 return [
+    'sandbox_enabled' => (bool) env('XENDIT_SANDBOX_ENABLED', false),
+    'sandbox_return_url' => env('XENDIT_SANDBOX_RETURN_URL'),
     'enabled' => (bool) env('XENDIT_ENABLED', false),
     'contract_verified' => (bool) env('XENDIT_CONTRACT_VERIFIED', false),
     'secret_key' => env('XENDIT_SECRET_KEY'),
