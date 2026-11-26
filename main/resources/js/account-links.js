@@ -1,6 +1,12 @@
 // Email secrets remain in fragments until submitted by POST. A same-page email
 // link may fire hashchange instead of loading the document again.
 export function mountAccountLinks(document, window) {
+    const code = document.querySelector('[data-verification-code]');
+    code?.addEventListener('input', () => {
+        const normalized = code.value.replace(/[\s-]+/g, '');
+        if (normalized !== code.value) code.value = normalized;
+    });
+    if (code) code.pattern = '[0-9]{6}';
     const links = [
         ['#verify-link-form', '#verification-token', 'token'],
         ['#recovery-token-form', '#recovery-token', 'recovery'],

@@ -15,12 +15,16 @@ function fixture(operation, email) {
     expect(result.status, result.stderr).toBe(0);
     return result.stdout;
 }
-async function login(page, role) {
+async function login(page, role, { firstVisit = false } = {}) {
     await page.goto('/login');
     await page.getByLabel('Email or username').fill(`${role}@browser.example.test`);
     await page.getByLabel(/^Password/).fill('BrowserStrong12!');
     await page.getByRole('button', { name: 'Sign in', exact: false }).click();
     await finishSignIn(page);
+    if (firstVisit) {
+        await expect(page).toHaveURL(/\/tower\/onboarding$/);
+        return;
+    }
     const creatorOrStaff = ['instructor','moderator','administrator','navinstructor','navmoderator','navadministrator','navcontributor','toweradmin'].includes(role);
     await expect(page).toHaveURL(creatorOrStaff ? /\/dashboard$/ : /\/(?:tower\/\d+)?$/);
     if (!creatorOrStaff) await page.goto('/dashboard');
@@ -222,7 +226,11 @@ test('A01 A02 B03 B05: guest trial, registration, verified play, reading and cou
     await page.goto(`/email/verify#token=${encodeURIComponent(token)}`);
     await expect(page.getByRole('heading', { name: 'You’re verified' })).toBeVisible();
     await expect(page).not.toHaveURL(/#/);
-    await login(page, 'newplayer');
+    await login(page, 'newplayer', { firstVisit: true });
+    await page.getByRole('radio', { name: /Beginner/ }).check();
+    await page.getByRole('button', { name: 'Continue to tutorial' }).click();
+    await page.getByRole('button', { name: 'Open Tower map' }).click();
+    await expect(page).toHaveURL(/\/\?view=map&track=beginner$/);
     await page.goto('/dashboard');
     await expect(page.getByRole('heading', { name: 'Next Tower level' })).toBeVisible();
     await page.setViewportSize({ width: 320, height: 900 });

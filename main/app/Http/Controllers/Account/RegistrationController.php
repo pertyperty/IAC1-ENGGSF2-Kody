@@ -19,14 +19,15 @@ class RegistrationController extends Controller
 
     public function store(RegisterAccountRequest $request, RegisterAccount $register): JsonResponse|RedirectResponse
     {
-        $register->handle($request->validated());
+        $data = $request->validated();
+        $register->handle($data);
 
-        $message = 'Your account was created. Check your email for a verification link. Delivery may take a moment; you can request another link later.';
+        $message = 'Your account was created. Check your email for a verification code and link. Delivery may take a moment.';
 
         if ($request->expectsJson()) {
             return response()->json(['message' => $message], 201);
         }
 
-        return redirect()->route('verification.notice')->with('status', $message);
+        return redirect()->route('verification.notice')->with('status', $message)->withInput(['email' => $data['email']]);
     }
 }

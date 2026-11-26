@@ -46,3 +46,15 @@ test('A02 code failures do not disclose account existence or permit unrelated co
     expect($known)->toBe($unknown);
     expect($user->fresh()->account_status)->toBe(AccountStatus::Unverified);
 });
+
+test('code entry keeps the email on retry and accepts a formatted copy of the email code', function () {
+    [$user, $delivery] = pendingVerification();
+    $wrong = $delivery->otp === '000000' ? '999999' : '000000';
+    $this->post(route('verification.code'), ['email' => $user->email, 'code' => $wrong])
+        ->assertUnprocessable()->assertViewIs('account.verify-email')->assertSee($user->email)
+        ->assertSee('This code is invalid')->assertDontSee($wrong)->assertSessionMissing('_old_input.code');
+    $formatted = substr($delivery->otp, 0, 2)." \u{00a0}".substr($delivery->otp, 2, 2).'-'.substr($delivery->otp, 4);
+    $this->post(route('verification.code'), ['email' => $user->email, 'code' => $formatted])
+        ->assertOk()->assertViewHas('verified', true)->assertDontSee($formatted);
+    expect($user->fresh()->account_status)->toBe(AccountStatus::Active);
+});
