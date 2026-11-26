@@ -22,6 +22,9 @@
             <span class="catalog-tag">{{ $enrollment->sequential ? 'Sequential trail' : 'Open exploration' }}</span>
             @if($enrollment->course->status === 'Archived')<span class="catalog-tag">Archived</span>@endif
         </div>
+        @if($enrollment->course->status === 'Archived')
+            <p class="field-hint">Your access is retained.</p>
+        @endif
     @endif
     @include('learning.saved-progress', ['saved' => $saved])
     <dl class="journey-dates"><div><dt>Joined</dt><dd>{{ $enrollment->enrolled_at->timezone('Asia/Manila')->format('M j, Y') }}</dd></div><div><dt>Last activity</dt><dd>{{ $saved['last_activity'] ? \Carbon\CarbonImmutable::parse($saved['last_activity'])->timezone('Asia/Manila')->format('M j, Y · g:i A') : 'No modules opened yet' }}</dd></div></dl>

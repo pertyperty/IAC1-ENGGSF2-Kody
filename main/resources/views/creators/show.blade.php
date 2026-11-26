@@ -113,11 +113,15 @@
         @if($totalPublished === 0)
             <x-empty-state title="No published work yet" description="Approved published modules, courses, and challenges from this creator will appear here."/>
         @else
-            @php($renderedAny = false)
+            @php
+                $renderedAny = false;
+            @endphp
             @foreach($content as $label => $group)
                 @continue($activeTab !== 'all' && $activeTab !== $group['tab'])
                 @continue($group['total'] === 0 && $activeTab === 'all')
-                @php($renderedAny = true)
+                @php
+                    $renderedAny = true;
+                @endphp
                 <section class="creator-work-group">
                     <div class="panel-heading">
                         <h3>{{ $label }} <span class="field-hint">{{ number_format($group['total']) }} published</span></h3>
