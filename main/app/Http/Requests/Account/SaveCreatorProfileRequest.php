@@ -14,10 +14,21 @@ class SaveCreatorProfileRequest extends FormRequest
 
     public function rules(): array
     {
-        return ['record_version' => ['required', 'integer', 'min:0'],
+        return [
+            'record_version' => ['required', 'integer', 'min:0'],
             'headline' => ['nullable', 'string', 'max:100', 'not_regex:/\x00/'],
             'bio' => ['nullable', 'string', 'max:1000', 'not_regex:/\x00/'],
             'accomplishments' => ['nullable', 'string', 'max:1000', 'not_regex:/\x00/'],
-            'confirmed' => ['required', 'accepted'], 'user_id' => ['prohibited'], 'verified' => ['prohibited'], 'account_role' => ['prohibited']];
+            'qualifications' => ['nullable', 'string', 'max:1000', 'not_regex:/\x00/'],
+            'social_links' => ['nullable', 'array'],
+            'social_links.website' => ['nullable', 'string', 'max:255', 'url:https', 'not_regex:/\x00/'],
+            'social_links.github' => ['nullable', 'string', 'max:255', 'url:https', 'not_regex:/\x00/'],
+            'social_links.linkedin' => ['nullable', 'string', 'max:255', 'url:https', 'not_regex:/\x00/'],
+            'social_links.x' => ['nullable', 'string', 'max:255', 'url:https', 'not_regex:/\x00/'],
+            'confirmed' => ['required', 'accepted'],
+            'user_id' => ['prohibited'],
+            'verified' => ['prohibited'],
+            'account_role' => ['prohibited'],
+        ];
     }
 }

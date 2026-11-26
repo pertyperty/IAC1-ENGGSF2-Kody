@@ -30,6 +30,7 @@ class CourseLearningController extends Controller
         $filters = $request->validate(['q' => ['nullable', 'string', 'max:80', 'not_regex:/\x00/'], 'difficulty' => ['nullable', 'in:Beginner,Intermediate,Advanced']]);
         $query = $filters['q'] ?? '';
         $courses = CourseRevision::select(['id', 'course_id', 'title', 'description', 'category', 'difficulty', 'estimated_duration', 'price_kb', 'minimum_xp'])
+            ->withCount('modules')
             ->with(['course.creator:id,username,account_role,account_status,email_verified_at', 'course.creator.creatorVerification'])->where('review_status', 'Approved')->whereHas('course', fn ($builder) => $builder->where('status', 'Published')->whereNull('staff_withdrawn_at')->whereColumn('published_revision_id', 'course_revisions.id'))
             ->when(trim($query) !== '', fn ($builder) => $builder->where(fn ($search) => $search->where('title', 'ilike', '%'.addcslashes(trim($query), '%_\\').'%')->orWhere('description', 'ilike', '%'.addcslashes(trim($query), '%_\\').'%')->orWhere('category', 'ilike', '%'.addcslashes(trim($query), '%_\\').'%')))
             ->when($filters['difficulty'] ?? null, fn ($builder, $difficulty) => $builder->where('difficulty', $difficulty))
@@ -39,8 +40,16 @@ class CourseLearningController extends Controller
         $enrollments = $participant === null ? new Collection : CourseEnrollment::where('user_id', $participant->id)->whereIn('course_id', $courses->pluck('course_id'))->with('course', 'revision')->get();
         $saved = $participant === null ? collect() : app(CourseLearning::class)->summaries($participant, $enrollments);
         $courseProgress = $enrollments->mapWithKeys(fn ($enrollment) => [$enrollment->course_id => $saved->get($enrollment->id) + ['edition' => $enrollment->course_revision_id]]);
+        $bookmarkedCourses = $participant === null || $courses->isEmpty()
+            ? collect()
+            : DB::table('learning_bookmarks')
+                ->where('user_id', $participant->id)
+                ->where('kind', 'course')
+                ->whereIn('content_id', $courses->pluck('course_id'))
+                ->pluck('content_id')
+                ->flip();
 
-        return response()->view('learning.courses', compact('courses', 'query', 'courseProgress', 'participant', 'filters'))->header('Cache-Control', 'no-store, private');
+        return response()->view('learning.courses', compact('courses', 'query', 'courseProgress', 'participant', 'filters', 'bookmarkedCourses'))->header('Cache-Control', 'no-store, private');
     }
 
     public function mine(Request $request): Response
@@ -85,7 +94,10 @@ class CourseLearningController extends Controller
             });
         }
 
-        return response()->view('learning.my-courses', compact('enrollments', 'courseProgress', 'recentModules', 'moduleProgress', 'filters', 'bookmarkContent', 'reviewItems', 'reviewLevels'))->header('Cache-Control', 'no-store, private');
+        $bookmarkedCourseIds = $bookmarks->where('kind', 'course')->pluck('content_id')->flip();
+        $bookmarkedModuleIds = $bookmarks->where('kind', 'module')->pluck('content_id')->flip();
+
+        return response()->view('learning.my-courses', compact('enrollments', 'courseProgress', 'recentModules', 'moduleProgress', 'filters', 'bookmarkContent', 'reviewItems', 'reviewLevels', 'bookmarkedCourseIds', 'bookmarkedModuleIds'))->header('Cache-Control', 'no-store, private');
     }
 
     public function show(Request $request, LearningCourse $course, CourseLearning $learning, ContentFeedback $feedback): Response

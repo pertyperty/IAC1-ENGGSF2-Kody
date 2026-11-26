@@ -22,29 +22,66 @@ use Illuminate\Validation\ValidationException;
 
 class CreatorProfileController extends Controller
 {
-    public function show(User $creator, CreatorProfiles $profiles): Response
+    public function show(Request $request, User $creator, CreatorProfiles $profiles): Response
     {
         abort_unless($profiles->visible($creator), 404);
+        $creator->loadMissing('creatorVerification');
+        $filters = $request->validate([
+            'tab' => ['nullable', 'in:all,modules,courses,challenges'],
+            'q' => ['nullable', 'string', 'max:80', 'not_regex:/\x00/'],
+        ]);
+        $activeTab = $filters['tab'] ?? 'all';
+        $search = trim($filters['q'] ?? '');
         $profile = DB::table('creator_profiles')->where('user_id', $creator->id)->first();
+        $socials = $profiles->socials($profile);
+
+        $groups = [
+            'Modules' => ['model' => LearningModule::class, 'tab' => 'modules', 'page' => 'modules_page'],
+            'Courses' => ['model' => LearningCourse::class, 'tab' => 'courses', 'page' => 'courses_page'],
+            'Coding challenges' => ['model' => CodingChallenge::class, 'tab' => 'challenges', 'page' => 'challenges_page'],
+        ];
+
         $content = [];
-        foreach (['Modules' => LearningModule::class, 'Courses' => LearningCourse::class, 'Coding challenges' => CodingChallenge::class] as $label => $model) {
-            $query = $model::where('created_by', $creator->id)->where('status', 'Published')->whereNull('staff_withdrawn_at')
+        $totals = [];
+        foreach ($groups as $label => $meta) {
+            $base = $meta['model']::where('created_by', $creator->id)
+                ->where('status', 'Published')
+                ->whereNull('staff_withdrawn_at')
                 ->whereHas('publishedRevision', fn ($revision) => $revision->where('review_status', 'Approved'));
-            $content[$label] = ['total' => (clone $query)->count(), 'items' => $query->select(['id', 'published_revision_id'])
-                ->with('publishedRevision:id,title')->orderByDesc('id')->limit(6)->get()];
+            $totals[$meta['tab']] = (clone $base)->count();
+
+            $filtered = (clone $base)->when($search !== '', fn ($builder) => $builder->whereHas('publishedRevision', fn ($revision) => $revision
+                ->where('review_status', 'Approved')
+                ->where('title', 'ilike', '%'.addcslashes($search, '%_\\').'%')));
+
+            $perPage = $activeTab === $meta['tab'] ? 12 : 6;
+            $paginator = $filtered->select(['id', 'published_revision_id'])
+                ->with('publishedRevision:id,title')
+                ->orderByDesc('id')
+                ->paginate($perPage, ['*'], $meta['page'])
+                ->withQueryString();
+
+            $content[$label] = [
+                'total' => $paginator->total(),
+                'items' => $paginator->getCollection(),
+                'paginator' => $paginator,
+                'tab' => $meta['tab'],
+            ];
         }
 
-        return response()->view('creators.show', compact('creator', 'profile', 'content'))->header('Cache-Control', 'no-store, private');
+        return response()->view('creators.show', compact('creator', 'profile', 'socials', 'content', 'totals', 'activeTab', 'search'))
+            ->header('Cache-Control', 'no-store, private');
     }
 
     public function edit(Request $request, CreatorProfiles $profiles): Response
     {
         abort_unless($profiles->visible($request->user()), 403);
         $profile = DB::table('creator_profiles')->where('user_id', $request->user()->id)->first();
+        $socials = $profiles->socials($profile);
 
         $badgeRequest = DB::table('creator_badge_requests')->where('user_id', $request->user()->id)->where('role', $request->user()->account_role->value)->whereNull('resolved_at')->first();
 
-        return response()->view('creators.edit', compact('profile', 'badgeRequest'))->header('Cache-Control', 'no-store, private');
+        return response()->view('creators.edit', compact('profile', 'socials', 'badgeRequest'))->header('Cache-Control', 'no-store, private');
     }
 
     public function requestBadge(Request $request): RedirectResponse

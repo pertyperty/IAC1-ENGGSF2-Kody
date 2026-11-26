@@ -20,6 +20,9 @@ test('bookmarks are owned idempotent reminders without enrollment or rewards', f
     $this->assertDatabaseCount('course_enrollments', 0);
     $this->assertDatabaseCount('xp_awards', 0);
     $this->assertDatabaseCount('tower_clearances', 0);
+    $this->get(route('modules.show', $module))->assertOk()->assertSee('aria-pressed="true"', false)->assertSee('Bookmarked')->assertSee('Saved in Library');
+    $this->get(route('learning.catalog'))->assertOk()->assertSee('is-bookmarked', false)->assertSee('Saved');
+    $this->get(route('course-learning.catalog'))->assertOk()->assertSee('is-bookmarked', false)->assertSee('Saved');
     $this->get(route('course-learning.mine', ['type' => 'bookmarks']))->assertOk()->assertSee($module->publishedRevision->title)->assertSee($course->publishedRevision->title);
     $this->get(route('course-learning.mine', ['type' => 'bookmarks', 'q' => '%']))->assertOk()->assertDontSee($module->publishedRevision->title)->assertDontSee($course->publishedRevision->title);
     moduleSignIn($this, moduleAccount(Role::Learner));
