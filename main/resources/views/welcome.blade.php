@@ -43,9 +43,18 @@
     </article>
     <article class="content-panel">
         <x-action-icon name="create"/>
-        <h2>Turn an idea into an adventure</h2>
-        <p>Approved creators combine modules with reusable games and automatically checked quizzes.</p>
-        <a class="quiet-link" href="{{ route('help.index', ['category' => 'creating-content']) }}">Meet the creator tools</a>
+        <h2>Teach and create on Kody</h2>
+        <p>Educators and contributors build interactive modules, guided courses, and coding challenges for learners.</p>
+        <div class="welcome-card-links">
+            @if(auth()->guest())
+                <a class="quiet-link" href="{{ route('register', ['role' => 'educator']) }}">Join as an educator</a>
+            @elseif(in_array(auth()->user()->account_role, [\App\Enums\Role::Learner, \App\Enums\Role::Contributor], true))
+                <a class="quiet-link" href="{{ route('instructor-application.create') }}">Apply as an instructor</a>
+            @elseif(auth()->user()->can('create', \App\Models\LearningModule::class))
+                <a class="quiet-link" href="{{ route('studio.index') }}">Open Module studio</a>
+            @endif
+            <a class="quiet-link" href="{{ route('help.index', ['category' => 'creating-content']) }}">Meet the creator tools</a>
+        </div>
     </article>
 </section>
 <section class="welcome-trial page-width" id="try-it">

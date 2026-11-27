@@ -1,7 +1,7 @@
 @extends('layouts.learning')
 @section('title', 'Weekly challenge calendar — Kody')
 @section('content')
-<section class="review-page page-width"><a class="quiet-link" href="{{ route('module-reviews.index') }}"><x-action-icon name="left"/> Review studio</a><h1>A fresh challenge for every week.</h1>
+<section class="review-page page-width"><a class="quiet-link" href="{{ route('review-inbox') }}"><x-action-icon name="left"/> Review inbox</a><p class="overline">MODERATOR WORKSPACE</p><h1>Weekly challenge schedule</h1>
 <p>Sunday 00:00 to the next Sunday 00:00, Manila time. Only one week can be active. An active event's problem and rules stay fixed.</p>
 
 @include('layouts.form-errors')

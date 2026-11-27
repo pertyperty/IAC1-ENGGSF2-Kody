@@ -1,4 +1,5 @@
 import { mountLivePreviews } from './live-preview.js';
+import { mountFileConstraints, mountCredentialPreviews } from './file-constraints.js';
 import { mountFormGuidance } from './form-guidance.js';
 import { mountChallengeEditor } from './challenge-editor.js';
 import { mountChallengeStatus } from './challenge-status.js';
@@ -65,3 +66,5 @@ decorateCurrency(document);
 document.addEventListener('kody:feedback', () => requestAnimationFrame(() => decorateCurrency(document, document.querySelector('[data-toast-region]'))));
 
 mountLivePreviews(document, window);
+mountFileConstraints(document);
+mountCredentialPreviews(document);

@@ -60,6 +60,7 @@ class AccountGovernanceController extends Controller
     public function show(User $account): Response
     {
         Gate::authorize('viewAny', User::class);
+        $account->loadMissing('creatorVerification');
         $history = DB::table('account_enforcements')->where('user_id', $account->id)->latest('created_at')->paginate(10)->withQueryString();
         $roleHistory = DB::table('account_role_changes')->where('user_id', $account->id)->latest('created_at')->paginate(10, ['*'], 'roles_page')->withQueryString();
         $supportHistory = DB::table('account_support_corrections')->where('user_id', $account->id)->latest('created_at')->paginate(10, ['*'], 'support_page')->withQueryString();

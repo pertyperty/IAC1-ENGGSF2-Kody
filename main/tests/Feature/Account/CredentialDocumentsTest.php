@@ -6,8 +6,10 @@ use App\Services\Account\CredentialDocuments;
 use App\Services\Account\InstructorApplications;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 
 uses(RefreshDatabase::class);
 
@@ -81,4 +83,31 @@ test('A09 A10 the shared document service authorizes before resolving private st
     expect(fn () => app(CredentialDocuments::class)->download(moduleAccount(Role::Learner), $application))
         ->toThrow(AuthorizationException::class);
     $this->assertDatabaseCount('audit_events', 0);
+});
+
+test('A09 A10 moderators can preview private credentials inline with sandboxed MIME headers and audit trails', function (string $kind) {
+    [$application, $url] = credentialDocumentFixture($kind);
+    $reviewer = signInReviewer($this);
+    $response = $this->get($url.'?inline=1')->assertOk()
+        ->assertHeader('Content-Type', 'application/pdf')
+        ->assertHeader('X-Content-Type-Options', 'nosniff')
+        ->assertHeader('X-Frame-Options', 'SAMEORIGIN')
+        ->assertHeader('Cache-Control', 'no-store, private');
+    expect($response->headers->get('Content-Security-Policy'))->toContain("sandbox; default-src 'none'");
+    expect($response->headers->get('Content-Disposition'))->toStartWith('inline');
+    $event = DB::table('audit_events')->sole();
+    expect($event->actor_id)->toBe($reviewer->id)->and($event->subject_user_id)->toBe($application->user_id)
+        ->and($event->event)->toBe(($kind === 'contributor' ? 'contributor' : 'instructor').'_application.credential_viewed');
+    expect($event->context)->not->toContain($application->credential_path);
+})->with(['instructor', 'contributor', 'history']);
+
+test('A09 A10 credential upload validation rejects JavaScript PDFs and corrupted images before storage', function () {
+    $service = app(CredentialDocuments::class);
+    $jsPdf = UploadedFile::fake()->createWithContent('bad.pdf', "%PDF-1.4\n/OpenAction << /S /JavaScript /JS (alert(1)) >>\n%%EOF");
+    expect(fn () => $service->validateUpload($jsPdf))->toThrow(ValidationException::class);
+    $fakePng = UploadedFile::fake()->createWithContent('bad.png', 'not-really-a-png');
+    expect(fn () => $service->validateUpload($fakePng))->toThrow(ValidationException::class);
+    $validPng = UploadedFile::fake()->image('degree.png', 200, 120);
+    $service->validateUpload($validPng);
+    expect(true)->toBeTrue();
 });

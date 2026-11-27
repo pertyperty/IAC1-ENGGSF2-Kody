@@ -1,13 +1,13 @@
 @extends('layouts.learning')
 @section('title', 'Earnings and refunds — Kody')
 @section('content')
-<section class="review-page page-width"><p class="overline">YOUR PRIVATE EARNINGS</p><h1>Keep your work rewarding.</h1><p><a class="quiet-link" href="{{ route('wallet.index') }}"><x-action-icon name="left"/> Wallet and sales history</a></p>
+<section class="review-page page-width"><p class="overline">EARNINGS &amp; REFUNDS</p><h1>Your earnings and refunds</h1><p><a class="quiet-link" href="{{ route('wallet.index') }}"><x-action-icon name="left"/> Wallet and sales history</a></p>
 
 @if($errors->any())<div class="studio-errors" role="alert">{{ $errors->first() }}</div>@endif
 @if(in_array(auth()->user()->account_role, [\App\Enums\Role::Contributor, \App\Enums\Role::Instructor], true))
 <details class="lesson-note"><summary>Claim matured Contributor KodeBits</summary><p>Whole KodeBits from eligible Contributor sales can be claimed after 14 days. Fractional earnings stay saved.</p><form class="studio-form" method="post" action="{{ route('earnings.claim') }}">@csrf<input type="hidden" name="confirmation_id" value="{{ $confirmationId }}">@include('transactions.password-confirmation')<button class="button button-play">Claim available whole KB</button></form></details>@endif
 @if(auth()->user()->account_role === \App\Enums\Role::Instructor)
-<details class="lesson-note"><summary>Request a PHP payout</summary><p>Minimum PHP500 in matured earnings. GCash recipient details require Administrator verification. The quoted contract fee is deducted from your requested amount.</p>
+<details class="lesson-note"><summary>Request a PHP payout</summary><p>Minimum PHP 500 in matured earnings. GCash recipient details require Administrator verification. The quoted contract fee is deducted from your requested amount.</p>
 @if(!$ready)<p>Cash payouts open after payment-provider setup.</p>@else<form class="studio-form" method="post" action="{{ route('earnings.payout') }}">@csrf<input type="hidden" name="confirmation_id" value="{{ $confirmationId }}"><input type="hidden" name="quoted_fee_minor" value="{{ config('xendit.payout_fee_minor') }}"><label>Requested PHP amount<input name="amount" inputmode="decimal" required maxlength="11"></label><p>Fee: PHP {{ \App\Support\ExactMoney::decimal(config('xendit.payout_fee_minor')) }}</p>
 @foreach(['given_name' => 'Recipient first name', 'surname' => 'Recipient surname', 'account_holder_name' => 'GCash account holder name', 'mobile' => 'GCash mobile number (09…)', 'street' => 'Street address', 'city' => 'City', 'province' => 'Province', 'postal_code' => 'Postal code'] as $key => $label)<label>{{ $label }}<input name="{{ $key }}" required maxlength="{{ in_array($key, ['given_name','surname']) ? 50 : ($key === 'mobile' ? 11 : ($key === 'postal_code' ? 4 : 255)) }}" autocomplete="off"></label>@endforeach
 @include('transactions.password-confirmation')<button class="button button-play">Request recipient review</button></form>@endif</details>@endif

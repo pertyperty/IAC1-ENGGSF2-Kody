@@ -8,6 +8,7 @@ use App\Models\InstructorApplication;
 use App\Models\User;
 use App\Services\Account\CredentialDocuments;
 use App\Services\Account\CurrentAccountSession;
+use App\Services\Notifications\InAppNotifications;
 use App\Support\AccountPasswords;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -49,6 +50,7 @@ class CreatorBadges
                 }
                 DB::table('creator_badge_requests')->where('user_id', $creator->id)->update(['resolved_at' => now()]);
                 app(AuditRecorder::class)->record($reviewer->id, $creator->id, 'creator_badge.declined', 'user', (string) $creator->id, ['reason' => $data['reason']]);
+                app(InAppNotifications::class)->creatorBadgeDecided($creator, 'decline', $creator->account_role->value);
 
                 return;
             }
@@ -77,6 +79,7 @@ class CreatorBadges
             app(AuditRecorder::class)->record($reviewer->id, $creator->id, $active ? 'creator_badge.granted' : 'creator_badge.revoked',
                 'user', (string) $creator->id, ['reason' => $data['reason'], 'role' => $creator->account_role->value,
                     'version' => ($existing?->record_version ?? 0) + 1, 'application_id' => $active ? $proof->id : null]);
+            app(InAppNotifications::class)->creatorBadgeDecided($creator, $active ? 'grant' : 'revoke', $creator->account_role->value);
         });
     }
 }

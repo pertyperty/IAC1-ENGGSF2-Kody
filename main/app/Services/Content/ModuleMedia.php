@@ -39,6 +39,13 @@ class ModuleMedia
                 $this->invalid();
             }
         } else {
+            $officeMimes = [
+                'docx' => ['application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/zip'],
+                'pptx' => ['application/vnd.openxmlformats-officedocument.presentationml.presentation', 'application/zip'],
+            ];
+            if (! in_array($file->getMimeType(), $officeMimes[$extension] ?? [], true)) {
+                $this->invalid();
+            }
             $pages = $this->officePreview($file, $extension);
         }
         $disk = config('content-media.disk');

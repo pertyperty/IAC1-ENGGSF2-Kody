@@ -16,6 +16,6 @@ class ProfilePictureRequest extends FormRequest
     {
         return ['user_id' => ['prohibited'], 'account_role' => ['prohibited'], 'account_status' => ['prohibited'], 'profile_picture' => ['prohibited'], 'disk' => ['prohibited'], 'path' => ['prohibited'], 'profile_version' => ['required', 'integer', 'min:0'],
             'remove_picture' => ['sometimes', 'boolean'],
-            'picture' => ['required_unless:remove_picture,1', 'prohibited_if:remove_picture,1', 'file', 'mimetypes:image/jpeg,image/png', 'max:2048']];
+            'picture' => ['required_unless:remove_picture,1', 'prohibited_if:remove_picture,1', 'file', 'extensions:jpg,jpeg,png', 'mimetypes:image/jpeg,image/png', 'max:2048']];
     }
 }

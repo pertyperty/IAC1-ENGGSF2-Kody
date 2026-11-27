@@ -73,15 +73,19 @@ class CreatorProfileController extends Controller
             ->header('Cache-Control', 'no-store, private');
     }
 
-    public function edit(Request $request, CreatorProfiles $profiles): Response
+    public function edit(Request $request, CreatorProfiles $profiles, CreatorBadges $badges, CredentialDocuments $documents): Response
     {
-        abort_unless($profiles->visible($request->user()), 403);
-        $profile = DB::table('creator_profiles')->where('user_id', $request->user()->id)->first();
+        $user = $request->user();
+        abort_unless($profiles->visible($user), 403);
+        $user->loadMissing('creatorVerification');
+        $profile = DB::table('creator_profiles')->where('user_id', $user->id)->first();
         $socials = $profiles->socials($profile);
 
-        $badgeRequest = DB::table('creator_badge_requests')->where('user_id', $request->user()->id)->where('role', $request->user()->account_role->value)->whereNull('resolved_at')->first();
+        $badgeRequest = DB::table('creator_badge_requests')->where('user_id', $user->id)->where('role', $user->account_role->value)->whereNull('resolved_at')->first();
+        $proof = in_array($user->account_role, [Role::Instructor, Role::Contributor], true) ? $badges->proof($user) : null;
+        $documentAvailable = $proof !== null && $documents->available($proof);
 
-        return response()->view('creators.edit', compact('profile', 'socials', 'badgeRequest'))->header('Cache-Control', 'no-store, private');
+        return response()->view('creators.edit', compact('profile', 'socials', 'badgeRequest', 'proof', 'documentAvailable'))->header('Cache-Control', 'no-store, private');
     }
 
     public function requestBadge(Request $request): RedirectResponse
