@@ -7,6 +7,17 @@
             <a class="quiet-link" href="{{ route('account.show') }}">View your profile</a>
         </header>
         @include('layouts.staff-tools')
+        @can('create', \App\Models\CodingChallenge::class)
+            <nav class="studio-wayfinding" aria-label="Creator quick actions">
+                @can('create', \App\Models\LearningModule::class)
+                    <a href="{{ route('studio.index') }}"><x-action-icon name="module"/> Module studio</a>
+                    <a href="{{ route('courses.index') }}"><x-action-icon name="course"/> Course builder</a>
+                @endcan
+                <a href="{{ route('challenges.index') }}"><x-action-icon name="code"/> Challenge studio</a>
+                <a href="{{ route('creators.show', auth()->user()) }}"><x-action-icon name="profile"/> Public profile</a>
+                <a href="{{ route('earnings.index') }}"><x-action-icon name="wallet"/> Earnings</a>
+            </nav>
+        @endcan
         @if(auth()->user()->account_role === \App\Enums\Role::Instructor)<div class="creator-play-link"><div><h2>Explore the Tower</h2><p>Play levels and track your own progress.</p></div><a class="button button-play" href="{{ route('home') }}"><x-action-icon name="tower"/> Play the Tower</a></div>@endif
         @if($progress)
         <section class="content-panel tower-continuation" aria-labelledby="continue-heading">
@@ -20,7 +31,6 @@
             @endif
 
         </section>
-        @if(auth()->user()->can('create', \App\Models\CodingChallenge::class))<p><a class="quiet-link" href="{{ route('challenges.index') }}">Your challenge studio</a></p>@endif
         <dl id="daily-progress" class="learning-stats"><div><dt><x-action-icon name="spark"/>Streak</dt><dd>{{ $progress['current_streak'] }} days</dd></div><div><dt><x-action-icon name="flag"/>Best streak</dt><dd>{{ $progress['longest_streak'] }} days</dd></div><div><dt><x-action-icon name="crystal"/>XP</dt><dd>{{ number_format($dashboard['achievements']['xp']) }}</dd></div><div><dt><x-action-icon name="crown"/>Rank</dt><dd>{{ $dashboard['achievements']['rank'] }}</dd></div></dl>
         <p class="activity-today">{{ $progress['active_today'] ? 'Today is complete.' : 'Complete a Tower level or module assessment to keep your streak.' }}</p>
         <nav class="studio-wayfinding" aria-label="Continue learning"><a href="{{ route('course-learning.mine') }}">Library</a><a href="{{ route('home') }}">Tower</a><a href="{{ route('challenges.catalog') }}">Challenges</a></nav>

@@ -21,7 +21,7 @@
         <details class="account-menu">
             <summary aria-label="Account menu">@include('layouts.avatar', ['avatarUser' => auth()->user(), 'avatarClass' => 'header-avatar'])<span class="header-username">{{ auth()->user()->username }}</span><span aria-hidden="true"><x-action-icon name="chevron"/></span></summary>
             <nav aria-label="Account navigation">
-                <div class="menu-identity"><strong>{{ auth()->user()->username }}</strong><span>{{ auth()->user()->account_role->name }}</span></div>
+                <div class="menu-identity"><strong>{{ auth()->user()->username }}</strong><span>{{ auth()->user()->account_role->name }}@if(auth()->user()->hasCreatorBadge()) <span class="identity-verified" title="Qualifications reviewed by Kody staff"><x-action-icon name="check"/> Verified</span>@endif</span></div>
                 <a href="{{ route('dashboard') }}">Dashboard</a>
                 <a href="{{ route('account.show') }}">My account</a>
                 @if(!$chrome['progress'] && $chrome['wallet'])

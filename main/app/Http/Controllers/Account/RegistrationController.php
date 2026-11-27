@@ -14,7 +14,10 @@ class RegistrationController extends Controller
 {
     public function create(Request $request): View
     {
-        return view('account.register', ['fromTower' => $request->query('from') === 'tower']);
+        return view('account.register', [
+            'fromTower' => $request->query('from') === 'tower',
+            'forEducator' => $request->query('role') === 'educator',
+        ]);
     }
 
     public function store(RegisterAccountRequest $request, RegisterAccount $register): JsonResponse|RedirectResponse

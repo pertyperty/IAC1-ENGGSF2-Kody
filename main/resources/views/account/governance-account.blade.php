@@ -3,7 +3,8 @@
 @section('shell-class', 'account-shell-wide')
 @section('content')
 <nav class="studio-wayfinding" aria-label="Account tools"><a href="#account-access">Account access</a><a href="#account-roles">Roles</a><a href="#account-profile">Profile support</a><a href="#account-history">History</a></nav>
-<h1>{{ $account->username ?? 'Account #'.$account->id }}</h1><p>{{ $account->account_role->name }} · {{ $account->account_status->value }}</p>
+<h1>{{ $account->username ?? 'Account #'.$account->id }}</h1>
+<p class="profile-role-line"><x-role-badge :user="$account" :show-verified="true"/><span class="status-pill" data-status="{{ $account->account_status->value }}">{{ $account->account_status->value }}</span></p>
 
 @if($errors->any())<div class="form-errors" role="alert">@foreach($errors->all() as $error)<p>{{ $error }}</p>@endforeach</div>@endif
 <section id="account-access"><h2>Account access</h2>
@@ -18,6 +19,15 @@
 @endif
 @endcan
 </section><section id="account-roles">
+@can('verifyCreator', $account)
+<div class="badge-status-card lesson-note">
+    <div>
+        <strong>Qualifications badge</strong>
+        <p class="field-hint">{{ $account->hasCreatorBadge() ? 'Badge active on this creator’s public profile.' : 'No active qualifications badge for this role.' }}</p>
+    </div>
+    <a class="button button-secondary" href="{{ route('creator-badges.show', $account) }}">Review qualifications badge</a>
+</div>
+@endcan
 @can('changeModeratorRole', $account)
 <h2>{{ $account->account_role === \App\Enums\Role::Moderator ? 'Remove Moderator appointment' : 'Appoint a Moderator' }}</h2>
 <form class="account-form" method="POST" action="{{ route('account-governance.moderator', $account) }}">@csrf
@@ -48,6 +58,5 @@
 {{ $supportHistory->links() }}
 <h2>Enforcement history</h2>@forelse($history as $event)<p>{{ $event->action }} · Staff account #{{ $event->actor_id }} · {{ \Carbon\CarbonImmutable::parse($event->created_at)->setTimezone('Asia/Manila')->format('M j, Y g:i A') }} Asia/Manila</p>@empty<p>No recorded enforcement actions.</p>@endforelse
 {{ $history->links() }}<p class="secondary-link"><a href="{{ route('account-governance.index') }}">Back to accounts</a></p>
-@can('verifyCreator', $account)<p><a href="{{ route('creator-badges.show', $account) }}">Review qualifications badge</a></p>@endcan
 </section>
 @endsection

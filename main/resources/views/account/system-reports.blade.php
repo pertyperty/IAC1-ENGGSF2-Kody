@@ -2,7 +2,7 @@
 @section('title', 'System reports — Kody')
 @section('shell-class', 'account-shell-wide')
 @section('content')
-<h1>System reports</h1><p>Read-only totals from stored Kody records. Dates use Asia/Manila, including both selected calendar days.</p>
+<p class="overline">ADMINISTRATOR WORKSPACE</p><h1>System reports</h1><p>Read-only totals from stored Kody records. Dates use Asia/Manila, including both selected calendar days.</p>
 <nav class="report-presets" aria-label="Report calendar shortcuts">@foreach($presets as $label => $preset)<a class="button button-secondary button-small" href="{{ route('system-reports', array_replace($filters, $preset)) }}"><x-action-icon name="calendar"/>{{ $label }}</a>@endforeach</nav>
 <div class="report-insights">@foreach($report['insights'] as $insight)<article class="report-insight"><span>{{ $insight['title'] }}</span><b>{{ $insight['value'] }}</b><p>{{ $insight['detail'] }}</p></article>@endforeach</div>
 @if($errors->any())<div class="form-errors" role="alert">@foreach($errors->all() as $error)<p>{{ $error }}</p>@endforeach</div>@endif

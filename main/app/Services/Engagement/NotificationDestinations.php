@@ -8,6 +8,8 @@ use App\Models\ContributorApplication;
 use App\Models\LearningCourse;
 use App\Models\LearningModule;
 use App\Models\User;
+use App\Notifications\CreatorBadgeDecided;
+use App\Services\Account\CreatorProfiles;
 use App\Services\Account\RoleChangeNotices;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
@@ -57,6 +59,13 @@ class NotificationDestinations
             $model = $user->account_role === Role::Instructor ? LearningModule::class : CodingChallenge::class;
             if (($notice->data['role'] ?? null) === $user->account_role->value && $gate->allows('create', $model)) {
                 $links[$notice->id] = route($user->account_role === Role::Instructor ? 'studio.index' : 'challenges.index');
+            }
+        }
+        if (app(CreatorProfiles::class)->visible($user)) {
+            foreach ($notifications->where('type', CreatorBadgeDecided::TYPE) as $notice) {
+                $links[$notice->id] = ($notice->data['outcome'] ?? null) === 'granted'
+                    ? route('creators.show', $user)
+                    : route('creator-profile.edit');
             }
         }
 

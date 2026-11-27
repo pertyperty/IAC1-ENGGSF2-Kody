@@ -10,6 +10,7 @@ use App\Services\Account\CredentialDocuments;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -26,17 +27,25 @@ class ContributorReviewController extends Controller
         return response()->view('account.contributor-reviews', compact('applications', 'filters'))->header('Cache-Control', 'no-store, private');
     }
 
-    public function show(ContributorApplication $application): Response
+    public function show(ContributorApplication $application, CredentialDocuments $documents): Response
     {
         Gate::authorize('view', $application);
-        $application->load('user');
+        $application->load('user.creatorVerification');
+        $documentMeta = $documents->metadata($application);
+        $badgeRequest = DB::table('creator_badge_requests')
+            ->where('user_id', $application->user_id)
+            ->where('role', $application->user->account_role->value)
+            ->whereNull('resolved_at')
+            ->first();
 
-        return response()->view('account.contributor-review', compact('application'))->header('Cache-Control', 'no-store, private');
+        return response()->view('account.contributor-review', compact('application', 'documentMeta', 'badgeRequest'))->header('Cache-Control', 'no-store, private');
     }
 
     public function credential(Request $request, ContributorApplication $application, CredentialDocuments $documents): StreamedResponse
     {
-        return $documents->download($request->user(), $application);
+        return $request->boolean('inline')
+            ? $documents->inline($request->user(), $application)
+            : $documents->download($request->user(), $application);
     }
 
     public function review(ReviewContributorRequest $request, ContributorApplication $application, ContributorApplications $applications): RedirectResponse

@@ -22,13 +22,31 @@
         <dt>Joined</dt><dd>{{ $profile['joined_at'] ?? 'Not available' }}</dd>
     </dl>
     @if($application)<div class="notice"><b>Instructor application: {{ $application->verification_status }}</b>@if($application->verification_notes)<p>{{ $application->verification_notes }}</p>@endif</div>@endif
-    @if(in_array(auth()->user()->account_role, [\App\Enums\Role::Learner, \App\Enums\Role::Contributor], true))<a class="button button-secondary" href="{{ route('instructor-application.create') }}">Apply as an instructor</a>@endif
+    @if(!empty($badgeSummary))
+        <div class="lesson-note badge-status-card">
+            <div>
+                <strong>Qualifications badge: {{ $badgeSummary['active'] ? 'Verified' : ($badgeSummary['pending'] ? 'Review requested' : 'Not yet verified') }}</strong>
+                <p class="field-hint">
+                    @if($badgeSummary['active'])Visible on your public profile and published work.
+                    @elseif($badgeSummary['pending'])Staff are reviewing your private supporting document.
+                    @else Request a staff review of your approved application credentials to display a verified badge.
+                    @endif
+                </p>
+            </div>
+            <a class="button button-secondary button-small" href="{{ $badgeSummary['active'] ? route('creators.show', auth()->user()) : route('creator-profile.edit').'#qualifications-badge' }}">{{ $badgeSummary['active'] ? 'View public profile' : ($badgeSummary['pending'] ? 'View status' : 'Request review') }}</a>
+        </div>
+    @endif
     </section></div><div class="profile-support">
+    @if(in_array(auth()->user()->account_role, [\App\Enums\Role::Learner, \App\Enums\Role::Contributor], true))
+    <div class="profile-actions" aria-label="Role applications">
+        <a href="{{ route('instructor-application.create') }}">Apply as an instructor</a>
+        @can('viewOwn', \App\Models\ContributorApplication::class)<a href="{{ route('contributor-application.create') }}">Contributor application and history</a>@endcan
+    </div>
+    @endif
     <div class="profile-actions">
         @can('create', \App\Models\LearningModule::class)<a href="{{ route('studio.index') }}">Open your creator studio</a>@endcan
         @can('create', \App\Models\CodingChallenge::class)<a href="{{ route('challenges.index') }}">Open your challenge studio</a>@endcan
         <a href="{{ route('notifications.index') }}">Your updates</a>
-        @can('viewOwn', \App\Models\ContributorApplication::class)<a href="{{ route('contributor-application.create') }}">Contributor application and history</a>@endcan
     </div>
     @if(app(\App\Services\Account\CreatorProfiles::class)->visible(auth()->user()))<div class="profile-actions"><a href="{{ route('creators.show', auth()->user()) }}">View public creator profile</a><a href="{{ route('creator-profile.edit') }}">Edit public details</a></div>@endif
     @include('layouts.staff-tools')

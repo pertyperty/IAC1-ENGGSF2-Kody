@@ -18,6 +18,9 @@ export function mountLivePreviews(doc, win) {
                 pictureUrl = win.URL.createObjectURL(file);
                 image.src = pictureUrl;
                 image.hidden = false;
+            } else if (image) {
+                image.hidden = true;
+                image.removeAttribute('src');
             }
         });
         win.addEventListener('pagehide', () => { if (pictureUrl) win.URL.revokeObjectURL(pictureUrl); });

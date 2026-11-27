@@ -9,10 +9,18 @@ use App\Models\ModuleRevision;
 use App\Models\User;
 use App\Notifications\ChallengeReviewed;
 use App\Notifications\CourseReviewed;
+use App\Notifications\CreatorBadgeDecided;
 use App\Notifications\ModuleReviewed;
 
 class InAppNotifications
 {
+    public function creatorBadgeDecided(User $recipient, string $decision, string $role): void
+    {
+        if ($recipient->account_status === AccountStatus::Active) {
+            $recipient->notify(new CreatorBadgeDecided($decision, $role));
+        }
+    }
+
     public function challengeReviewed(User $recipient, CodingChallengeRevision $revision): void
     {
         if ($recipient->account_status === AccountStatus::Active) {

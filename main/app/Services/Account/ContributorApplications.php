@@ -24,6 +24,7 @@ class ContributorApplications
 {
     public function submit(User $actor, string $sessionId, array $data, UploadedFile $credential): void
     {
+        app(CredentialDocuments::class)->validateUpload($credential);
         $disk = config('account.credentials.disk');
         $path = null;
         try {

@@ -22,11 +22,20 @@
 <button class="primary-button">Save public profile</button></form>
 <aside class="live-preview-panel"><details><summary>Preview public profile</summary><article class="profile-preview" aria-label="Public profile preview"><p class="overline">UNSAVED PREVIEW</p><h2>{{ auth()->user()->username }}</h2><x-creator-byline :creator="auth()->user()" :linked="false"/><strong data-preview-value="headline" data-preview-placeholder="Your line of work"></strong><h3>Qualifications</h3><p data-preview-value="qualifications" data-preview-placeholder="Your public qualifications"></p><h3>About you</h3><p data-preview-value="bio" data-preview-placeholder="About you"></p><h3>Experience and accomplishments</h3><p data-preview-value="accomplishments" data-preview-placeholder="Your experience"></p></article></details></aside></div>
 @if(in_array(auth()->user()->account_role, [\App\Enums\Role::Instructor, \App\Enums\Role::Contributor], true))
-<section><h2>Qualifications badge</h2>
-@if(auth()->user()->hasCreatorBadge())<p class="notice">Your qualifications badge is active.</p>
-@elseif($badgeRequest)<p class="notice">Review requested. Staff will check your private supporting documents.</p>
-@else<p>Staff can review the credentials in your approved role application. Documents remain private; a badge is issued only after review.</p>
-<form class="account-form" method="post" action="{{ route('creator-profile.badge-request') }}">@csrf<label><input type="checkbox" name="confirmed" value="1" required> Ask staff to review my existing qualifications.</label><button class="primary-button">Request qualifications review</button></form>
+<section id="qualifications-badge" class="badge-request-section"><h2>Qualifications badge</h2>
+@if(auth()->user()->hasCreatorBadge())
+<div class="notice">
+    <p class="profile-role-line"><x-role-badge :user="auth()->user()" :show-verified="true"/></p>
+    <p>Your qualifications badge is active and visible on your public profile and published work.</p>
+    <p><a class="quiet-link" href="{{ route('creators.show', auth()->user()) }}">View public creator profile</a></p>
+</div>
+@elseif($badgeRequest)
+<div class="notice"><p><strong>Review requested.</strong> Staff will check your private supporting documents.</p><p class="field-hint">Requested {{ \Carbon\CarbonImmutable::parse($badgeRequest->requested_at)->setTimezone('Asia/Manila')->format('M j, Y g:i A') }} Asia/Manila.</p></div>
+@elseif($proof && $documentAvailable)
+<p>Staff can review the private credentials in your approved {{ auth()->user()->account_role->value }} application. Documents remain private; once approved, a verified badge appears on your public profile and published work.</p>
+<form class="account-form" method="post" action="{{ route('creator-profile.badge-request') }}">@csrf<label class="review-check"><input type="checkbox" name="confirmed" value="1" required> Ask staff to review my existing qualifications.</label><button class="primary-button">Request qualifications review</button></form>
+@else
+<p class="notice">A qualifications badge requires an approved {{ auth()->user()->account_role->value }} application with available private supporting documents on file. Contact support if your supporting file needs to be refreshed.</p>
 @endif</section>@endif
 <p class="secondary-link"><a href="{{ route('account.show') }}">Back to account</a></p>
 @endsection
