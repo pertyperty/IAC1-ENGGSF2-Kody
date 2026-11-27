@@ -3,7 +3,8 @@
 Use a separate checkout and a fresh PostgreSQL cluster listening on loopback on
 an unused port other than 5432. Create `kody_xendit_sandbox` there. Never copy an
 existing Kody database or point this instance at an existing queue. This mode
-exercises GCash top-ups only; refunds and creator payouts stay disabled.
+exercises GCash top-ups only; refunds and creator payouts stay disabled. Use the
+[offline presentation rehearsal](economy-presentation.md) to show the full journey.
 
 1. Create a separate, Git-ignored `.env` for the sandbox instance. Use
    `APP_ENV=local`, a fresh application key and a loopback `APP_URL`. Keep

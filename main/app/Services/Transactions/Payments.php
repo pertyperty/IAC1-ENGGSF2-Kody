@@ -34,17 +34,22 @@ class Payments
                 throw ValidationException::withMessages(['purchase' => 'Choose and confirm a Kody package.']);
             }
             $package = config('economy.packages.'.$data['package']);
+            $emailReceipt = in_array($data['email_receipt'] ?? false, [true, 1, '1'], true);
             $existing = DB::table('payment_purchases')->where('user_id', $user->id)->where('confirmation_id', $data['confirmation_id'])->first();
             if ($existing !== null) {
                 if ($existing->package !== $data['package']) {
                     throw ValidationException::withMessages(['purchase' => 'This confirmation already identifies another package.']);
                 }
 
+                if ($existing->email_receipt !== $emailReceipt) {
+                    throw ValidationException::withMessages(['purchase' => 'This confirmation already has a receipt preference. Refresh your wallet to start a new purchase.']);
+                }
+
                 return $existing->id;
             }
             $id = (string) Str::uuid();
             DB::table('payment_purchases')->insert(['id' => $id, 'user_id' => $user->id, 'confirmation_id' => $data['confirmation_id'],
-                'package' => $data['package'], 'kodebits' => $package['kodebits'], 'gross_minor' => $package['price_minor'],
+                'package' => $data['package'], 'email_receipt' => $emailReceipt, 'kodebits' => $package['kodebits'], 'gross_minor' => $package['price_minor'],
                 'fee_minor' => $sandbox ? 0 : $readiness->fee($package['price_minor']), 'fee_schedule' => json_encode($sandbox ? ['mode' => 'sandbox', 'basis_points' => 0, 'fixed_minor' => 0] : ['basis_points' => config('xendit.payment_fee_basis_points'), 'fixed_minor' => config('xendit.payment_fee_fixed_minor'), 'policy_version' => config('economy.policy_version')], JSON_THROW_ON_ERROR), 'created_at' => now(), 'updated_at' => now()]);
             app(AuditRecorder::class)->record($user->id, $user->id, 'payment.requested', 'payment_purchase', $id, ['package' => $data['package']]);
             Queue::connection('database')->pushOn('payments', (new CreateProviderOperation('payment', $id))->beforeCommit());
@@ -123,8 +128,9 @@ class Payments
                     DB::table('payment_purchases')->where('id', $row->id)->update(['state' => 'Succeeded', 'lot_id' => $lot->id,
                         'provider_request_id' => $proof->id, 'provider_payment_id' => $proof->paymentId, 'updated_at' => now()]);
                     app(AuditRecorder::class)->record(null, $row->user_id, 'payment.succeeded', 'payment_purchase', $row->id, ['gross_minor' => $row->gross_minor, 'fee_minor' => $row->fee_minor, 'kodebits' => $row->kodebits]);
-                    app(FinancialNotices::class)->queue($row->user_id, 'purchase:'.$row->id, 'KodeBit purchase confirmed', ['kodebits' => $row->kodebits, 'amount_minor' => $row->gross_minor, 'fee_minor' => $row->fee_minor,
-                        'purchase_reference' => $row->id, 'package' => $row->package, 'confirmed_at' => now()->toIso8601String()]);
+                    $sandbox = (json_decode($row->fee_schedule, true, flags: JSON_THROW_ON_ERROR)['mode'] ?? null) === 'sandbox';
+                    app(FinancialNotices::class)->queue($row->user_id, 'purchase:'.$row->id, $sandbox ? 'Test-mode KodeBit purchase confirmed' : 'KodeBit purchase confirmed', ['kodebits' => $row->kodebits, 'amount_minor' => $row->gross_minor, 'fee_minor' => $row->fee_minor,
+                        'purchase_reference' => $row->id, 'package' => $row->package, 'sandbox' => $sandbox, 'confirmed_at' => now()->toIso8601String()], email: $row->email_receipt);
                 }
             } elseif ($row->lot_id === null && in_array($proof->status, ['FAILED', 'EXPIRED', 'CANCELED'], true)) {
                 DB::table('payment_purchases')->where('id', $row->id)->update(['state' => 'Failed', 'provider_request_id' => $proof->id, 'updated_at' => now()]);

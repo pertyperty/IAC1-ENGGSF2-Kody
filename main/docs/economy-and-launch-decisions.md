@@ -92,8 +92,9 @@ implementation record. This document is authority, not a completion claim.
   backed KB while revoking access; retained visits/history are preserved.
   Defects, withdrawals, disputes and mandatory remedies outside courtesy rules
   go to staff review; the courtesy limits do not assert a legal waiver.
-- Critical receipts/payout/refund notices use a durable, retryable email outbox
-  and private in-app updates. Delivery failure does not undo financial success.
+- Verified purchase receipts are available privately in Wallet; purchase receipt email
+  is opt-in per purchase. Opted-in receipts and critical payout/refund notices use a
+  durable email outbox. See the [presentation walkthrough](economy-presentation.md). Delivery failure does not undo financial success.
   Preserve pseudonymous financial references; do not market application receipts
   as BIR-compliant invoices before the business's tax setup is verified.
 

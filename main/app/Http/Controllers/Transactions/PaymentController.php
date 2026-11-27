@@ -67,6 +67,7 @@ class PaymentController extends Controller
         $notice = DB::table('financial_deliveries')->where('user_id', $request->user()->id)->where('reference', 'purchase:'.$row->id)->firstOrFail();
         $receipt = ['id' => $notice->id, 'title' => $notice->title, 'details' => json_decode($notice->details, true, flags: JSON_THROW_ON_ERROR),
             'issued_at' => $notice->created_at, 'purchase_reference' => $row->id];
+        $receipt['details']['sandbox'] = (json_decode($row->fee_schedule, true, flags: JSON_THROW_ON_ERROR)['mode'] ?? null) === 'sandbox';
         if ($request->boolean('pdf')) {
             return response(app(PdfDocuments::class)->render('transactions.receipt-pdf', compact('receipt')))->withHeaders([
                 'Content-Type' => 'application/pdf', 'Content-Disposition' => 'attachment; filename="kody-receipt-'.$row->id.'.pdf"',

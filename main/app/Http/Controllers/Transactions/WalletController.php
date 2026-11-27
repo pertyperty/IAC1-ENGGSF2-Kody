@@ -23,7 +23,9 @@ class WalletController extends Controller
         $operations = DB::table('wallet_operations')->where('user_id', $id)
             ->when(($filters['direction'] ?? '') === 'credit', fn ($query) => $query->where('kodebits', '>', 0))
             ->when(($filters['direction'] ?? '') === 'debit', fn ($query) => $query->where('kodebits', '<', 0))->orderByDesc('created_at')->orderByDesc('id')->paginate(15, ['*'], 'history')->withQueryString();
-        $earnings = DB::table('publisher_earnings')->where('user_id', $id)->orderByDesc('created_at')->orderByDesc('id')->paginate(15, ['*'], 'earnings')->withQueryString();
+        $earnings = DB::table('publisher_earnings as earnings')->join('content_purchases as sales', 'sales.id', '=', 'earnings.purchase_id')
+            ->where('earnings.user_id', $id)->orderByDesc('earnings.created_at')->orderByDesc('earnings.id')
+            ->paginate(15, ['earnings.*', 'sales.kodebits as sold_kb', 'sales.value_minor as sale_value_minor'], 'earnings')->withQueryString();
         $purchases = DB::table('payment_purchases')->where('user_id', $id)->orderByDesc('created_at')->limit(10)->get(['id', 'package', 'gross_minor', 'state', 'checkout_url', 'lot_id']);
         $confirmationId = (string) Str::uuid();
         $readiness = app(Readiness::class);

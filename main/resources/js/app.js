@@ -16,6 +16,7 @@ import { mountCourseJourney } from './course-journey.js';
 import { mountNavigationRail } from './navigation-rail.js';
 import { mountResourceViewer } from './resource-viewer.js';
 import { mountGameResult } from './game-result.js';
+import { mountPayoutQuote } from './payout-quote.js';
 import { mountPaymentStatus } from './payment-status.js';
 import { mountDocumentStage } from './document-stage.js';
 import { mountNoticeEditor } from './site-notice.js';
@@ -31,6 +32,7 @@ document.querySelectorAll('.report-trend-chart').forEach(chart => {
 });
 mountNavigationRail(document, window);
 document.querySelectorAll('[data-resource-workspace]').forEach(root => mountResourceViewer(root, window));
+document.querySelectorAll('[data-payout-quote]').forEach(mountPayoutQuote);
 document.querySelectorAll('[data-payment-status]').forEach(root => mountPaymentStatus(root, window));
 document.querySelectorAll('[data-document-stage]').forEach(root => mountDocumentStage(root, window));
 document.querySelectorAll('[data-notice-editor]').forEach(mountNoticeEditor);
