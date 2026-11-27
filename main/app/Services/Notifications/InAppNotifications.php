@@ -20,6 +20,7 @@ class InAppNotifications
             $recipient->notify(new CreatorBadgeDecided($decision, $role));
         }
     }
+
     public function challengeReviewed(User $recipient, CodingChallengeRevision $revision): void
     {
         if ($recipient->account_status === AccountStatus::Active) {

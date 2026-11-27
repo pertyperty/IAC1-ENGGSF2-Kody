@@ -6,8 +6,10 @@ use App\Services\Account\CredentialDocuments;
 use App\Services\Account\InstructorApplications;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 
 uses(RefreshDatabase::class);
 
@@ -101,11 +103,11 @@ test('A09 A10 moderators can preview private credentials inline with sandboxed M
 
 test('A09 A10 credential upload validation rejects JavaScript PDFs and corrupted images before storage', function () {
     $service = app(CredentialDocuments::class);
-    $jsPdf = \Illuminate\Http\UploadedFile::fake()->createWithContent('bad.pdf', "%PDF-1.4\n/OpenAction << /S /JavaScript /JS (alert(1)) >>\n%%EOF");
-    expect(fn () => $service->validateUpload($jsPdf))->toThrow(\Illuminate\Validation\ValidationException::class);
-    $fakePng = \Illuminate\Http\UploadedFile::fake()->createWithContent('bad.png', 'not-really-a-png');
-    expect(fn () => $service->validateUpload($fakePng))->toThrow(\Illuminate\Validation\ValidationException::class);
-    $validPng = \Illuminate\Http\UploadedFile::fake()->image('degree.png', 200, 120);
+    $jsPdf = UploadedFile::fake()->createWithContent('bad.pdf', "%PDF-1.4\n/OpenAction << /S /JavaScript /JS (alert(1)) >>\n%%EOF");
+    expect(fn () => $service->validateUpload($jsPdf))->toThrow(ValidationException::class);
+    $fakePng = UploadedFile::fake()->createWithContent('bad.png', 'not-really-a-png');
+    expect(fn () => $service->validateUpload($fakePng))->toThrow(ValidationException::class);
+    $validPng = UploadedFile::fake()->image('degree.png', 200, 120);
     $service->validateUpload($validPng);
     expect(true)->toBeTrue();
 });
