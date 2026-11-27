@@ -527,16 +527,16 @@
 
 /* Terminal Quest: Emulator chrome, live checklist, quick command starter chips. */
 .terminal-chrome {
-    display: flex; align-items: center; justify-content: space-between; gap: .5rem; width: 100%;
-    padding: .45rem .75rem; border-radius: 10px; background: #0f1b2d; border: 1px solid #30445e;
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .4rem .5rem; width: 100%;
+    padding: .45rem .65rem; border-radius: 10px; background: #0f1b2d; border: 1px solid #30445e;
 }
 .terminal-chrome-dots {
-    display: inline-block; width: 34px; height: 10px;
+    display: inline-block; flex: 0 0 34px; width: 34px; height: 10px;
     background: radial-gradient(circle 4px at 5px 5px, #f87171 95%, transparent),
         radial-gradient(circle 4px at 17px 5px, #fbbf24 95%, transparent),
         radial-gradient(circle 4px at 29px 5px, #34d399 95%, transparent);
 }
-.terminal-chrome-title { font: 600 .75rem/1.3 ui-monospace, Consolas, monospace; color: #dbeafe; overflow-wrap: anywhere; }
+.terminal-chrome-title { flex: 1 1 auto; min-width: 0; font: 600 .75rem/1.3 ui-monospace, Consolas, monospace; color: #dbeafe; overflow-wrap: anywhere; }
 .terminal-chrome-tag {
     padding: .1rem .45rem; border-radius: 999px; background: #1e3a5f; color: #93c5fd;
     font: 700 .6875rem/1.3 ui-monospace, Consolas, monospace; text-transform: uppercase;
@@ -661,14 +661,25 @@
     }
     .circuit-wires, .circuit-output-wire { display: none; }
     .game-card .logic-gate { min-height: 4.25rem; }
-    .stack-world { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem; }
-    .stack-vessel-panel { padding: .5rem; }
-    .stack-column { min-height: 8.5rem; }
+    .game-card .arcade-world.stack-world { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .45rem; }
+    .game-card .stack-world .puzzle-state.stack-vessel-panel { padding: .45rem; }
+    .stack-vessel { padding: .3rem .3rem .25rem; }
+    .game-card .stack-world .value-strip.stack-column { min-height: 8.5rem; gap: .25rem; }
+    .game-card .stack-world .value-cell.stack-item-cell { padding: .2rem .35rem; gap: .25rem; }
+    .top-pointer-tag { padding: .08rem .3rem; font-size: .625rem; flex-shrink: 0; }
     .stack-empty-slot { height: 1rem; }
     .trace-diff-card { grid-template-columns: minmax(0, 1fr); }
     .sort-compare { width: 1.05rem; height: 1.05rem; font-size: .6875rem; }
     .pixel-col-axis, .pixel-grid-body { gap: 3px; }
     .pixel-col-axis { grid-template-columns: 1rem repeat(3, minmax(0, 1fr)); }
     .pixel-grid-body { grid-template-columns: 1rem minmax(0, 1fr); }
-    .game-card .pixel-panel { flex: 1 1 128px; max-width: 150px; }
+    .game-card .pixel-panel { flex: 1 1 124px; max-width: 150px; }
+}
+@media (max-width: 420px) {
+    .stack-slot-idx { display: none; }
+    .game-card .stack-world .puzzle-state.stack-vessel-panel { padding: .35rem; }
+    .game-card .stack-world .value-cell.stack-item-cell { padding: .2rem .3rem; }
+    .stack-vessel-head h3 { font-size: .8125rem; }
+    .game-card .logic-switch { padding: .4rem .45rem; gap: .3rem; }
+    .switch-rocker { font-size: .6875rem; padding: .1rem .35rem; }
 }
