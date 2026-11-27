@@ -13,16 +13,33 @@
         </div>
         <details class="practice-options">
             <summary>Change activity</summary>
-            <form method="get" action="{{ route('arcade') }}" class="practice-picker" data-practice-picker>
-                <input type="hidden" name="level" value="{{ $level }}">
-                <label for="practice-game">Choose a concept</label>
-                <select id="practice-game" name="game">
+            <div class="practice-drawer">
+                <nav class="practice-activity-grid" aria-label="Practice activities">
                     @foreach($cabinets as $slug => $instance)
-                        <option value="{{ $slug }}" @selected($selected === $slug)>{{ $instance['concept'] }}</option>
+                        @php
+                            $iconMap = ['pixel-studio' => 'panel', 'number-machine' => 'chart', 'sort-lab' => 'updates', 'terminal-quest' => 'code', 'logic-switchboard' => 'spark', 'string-forge' => 'pencil', 'memory-trail' => 'book', 'sequences' => 'journey', 'loops' => 'refresh', 'conditions' => 'crystal'];
+                            $icon = $iconMap[$slug] ?? 'game';
+                        @endphp
+                        <a class="practice-activity-card" href="{{ route('arcade', ['game' => $slug, 'level' => $level]) }}" @if($selected === $slug) aria-current="page" @endif>
+                            <span class="practice-card-icon" aria-hidden="true"><x-action-icon :name="$icon"/></span>
+                            <span class="practice-card-copy">
+                                <strong>{{ $instance['title'] }}</strong>
+                                <small>{{ $instance['concept'] }}</small>
+                            </span>
+                        </a>
                     @endforeach
-                </select>
-                <button type="submit" class="button button-secondary">Open activity</button>
-            </form>
+                </nav>
+                <form method="get" action="{{ route('arcade') }}" class="practice-picker" data-practice-picker>
+                    <input type="hidden" name="level" value="{{ $level }}">
+                    <label for="practice-game">Choose a concept</label>
+                    <select id="practice-game" name="game">
+                        @foreach($cabinets as $slug => $instance)
+                            <option value="{{ $slug }}" @selected($selected === $slug)>{{ $instance['concept'] }}</option>
+                        @endforeach
+                    </select>
+                    <button type="submit" class="button button-secondary">Open activity</button>
+                </form>
+            </div>
         </details>
     </header>
     <section id="arcade-station" class="arcade-station" aria-label="Selected practice game" data-activity-title-shown>

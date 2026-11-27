@@ -51,16 +51,33 @@ export function mountLearningTrace(root, game, getProgram, buildTrace, render, i
     const statePanel = document.createElement('details');
     const stateSummary = document.createElement('summary'); stateSummary.textContent = 'Program state'; statePanel.append(stateSummary, state);
 
-    const status = document.createElement('p'); status.className = 'field-hint'; status.setAttribute('role', 'status'); status.tabIndex = 0;
+    const status = document.createElement('p'); status.className = 'field-hint trace-status-line'; status.setAttribute('role', 'status'); status.tabIndex = 0;
+    const diffCard = document.createElement('div'); diffCard.className = 'trace-diff-card'; diffCard.hidden = true;
+    const beforeBox = document.createElement('div'); beforeBox.className = 'trace-diff-box';
+    const beforeLabel = document.createElement('span'); beforeLabel.className = 'trace-diff-label'; beforeLabel.textContent = 'Before';
+    const beforeVal = document.createElement('pre'); beforeBox.append(beforeLabel, beforeVal);
+    const afterBox = document.createElement('div'); afterBox.className = 'trace-diff-box trace-diff-after';
+    const afterLabel = document.createElement('span'); afterLabel.className = 'trace-diff-label'; afterLabel.textContent = 'After';
+    const afterVal = document.createElement('pre'); afterBox.append(afterLabel, afterVal);
+    diffCard.append(beforeBox, afterBox);
     const actions = document.createElement('div'); actions.className = 'trace-actions';
     let trace, cursor = 0, replayToken = 0;
     const show = () => {
         const frame = trace.frames[cursor - 1]; const current = frame?.state ?? trace.initial;
+        const previous = cursor > 1 ? trace.frames[cursor - 2]?.state : trace.initial;
         state.textContent = stateText(game, current);
+        if (frame) {
+            diffCard.hidden = false;
+            beforeVal.textContent = stateText(game, previous);
+            afterVal.textContent = stateText(game, current);
+        } else {
+            diffCard.hidden = true;
+        }
         status.textContent = frame ? `Preview step ${cursor}/${trace.frames.length}. ${frame.explanation}${cursor === trace.frames.length ? ` ${trace.message}` : ''}` : trace.message;
         highlight(frame?.index);
         const label = root.querySelector('[data-execution-label]');
         if (label) label.textContent = frame ? `Preview step ${cursor}` : 'Not run';
+        back.disabled = isBusy() || cursor <= 0;
         step.disabled = isBusy() || cursor >= trace.frames.length;
         render(current);
     };
@@ -76,6 +93,7 @@ export function mountLearningTrace(root, game, getProgram, buildTrace, render, i
         });
     };
     const button = (text, action) => { const item = document.createElement('button'); item.type = 'button'; item.className = 'button button-ghost'; item.textContent = text; item.addEventListener('click', () => { if (!isBusy()) action(); }); actions.append(item); return item; };
+    const back = button('Back', () => { replayToken++; cursor = Math.max(0, cursor - 1); show(); });
     const step = button('Step', () => { replayToken++; cursor = Math.min(cursor + 1, trace.frames.length); show(); });
     const replay = button('Replay', async () => {
         const token = ++replayToken; cursor = 0; show();
@@ -87,15 +105,17 @@ export function mountLearningTrace(root, game, getProgram, buildTrace, render, i
         }
     });
     const restart = button('Restart', () => { replayToken++; cursor = 0; show(); });
-    panel.append(actions, status, statePanel);
+    panel.append(actions, status, diffCard, statePanel);
     const controls = root.querySelector('.game-controls');
     controls.querySelector('.game-extras').append(panel);
     const refresh = (paint = false) => {
         replayToken++;
         const program = getProgram(); trace = buildTrace(program); cursor = 0;
         highlight();
+        diffCard.hidden = true;
         state.textContent = `Initial state\n${stateText(game, trace.initial)}`;
         status.textContent = program.length ? trace.message : 'Add an instruction to begin.';
+        back.disabled = true;
         step.disabled = !trace.frames.length || isBusy();
         replay.disabled = !trace.frames.length || isBusy();
         restart.disabled = !trace.frames.length || isBusy();
