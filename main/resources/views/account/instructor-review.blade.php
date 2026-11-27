@@ -50,7 +50,9 @@
         <summary>Submitted qualification history</summary>
         <ul class="review-list">
             @foreach($versions as $version)
-                @php($vMeta = $versionMeta[$version->application_version] ?? ['available' => false, 'extension' => '', 'size' => null, 'previewable' => false])
+                @php
+                    $vMeta = $versionMeta[$version->application_version] ?? ['available' => false, 'extension' => '', 'size' => null, 'previewable' => false];
+                @endphp
                 <li>
                     <span>Submission {{ $version->application_version }} · {{ $version->verification_status }}@if(!empty($vMeta['extension'])) · {{ strtoupper($vMeta['extension']) }}@endif</span>
                     <span class="credential-history-actions">

@@ -23,7 +23,9 @@
     <label>Institution<input name="institution_name" value="{{ old('institution_name') }}" maxlength="100" required placeholder="School, university, or organization"></label>
     <label>Specialization<input name="specialization" value="{{ old('specialization') }}" maxlength="100" required placeholder="e.g. Computer Science, Web Development"></label>
 </div>
-@php($credMaxKb = (int) config('account.credentials.max_kilobytes', 5120))
+@php
+    $credMaxKb = (int) config('account.credentials.max_kilobytes', 5120);
+@endphp
 <label>Teaching credentials<input type="file" name="credential_document" accept="application/pdf,image/jpeg,image/png,.pdf,.jpg,.jpeg,.png" data-file-constraints data-max-bytes="{{ $credMaxKb * 1024 }}" data-max-files="1" data-allowed-types="application/pdf,image/jpeg,image/png" data-allowed-extensions="pdf,jpg,jpeg,png" required><small class="file-constraints-note">Accepted formats: <strong>PDF, JPEG, or PNG</strong> · Maximum size: <strong>{{ number_format($credMaxKb / 1024, 1) }} MB</strong> · Standard unencrypted files only. Stored privately for authorized staff reviewers.</small></label>
 <p class="file-constraint-feedback" data-file-feedback="credential_document" role="status" aria-live="polite" hidden></p>
 <label class="checkbox-label"><input type="checkbox" name="confirmed" value="1" required> I confirm these credentials are ready for review.</label>
