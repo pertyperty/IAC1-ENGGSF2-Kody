@@ -6,6 +6,7 @@ import { saveCompletion } from './save-completion.js';
 import { programRuleError, mountConceptCheck, objectiveFeedback } from './assessment-challenges.js';
 import { mountMission } from './mission.js';
 import { normalizeArcadeCommand } from './arcade-pseudocode.js';
+import { analyzeSortArray, numberLineMetrics, renderHighlightedCode } from './visual-aids.js';
 
 const readableInstruction = (template, command) => formatInstruction(template, normalizeArcadeCommand(template, command));
 
@@ -143,13 +144,28 @@ export function mountArcade(root) {
     function render(state) {
         mission.update(state);
         world.replaceChildren();
+        const currentLines = lines();
         if (puzzleTemplates.includes(game.template)) {
-            renderPuzzle(game, state, world, node, button, add);
+            const stringSteps = game.template === 'string-forge'
+                ? currentLines.slice(0, 12).map((command, idx) => {
+                    const stepRes = evaluateArcade(game, currentLines.slice(0, idx + 1));
+                    return { label: normalizeArcadeCommand(game.template, command).split(' ')[0], text: stepRes.state.text, error: Boolean(stepRes.error) };
+                })
+                : [];
+            renderPuzzle(game, state, world, node, button, add, stringSteps);
         } else if (game.template === 'pixel-studio') {
             const target = Object.fromEntries(game.scenario.pixels.map((pixel) => { const [x, y, color] = pixel.split(' '); return [`${x} ${y}`, color]; }));
             for (const [label, pixels] of [['Target picture', target], ['Your canvas', state.pixels]]) {
                 const panel = node('div', '', 'pixel-panel');
                 panel.append(node('h3', label));
+                const frame = node('div', '', 'pixel-coord-frame');
+                const colAxis = node('div', '', 'pixel-col-axis');
+                colAxis.setAttribute('aria-hidden', 'true');
+                colAxis.append(node('span', '#', 'axis-corner'), node('span', '1'), node('span', '2'), node('span', '3'));
+                const body = node('div', '', 'pixel-grid-body');
+                const rowAxis = node('div', '', 'pixel-row-axis');
+                rowAxis.setAttribute('aria-hidden', 'true');
+                rowAxis.append(node('span', '1'), node('span', '2'), node('span', '3'));
                 const grid = node('div', '', 'pixel-grid');
                 for (let y = 1; y <= 3; y++) for (let x = 1; x <= 3; x++) {
                     const color = pixels[`${x} ${y}`] ?? 'blank';
@@ -161,32 +177,62 @@ export function mountArcade(root) {
                     if (label === 'Your canvas') tile.dataset.match = color === (target[`${x} ${y}`] ?? 'blank') ? 'same' : 'different';
                     grid.append(tile);
                 }
-                panel.append(grid);
+                body.append(rowAxis, grid);
+                frame.append(colAxis, body);
+                panel.append(frame);
                 world.append(panel);
             }
         } else if (game.template === 'number-machine') {
+            const metrics = numberLineMetrics(game.scenario.start, state.number, game.scenario.target);
             const start = node('div', '', 'machine-node'); start.append(node('small', 'START'), node('b', String(game.scenario.start)));
-            const current = node('div', '', 'machine-node number-display'); current.append(node('small', 'YOUR VALUE'), node('b', String(state.number)));
-            const target = node('div', '', 'machine-node'); target.append(node('small', 'TARGET'), node('b', String(game.scenario.target)));
+            const current = node('div', '', `machine-node number-display${metrics.diff === 0 ? ' is-exact' : ''}`); current.append(node('small', 'YOUR VALUE'), node('b', String(state.number)));
+            const target = node('div', '', 'machine-node machine-target'); target.append(node('small', 'TARGET'), node('b', String(game.scenario.target)));
             const arrow = () => {
                 const element = node('span', '', 'machine-arrow');
                 element.append(createIcon(root.ownerDocument, 'right'));
                 return element;
             };
             world.append(start, arrow(), current, arrow(), target);
-            const trail = node('ol', '', 'value-journey'); trail.setAttribute('aria-label', 'Value after each instruction');
-            lines().slice(0, 12).forEach((command, index) => {
-                const frame = evaluateArcade(game, lines().slice(0, index + 1));
-                const item = node('li', '', frame.error ? 'journey-error' : '');
-                item.append(node('small', `Step ${index + 1}`), node('code', readableInstruction(game.template, command)), node('b', frame.error ? 'Check instruction' : String(frame.state.number)));
+
+            const gauge = node('div', '', 'number-gauge');
+            gauge.setAttribute('aria-hidden', 'true');
+            const gaugeHead = node('div', '', 'number-gauge-head');
+            gaugeHead.append(node('span', 'Number line'), node('span', metrics.deltaLabel, `gauge-delta${metrics.diff === 0 ? ' is-exact' : ''}`));
+            const track = node('div', '', 'number-gauge-track');
+            const startPin = node('span', '', 'gauge-pin gauge-pin-start'); startPin.style.left = `${metrics.startPct}%`;
+            const targetPin = node('span', '', 'gauge-pin gauge-pin-target'); targetPin.style.left = `${metrics.targetPct}%`;
+            const currPin = node('span', '', 'gauge-pin gauge-pin-current'); currPin.style.left = `${metrics.currentPct}%`;
+            track.append(startPin, targetPin, currPin);
+            gauge.append(gaugeHead, track);
+            world.append(gauge);
+
+            const trail = node('ol', '', 'value-journey');
+            trail.tabIndex = 0;
+            trail.setAttribute('aria-label', 'Value after each instruction');
+            currentLines.slice(0, 12).forEach((command, index) => {
+                const frame = evaluateArcade(game, currentLines.slice(0, index + 1));
+                const item = node('li', '', frame.error ? 'journey-error' : frame.state.number === game.scenario.target ? 'journey-hit' : '');
+                const codeEl = node('code', '');
+                codeEl.append(renderHighlightedCode(root.ownerDocument, readableInstruction(game.template, command)));
+                item.append(node('small', `Step ${index + 1}`), codeEl, node('b', frame.error ? 'Check instruction' : String(frame.state.number)));
                 trail.append(item);
             });
-            const history = node('details', '', 'value-history'); history.append(node('summary', 'Trace changes'), trail); world.append(history);
+            const historyPanel = node('details', '', 'value-history');
+            if (currentLines.length) historyPanel.open = true;
+            historyPanel.append(node('summary', currentLines.length ? `Execution trace (${currentLines.length})` : 'Trace changes'), trail);
+            world.append(historyPanel);
         } else if (game.template === 'sort-lab') {
+            const analysis = analyzeSortArray(state.items);
+            const sorted = [...game.scenario.items].sort((a, b) => a - b);
+            const maxVal = Math.max(1, ...state.items);
+            const headerBar = node('div', '', 'sort-header-bar');
+            const goal = node('p', `Target: [${sorted.join(', ')}]`, 'array-target');
+            const orderBadge = node('span', analysis.adjacentErrors === 0 ? 'In ascending order' : `${analysis.adjacentErrors} out-of-order ${analysis.adjacentErrors === 1 ? 'pair' : 'pairs'}`, `sort-order-badge${analysis.adjacentErrors === 0 ? ' is-sorted' : ''}`);
+            headerBar.append(goal, orderBadge);
             const stack = node('div', '', 'sort-stack');
             state.items.forEach((value, index) => {
                 const tile = button('', 'sort-tile', `Select position ${index + 1}, value ${value}`, () => {
-                    if (selectedPosition === null) { selectedPosition = index; render(state); world.querySelector(`[aria-label^="Select position ${index + 1},"]`)?.focus({ preventScroll: true }); previewStatus.textContent = 'Now choose a second tile to swap.'; }
+                    if (selectedPosition === null) { selectedPosition = index; render(state); world.querySelector(`[aria-label^="Select position ${index + 1},"]`)?.focus({ preventScroll: true }); previewStatus.textContent = `Selected position ${index + 1} (${value}). Choose a second slot to swap.`; }
                     else {
                         const first = selectedPosition; selectedPosition = null;
                         if (first !== index) add(`swap ${first + 1} ${index + 1}`); else preview();
@@ -194,23 +240,63 @@ export function mountArcade(root) {
                     }
                 });
                 tile.setAttribute('aria-pressed', String(selectedPosition === index));
-                tile.dataset.match = value === [...game.scenario.items].sort((a, b) => a - b)[index] ? 'same' : 'different';
-                tile.append(node('b', String(value)), node('small', `position ${index + 1}`));
-                const bar = node('span', '', 'sort-bar'); bar.style.setProperty('--bar-height', `${30 + value / 99 * 60}%`); tile.append(bar);
+                tile.dataset.match = value === sorted[index] ? 'same' : 'different';
+                tile.append(node('b', String(value)), node('small', `[${index + 1}]`, 'sort-index-chip'));
+                const bar = node('span', '', 'sort-bar'); bar.style.setProperty('--bar-height', `${24 + (value / maxVal) * 66}%`); tile.append(bar);
                 stack.append(tile);
+                if (index < state.items.length - 1) {
+                    const pair = analysis.pairs[index];
+                    const cmp = node('span', pair.ordered ? '≤' : '>', `sort-compare${pair.ordered ? ' is-ok' : ' is-inv'}`);
+                    cmp.setAttribute('aria-hidden', 'true');
+                    stack.append(cmp);
+                }
             });
-            const goal = node('p', `Target: [${[...game.scenario.items].sort((a, b) => a - b).join(', ')}]`, 'array-target');
-            world.append(goal, stack, node('p', 'Select two positions to add a swap.', 'scene-instruction'));
+            world.append(headerBar, stack, node('p', selectedPosition !== null ? `Swap slot [${selectedPosition + 1}] with another tile.` : 'Select two slots to swap their values.', 'scene-instruction'));
         } else {
-            const mission = node('div', '', 'terminal-mission');
-            mission.append(node('span', 'VIRTUAL WORKSPACE', 'game-kicker'), node('h3', `Make ${game.scenario.destination}`), node('p', `Copy a file containing “${game.scenario.content}”, then inspect the new file with cat.`));
+            const inspected = new Set();
+            let verifiedDest = false;
+            for (const cmd of currentLines) {
+                const norm = normalizeArcadeCommand(game.template, cmd);
+                const m = /^cat ([a-z][a-z0-9_-]{0,19}\.[a-z]{1,5})$/.exec(norm);
+                if (m) {
+                    inspected.add(m[1]);
+                    if (m[1] === game.scenario.destination && state.files[m[1]] === game.scenario.content) verifiedDest = true;
+                }
+                if (/^cp /.test(norm)) verifiedDest = false;
+            }
+            const hasExplored = currentLines.some(cmd => /^(ls|cat )/.test(normalizeArcadeCommand(game.template, cmd)));
+            const hasCopied = state.files[game.scenario.destination] === game.scenario.content;
+
+            const chrome = node('div', '', 'terminal-chrome');
+            const dots = node('span', '', 'terminal-chrome-dots'); dots.setAttribute('aria-hidden', 'true');
+            chrome.append(dots, node('span', 'kody@workspace — virtual shell', 'terminal-chrome-title'), node('span', 'sandboxed', 'terminal-chrome-tag'));
+
+            const missionBox = node('div', '', 'terminal-mission');
+            missionBox.append(node('span', 'VIRTUAL WORKSPACE', 'game-kicker'), node('h3', `Make ${game.scenario.destination}`), node('p', `Copy a file containing “${game.scenario.content}”, then inspect the new file with cat.`));
+
+            const checklist = node('ol', '', 'terminal-checklist');
+            checklist.setAttribute('aria-label', 'Mission checklist');
+            for (const [done, text] of [
+                [hasExplored, 'Explore files (ls or cat)'],
+                [hasCopied, `Copy match to ${game.scenario.destination} (cp)`],
+                [verifiedDest, `Verify with cat ${game.scenario.destination}`],
+            ]) {
+                const li = node('li', text, done ? 'is-done' : '');
+                checklist.append(li);
+            }
+
             const files = node('ul', '', 'terminal-files');
             Object.keys(state.files).forEach(name => {
                 const item = node('li', '');
-                item.append(button(name, 'file-inspect', `Read ${name}`, () => add(`cat ${name}`)));
+                const isDest = name === game.scenario.destination;
+                const tag = isDest ? (verifiedDest ? 'verified' : 'copy') : (inspected.has(name) ? 'read' : '');
+                const btn = button('', `file-inspect${isDest ? ' is-dest' : ''}${inspected.has(name) ? ' is-read' : ''}`, `Read ${name}`, () => add(`cat ${name}`));
+                btn.append(node('span', name, 'file-name'));
+                if (tag) btn.append(node('small', tag, 'file-state-tag'));
+                item.append(btn);
                 files.append(item);
             });
-            world.append(mission, files, node('p', 'A safe simulator. Commands never access your computer.', 'scene-instruction'));
+            world.append(chrome, missionBox, checklist, files, node('p', 'A safe simulator. Commands never access your computer.', 'scene-instruction'));
         }
     }
     function preview() {
@@ -228,7 +314,9 @@ export function mountArcade(root) {
         program.slice(0, 12).forEach((command, index) => {
             const row = node('li', '');
             row.dataset.instructionIndex = String(index);
-            row.append(node('small', String(index + 1)), node('code', readableInstruction(game.template, command)));
+            const codeEl = node('code', '');
+            codeEl.append(renderHighlightedCode(root.ownerDocument, readableInstruction(game.template, command)));
+            row.append(node('small', String(index + 1)), codeEl);
             const remove = button('', 'instruction-remove', `Remove step ${index + 1}`, () => {
                 const updated = lines(); updated.splice(index, 1); code.value = updated.join('\n'); preview();
                 programList.querySelectorAll('button')[Math.min(index, updated.length - 1)]?.focus({ preventScroll: true });
@@ -314,10 +402,12 @@ export function mountArcade(root) {
         const palette = node('div', '', 'paint-palette');
         palette.setAttribute('role', 'group'); palette.setAttribute('aria-label', 'Paint color');
         availablePaintColors.forEach(color => {
-            const swatch = button(color, `paint-swatch pixel-${color}`, `Paint with ${color}`, () => {
+            const swatch = button('', `paint-swatch pixel-${color}`, `Paint with ${color}`, () => {
                 selectedColor = color;
                 palette.querySelectorAll('button').forEach(option => option.setAttribute('aria-pressed', String(option === swatch)));
             });
+            const dot = node('i', '', `swatch-dot pixel-${color}`); dot.setAttribute('aria-hidden', 'true');
+            swatch.append(dot, node('span', color));
             swatch.setAttribute('aria-pressed', String(color === selectedColor)); palette.append(swatch);
         });
         // Keep colors next to the canvas, outside the bounded state scroller.
@@ -329,7 +419,9 @@ export function mountArcade(root) {
         game.assessment.commands.forEach(command => {
             const control = button('', 'instruction-choice', `Add ${readableInstruction(game.template, command)}`, () => add(command));
             control.dataset.addCommand = command;
-            control.append(node('code', readableInstruction(game.template, command)), node('small', meanings[command.split(' ')[0]] ?? 'Add this instruction'));
+            const codeEl = node('code', '');
+            codeEl.append(renderHighlightedCode(root.ownerDocument, readableInstruction(game.template, command)));
+            control.append(codeEl, node('small', meanings[command.split(' ')[0]] ?? 'Add this instruction'));
             bank.append(control);
         });
         controls.append(bank);
@@ -356,6 +448,23 @@ export function mountArcade(root) {
         syncOperand();
         build = () => `${operation.value}${['push', 'append'].includes(operation.value) ? ` ${value.value}` : ''}`;
     } else {
+        const helpers = node('div', '', 'terminal-quick-chips');
+        helpers.setAttribute('aria-label', 'Quick command starters');
+        for (const [chipLabel, snippet, hint] of [
+            ['ls', 'ls', 'List files'],
+            ['cat', 'cat ', 'Read a file'],
+            ['cp', `cp  ${game.scenario.destination}`, 'Copy source to destination'],
+        ]) {
+            const chip = button('', 'terminal-chip', `Insert ${chipLabel} (${hint})`, () => {
+                if (snippet === 'ls') { add('ls'); return; }
+                terminalInput.value = snippet;
+                terminalInput.focus();
+                if (chipLabel === 'cp') terminalInput.setSelectionRange(3, 3);
+            });
+            chip.append(node('code', chipLabel), node('small', hint));
+            helpers.append(chip);
+        }
+        controls.append(helpers);
         const wrapper = node('label', 'kody@workspace $', 'terminal-prompt'); terminalInput = document.createElement('input'); terminalInput.type = 'text'; terminalInput.maxLength = 100; terminalInput.placeholder = 'ls'; terminalInput.autocomplete = 'off'; terminalInput.spellcheck = false; wrapper.append(terminalInput); controls.append(wrapper);
         build = () => terminalInput.value.trim();
         terminalInput.addEventListener('keydown', async (event) => {

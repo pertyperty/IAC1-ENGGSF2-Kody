@@ -1,5 +1,6 @@
 import { validateQuestion, checkQuestion, readQuestionAnswer } from './quiz-types.js';
 import { saveCompletion } from './save-completion.js';
+import { splitQuizPrompt } from './visual-aids.js';
 
 export function validateQuiz(quiz) {
     if (!quiz || quiz.template !== 'choice-quiz' || ![1, 2, 3].includes(quiz.version)) throw new Error('Unsupported quiz template.');
@@ -126,6 +127,49 @@ export function mountQuiz(root) {
             feedback.textContent = 'Answer changed. Check your answers again.';
             updateNavigation();
         }));
+        groups.forEach((group) => {
+            const legend = group.querySelector('legend');
+            if (legend) {
+                const raw = legend.textContent ?? '';
+                const prefixMatch = /^(\d+\.\s+)/.exec(raw);
+                const prefix = prefixMatch ? prefixMatch[1] : '';
+                const body = prefix ? raw.slice(prefix.length) : raw;
+                const parsed = splitQuizPrompt(body);
+                if (parsed.code) {
+                    legend.replaceChildren();
+                    if (parsed.question) {
+                        const qSpan = doc.createElement('span');
+                        qSpan.className = 'quiz-prompt-question';
+                        qSpan.textContent = `${prefix}${parsed.question}`;
+                        legend.append(qSpan);
+                    }
+                    const wrap = doc.createElement('div');
+                    wrap.className = 'quiz-code-wrap';
+                    if (parsed.lead) {
+                        const lang = doc.createElement('span');
+                        lang.className = 'quiz-code-lang';
+                        lang.textContent = parsed.lead;
+                        wrap.append(lang);
+                    }
+                    const pre = doc.createElement('pre');
+                    pre.className = 'quiz-code-snippet';
+                    pre.textContent = parsed.code;
+                    wrap.append(pre);
+                    legend.append(wrap);
+                }
+            }
+            const radioLabels = [...group.querySelectorAll('label')].filter((lbl) => lbl.querySelector('input[type="radio"]'));
+            const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
+            radioLabels.forEach((lbl, idx) => {
+                if (lbl.querySelector('.quiz-option-key')) return;
+                const keyBadge = doc.createElement('span');
+                keyBadge.className = 'quiz-option-key';
+                keyBadge.dataset.key = letters[idx] ?? String(idx + 1);
+                keyBadge.setAttribute('aria-hidden', 'true');
+                const radio = lbl.querySelector('input[type="radio"]');
+                radio?.after(keyBadge);
+            });
+        });
         root.classList.add('quiz-stepped');
         updateNavigation();
         showQuestion(0, false);

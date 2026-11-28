@@ -4,6 +4,7 @@ import { mountLearningTrace, readableInstruction } from './learning-trace.js';
 import { createIcon } from '../icons.js';
 import { saveCompletion } from './save-completion.js';
 import { programRuleError, mountConceptCheck } from './assessment-challenges.js';
+import { previewGardenRoute, renderHighlightedCode } from './visual-aids.js';
 
 const moves = Object.freeze({ up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] });
 const key = ([x, y]) => `${x},${y}`;
@@ -100,11 +101,74 @@ export function mountGarden(root) {
             tiles.push({ tile, actor, point: [x, y] });
         }
     }
-    const renderBoard = (position = instance.start, crystals = instance.crystals.map(key)) => {
+    const routeOverlay = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    routeOverlay.setAttribute('class', 'garden-route-overlay');
+    routeOverlay.setAttribute('aria-hidden', 'true');
+    routeOverlay.setAttribute('viewBox', `0 0 ${instance.width * 100} ${instance.height * 100}`);
+    routeOverlay.setAttribute('preserveAspectRatio', 'none');
+    board.append(routeOverlay);
+
+    const liveBranchChip = document.createElement('p');
+    liveBranchChip.className = 'garden-live-chip';
+    liveBranchChip.hidden = true;
+    liveBranchChip.setAttribute('aria-live', 'polite');
+    board.after(liveBranchChip);
+
+    const renderRoutePreview = () => {
+        routeOverlay.replaceChildren();
+        tiles.forEach(({ tile }) => {
+            tile.classList.remove('preview-step-tile', 'collision-tile');
+        });
+        if (!program.length || running) return;
+        const preview = previewGardenRoute(instance, program, {
+            repeat: Boolean(root.querySelector('[data-game-repeat]')?.checked),
+            conditional: Boolean(root.querySelector('[data-game-conditional]')?.checked),
+        });
+        const svgNS = 'http://www.w3.org/2000/svg';
+        for (const seg of preview.segments) {
+            const line = document.createElementNS(svgNS, 'line');
+            line.setAttribute('x1', String(seg.from[0] * 100 + 50));
+            line.setAttribute('y1', String(seg.from[1] * 100 + 50));
+            line.setAttribute('x2', String(seg.to[0] * 100 + 50));
+            line.setAttribute('y2', String(seg.to[1] * 100 + 50));
+            line.setAttribute('class', seg.cycle === 2 ? 'route-seg route-seg-loop2' : 'route-seg');
+            routeOverlay.append(line);
+            const dot = document.createElementNS(svgNS, 'circle');
+            dot.setAttribute('cx', String(seg.to[0] * 100 + 50));
+            dot.setAttribute('cy', String(seg.to[1] * 100 + 50));
+            dot.setAttribute('r', seg.collected ? '11' : '7');
+            dot.setAttribute('class', seg.collected ? 'route-dot route-dot-collect' : seg.cycle === 2 ? 'route-dot route-dot-loop2' : 'route-dot');
+            routeOverlay.append(dot);
+            tiles.find(({ point }) => key(point) === key(seg.to))?.tile.classList.add('preview-step-tile');
+        }
+        if (preview.collision) {
+            const { from, to } = preview.collision;
+            const clampX = Math.max(0, Math.min(instance.width - 1, to[0]));
+            const clampY = Math.max(0, Math.min(instance.height - 1, to[1]));
+            const line = document.createElementNS(svgNS, 'line');
+            line.setAttribute('x1', String(from[0] * 100 + 50));
+            line.setAttribute('y1', String(from[1] * 100 + 50));
+            line.setAttribute('x2', String(clampX * 100 + 50));
+            line.setAttribute('y2', String(clampY * 100 + 50));
+            line.setAttribute('class', 'route-seg route-seg-error');
+            routeOverlay.append(line);
+            const marker = document.createElementNS(svgNS, 'circle');
+            marker.setAttribute('cx', String(clampX * 100 + 50));
+            marker.setAttribute('cy', String(clampY * 100 + 50));
+            marker.setAttribute('r', '14');
+            marker.setAttribute('class', 'route-dot route-dot-error');
+            routeOverlay.append(marker);
+            tiles.find(({ point }) => key(point) === key([clampX, clampY]))?.tile.classList.add('collision-tile');
+        }
+    };
+
+    const renderBoard = (position = instance.start, crystals = instance.crystals.map(key), facing = null) => {
         mission.update({ position, crystals });
         for (const { tile, actor, point } of tiles) {
             const isKody = key(point) === key(position);
             actor.className = `tile-actor${isKody ? ' garden-kody' : ''}`;
+            if (isKody && facing) actor.dataset.facing = facing;
+            else delete actor.dataset.facing;
             actor.replaceChildren(); if (!isKody && (key(point) === key(instance.goal) || crystals.includes(key(point)))) actor.append(createIcon(document, key(point) === key(instance.goal) ? 'flag' : 'crystal'));
             tile.classList.toggle('goal-tile', key(point) === key(instance.goal));
             tile.classList.toggle('crystal-tile', crystals.includes(key(point)));
@@ -113,6 +177,7 @@ export function mountGarden(root) {
         const coordinates = points => points.map(([x, y]) => `${x + 1},${y + 1}`).join('; ');
         board.setAttribute('aria-label', `Kody is at column ${position[0] + 1}, row ${position[1] + 1}. Flag at column ${instance.goal[0] + 1}, row ${instance.goal[1] + 1}. Path tiles (column,row): ${coordinates(instance.path)}. ${crystals.length} crystals left${crystals.length ? ` at ${coordinates(crystals.map(point => point.split(',').map(Number)))}` : ''}.`);
         if (objectives) objectives.textContent = crystals.length ? `${crystals.length} crystals left` : (instance.crystals.length ? 'All crystals collected' : 'Follow the path to the flag');
+        renderRoutePreview();
     };
     const updateTools = () => {
         root.querySelector('[data-game-run]').disabled = running || program.length === 0;
@@ -122,10 +187,12 @@ export function mountGarden(root) {
     };
     const renderProgram = () => {
         programTrack.replaceChildren();
+        const loopActive = instance.mode === 'loop' && Boolean(root.querySelector('[data-game-repeat]')?.checked);
+        programTrack.dataset.loopActive = String(loopActive);
         if (instance.mode === 'loop') {
             const rule = document.createElement('div');
-            rule.className = 'trace-rule';
-            rule.textContent = root.querySelector('[data-game-repeat]')?.checked ? 'repeat 2 times:' : 'Repeat is off.';
+            rule.className = `trace-rule${loopActive ? ' is-active-loop' : ''}`;
+            rule.textContent = loopActive ? 'repeat 2 times:' : 'Repeat is off.';
             programTrack.append(rule);
         }
         if (program.length === 0) {
@@ -134,10 +201,12 @@ export function mountGarden(root) {
         program.forEach((command, index) => {
             const step = document.createElement('button');
             step.type = 'button'; step.className = 'program-step';
+            if (loopActive) step.dataset.inLoop = 'true';
             const number = document.createElement('small'); number.textContent = index + 1;
             const instruction = document.createElement('code');
-            instruction.textContent = readableInstruction('command-garden', command);
-            if (instance.mode === 'conditional' && root.querySelector('[data-game-conditional]')?.checked) instruction.textContent += '\nif kody.on_crystal():\n    kody.collect()';
+            let codeText = readableInstruction('command-garden', command);
+            if (instance.mode === 'conditional' && root.querySelector('[data-game-conditional]')?.checked) codeText += '\nif kody.on_crystal():\n    kody.collect()';
+            instruction.append(renderHighlightedCode(document, codeText));
             step.dataset.instructionIndex = String(index);
             step.append(number, instruction);
             step.setAttribute('aria-label', `Step ${index + 1}: ${command}`);
@@ -160,6 +229,7 @@ export function mountGarden(root) {
         root.dataset.playState = 'ready';
         root.querySelector('[data-execution-label]').textContent = 'Not run';
         success.hidden = true;
+        liveBranchChip.hidden = true;
         feedback.textContent = program.length ? 'Program changed. Run to check the goal.' : 'Add moves, then run your program.';
         renderProgram();
         renderBoard();
@@ -227,7 +297,19 @@ export function mountGarden(root) {
             for (const frame of checkingAnswer ? result.trace.slice(-1) : result.trace) {
                 if (delay && !checkingAnswer) await new Promise((resolve) => setTimeout(resolve, delay));
                 inspector.highlight(frame.index);
-                renderBoard(frame.position, frame.crystals);
+                renderBoard(frame.position, frame.crystals, program[frame.index]);
+                if (instance.mode === 'conditional') {
+                    const ruleOn = Boolean(root.querySelector('[data-game-conditional]')?.checked);
+                    liveBranchChip.hidden = false;
+                    liveBranchChip.dataset.branch = frame.crystalHere && ruleOn ? 'true' : 'false';
+                    liveBranchChip.textContent = frame.crystalHere
+                        ? (ruleOn ? 'if on_crystal() → TRUE · kody.collect()' : 'Crystal here, but collection rule is OFF')
+                        : 'if on_crystal() → FALSE · skip collect()';
+                } else if (instance.mode === 'loop') {
+                    liveBranchChip.hidden = false;
+                    liveBranchChip.dataset.branch = frame.cycle === 2 ? 'loop2' : 'loop1';
+                    liveBranchChip.textContent = `Loop pass ${frame.cycle} of 2 · step ${frame.index + 1}`;
+                }
                 feedback.textContent = `Step ${frame.index + 1}: ${readableInstruction('command-garden', program[frame.index])}. Now at column ${frame.position[0] + 1}, row ${frame.position[1] + 1}.`;
                 tiles.find(({ point }) => key(point) === key(frame.position))?.tile.classList.add('visited-tile');
                 programTrack.querySelectorAll('.program-step').forEach((step, index) => step.classList.toggle('executing', index === frame.index));
