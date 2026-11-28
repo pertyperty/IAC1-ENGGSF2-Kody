@@ -66,6 +66,23 @@ class PublisherSettlements
         }, 3);
     }
 
+    /** @return array{available: int, pending: int, reserved: int, minimum: int, fee: ?int, shortfall: int} */
+    public function payoutSummary(int $userId, bool $ready): array
+    {
+        $asOf = now();
+        $row = $this->availableEarnings($userId, 'Cash')->selectRaw(
+            'COALESCE(SUM(amount_minor - claimed_minor - reserved_minor) FILTER (WHERE available_at <= ?), 0) AS available,
+             COALESCE(SUM(amount_minor - claimed_minor - reserved_minor) FILTER (WHERE available_at > ?), 0) AS pending,
+             COALESCE(SUM(reserved_minor), 0) AS reserved', [$asOf, $asOf]
+        )->first();
+        $available = (int) ($row->available ?? 0);
+        $minimum = (int) config('economy.minimum_payout_minor');
+        $fee = $ready ? (int) config('xendit.payout_fee_minor') : null;
+
+        return ['available' => $available, 'pending' => (int) ($row->pending ?? 0), 'reserved' => (int) ($row->reserved ?? 0),
+            'minimum' => $minimum, 'fee' => $fee, 'shortfall' => max(0, max($minimum, ($fee ?? 0) + 1) - $available)];
+    }
+
     public function request(User $actor, string $sessionId, #[\SensitiveParameter] array $data): string
     {
         return DB::transaction(function () use ($actor, $sessionId, $data): string {
@@ -76,7 +93,7 @@ class PublisherSettlements
             $gross = ExactMoney::minor($data['amount']);
             $fee = config('xendit.payout_fee_minor');
             if ($gross < config('economy.minimum_payout_minor') || $gross <= $fee || (int) ($data['quoted_fee_minor'] ?? -1) !== $fee) {
-                throw ValidationException::withMessages(['amount' => 'Choose at least PHP500 and confirm the current quoted fee.']);
+                throw ValidationException::withMessages(['amount' => 'Request at least PHP '.ExactMoney::decimal(config('economy.minimum_payout_minor')).', enough to cover the fee, and confirm the current fee.']);
             }
             $recipient = $this->recipient($data);
             $ledger = app(WalletLedger::class);
@@ -265,8 +282,12 @@ class PublisherSettlements
 
     private function earnings(int $userId, string $kind): Builder
     {
-        return DB::table('publisher_earnings')->where('user_id', $userId)->where('kind', $kind)->where('status', 'Available')
-            ->where('available_at', '<=', now())->orderBy('created_at')->orderBy('id')->lockForUpdate();
+        return $this->availableEarnings($userId, $kind)->where('available_at', '<=', now())->orderBy('created_at')->orderBy('id')->lockForUpdate();
+    }
+
+    private function availableEarnings(int $userId, string $kind): Builder
+    {
+        return DB::table('publisher_earnings')->where('user_id', $userId)->where('kind', $kind)->where('status', 'Available');
     }
 
     private function confirmation(array $data): void

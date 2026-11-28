@@ -16,7 +16,7 @@ test('F01 owned status never treats a browser return as payment and verified rec
     economyProvider();
     $user = moduleAccount(Role::Learner);
     moduleSignIn($this, $user);
-    $id = app(Payments::class)->purchase($user->fresh(), session()->getId(), economyConfirm(['package' => 'starter']));
+    $id = app(Payments::class)->purchase($user->fresh(), session()->getId(), economyConfirm(['package' => 'starter', 'email_receipt' => '1']));
     $this->get(route('wallet.purchase.show', $id).'?status=SUCCEEDED')->assertOk();
     $this->getJson(route('wallet.purchase.status', $id))->assertJson(['state' => 'Queued', 'verified' => false, 'available' => 0, 'receipt' => null]);
     $this->get(route('wallet.receipt', $id))->assertNotFound();

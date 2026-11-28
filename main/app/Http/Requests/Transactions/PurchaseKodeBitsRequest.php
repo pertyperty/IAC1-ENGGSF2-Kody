@@ -16,6 +16,6 @@ class PurchaseKodeBitsRequest extends FormRequest
     public function rules(): array
     {
         return ['package' => ['required', Rule::in(array_keys(config('economy.packages')))], 'confirmation_id' => ['required', 'uuid'],
-            'current_password' => ['required', 'string', 'max:32'], 'confirmed' => ['required', 'accepted']];
+            'current_password' => ['required', 'string', 'max:32'], 'confirmed' => ['required', 'accepted'], 'email_receipt' => ['sometimes', 'boolean']];
     }
 }

@@ -1,5 +1,6 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>{{ $receiptTitle }}</title></head><body>
 <h1>{{ $receiptTitle }}</h1><p>Your verified Kody transaction has been recorded.</p>
+@if($details['sandbox'] ?? false)<p><strong>Xendit test mode. No real payment was collected.</strong></p>@endif
 @if(isset($details['kodebits']))<p>KodeBits: {{ $details['kodebits'] }} KB</p>@endif
 @if(isset($details['amount_minor']))<p>Amount: PHP {{ \App\Support\ExactMoney::decimal($details['amount_minor']) }}</p>@endif
 @if(isset($details['fee_minor']))<p>Fee: PHP {{ \App\Support\ExactMoney::decimal($details['fee_minor']) }}</p>@endif

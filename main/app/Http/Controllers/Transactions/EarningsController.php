@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Transactions;
 
+use App\Enums\Role;
 use App\Http\Controllers\Controller;
 use App\Services\Transactions\PublisherSettlements;
 use App\Services\Transactions\Refunds;
@@ -15,18 +16,19 @@ use Illuminate\Support\Str;
 
 class EarningsController extends Controller
 {
-    public function index(Request $request): Response
+    public function index(Request $request, PublisherSettlements $settlements): Response
     {
         $id = $request->user()->id;
         $payouts = DB::table('payout_requests')->where('user_id', $id)->orderByDesc('created_at')->paginate(10, ['id', 'gross_minor', 'fee_minor', 'state', 'review_notes', 'created_at'], 'payouts')->withQueryString();
         $refunds = DB::table('refund_requests')->where('user_id', $id)->orderByDesc('created_at')->paginate(10, ['id', 'kind', 'state', 'reason', 'review_notes'], 'refunds')->withQueryString();
         $confirmationId = (string) Str::uuid();
         $ready = app(Readiness::class)->available();
+        $payoutSummary = $request->user()->account_role === Role::Instructor ? $settlements->payoutSummary($id, $ready) : null;
         $accessSales = DB::table('content_purchases')->where('user_id', $id)->where('status', 'Active')->where('created_at', '>=', now()->subDays(7))->orderByDesc('created_at')->limit(20)->get();
         $topups = DB::table('payment_purchases')->where('user_id', $id)->where('state', 'Succeeded')->where('created_at', '>=', now()->subDays(14))->orderByDesc('created_at')->limit(20)->get(['id', 'package']);
         $closure = app(WalletClosure::class)->snapshot($id);
 
-        return response()->view('transactions.earnings', compact('payouts', 'refunds', 'confirmationId', 'ready', 'accessSales', 'topups', 'closure'))->header('Cache-Control', 'no-store, private');
+        return response()->view('transactions.earnings', compact('payouts', 'refunds', 'confirmationId', 'ready', 'payoutSummary', 'accessSales', 'topups', 'closure'))->header('Cache-Control', 'no-store, private');
     }
 
     public function claim(Request $request, PublisherSettlements $settlements): RedirectResponse

@@ -12,6 +12,12 @@ class Client
     public function request(string $method, string $path, #[\SensitiveParameter] ?array $body = null, string $version = '2024-11-11', ?string $idempotency = null): array
     {
         abort_unless(app(Readiness::class)->available(), 503, 'Payments are unavailable.');
+
+        return $this->send($method, $path, $body, $version, $idempotency);
+    }
+
+    private function send(string $method, string $path, #[\SensitiveParameter] ?array $body = null, string $version = '2024-11-11', ?string $idempotency = null): array
+    {
         try {
             $http = Http::withBasicAuth(config('xendit.secret_key'), '')->acceptJson()->withHeaders(['api-version' => $version])
                 ->connectTimeout(5)->timeout(15)->withoutRedirecting();
@@ -38,10 +44,16 @@ class Client
 
     public function createPayment(object $purchase): ProviderResult
     {
-        return $this->payment($this->request('POST', '/v3/payment_requests', ['reference_id' => $purchase->id, 'type' => 'PAY',
+        $readiness = app(Readiness::class);
+        abort_unless($readiness->checkoutAvailable(), 503, 'Payments are unavailable.');
+        $returnUrl = $readiness->sandboxAvailable()
+            ? config('xendit.sandbox_return_url')
+            : rtrim(config('app.url'), '/').route('wallet.index', absolute: false);
+
+        return $this->payment($this->send('POST', '/v3/payment_requests', ['reference_id' => $purchase->id, 'type' => 'PAY',
             'country' => 'PH', 'currency' => 'PHP', 'request_amount' => '__PHP_AMOUNT_'.ExactMoney::decimal($purchase->gross_minor).'__',
             'capture_method' => 'AUTOMATIC', 'channel_code' => 'GCASH',
-            'channel_properties' => ['success_return_url' => rtrim(config('app.url'), '/').route('wallet.index', absolute: false), 'failure_return_url' => rtrim(config('app.url'), '/').route('wallet.index', absolute: false)],
+            'channel_properties' => ['success_return_url' => $returnUrl, 'failure_return_url' => $returnUrl],
             'description' => 'Kody KodeBits']));
     }
 
@@ -49,7 +61,23 @@ class Client
     {
         $this->id($id, 'pr-');
 
-        return $this->payment($this->request('GET', '/v3/payment_requests/'.$id));
+        abort_unless(app(Readiness::class)->checkoutAvailable(), 503, 'Payments are unavailable.');
+
+        return $this->payment($this->send('GET', '/v3/payment_requests/'.$id));
+    }
+
+    public function retrieveSandboxCapture(string $paymentId): ProviderResult
+    {
+        abort_unless(app(Readiness::class)->sandboxAvailable(), 503);
+        $this->id($paymentId, 'py-');
+        $data = $this->send('GET', '/v3/payments/'.$paymentId);
+        if (($data['payment_id'] ?? null) !== $paymentId) {
+            throw new RuntimeException('Unexpected captured payment reference.');
+        }
+
+        $data['latest_payment_id'] = $paymentId;
+
+        return $this->payment($data);
     }
 
     public function payment(array $data): ProviderResult

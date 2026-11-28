@@ -23,25 +23,34 @@ class Payments
         return DB::transaction(function () use ($actor, $sessionId, $data): string {
             $user = app(FinancialAccounts::class)->lock($actor, $sessionId);
             app(FinancialAccounts::class)->confirm($user, $data);
-            abort_unless(app(Readiness::class)->available(), 503, 'Payments are being prepared.');
-            app(BudgetAdmission::class)->assert('payments');
+            $readiness = app(Readiness::class);
+            abort_unless($readiness->checkoutAvailable(), 503, 'Payments are being prepared.');
+            $sandbox = $readiness->sandboxAvailable();
+            if (! $sandbox) {
+                app(BudgetAdmission::class)->assert('payments');
+            }
             if (! Str::isUuid($data['confirmation_id'] ?? '') || ! in_array($data['confirmed'] ?? null, [true, 1, '1', 'yes', 'on', 'true'], true)
                 || ! isset(config('economy.packages')[$data['package'] ?? ''])) {
                 throw ValidationException::withMessages(['purchase' => 'Choose and confirm a Kody package.']);
             }
             $package = config('economy.packages.'.$data['package']);
+            $emailReceipt = in_array($data['email_receipt'] ?? false, [true, 1, '1'], true);
             $existing = DB::table('payment_purchases')->where('user_id', $user->id)->where('confirmation_id', $data['confirmation_id'])->first();
             if ($existing !== null) {
                 if ($existing->package !== $data['package']) {
                     throw ValidationException::withMessages(['purchase' => 'This confirmation already identifies another package.']);
                 }
 
+                if ($existing->email_receipt !== $emailReceipt) {
+                    throw ValidationException::withMessages(['purchase' => 'This confirmation already has a receipt preference. Refresh your wallet to start a new purchase.']);
+                }
+
                 return $existing->id;
             }
             $id = (string) Str::uuid();
             DB::table('payment_purchases')->insert(['id' => $id, 'user_id' => $user->id, 'confirmation_id' => $data['confirmation_id'],
-                'package' => $data['package'], 'kodebits' => $package['kodebits'], 'gross_minor' => $package['price_minor'],
-                'fee_minor' => app(Readiness::class)->fee($package['price_minor']), 'fee_schedule' => json_encode(['basis_points' => config('xendit.payment_fee_basis_points'), 'fixed_minor' => config('xendit.payment_fee_fixed_minor'), 'policy_version' => config('economy.policy_version')], JSON_THROW_ON_ERROR), 'created_at' => now(), 'updated_at' => now()]);
+                'package' => $data['package'], 'email_receipt' => $emailReceipt, 'kodebits' => $package['kodebits'], 'gross_minor' => $package['price_minor'],
+                'fee_minor' => $sandbox ? 0 : $readiness->fee($package['price_minor']), 'fee_schedule' => json_encode($sandbox ? ['mode' => 'sandbox', 'basis_points' => 0, 'fixed_minor' => 0] : ['basis_points' => config('xendit.payment_fee_basis_points'), 'fixed_minor' => config('xendit.payment_fee_fixed_minor'), 'policy_version' => config('economy.policy_version')], JSON_THROW_ON_ERROR), 'created_at' => now(), 'updated_at' => now()]);
             app(AuditRecorder::class)->record($user->id, $user->id, 'payment.requested', 'payment_purchase', $id, ['package' => $data['package']]);
             Queue::connection('database')->pushOn('payments', (new CreateProviderOperation('payment', $id))->beforeCommit());
 
@@ -56,7 +65,8 @@ class Payments
             if ($row === null || $row->state !== 'Queued') {
                 return null;
             }
-            abort_unless(app(Readiness::class)->available(), 503);
+            abort_unless(app(Readiness::class)->checkoutAvailable(), 503);
+            $this->assertProviderMode($row);
             DB::table('payment_purchases')->where('id', $id)->update(['state' => 'Creating', 'updated_at' => now()]);
 
             return $row;
@@ -86,18 +96,28 @@ class Payments
     public function reconcile(object $event): void
     {
         $callback = json_decode($event->proof, true, flags: JSON_THROW_ON_ERROR);
-        $proof = app(Client::class)->retrievePayment($event->object_id);
-        DB::transaction(function () use ($event, $callback, $proof): void {
+        $client = app(Client::class);
+        $proof = $client->retrievePayment($event->object_id);
+        $capture = $proof;
+        if ($event->event === 'payment.capture' && app(Readiness::class)->sandboxAvailable()) {
+            if ($proof->paymentId === null || $proof->paymentId !== $callback['payment_id']) {
+                throw new RuntimeException('The request does not identify the captured payment.');
+            }
+            $capture = $client->retrieveSandboxCapture($proof->paymentId);
+        }
+        DB::transaction(function () use ($event, $callback, $proof, $capture): void {
             app(WalletLedger::class)->lock();
             $row = DB::table('payment_purchases')->where('id', $callback['reference'])->lockForUpdate()->firstOrFail();
+            $this->assertProviderMode($row);
             $this->match($row, $proof);
             if (($row->provider_request_id !== null && $row->provider_request_id !== $proof->id) || $proof->id !== $event->object_id
                 || $callback['amount_minor'] !== $row->gross_minor || $callback['business_id'] !== $proof->businessId) {
                 throw new RuntimeException('Payment proofs do not agree.');
             }
             if ($event->event === 'payment.capture') {
-                if ($proof->status !== 'SUCCEEDED' || $callback['status'] !== 'SUCCEEDED' || $proof->paymentId !== $callback['payment_id']
-                    || $proof->captures !== $callback['captures'] || array_sum($proof->captures) !== $row->gross_minor || $proof->captures === []) {
+                $this->match($row, $capture);
+                if ($capture->id !== $proof->id || $capture->status !== 'SUCCEEDED' || $proof->status !== 'SUCCEEDED' || $callback['status'] !== 'SUCCEEDED' || $proof->paymentId !== $callback['payment_id']
+                    || $capture->captures !== $callback['captures'] || array_sum($capture->captures) !== $row->gross_minor || $capture->captures === []) {
                     throw new RuntimeException('Captured payment is not fully verified.');
                 }
                 if ($row->state === 'Failed') {
@@ -108,8 +128,9 @@ class Payments
                     DB::table('payment_purchases')->where('id', $row->id)->update(['state' => 'Succeeded', 'lot_id' => $lot->id,
                         'provider_request_id' => $proof->id, 'provider_payment_id' => $proof->paymentId, 'updated_at' => now()]);
                     app(AuditRecorder::class)->record(null, $row->user_id, 'payment.succeeded', 'payment_purchase', $row->id, ['gross_minor' => $row->gross_minor, 'fee_minor' => $row->fee_minor, 'kodebits' => $row->kodebits]);
-                    app(FinancialNotices::class)->queue($row->user_id, 'purchase:'.$row->id, 'KodeBit purchase confirmed', ['kodebits' => $row->kodebits, 'amount_minor' => $row->gross_minor, 'fee_minor' => $row->fee_minor,
-                        'purchase_reference' => $row->id, 'package' => $row->package, 'confirmed_at' => now()->toIso8601String()]);
+                    $sandbox = (json_decode($row->fee_schedule, true, flags: JSON_THROW_ON_ERROR)['mode'] ?? null) === 'sandbox';
+                    app(FinancialNotices::class)->queue($row->user_id, 'purchase:'.$row->id, $sandbox ? 'Test-mode KodeBit purchase confirmed' : 'KodeBit purchase confirmed', ['kodebits' => $row->kodebits, 'amount_minor' => $row->gross_minor, 'fee_minor' => $row->fee_minor,
+                        'purchase_reference' => $row->id, 'package' => $row->package, 'sandbox' => $sandbox, 'confirmed_at' => now()->toIso8601String()], email: $row->email_receipt);
                 }
             } elseif ($row->lot_id === null && in_array($proof->status, ['FAILED', 'EXPIRED', 'CANCELED'], true)) {
                 DB::table('payment_purchases')->where('id', $row->id)->update(['state' => 'Failed', 'provider_request_id' => $proof->id, 'updated_at' => now()]);
@@ -119,6 +140,14 @@ class Payments
             }
             DB::table('provider_webhooks')->where('id', $event->id)->update(['state' => 'Processed', 'processed_at' => now()]);
         }, 3);
+    }
+
+    private function assertProviderMode(object $purchase): void
+    {
+        $fees = json_decode($purchase->fee_schedule, true, flags: JSON_THROW_ON_ERROR);
+        if ((($fees['mode'] ?? null) === 'sandbox') !== app(Readiness::class)->sandboxAvailable()) {
+            throw new RuntimeException('Payment belongs to a different provider mode.');
+        }
     }
 
     private function match(object $purchase, ProviderResult $proof): void
