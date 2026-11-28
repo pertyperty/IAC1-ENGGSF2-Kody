@@ -206,7 +206,9 @@ export function mountArcade(root) {
             gauge.append(gaugeHead, track);
             world.append(gauge);
 
-            const trail = node('ol', '', 'value-journey'); trail.setAttribute('aria-label', 'Value after each instruction');
+            const trail = node('ol', '', 'value-journey');
+            trail.tabIndex = 0;
+            trail.setAttribute('aria-label', 'Value after each instruction');
             currentLines.slice(0, 12).forEach((command, index) => {
                 const frame = evaluateArcade(game, currentLines.slice(0, index + 1));
                 const item = node('li', '', frame.error ? 'journey-error' : frame.state.number === game.scenario.target ? 'journey-hit' : '');
